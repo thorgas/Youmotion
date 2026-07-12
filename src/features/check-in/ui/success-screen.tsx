@@ -1,5 +1,6 @@
 import { useSelector } from '@xstate/react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { PressableScale } from 'pressto';
+import { StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { CHECK_IN_EVENTS } from '@/constants';
@@ -22,9 +23,9 @@ export function SuccessScreen() {
         <View style={styles.halo}><Text style={styles.check}>✓</Text></View>
         <Text style={styles.title}><fbt desc="Successful check-in title">You arrived with yourself.</fbt></Text>
         <Text style={styles.copy}>{savedCheckInCopy(saved)}</Text>
-        <Pressable accessibilityRole="button" onPress={_restart} style={styles.button}>
+        <PressableScale accessibilityRole="button" onPress={_restart} style={styles.button}>
           <Text style={styles.buttonText}><fbt desc="Button starting another check-in">New check-in</fbt></Text>
-        </Pressable>
+        </PressableScale>
       </SafeAreaView>
     </View>
   );

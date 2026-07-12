@@ -96,6 +96,8 @@ Persisted check-ins store stable emotion IDs, intensity, and nuance levels rathe
 
 The repository includes Callstack's project-local React Native, navigation, upgrade, GitHub, and GitHub Actions agent skills. The tooling dependencies are pinned in the pnpm lockfile rather than installed globally.
 
+Pressto provides consistent press feedback for the app's tap controls. A shared configuration uses subtle scale compression, a near-critically damped spring, and the system reduced-motion preference; direct-manipulation gestures such as the emotion star keep their gesture-specific feedback.
+
 Use a development build when working with native tooling. Expo Go cannot load Inspector, React Native Grab, Nitro Modules, or the Ottrelite Tracy backend.
 
 ```bash
@@ -106,7 +108,7 @@ pnpm devtools:inspector
 
 `start:tools` enables Rozenite with its Metro require profiler and performance monitor. React Native Grab is available from the development menu and is wrapped around every native route. `devtools:react` exposes the React tree and profiler to agent tooling. Inspector is opt-in for release profiling: start its server, then run a release development build with `WITH_INSPECTOR=true`.
 
-Ottrelite installs the Tracy backend only in development JavaScript. Native development builds include the backend and Nitro Modules. Start Tracy 0.12.2 on the host; for Android, run `pnpm tracy:android` to forward port 8086 before recording. Tracy does not support Ottrelite async events, so use synchronous events and counters for Tracy sessions.
+Ottrelite installs the Tracy backend only in development JavaScript. Native development builds include the backend and Nitro Modules. `pnpm ios` prepares the pinned Tracy 0.12.2 sources before CocoaPods runs. Start Tracy 0.12.2 on the host; for Android, run `pnpm tracy:android` to forward port 8086 before recording. Tracy does not support Ottrelite async events, so use synchronous events and counters for Tracy sessions.
 
 Reassure has a first domain performance scenario and keeps measurements under the ignored `.reassure` directory:
 

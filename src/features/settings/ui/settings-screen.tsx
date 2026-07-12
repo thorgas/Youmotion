@@ -1,6 +1,7 @@
 import { useLocaleContext } from 'fbtee';
+import { PressableScale } from 'pressto';
 import { startTransition } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { APP_LOCALES } from '@/constants';
@@ -20,22 +21,22 @@ export function SettingsScreen() {
           <Text style={styles.cardTitle}><fbt desc="Language setting title">Language</fbt></Text>
           <Text style={styles.cardCopy}><fbt desc="Language setting explanation">Choose the language used throughout Youmotion.</fbt></Text>
           <View style={styles.languageRow}>
-            <Pressable
+            <PressableScale
               accessibilityRole="button"
               accessibilityState={{ selected: locale === APP_LOCALES.ENGLISH }}
               disabled={localeChangeIsPending}
               onPress={_setEnglish}
               style={[styles.languageButton, locale === APP_LOCALES.ENGLISH && styles.languageButtonSelected]}>
               <Text style={[styles.languageText, locale === APP_LOCALES.ENGLISH && styles.languageTextSelected]}><fbt desc="English language option">English</fbt></Text>
-            </Pressable>
-            <Pressable
+            </PressableScale>
+            <PressableScale
               accessibilityRole="button"
               accessibilityState={{ selected: locale === APP_LOCALES.GERMAN }}
               disabled={localeChangeIsPending}
               onPress={_setGerman}
               style={[styles.languageButton, locale === APP_LOCALES.GERMAN && styles.languageButtonSelected]}>
               <Text style={[styles.languageText, locale === APP_LOCALES.GERMAN && styles.languageTextSelected]}><fbt desc="German language option">German</fbt></Text>
-            </Pressable>
+            </PressableScale>
           </View>
         </View>
         <View style={styles.card}>

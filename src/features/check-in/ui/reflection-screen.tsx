@@ -1,5 +1,6 @@
 import { useSelector } from '@xstate/react';
-import { ActivityIndicator, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
+import { PressableScale } from 'pressto';
+import { ActivityIndicator, StyleSheet, Text, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { CHECK_IN_EVENTS, CHECK_IN_STATES, NAVIGATION_STATES } from '@/constants';
@@ -56,10 +57,10 @@ export function ReflectionScreen() {
           />
           {failed ? <Text style={styles.error}><fbt desc="Error shown when saving a check-in fails">Your check-in could not be saved.</fbt></Text> : null}
           <View style={styles.actions}>
-            <Pressable accessibilityRole="button" disabled={saving} onPress={_back} style={styles.secondaryButton}>
+            <PressableScale accessibilityRole="button" disabled={saving} onPress={_back} style={styles.secondaryButton}>
               <Text style={styles.secondaryText}><fbt desc="Button returning from reflection to the emotion star">Back</fbt></Text>
-            </Pressable>
-            <Pressable accessibilityRole="button" disabled={saving} onPress={_submit} style={styles.primaryButton}>
+            </PressableScale>
+            <PressableScale accessibilityRole="button" disabled={saving} onPress={_submit} style={styles.primaryButton}>
               {saving ? <ActivityIndicator color="#FFFFFF" /> : (
                 <Text style={styles.primaryText}>
                   {failed
@@ -67,7 +68,7 @@ export function ReflectionScreen() {
                     : <fbt desc="Button saving a completed check-in">Save check-in</fbt>}
                 </Text>
               )}
-            </Pressable>
+            </PressableScale>
           </View>
         </View>
       </SafeAreaView>

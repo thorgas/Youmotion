@@ -5,6 +5,7 @@ import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
+import { PressFeedbackProvider } from '@/components/ui/press-feedback-provider';
 import { DevelopmentRoot } from '@/development/development-root';
 import { AppLocaleProvider } from '@/localization/app-locale-provider';
 import { AppNavigationProvider } from '@/navigation/app-navigation.provider';
@@ -24,10 +25,12 @@ export default function RootLayout() {
     <AppLocaleProvider>
       <DevelopmentRoot>
         <GestureHandlerRootView style={{ flex: 1 }}>
-          <AppNavigationProvider>
-            <StatusBar style="dark" />
-            <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: '#F4F0E8' } }} />
-          </AppNavigationProvider>
+          <PressFeedbackProvider>
+            <AppNavigationProvider>
+              <StatusBar style="dark" />
+              <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: '#F4F0E8' } }} />
+            </AppNavigationProvider>
+          </PressFeedbackProvider>
         </GestureHandlerRootView>
       </DevelopmentRoot>
     </AppLocaleProvider>
