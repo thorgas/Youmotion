@@ -23,8 +23,9 @@ Read the exact Expo SDK 57 documentation at https://docs.expo.dev/versions/v57.0
 
 ## Verification
 
-- Run `npm run verify` for lint, TypeScript 7, and Jest.
-- Run `npm run test:coverage`; never lower the configured coverage thresholds.
+- Use pnpm exclusively for dependency management and project scripts.
+- Run `pnpm verify` for lint, TypeScript 7, and Jest.
+- Run `pnpm test:coverage`; never lower the configured coverage thresholds.
 - Add model-path coverage when changing navigation states or events.
 - Add or update a custom Oxlint rule test when changing an architectural invariant.
 - Use React Native Harness for device-level component interactions.

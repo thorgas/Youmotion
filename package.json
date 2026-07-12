@@ -2,6 +2,7 @@
   "name": "youmotion",
   "main": "expo-router/entry",
   "version": "1.0.0",
+  "packageManager": "pnpm@11.12.0",
   "dependencies": {
     "@expo-google-fonts/dm-sans": "^0.4.2",
     "@expo-google-fonts/fraunces": "^0.4.1",
@@ -72,7 +73,7 @@
     "test:watch": "jest --watch --no-watchman",
     "test:coverage": "jest --coverage --runInBand --no-watchman",
     "test:harness": "harness --config jest.harness.config.mjs --no-watchman",
-    "verify": "npm run lint && npm run typecheck && npm run test"
+    "verify": "pnpm lint && pnpm typecheck && pnpm test"
   },
   "private": true
 }

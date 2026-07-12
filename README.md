@@ -49,24 +49,27 @@ Persistence uses `Schema.parseJson` and typed `Schema.TaggedError` failures. The
 ## Development
 
 ```bash
-npm install
-npm run start
+corepack enable
+pnpm install
+pnpm start
 ```
+
+The repository pins pnpm 11.12.0 through the `packageManager` field and commits a pnpm lockfile. Do not generate npm or Yarn lockfiles.
 
 Open iOS, Android, or web from Expo's terminal UI. Useful commands:
 
 ```bash
-npm run lint
-npm run lint:rules
-npm run typecheck
-npm run typecheck:compat
-npm run test
-npm run test:coverage
-npm run verify
-npm run test:harness
+pnpm lint
+pnpm lint:rules
+pnpm typecheck
+pnpm typecheck:compat
+pnpm test
+pnpm test:coverage
+pnpm verify
+pnpm test:harness
 ```
 
-`npm run typecheck` invokes TypeScript 7 directly. `typecheck:compat` checks the compatibility compiler used by editor and lint integrations.
+`pnpm typecheck` invokes TypeScript 7 directly. `typecheck:compat` checks the compatibility compiler used by editor and lint integrations.
 
 ## Enforced code boundaries
 

@@ -2,6 +2,7 @@
 
 # dependencies
 node_modules/
+.pnpm-store/
 
 # Expo
 .expo/
@@ -25,6 +26,7 @@ expo-env.d.ts
 
 # debug
 npm-debug.*
+pnpm-debug.*
 yarn-debug.*
 yarn-error.*
 
