@@ -1,0 +1,8 @@
+{
+  "editor.codeActionsOnSave": {
+    "source.fixAll": "explicit",
+    "source.fixAll.oxc": "always",
+    "source.organizeImports": "explicit",
+    "source.sortMembers": "explicit"
+  }
+}

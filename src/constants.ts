@@ -1,0 +1,60 @@
+const literal = <Value extends string>(value: Value) => value;
+
+export const EMOTION_IDS = Object.freeze({
+  JOY: literal('freude'),
+  LOVE: literal('liebe'),
+  SHAME: literal('scham'),
+  DISGUST: literal('ekel'),
+  SADNESS: literal('trauer'),
+  ANGER: literal('wut'),
+  FEAR: literal('furcht'),
+});
+
+export const CHECK_IN_EVENTS = Object.freeze({
+  TOUCH_STARTED: literal('touch.started'),
+  SELECTION_CHANGED: literal('selection.changed'),
+  SELECTION_RELEASED: literal('selection.released'),
+  NOTE_CHANGED: literal('note.changed'),
+  CONFIRMED: literal('checkIn.confirmed'),
+  PERSISTED: literal('checkIn.persisted'),
+  FAILED: literal('checkIn.failed'),
+  RETRIED: literal('checkIn.retried'),
+  RESTARTED: literal('checkIn.restarted'),
+  REFLECTION_CANCELLED: literal('reflection.cancelled'),
+});
+
+export const CHECK_IN_STATES = Object.freeze({
+  IDLE: literal('idle'),
+  EXPLORING: literal('exploring'),
+  REFLECTING: literal('reflecting'),
+  SAVING: literal('saving'),
+  SUCCESS: literal('success'),
+  FAILURE: literal('failure'),
+});
+
+export const NAVIGATION_EVENTS = Object.freeze({
+  TODAY_OPENED: literal('navigation.todayOpened'),
+  HISTORY_OPENED: literal('navigation.historyOpened'),
+  SETTINGS_OPENED: literal('navigation.settingsOpened'),
+});
+
+export const NAVIGATION_STATES = Object.freeze({
+  TABS: literal('tabs'),
+  TODAY: literal('today'),
+  HISTORY: literal('history'),
+  SETTINGS: literal('settings'),
+  REFLECTION: literal('reflection'),
+});
+
+export const APP_ROUTES = Object.freeze({
+  TODAY: literal('/today'),
+  HISTORY: literal('/history'),
+  SETTINGS: literal('/settings'),
+  REFLECTION: literal('/reflection'),
+  SUCCESS: literal('/success'),
+});
+
+export const CHECK_IN_STORAGE_KEY = 'youmotion.check-ins.v1';
+export const MAX_CHECK_IN_HISTORY = 30;
+export const MAX_NOTE_LENGTH = 240;
+export const CHECK_IN_FAILURE_MESSAGE = 'Dein Check-in konnte nicht gespeichert werden.';

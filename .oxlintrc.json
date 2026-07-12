@@ -1,0 +1,115 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "options": {
+    "typeAware": true,
+    "maxWarnings": 0
+  },
+  "categories": {
+    "correctness": "error",
+    "suspicious": "error",
+    "perf": "error"
+  },
+  "plugins": [
+    "eslint",
+    "typescript",
+    "unicorn",
+    "oxc",
+    "import",
+    "react",
+    "jsx-a11y",
+    "promise",
+    "jest"
+  ],
+  "jsPlugins": [
+    {
+      "name": "architecture",
+      "specifier": "./oxlint-rules/architecture.cjs"
+    }
+  ],
+  "ignorePatterns": [
+    ".agents/**",
+    ".expo/**",
+    "coverage/**",
+    "dist/**",
+    "expo-env.d.ts",
+    "node_modules/**"
+  ],
+  "rules": {
+    "architecture/no-framework-in-domain": "error",
+    "architecture/ui-cannot-reach-infrastructure": "error",
+    "architecture/feature-public-api": "error",
+    "architecture/no-react-state-hooks": "error",
+    "architecture/single-xstate-hook": "error",
+    "architecture/no-inline-jsx-callbacks": "error",
+    "architecture/no-multiple-function-params": "error",
+    "architecture/no-type-assertion": "error",
+    "architecture/no-switch": "error",
+    "architecture/no-sync-schema-apis": "error",
+    "architecture/no-barrel-files": "error",
+    "architecture/no-comments": "error",
+    "import/no-cycle": ["error", { "maxDepth": 3 }],
+    "no-restricted-imports": [
+      "error",
+      {
+        "paths": [
+          {
+            "name": "effect",
+            "message": "Use direct Effect subpath imports such as effect/Effect."
+          }
+        ]
+      }
+    ],
+    "max-depth": ["error", 3],
+    "complexity": ["error", 12],
+    "no-underscore-dangle": "off",
+    "typescript/no-non-null-assertion": "error",
+    "typescript/no-floating-promises": ["error", { "ignoreVoid": true }],
+    "typescript/no-misused-promises": "error",
+    "typescript/await-thenable": "error",
+    "typescript/no-unnecessary-type-assertion": "error",
+    "react-hooks/rules-of-hooks": "error",
+    "react-hooks/exhaustive-deps": "error",
+    "react/react-in-jsx-scope": "off",
+    "react/style-prop-object": "off",
+    "promise/always-return": "error",
+    "promise/catch-or-return": "error"
+  },
+  "overrides": [
+    {
+      "files": ["src/features/**/domain/**/*.{ts,tsx}"],
+      "rules": {
+        "max-lines": ["error", { "max": 180, "skipBlankLines": true, "skipComments": true }]
+      }
+    },
+    {
+      "files": ["src/**/*.{ts,tsx}"],
+      "rules": {
+        "typescript/no-unsafe-assignment": "error",
+        "typescript/no-unsafe-argument": "error",
+        "typescript/no-unsafe-call": "error",
+        "typescript/no-unsafe-member-access": "error",
+        "typescript/no-unsafe-return": "error"
+      }
+    },
+    {
+      "files": ["**/__tests__/**", "**/*.test.{ts,tsx,js,cjs}", "**/*.harness.{ts,tsx}"],
+      "env": { "jest": true },
+      "rules": {
+        "max-lines": "off",
+        "typescript/no-unsafe-assignment": "off",
+        "typescript/no-unsafe-argument": "off",
+        "typescript/no-unsafe-call": "off",
+        "typescript/no-unsafe-member-access": "off",
+        "typescript/no-unsafe-return": "off"
+      }
+    },
+    {
+      "files": ["jest.setup.js"],
+      "env": { "jest": true }
+    },
+    {
+      "files": ["metro.config.cjs"],
+      "env": { "node": true }
+    }
+  ]
+}
