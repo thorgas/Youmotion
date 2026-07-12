@@ -1,0 +1,90 @@
+diff --git a/apple/Sources/ExpoModulesJSI/Contexts/HostFunctionContext.swift b/apple/Sources/ExpoModulesJSI/Contexts/HostFunctionContext.swift
+--- a/apple/Sources/ExpoModulesJSI/Contexts/HostFunctionContext.swift
++++ b/apple/Sources/ExpoModulesJSI/Contexts/HostFunctionContext.swift
+@@ -3 +3 @@
+-  weak let runtime: JavaScriptRuntime?
++  nonisolated(unsafe) weak var runtime: JavaScriptRuntime?
+@@ -17 +17 @@
+-  weak let runtime: JavaScriptRuntime?
++  nonisolated(unsafe) weak var runtime: JavaScriptRuntime?
+diff --git a/apple/Sources/ExpoModulesJSI/Contexts/HostObjectContext.swift b/apple/Sources/ExpoModulesJSI/Contexts/HostObjectContext.swift
+--- a/apple/Sources/ExpoModulesJSI/Contexts/HostObjectContext.swift
++++ b/apple/Sources/ExpoModulesJSI/Contexts/HostObjectContext.swift
+@@ -8 +8 @@
+-  weak let runtime: JavaScriptRuntime?
++  nonisolated(unsafe) weak var runtime: JavaScriptRuntime?
+diff --git a/apple/Sources/ExpoModulesJSI/Runtime/JavaScriptActor.swift b/apple/Sources/ExpoModulesJSI/Runtime/JavaScriptActor.swift
+--- a/apple/Sources/ExpoModulesJSI/Runtime/JavaScriptActor.swift
++++ b/apple/Sources/ExpoModulesJSI/Runtime/JavaScriptActor.swift
+@@ -79 +79 @@
+-  private weak let runtime: JavaScriptRuntime?
++  private weak var runtime: JavaScriptRuntime?
+@@ -98 +98 @@
+-  private weak let runtime: JavaScriptRuntime?
++  private weak var runtime: JavaScriptRuntime?
+diff --git a/apple/Sources/ExpoModulesJSI/Runtime/JavaScriptPropNameID.swift b/apple/Sources/ExpoModulesJSI/Runtime/JavaScriptPropNameID.swift
+--- a/apple/Sources/ExpoModulesJSI/Runtime/JavaScriptPropNameID.swift
++++ b/apple/Sources/ExpoModulesJSI/Runtime/JavaScriptPropNameID.swift
+@@ -5 +5 @@
+-  private weak let runtime: JavaScriptRuntime?
++  nonisolated(unsafe) private weak var runtime: JavaScriptRuntime?
+diff --git a/apple/Sources/ExpoModulesJSI/Runtime/Values/JavaScriptArray.swift b/apple/Sources/ExpoModulesJSI/Runtime/Values/JavaScriptArray.swift
+--- a/apple/Sources/ExpoModulesJSI/Runtime/Values/JavaScriptArray.swift
++++ b/apple/Sources/ExpoModulesJSI/Runtime/Values/JavaScriptArray.swift
+@@ -8 +8 @@
+-  internal weak let runtime: JavaScriptRuntime?
++  internal weak var runtime: JavaScriptRuntime?
+diff --git a/apple/Sources/ExpoModulesJSI/Runtime/Values/JavaScriptArrayBuffer.swift b/apple/Sources/ExpoModulesJSI/Runtime/Values/JavaScriptArrayBuffer.swift
+--- a/apple/Sources/ExpoModulesJSI/Runtime/Values/JavaScriptArrayBuffer.swift
++++ b/apple/Sources/ExpoModulesJSI/Runtime/Values/JavaScriptArrayBuffer.swift
+@@ -9 +9 @@
+-  internal weak let runtime: JavaScriptRuntime?
++  internal weak var runtime: JavaScriptRuntime?
+diff --git a/apple/Sources/ExpoModulesJSI/Runtime/Values/JavaScriptBigInt.swift b/apple/Sources/ExpoModulesJSI/Runtime/Values/JavaScriptBigInt.swift
+--- a/apple/Sources/ExpoModulesJSI/Runtime/Values/JavaScriptBigInt.swift
++++ b/apple/Sources/ExpoModulesJSI/Runtime/Values/JavaScriptBigInt.swift
+@@ -40 +40 @@
+-  internal weak let runtime: JavaScriptRuntime?
++  internal weak var runtime: JavaScriptRuntime?
+diff --git a/apple/Sources/ExpoModulesJSI/Runtime/Values/JavaScriptError.swift b/apple/Sources/ExpoModulesJSI/Runtime/Values/JavaScriptError.swift
+--- a/apple/Sources/ExpoModulesJSI/Runtime/Values/JavaScriptError.swift
++++ b/apple/Sources/ExpoModulesJSI/Runtime/Values/JavaScriptError.swift
+@@ -15 +15 @@
+-  private weak let runtime: JavaScriptRuntime?
++  nonisolated(unsafe) private weak var runtime: JavaScriptRuntime?
+diff --git a/apple/Sources/ExpoModulesJSI/Runtime/Values/JavaScriptFunction.swift b/apple/Sources/ExpoModulesJSI/Runtime/Values/JavaScriptFunction.swift
+--- a/apple/Sources/ExpoModulesJSI/Runtime/Values/JavaScriptFunction.swift
++++ b/apple/Sources/ExpoModulesJSI/Runtime/Values/JavaScriptFunction.swift
+@@ -7 +7 @@
+-  internal weak let runtime: JavaScriptRuntime?
++  internal weak var runtime: JavaScriptRuntime?
+diff --git a/apple/Sources/ExpoModulesJSI/Runtime/Values/JavaScriptObject.swift b/apple/Sources/ExpoModulesJSI/Runtime/Values/JavaScriptObject.swift
+--- a/apple/Sources/ExpoModulesJSI/Runtime/Values/JavaScriptObject.swift
++++ b/apple/Sources/ExpoModulesJSI/Runtime/Values/JavaScriptObject.swift
+@@ -9 +9 @@
+-  internal weak let runtime: JavaScriptRuntime?
++  internal weak var runtime: JavaScriptRuntime?
+diff --git a/apple/Sources/ExpoModulesJSI/Runtime/Values/JavaScriptPromise.swift b/apple/Sources/ExpoModulesJSI/Runtime/Values/JavaScriptPromise.swift
+--- a/apple/Sources/ExpoModulesJSI/Runtime/Values/JavaScriptPromise.swift
++++ b/apple/Sources/ExpoModulesJSI/Runtime/Values/JavaScriptPromise.swift
+@@ -13 +13 @@
+-  private weak let runtime: JavaScriptRuntime?
++  private weak var runtime: JavaScriptRuntime?
+diff --git a/apple/Sources/ExpoModulesJSI/Runtime/Values/JavaScriptTypedArray.swift b/apple/Sources/ExpoModulesJSI/Runtime/Values/JavaScriptTypedArray.swift
+--- a/apple/Sources/ExpoModulesJSI/Runtime/Values/JavaScriptTypedArray.swift
++++ b/apple/Sources/ExpoModulesJSI/Runtime/Values/JavaScriptTypedArray.swift
+@@ -11 +11 @@
+-  internal weak let runtime: JavaScriptRuntime?
++  internal weak var runtime: JavaScriptRuntime?
+diff --git a/apple/Sources/ExpoModulesJSI/Runtime/Values/JavaScriptValue.swift b/apple/Sources/ExpoModulesJSI/Runtime/Values/JavaScriptValue.swift
+--- a/apple/Sources/ExpoModulesJSI/Runtime/Values/JavaScriptValue.swift
++++ b/apple/Sources/ExpoModulesJSI/Runtime/Values/JavaScriptValue.swift
+@@ -10 +10 @@
+-  internal weak let runtime: JavaScriptRuntime?
++  nonisolated(unsafe) internal weak var runtime: JavaScriptRuntime?
+diff --git a/apple/Sources/ExpoModulesJSI/Runtime/Values/JavaScriptWeakObject.swift b/apple/Sources/ExpoModulesJSI/Runtime/Values/JavaScriptWeakObject.swift
+--- a/apple/Sources/ExpoModulesJSI/Runtime/Values/JavaScriptWeakObject.swift
++++ b/apple/Sources/ExpoModulesJSI/Runtime/Values/JavaScriptWeakObject.swift
+@@ -8 +8 @@
+-  internal weak let runtime: JavaScriptRuntime?
++  internal weak var runtime: JavaScriptRuntime?

@@ -7,3 +7,7 @@ jest.mock('expo-haptics', () => ({
   impactAsync: jest.fn(() => Promise.resolve()),
   ImpactFeedbackStyle: { Soft: 'soft' },
 }));
+
+jest.mock('expo-localization', () => ({
+  getLocales: jest.fn(() => [{ languageTag: 'en-US' }]),
+}));

@@ -47,13 +47,10 @@ export function selectionFromPoint({
   const emotion = emotions[closestIndex] ?? emotions[0];
   if (!emotion) return null;
   const intensity = _clamp({ value: (distance - deadZone) / Math.max(maxRadius - deadZone, 1), min: 0, max: 1 });
-  const level = Math.min(Math.floor(intensity * emotion.nuances.length), emotion.nuances.length - 1);
-  const nuance = emotion.nuances[level] ?? emotion.nuances[0] ?? emotion.name;
+  const level = Math.min(Math.floor(intensity * emotion.nuanceCount), emotion.nuanceCount - 1);
 
   return {
     emotionId: emotion.id,
-    emotion: emotion.name,
-    nuance,
     intensity,
     level,
     color: emotion.color,

@@ -2,3 +2,5 @@ allowBuilds:
   '@ottrelite/backend-wrapper-tracy': true
   '@ottrelite/core': true
   esbuild: true
+patchedDependencies:
+  expo-modules-jsi@57.0.1: patches/expo-modules-jsi@57.0.1.patch

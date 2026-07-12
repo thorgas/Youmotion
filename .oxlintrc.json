@@ -108,7 +108,7 @@
       "env": { "jest": true }
     },
     {
-      "files": ["metro.config.cjs"],
+      "files": ["babel.config.cjs", "metro.config.cjs"],
       "env": { "node": true }
     }
   ]

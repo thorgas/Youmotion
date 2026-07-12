@@ -1,33 +1,37 @@
 import { useSelector } from '@xstate/store-react';
+import { useLocaleContext } from 'fbtee';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { formatHistoryDate } from '@/localization/date-copy';
 import { checkInHistoryStore } from '../application/check-in-history.store';
+import { emotionSummary } from './emotion-copy';
 import { palette, type } from './theme';
 
 const _selectHistory = (state: ReturnType<typeof checkInHistoryStore.getSnapshot>) => state.context.entries;
 
 export function HistoryScreen() {
   const entries = useSelector(checkInHistoryStore, _selectHistory);
+  const { locale } = useLocaleContext();
 
   return (
     <View style={styles.page}>
       <SafeAreaView edges={['top']} style={styles.safeArea}>
         <ScrollView contentContainerStyle={styles.content}>
-          <Text style={styles.eyebrow}>DEIN VERLAUF</Text>
-          <Text style={styles.title}>Momente, die du bemerkt hast.</Text>
-          <Text style={styles.intro}>Deine Check-ins bleiben lokal auf diesem Gerät.</Text>
+          <Text style={styles.eyebrow}><fbt desc="Check-in history eyebrow heading">YOUR HISTORY</fbt></Text>
+          <Text style={styles.title}><fbt desc="Check-in history title">Moments you noticed.</fbt></Text>
+          <Text style={styles.intro}><fbt desc="Privacy note above check-in history">Your check-ins stay locally on this device.</fbt></Text>
           {entries.length === 0 ? (
             <View style={styles.empty}>
-              <Text style={styles.emptyTitle}>Noch ganz ruhig hier.</Text>
-              <Text style={styles.emptyCopy}>Nach deinem ersten Check-in entsteht an dieser Stelle ein behutsamer Verlauf.</Text>
+              <Text style={styles.emptyTitle}><fbt desc="Empty check-in history title">Still quiet here.</fbt></Text>
+              <Text style={styles.emptyCopy}><fbt desc="Empty check-in history explanation">After your first check-in, a gentle history will appear here.</fbt></Text>
             </View>
           ) : entries.map((entry) => (
             <View key={entry.id} style={styles.row}>
               <View style={styles.dot} />
               <View style={styles.rowCopy}>
-                <Text style={styles.emotion}>{entry.emotion} · {entry.nuance}</Text>
-                <Text style={styles.date}>{new Intl.DateTimeFormat('de-DE', { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(entry.createdAt))}</Text>
+                <Text style={styles.emotion}>{emotionSummary(entry)}</Text>
+                <Text style={styles.date}>{formatHistoryDate({ date: new Date(entry.createdAt), locale })}</Text>
                 {entry.note ? <Text style={styles.note}>{entry.note}</Text> : null}
               </View>
               <Text style={styles.intensity}>{Math.round(entry.intensity * 100)}%</Text>

@@ -1,28 +1,26 @@
 import { useSelector as useActorSelector } from '@xstate/react';
 import { useSelector as useStoreSelector } from '@xstate/store-react';
+import { useLocaleContext } from 'fbtee';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { CHECK_IN_EVENTS } from '@/constants';
+import { formatHeadlineDate } from '@/localization/date-copy';
 import { useAppNavigationActor } from '@/navigation/app-navigation.provider';
 import type { EmotionSelection } from '../domain/check-in';
 import { checkInHistoryStore } from '../application/check-in-history.store';
 import { EmotionStar } from './emotion-star';
+import { emotionSummary, intensityCopy } from './emotion-copy';
 import { palette, type } from './theme';
 
 const _selectSnapshot = (snapshot: ReturnType<ReturnType<typeof useAppNavigationActor>['getSnapshot']>) => snapshot;
 const _selectHistory = (state: ReturnType<typeof checkInHistoryStore.getSnapshot>) => state.context.entries;
 
-const _formatDate = (date: Date) => new Intl.DateTimeFormat('de-DE', {
-  weekday: 'long',
-  day: '2-digit',
-  month: 'long',
-}).format(date);
-
 export function CheckInScreen() {
   const actor = useAppNavigationActor();
   const snapshot = useActorSelector(actor, _selectSnapshot);
   const entries = useStoreSelector(checkInHistoryStore, _selectHistory);
+  const { locale } = useLocaleContext();
   const latest = entries[0];
 
   const _touchStarted = () => actor.send({ type: CHECK_IN_EVENTS.TOUCH_STARTED });
@@ -37,20 +35,20 @@ export function CheckInScreen() {
         <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
           <View style={styles.header}>
             <View>
-              <Text style={styles.eyebrow}>{_formatDate(new Date())}</Text>
-              <Text style={styles.title}>Wie fühlst du dich?</Text>
+              <Text style={styles.eyebrow}>{formatHeadlineDate({ date: new Date(), locale })}</Text>
+              <Text style={styles.title}><fbt desc="Question asking the user about their current feeling">How are you feeling?</fbt></Text>
             </View>
             <View accessibilityLabel="Youmotion" style={styles.mark}>
               <Text style={styles.markText}>Y</Text>
             </View>
           </View>
           <Text style={styles.intro}>
-            Nimm dir einen Moment. Ziehe vom Zentrum in die Richtung, die gerade am besten passt.
+            <fbt desc="Instructions introducing the emotion star gesture">Take a moment. Drag from the center in the direction that feels most fitting right now.</fbt>
           </Text>
           <View style={styles.starCard}>
             <View style={styles.cardTopline}>
-              <Text style={styles.cardLabel}>GEFÜHLSSTERN</Text>
-              <Text style={styles.cardStep}>01 · Erkunden</Text>
+              <Text style={styles.cardLabel}><fbt desc="Emotion star card label">EMOTION STAR</fbt></Text>
+              <Text style={styles.cardStep}><fbt desc="First step label for exploring emotions">01 · Explore</fbt></Text>
             </View>
             <EmotionStar
               selection={snapshot.context.selection}
@@ -61,23 +59,23 @@ export function CheckInScreen() {
           </View>
           <View style={styles.gestureHint}>
             <View style={styles.hintLine} />
-            <Text style={styles.hintText}>HALTEN · ZIEHEN · LOSLASSEN</Text>
+            <Text style={styles.hintText}><fbt desc="Short gesture instructions">HOLD · DRAG · RELEASE</fbt></Text>
             <View style={styles.hintLine} />
           </View>
           {latest ? (
             <View style={styles.recent}>
-              <Text style={styles.sectionTitle}>Zuletzt eingecheckt</Text>
+              <Text style={styles.sectionTitle}><fbt desc="Heading for the most recent check-in">Latest check-in</fbt></Text>
               <View style={styles.recentCard}>
                 <View style={styles.recentDot} />
                 <View style={styles.recentCopy}>
-                  <Text style={styles.recentEmotion}>{latest.emotion} · {latest.nuance}</Text>
-                  <Text style={styles.recentTime}>{Math.round(latest.intensity * 100)}% Intensität</Text>
+                  <Text style={styles.recentEmotion}>{emotionSummary(latest)}</Text>
+                  <Text style={styles.recentTime}>{intensityCopy(latest.intensity)}</Text>
                 </View>
               </View>
             </View>
           ) : null}
           <Text style={styles.disclaimer}>
-            Youmotion unterstützt die Selbstwahrnehmung und ersetzt keine psychotherapeutische oder medizinische Behandlung.
+            <fbt desc="Health disclaimer shown below the emotion check-in">Youmotion supports self-awareness and does not replace psychotherapeutic or medical treatment.</fbt>
           </Text>
         </ScrollView>
       </SafeAreaView>

@@ -4,6 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { CHECK_IN_EVENTS } from '@/constants';
 import { useAppNavigationActor } from '@/navigation/app-navigation.provider';
+import { savedCheckInCopy } from './emotion-copy';
 import { palette, type } from './theme';
 
 const _selectSaved = (snapshot: ReturnType<ReturnType<typeof useAppNavigationActor>['getSnapshot']>) => snapshot.context.saved;
@@ -19,10 +20,10 @@ export function SuccessScreen() {
     <View style={styles.page}>
       <SafeAreaView style={styles.content}>
         <View style={styles.halo}><Text style={styles.check}>✓</Text></View>
-        <Text style={styles.title}>Bei dir angekommen.</Text>
-        <Text style={styles.copy}>Dein Check-in „{saved.emotion} · {saved.nuance}“ wurde nur auf diesem Gerät gespeichert.</Text>
+        <Text style={styles.title}><fbt desc="Successful check-in title">You arrived with yourself.</fbt></Text>
+        <Text style={styles.copy}>{savedCheckInCopy(saved)}</Text>
         <Pressable accessibilityRole="button" onPress={_restart} style={styles.button}>
-          <Text style={styles.buttonText}>Neuer Check-in</Text>
+          <Text style={styles.buttonText}><fbt desc="Button starting another check-in">New check-in</fbt></Text>
         </Pressable>
       </SafeAreaView>
     </View>

@@ -13,6 +13,7 @@ import Svg, {
 
 import { emotionAngle, selectionFromPoint } from '../domain/emotion-selection';
 import { emotions, type EmotionSelection } from '../domain/emotion';
+import { emotionName, emotionNuance, emotionStarAccessibility } from './emotion-copy';
 import { palette, type } from './theme';
 
 type EmotionStarProps = {
@@ -85,11 +86,6 @@ const _markerPoint = ({ center, radius, selection }: {
   });
 };
 
-const _accessibilityLabel = (selection: EmotionSelection | null) => {
-  if (!selection) return 'Gefühlsstern. Ziehe vom Zentrum nach außen.';
-  return `${selection.emotion}, ${selection.nuance}, Intensität ${Math.round(selection.intensity * 100)} Prozent`;
-};
-
 export function EmotionStar({ selection, disabled, onTouchStart, onSelectionChange, onRelease }: EmotionStarProps) {
   const { width } = useWindowDimensions();
   const size = Math.min(width - 68, 370);
@@ -125,7 +121,7 @@ export function EmotionStar({ selection, disabled, onTouchStart, onSelectionChan
 
   return (
     <View
-      accessibilityLabel={_accessibilityLabel(selection)}
+      accessibilityLabel={emotionStarAccessibility(selection)}
       accessibilityRole="adjustable"
       style={styles.frame}
       {...responder.panHandlers}>
@@ -176,7 +172,7 @@ export function EmotionStar({ selection, disabled, onTouchStart, onSelectionChan
               fontFamily={type.sansSemibold}
               fontSize={isActive ? 13 : 11}
               letterSpacing={0.4}>
-              {emotion.name.toUpperCase()}
+              {emotionName(emotion.id).toUpperCase()}
             </SvgText>
           );
         })}
@@ -191,9 +187,11 @@ export function EmotionStar({ selection, disabled, onTouchStart, onSelectionChan
 
       <View style={styles.readout}>
         <Text style={[styles.readoutEmotion, selection && { color: selection.color }]}>
-          {selection?.emotion ?? 'Berühren'}
+          {selection ? emotionName(selection.emotionId) : <fbt desc="Prompt inside the emotion star before touching">Touch</fbt>}
         </Text>
-        <Text style={styles.readoutNuance}>{selection?.nuance ?? 'und nach außen ziehen'}</Text>
+        <Text style={styles.readoutNuance}>
+          {selection ? emotionNuance(selection) : <fbt desc="Second half of the emotion star gesture prompt">and drag outward</fbt>}
+        </Text>
       </View>
     </View>
   );

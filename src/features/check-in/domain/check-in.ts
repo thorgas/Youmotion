@@ -21,8 +21,6 @@ export type CheckInTimestamp = typeof CheckInTimestamp.Type;
 
 export const EmotionSelectionSchema = Schema.Struct({
   emotionId: EmotionId,
-  emotion: Schema.String,
-  nuance: Schema.String,
   intensity: Schema.Number.pipe(Schema.between(0, 1)),
   level: Schema.Int.pipe(Schema.nonNegative()),
   color: Schema.String,
@@ -33,9 +31,8 @@ export const CheckInSchema = Schema.Struct({
   id: CheckInId,
   createdAt: CheckInTimestamp,
   emotionId: EmotionId,
-  emotion: Schema.String,
-  nuance: Schema.String,
   intensity: Schema.Number.pipe(Schema.between(0, 1)),
+  level: Schema.optional(Schema.Int.pipe(Schema.nonNegative())),
   note: Schema.String.pipe(Schema.maxLength(MAX_NOTE_LENGTH)),
 });
 export type CheckIn = typeof CheckInSchema.Type;

@@ -16,6 +16,6 @@ describe('selectionFromPoint', () => {
   it('clamps drags beyond the star', () => {
     const selection = selectionFromPoint({ point: { x: 100, y: -200 }, center, maxRadius: 80 });
     expect(selection?.intensity).toBe(1);
-    expect(selection?.nuance).toBe('Glück');
+    expect(selection?.level).toBe(6);
   });
 });

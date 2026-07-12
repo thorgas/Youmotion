@@ -11,6 +11,7 @@ This is a self-reflection tool, not a substitute for psychotherapy, medical advi
 - XState 6 alpha for the complete app and navigation state graph
 - XState Store for reactive check-in history
 - Effect and Effect Schema for workflows, validation, errors, and JSON persistence
+- fbtee 2 with English source strings and a German BCP 47 translation catalog
 - Jest, React Native Testing Library 14, and React Native Harness
 - Oxlint with TypeScript-7-powered type-aware linting and a project-local architecture plugin
 
@@ -56,9 +57,12 @@ pnpm start
 
 The repository pins pnpm 11.12.0 through the `packageManager` field and commits a pnpm lockfile. Do not generate npm or Yarn lockfiles.
 
-Open iOS, Android, or web from Expo's terminal UI. Useful commands:
+Build and launch the native development apps, or open web from Expo's terminal UI:
 
 ```bash
+pnpm ios
+pnpm android
+pnpm web
 pnpm lint
 pnpm lint:rules
 pnpm typecheck
@@ -71,6 +75,22 @@ pnpm doctor:react
 ```
 
 `pnpm typecheck` invokes TypeScript 7 directly. `typecheck:compat` checks the compatibility compiler used by editor and lint integrations.
+The pnpm patch for `expo-modules-jsi` keeps Expo SDK 57 buildable with the repository host's Xcode 26.1 Swift compiler.
+
+## Internationalization
+
+fbtee compiles inline translator-aware source strings through Babel. English (`en-US`) is the source language, German (`de-DE`) is maintained in `translations/de-DE.json`, and the initial locale follows the device preference from `expo-localization`. The language can be changed from Settings.
+
+```bash
+pnpm i18n:collect
+pnpm i18n:prepare
+pnpm i18n:compile
+pnpm i18n:all
+```
+
+`i18n:prepare` adds new phrases to the editable German catalog with a `new` status. Translate those entries and remove the status before committing. The compact runtime catalog under `src/translations` is generated during `pnpm install` and intentionally ignored.
+
+Persisted check-ins store stable emotion IDs, intensity, and nuance levels rather than localized labels. Existing German-label records remain readable and are projected into the active locale at render time.
 
 ## Developer tooling
 

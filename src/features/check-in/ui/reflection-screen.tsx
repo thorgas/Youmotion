@@ -4,6 +4,12 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { CHECK_IN_EVENTS, CHECK_IN_STATES, NAVIGATION_STATES } from '@/constants';
 import { useAppNavigationActor } from '@/navigation/app-navigation.provider';
+import {
+  emotionName,
+  nuanceIntensityCopy,
+  optionalNoteAccessibilityLabel,
+  optionalNotePlaceholder,
+} from './emotion-copy';
 import { palette, type } from './theme';
 
 const _selectSnapshot = (snapshot: ReturnType<ReturnType<typeof useAppNavigationActor>['getSnapshot']>) => snapshot;
@@ -12,7 +18,6 @@ export function ReflectionScreen() {
   const actor = useAppNavigationActor();
   const snapshot = useSelector(actor, _selectSnapshot);
   const selection = snapshot.context.selection;
-  const { error } = snapshot.context;
   const saving = snapshot.matches(CHECK_IN_STATES.SAVING);
   const failed = snapshot.matches(CHECK_IN_STATES.FAILURE);
 
@@ -26,36 +31,42 @@ export function ReflectionScreen() {
     <View style={styles.page}>
       <SafeAreaView style={styles.safeArea}>
         <View style={styles.header}>
-          <Text style={styles.eyebrow}>02 · REFLEKTIEREN</Text>
-          <Text style={styles.title}>Was ist gerade da?</Text>
-          <Text style={styles.copy}>Du musst nichts erklären. Ein paar Worte können helfen, den Moment festzuhalten.</Text>
+          <Text style={styles.eyebrow}><fbt desc="Second step label for reflecting on a feeling">02 · REFLECT</fbt></Text>
+          <Text style={styles.title}><fbt desc="Reflection screen question">What is present right now?</fbt></Text>
+          <Text style={styles.copy}><fbt desc="Gentle instructions for the optional reflection">You do not have to explain anything. A few words can help hold onto the moment.</fbt></Text>
         </View>
         <View style={styles.card}>
           <View style={styles.selectionRow}>
             <View style={[styles.dot, { backgroundColor: selection.color }]} />
             <View>
-              <Text style={styles.emotion}>{selection.emotion}</Text>
-              <Text style={styles.nuance}>{selection.nuance} · {Math.round(selection.intensity * 100)}%</Text>
+              <Text style={styles.emotion}>{emotionName(selection.emotionId)}</Text>
+              <Text style={styles.nuance}>{nuanceIntensityCopy(selection)}</Text>
             </View>
           </View>
           <TextInput
-            accessibilityLabel="Optionale Notiz zum Gefühl"
+            accessibilityLabel={optionalNoteAccessibilityLabel()}
             editable={!saving}
             maxLength={240}
             multiline
             onChangeText={_noteChanged}
-            placeholder="Ein Gedanke, ein Körpergefühl, eine Situation …"
+            placeholder={optionalNotePlaceholder()}
             placeholderTextColor="#A39A8F"
             style={styles.input}
             value={snapshot.context.note}
           />
-          {failed ? <Text style={styles.error}>{error}</Text> : null}
+          {failed ? <Text style={styles.error}><fbt desc="Error shown when saving a check-in fails">Your check-in could not be saved.</fbt></Text> : null}
           <View style={styles.actions}>
             <Pressable accessibilityRole="button" disabled={saving} onPress={_back} style={styles.secondaryButton}>
-              <Text style={styles.secondaryText}>Zurück</Text>
+              <Text style={styles.secondaryText}><fbt desc="Button returning from reflection to the emotion star">Back</fbt></Text>
             </Pressable>
             <Pressable accessibilityRole="button" disabled={saving} onPress={_submit} style={styles.primaryButton}>
-              {saving ? <ActivityIndicator color="#FFFFFF" /> : <Text style={styles.primaryText}>{failed ? 'Erneut versuchen' : 'Check-in speichern'}</Text>}
+              {saving ? <ActivityIndicator color="#FFFFFF" /> : (
+                <Text style={styles.primaryText}>
+                  {failed
+                    ? <fbt desc="Button retrying a failed check-in save">Try again</fbt>
+                    : <fbt desc="Button saving a completed check-in">Save check-in</fbt>}
+                </Text>
+              )}
             </Pressable>
           </View>
         </View>

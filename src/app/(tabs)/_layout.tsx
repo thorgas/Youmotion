@@ -1,6 +1,7 @@
 import { Tabs } from 'expo-router';
 
 import { NAVIGATION_EVENTS } from '@/constants';
+import { historyTabTitle, settingsTabTitle, todayTabTitle } from '@/localization/navigation-copy';
 import { useAppNavigationActor } from '@/navigation/app-navigation.provider';
 
 export default function TabLayout() {
@@ -26,9 +27,9 @@ export default function TabLayout() {
 
   return (
     <Tabs screenOptions={{ headerShown: false, tabBarActiveTintColor: '#292722', tabBarStyle: { backgroundColor: '#FBF8F2' } }}>
-      <Tabs.Screen name="today" listeners={_todayListeners} options={{ title: 'Heute' }} />
-      <Tabs.Screen name="history" listeners={_historyListeners} options={{ title: 'Verlauf' }} />
-      <Tabs.Screen name="settings" listeners={_settingsListeners} options={{ title: 'Einstellungen' }} />
+      <Tabs.Screen name="today" listeners={_todayListeners} options={{ title: todayTabTitle() }} />
+      <Tabs.Screen name="history" listeners={_historyListeners} options={{ title: historyTabTitle() }} />
+      <Tabs.Screen name="settings" listeners={_settingsListeners} options={{ title: settingsTabTitle() }} />
     </Tabs>
   );
 }

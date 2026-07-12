@@ -1,0 +1,1226 @@
+{
+  "fb-locale": "de-DE",
+  "translations": {
+    "ESeO7pm9a7u44l0AyiRypg==": {
+      "description": "Settings screen eyebrow heading",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "EINSTELLUNGEN",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "usxXaM4bk/GJu4WGKoOBIA==": {
+      "description": "Settings screen title",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Ein geschützter Raum.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "QDJ8toc3l5s+TM7/kL9K5g==": {
+      "description": "Language setting title",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Sprache",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "MCZ2VlCYAOOW2aQWojKPWQ==": {
+      "description": "Language setting explanation",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Wähle die Sprache, die in Youmotion verwendet wird.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "3sUfMF3z6l71XJsAKeC/VQ==": {
+      "description": "English language option",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Englisch",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "VCosCjcVP5iD20L5h7lVDg==": {
+      "description": "German language option",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Deutsch",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "k2Qq3egAT2sB1r3VozmiFA==": {
+      "description": "Local privacy setting title",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Privat by Design",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "Xdi0knLLJphcj5voFGjUGw==": {
+      "description": "Local privacy explanation",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Deine Check-ins werden derzeit ausschließlich lokal auf diesem Gerät gespeichert.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "TiL26KMpEl+SOXn11xtWcQ==": {
+      "description": "About the emotion star setting title",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Über den Gefühlsstern",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "A8ko/SXByYQjGxHIG6RPaw==": {
+      "description": "Explanation of the emotion star source and purpose",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Die sieben Grundrichtungen basieren auf dem deutschen Therapiematerial „Der Gefühlsstern“. Die App dient der Selbstreflexion, nicht der Diagnose.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "4ndMAcSgIsmhjzeKNPbj9w==": {
+      "description": "Question asking the user about their current feeling",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Wie fühlst du dich?",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "9pgy6Emm9X1zm29YC4ikrg==": {
+      "description": "Instructions introducing the emotion star gesture",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Nimm dir einen Moment. Ziehe vom Zentrum in die Richtung, die gerade am besten passt.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "Qy5Bp6g9FTNvMIoMbNceDg==": {
+      "description": "Emotion star card label",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "GEFÜHLSSTERN",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "911/eCqamTAN6gGCpeGymQ==": {
+      "description": "First step label for exploring emotions",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "01 · Erkunden",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "bHBoBzT4OLullxzes67R+Q==": {
+      "description": "Short gesture instructions",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "HALTEN · ZIEHEN · LOSLASSEN",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "3kkTuAL7PCZ9OHsto/IQxQ==": {
+      "description": "Heading for the most recent check-in",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Zuletzt eingecheckt",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "I/WnowNV2ma0jAY63ZUH5g==": {
+      "description": "Health disclaimer shown below the emotion check-in",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Youmotion unterstützt die Selbstwahrnehmung und ersetzt keine psychotherapeutische oder medizinische Behandlung.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "Wdroa8DFGr35Z02uRC82OQ==": {
+      "description": "Name of the joy emotion",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Freude",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "bplkFw5W0HAF7Mw0OkeZoA==": {
+      "description": "Low-intensity nuance of joy",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Vergnügen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "SZnhFfXXbMapvx4OBYxjvA==": {
+      "description": "Nuance of joy",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Lust",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "rKCaGTIVP80D0mr87wSFzg==": {
+      "description": "Nuance of joy",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Fröhlichkeit",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "w7vzyAkqW6xj6XabgiwIdA==": {
+      "description": "Nuance of joy",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Optimismus",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "1SAHJ/QNIVMUc6w3NTNnUQ==": {
+      "description": "Nuance of joy",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Begeisterung",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "v0lBvircTZY66r1ds3l3EA==": {
+      "description": "Nuance of joy",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Zufriedenheit",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "AmI5MGkA5xEDUigzW5Dnmw==": {
+      "description": "High-intensity nuance of joy",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Glück",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "qb6Jy6QPEHqOaPuS6c+Cvw==": {
+      "description": "Name of the love emotion",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Liebe",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "2JFTO3OyUCvyipQbVRCtUA==": {
+      "description": "Low-intensity nuance of love",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Sympathie",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "KXpRT8YGtDw8gAsUQAlpLQ==": {
+      "description": "Nuance of love",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Zuneigung",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "s8v9HRyad08COqv9/WRDcg==": {
+      "description": "Nuance of love",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Vertrautheit",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "CeaniaJNhDrG+KaSN3ouIw==": {
+      "description": "Nuance of love",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Bewunderung",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "+gzAg94j2fZef4uCV9zlbw==": {
+      "description": "Nuance of love",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Leidenschaft",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "BqxyIHHO30976QDa3+QpOA==": {
+      "description": "High-intensity nuance of love",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Begehren",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "RTXJ5eL9Ag8YvEdKZGoHmg==": {
+      "description": "Name of the shame emotion",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Scham",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "HCIkmZip7x7j7TWrJKXiEQ==": {
+      "description": "Low-intensity nuance of shame",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Verwirrung",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "8NRwOh3uZXBVRH4NOKDgAQ==": {
+      "description": "Nuance of shame",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Befangenheit",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "/D0zimes2hERPrlvkMVupA==": {
+      "description": "Nuance of shame",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Peinlichkeit",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "YF0V5EhMEWVPIIu/yKBOhw==": {
+      "description": "Nuance of shame",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Demütigung",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "xRU8SAdP4Cr+nvI9lrqCgQ==": {
+      "description": "Nuance of shame",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Bedauern",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "pU4uURoEGbk/tzD+/RGW8A==": {
+      "description": "Nuance of shame",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Reue",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "/NcZi2nVwXksTFyzMqbRBw==": {
+      "description": "High-intensity nuance of shame",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Schuldgefühl",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "V8ScYpK65v1GAkfrqOGztA==": {
+      "description": "Name of the disgust emotion",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Ekel",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "BvL/z/T8cBl4L7b+zzB10w==": {
+      "description": "Low-intensity nuance of disgust",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Abneigung",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "iqaYPHPvrUiI57CyI9Tbwg==": {
+      "description": "Nuance of disgust",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Widerwille",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "1rv5OOSqSfRq30S0MdpEkg==": {
+      "description": "Nuance of disgust",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Verachtung",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "mDzqCIolKYK0YLXL2yLFCw==": {
+      "description": "Nuance of disgust",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Abscheu",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "Is0zAZwMGeCrFikBUYzUVg==": {
+      "description": "High-intensity nuance of disgust",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Abgestoßenheit",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "A4fGfTt7RFlDtGAViwk43w==": {
+      "description": "Name of the sadness emotion",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Trauer",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "Irqqmo7VRTs7IY0dGsLZTA==": {
+      "description": "Low-intensity nuance of sadness",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Bedrücktheit",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "RFeo6uKkhSA44WkzVFMYbQ==": {
+      "description": "Nuance of sadness",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Kummer",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "DL/qrmJh2bAq06Sf2RP2Iw==": {
+      "description": "Nuance of sadness",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Enttäuschung",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "x/Zomd/oQM3zEbEJg37n4w==": {
+      "description": "Nuance of sadness",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Hoffnungslosigkeit",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "Q1AIfkuhvSDq2uRvJ1LF3g==": {
+      "description": "Nuance of sadness",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Einsamkeit",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "uCQ7EbQRXvorkn9U4Z14Hg==": {
+      "description": "High-intensity nuance of sadness",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Verzweiflung",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "0s/bW9mbY1/U+pVTKEfvlQ==": {
+      "description": "Name of the anger emotion",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Wut",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "CfXAB70dMX/TT90DSZ0m3Q==": {
+      "description": "Low-intensity nuance of anger",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Verstimmung",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "RqtCXgmTbTeH5GTkvZ5rLg==": {
+      "description": "Nuance of anger",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Genervtheit",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "Zjmy5B5WrZRorf048CJ8lg==": {
+      "description": "Nuance of anger",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Missmut",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "+jwndzYNyUI5aWclfFgaJw==": {
+      "description": "Nuance of anger",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Ärger",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "D56xJb7l+stYRWV1Fxtteg==": {
+      "description": "Nuance of anger",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Groll",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "WOnDUwXjuH9ayJ8R21PBZQ==": {
+      "description": "Nuance of anger",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Zorn",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "xLOmyD8Gh7li9yvmE3ahcA==": {
+      "description": "High-intensity nuance of anger",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Aggression",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "tZzZipd57gRtpvlVX0HHPA==": {
+      "description": "Name of the fear emotion",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Furcht",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "iXIIXx/WRqJtK3YzZmh70g==": {
+      "description": "Low-intensity nuance of fear",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Unsicherheit",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "AqnedNxqCAMhzim8JQfIRw==": {
+      "description": "Nuance of fear",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Befürchtung",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "9fY002lzA0K8q0i71Sll1w==": {
+      "description": "Nuance of fear",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Besorgnis",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "65MDVorET+PC0ajOi0YKqw==": {
+      "description": "Nuance of fear",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Sorge",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "TaVG8T6Fwp7BVZkBx1rDsQ==": {
+      "description": "Nuance of fear",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Hilflosigkeit",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "TNqO9F4Q1EAg+OiBK1xyYA==": {
+      "description": "Nuance of fear",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Schrecken",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "TlIwi6BasG4UHJFUTr0IZA==": {
+      "description": "Nuance of fear",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Grauen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "yQC6aw8np7LYwaT7Ywe3DA==": {
+      "description": "High-intensity nuance of fear",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Panik",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "QQio5wtO7omxlfp+kIJ4sA==": {
+      "description": "Fallback emotion name",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Gefühl",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "qZoR46V+DAx1dDRSf4Y9Hw==": {
+      "description": "Fallback emotion nuance",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Empfindung",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "bUGRMLxXNGkgePkmYDZf+A==": {
+      "description": "Emotion star accessibility instructions",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Gefühlsstern. Ziehe vom Zentrum nach außen.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "9iVg0IUNz+gTUJfMMaDPQw==": {
+      "description": "Selected emotion, nuance and intensity for accessibility",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "{emotionName}, {emotionNuance}, Intensität {intensity} Prozent",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "mIK3j2vTbcghohLLsfYyrw==": {
+      "description": "Prompt inside the emotion star before touching",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Berühren",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "SWDR/hbIMbxIJympAZPfqg==": {
+      "description": "Second half of the emotion star gesture prompt",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "und nach außen ziehen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "bur8y6WgEM3yYFGxxKlvMw==": {
+      "description": "Check-in history eyebrow heading",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "DEIN VERLAUF",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "IKwPYLZd2zb6tVdhquHJuQ==": {
+      "description": "Check-in history title",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Momente, die du bemerkt hast.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "u77koIh0YKwIMt41CCDrEQ==": {
+      "description": "Privacy note above check-in history",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Deine Check-ins bleiben lokal auf diesem Gerät.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "imy9ZZpuhrvbMOLT2EVijQ==": {
+      "description": "Empty check-in history title",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Noch ganz ruhig hier.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "+AwBuCuU3epzpjiChxUtog==": {
+      "description": "Empty check-in history explanation",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Nach deinem ersten Check-in entsteht an dieser Stelle ein behutsamer Verlauf.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "cwUthFJdCgV42WV4iwhplg==": {
+      "description": "Second step label for reflecting on a feeling",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "02 · REFLEKTIEREN",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "yqdNa50IDs9gbGrotVnfdA==": {
+      "description": "Reflection screen question",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Was ist gerade da?",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "oOaTGRq0KpgPJyKgreHQuA==": {
+      "description": "Gentle instructions for the optional reflection",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Du musst nichts erklären. Ein paar Worte können helfen, den Moment festzuhalten.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "Jja2boA4+WqeI34t/kbrQg==": {
+      "description": "Selected emotion nuance and intensity on reflection screen",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "{emotionNuance} · {intensity}%",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "3vMdMEOpdoi7uGgoaFzeXA==": {
+      "description": "Accessibility label for the reflection note input",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Optionale Notiz zum Gefühl",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "pypybnNuf9ZI+2YU7DYp/Q==": {
+      "description": "Placeholder for the optional reflection note",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Ein Gedanke, ein Körpergefühl, eine Situation …",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "O0gcdguTvxq6lDAC8l6YUw==": {
+      "description": "Error shown when saving a check-in fails",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Dein Check-in konnte nicht gespeichert werden.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "9MyAGNeWk4AqOx0D3sBwPw==": {
+      "description": "Button returning from reflection to the emotion star",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Zurück",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "CPeZaDUtYCGVib3PdWuQ9g==": {
+      "description": "Button retrying a failed check-in save",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Erneut versuchen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "+9IJjzAR1upCMMO1/zCMKw==": {
+      "description": "Button saving a completed check-in",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Check-in speichern",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "5lNc0hmffJcO2eFcs5QYkg==": {
+      "description": "Successful check-in title",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Bei dir angekommen.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "NA5jXfp6J74ZbD9V/CnYtQ==": {
+      "description": "Confirmation that the localized check-in was saved locally",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Dein Check-in „{emotionName} · {emotionNuance}“ wurde nur auf diesem Gerät gespeichert.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "GiSLY9y/j8Ai+2BOdxJfkg==": {
+      "description": "Button starting another check-in",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Neuer Check-in",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "HDiHP2xJrJnixHbao7NvAA==": {
+      "description": "Today tab title",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Heute",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "cS5gQ1oQlUJghawGwP8oYA==": {
+      "description": "History tab title",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Verlauf",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "BARRQxxgpJgcpGdS4A2asw==": {
+      "description": "Settings tab title",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Einstellungen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "IYUmtYxQtGdt1MucjXrsVA==": {
+      "description": "Label with meaning 'at least number'",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "{number}+",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "ZIF1WhVQwt7WZJvFTEbMWw==": {
+      "description": "Label with meaning 'less than number'",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "<{number}",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "Oc/9PrbjfyLHS60BXceD1A==": {
+      "description": "A list of items of various types, for example: \"San Francisco; London; Tokyo\". {previous items} and {following items} are themselves lists that contain one or more items.",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "{previous items}; {following items}",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "AXXbKEUZuc0ji1IClRrOOw==": {
+      "description": "A list of items of various types separated by bullets, for example: \"San Francisco \\u2022 London \\u2022 Tokyo\". {previous items} and {following items} are themselves lists that contain one or more items.",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "{previous items} • {following items}",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "89ACgPMtnwlLDSeqhLBx2Q==": {
+      "description": "A list of items of various types separated by commas, for example: \"San Francisco, London, Tokyo\". {previous items} and {following items} are themselves lists that contain one or more items.",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "{previous items}, {following items}",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "5hL7VXOBVnetm46YAjpX0g==": {
+      "description": "A list of items of various types with a serial comma, for example: \"item1, item2, and item3\"",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "{list of items} und {last item}",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "icNetEL/crQv/PS6yhySVQ==": {
+      "description": "A list of items of various types, for example: \"item1, item2, item3 and item4\"",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "{list of items} und {last item}",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "8kLAQ3ffiiFnQ/bWPqXfuQ==": {
+      "description": "A list of items of various types with a serial comma, for example: \"item1, item2, or item3\"",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "{list of items} oder {last item}",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "8eSaAzrWtAqn9ktNKfkaEg==": {
+      "description": "A list of items of various types, for example: \"item1, item2, item3 or item4\"",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "{list of items} oder {last item}",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "+IBI7kr/mMKdzp+3stDvkw==": {
+      "description": "A list of items of various types, for example: \"San Francisco; London; Tokyo\". {previous items} itself contains one or more items.",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "{previous items}; {last item}",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "55IeE8c0qqtjTU0lo7q9AA==": {
+      "description": "A list of items of various types separated by bullets, for example: \"San Francisco \\u2022 London \\u2022 Tokyo\". {previous items} contains one or more items.",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "{list of items} • {last item}",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "6PRJS0QalZfvaN8CkKCUCw==": {
+      "description": "A list of items of various types, for example: \"item1, item2, item3, item4\"",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "{list of items}, {last item}",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "vTLqoD9//LwRZsksKQ1X3g==": {
+      "description": "Localized emotion and nuance in a check-in",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "{emotionName} · {emotionNuance}",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "8G6QMIcIk+d7yoZ3rGL7DQ==": {
+      "description": "Intensity percentage for a check-in",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "{intensity} % Intensität",
+          "variations": {}
+        }
+      ],
+      "types": []
+    }
+  }
+}

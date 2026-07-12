@@ -14,8 +14,6 @@ import { appNavigationMachine, routeForStateValue } from '../app-navigation.mach
 
 const selection = {
   emotionId: EMOTION_IDS.JOY,
-  emotion: 'Freude',
-  nuance: 'Fröhlichkeit',
   intensity: 0.42,
   level: 2,
   color: '#E7AD32',
