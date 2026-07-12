@@ -42,22 +42,3 @@ export type CheckIn = typeof CheckInSchema.Type;
 
 export const CheckInListSchema = Schema.Array(CheckInSchema);
 export const CheckInListFromJson = Schema.parseJson(CheckInListSchema);
-
-export const PersistCheckInInputSchema = Schema.Struct({
-  selection: Schema.NullOr(EmotionSelectionSchema),
-  note: Schema.String.pipe(Schema.maxLength(MAX_NOTE_LENGTH)),
-});
-export type PersistCheckInInput = typeof PersistCheckInInputSchema.Type;
-
-export class PersistCheckInSuccess extends Schema.TaggedClass<PersistCheckInSuccess>()(
-  'PersistCheckInSuccess',
-  { saved: CheckInSchema },
-) {}
-
-export class PersistCheckInFailure extends Schema.TaggedClass<PersistCheckInFailure>()(
-  'PersistCheckInFailure',
-  { message: Schema.String },
-) {}
-
-export const PersistCheckInResultSchema = Schema.Union(PersistCheckInSuccess, PersistCheckInFailure);
-export type PersistCheckInResult = typeof PersistCheckInResultSchema.Type;

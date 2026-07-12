@@ -18,6 +18,8 @@ export const CHECK_IN_EVENTS = Object.freeze({
   CONFIRMED: literal('checkIn.confirmed'),
   PERSISTED: literal('checkIn.persisted'),
   FAILED: literal('checkIn.failed'),
+  HISTORY_HYDRATED: literal('checkIn.historyHydrated'),
+  HISTORY_HYDRATION_FAILED: literal('checkIn.historyHydrationFailed'),
   RETRIED: literal('checkIn.retried'),
   RESTARTED: literal('checkIn.restarted'),
   REFLECTION_CANCELLED: literal('reflection.cancelled'),

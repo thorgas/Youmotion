@@ -2,7 +2,6 @@ import * as Effect from 'effect/Effect';
 import * as Schema from 'effect/Schema';
 import * as Haptics from 'expo-haptics';
 import {
-  createAsyncLogic,
   matchesState,
   setup,
   type StateValue,
@@ -21,10 +20,6 @@ import {
   CheckInSchema,
   CheckInListSchema,
   EmotionSelectionSchema,
-  PersistCheckInFailure,
-  PersistCheckInInputSchema,
-  PersistCheckInResultSchema,
-  PersistCheckInSuccess,
 } from '@/features/check-in/domain/check-in';
 import { loadCheckIns, persistCheckIn } from '@/features/check-in/infrastructure/check-in.repository';
 import { checkInHistoryStore } from '@/features/check-in/application/check-in-history.store';
@@ -37,29 +32,6 @@ const AppContextSchema = Schema.Struct({
 });
 
 const EmptyEventSchema = Schema.standardSchemaV1(Schema.Struct({}));
-
-const persistCheckInActor = createAsyncLogic({
-  schemas: {
-    input: Schema.standardSchemaV1(PersistCheckInInputSchema),
-    output: Schema.standardSchemaV1(PersistCheckInResultSchema),
-  },
-  run: ({ input }) => Effect.runPromise(
-    Effect.gen(function* () {
-      if (!input.selection) return yield* Effect.dieMessage('Saving requires an emotion selection.');
-      return yield* persistCheckIn({ selection: input.selection, note: input.note });
-    }).pipe(
-      Effect.match({
-        onFailure: () => PersistCheckInFailure.make({ message: CHECK_IN_FAILURE_MESSAGE }),
-        onSuccess: (saved) => PersistCheckInSuccess.make({ saved }),
-      }),
-    ),
-  ),
-});
-
-const hydrateHistoryActor = createAsyncLogic({
-  schemas: { output: Schema.standardSchemaV1(CheckInListSchema) },
-  run: () => Effect.runPromise(loadCheckIns),
-});
 
 export const appNavigationMachine = setup({
   states: {
@@ -93,23 +65,40 @@ export const appNavigationMachine = setup({
       [CHECK_IN_EVENTS.SELECTION_RELEASED]: EmptyEventSchema,
       [CHECK_IN_EVENTS.NOTE_CHANGED]: Schema.standardSchemaV1(Schema.Struct({ note: Schema.String })),
       [CHECK_IN_EVENTS.CONFIRMED]: EmptyEventSchema,
+      [CHECK_IN_EVENTS.PERSISTED]: Schema.standardSchemaV1(Schema.Struct({ saved: CheckInSchema })),
+      [CHECK_IN_EVENTS.FAILED]: Schema.standardSchemaV1(Schema.Struct({ message: Schema.String })),
+      [CHECK_IN_EVENTS.HISTORY_HYDRATED]: Schema.standardSchemaV1(
+        Schema.Struct({ entries: CheckInListSchema }),
+      ),
+      [CHECK_IN_EVENTS.HISTORY_HYDRATION_FAILED]: Schema.standardSchemaV1(
+        Schema.Struct({ message: Schema.String }),
+      ),
       [CHECK_IN_EVENTS.RETRIED]: EmptyEventSchema,
       [CHECK_IN_EVENTS.RESTARTED]: EmptyEventSchema,
       [CHECK_IN_EVENTS.REFLECTION_CANCELLED]: EmptyEventSchema,
     },
   },
-  actorSources: { persistCheckIn: persistCheckInActor, hydrateHistory: hydrateHistoryActor },
 }).createMachine({
   id: 'appNavigation',
   initial: NAVIGATION_STATES.TABS,
   context: { selection: null, note: '', saved: null, error: null },
-  invoke: {
-    src: 'hydrateHistory',
-    onDone: ({ event }, enq) => {
-      enq(() => checkInHistoryStore.trigger.hydrated({ entries: event.output }));
+  entry: ({ self }, enq) => {
+    enq(() => {
+      void Effect.runPromise(loadCheckIns).then(
+        (entries) => self.send({ type: CHECK_IN_EVENTS.HISTORY_HYDRATED, entries }),
+        () => self.send({
+          type: CHECK_IN_EVENTS.HISTORY_HYDRATION_FAILED,
+          message: CHECK_IN_FAILURE_MESSAGE,
+        }),
+      );
+    });
+  },
+  on: {
+    [CHECK_IN_EVENTS.HISTORY_HYDRATED]: ({ event }, enq) => {
+      enq(() => checkInHistoryStore.trigger.hydrated({ entries: event.entries }));
     },
-    onError: (_args, enq) => {
-      enq(() => checkInHistoryStore.trigger.hydrationFailed({ message: CHECK_IN_FAILURE_MESSAGE }));
+    [CHECK_IN_EVENTS.HISTORY_HYDRATION_FAILED]: ({ event }, enq) => {
+      enq(() => checkInHistoryStore.trigger.hydrationFailed({ message: event.message }));
     },
   },
   states: {
@@ -171,27 +160,30 @@ export const appNavigationMachine = setup({
       },
     },
     [CHECK_IN_STATES.SAVING]: {
-      invoke: {
-        src: 'persistCheckIn',
-        input: ({ context }) => ({ selection: context.selection, note: context.note }),
-        onDone: ({ context, event }, enq) => {
-          if (event.output._tag === 'PersistCheckInSuccess') {
-            const output = event.output;
-            enq(() => checkInHistoryStore.trigger.recorded({ entry: output.saved }));
-            return {
-              target: CHECK_IN_STATES.SUCCESS,
-              context: { ...context, saved: event.output.saved, error: null },
-            };
+      entry: ({ context, self }, enq) => {
+        enq(() => {
+          if (!context.selection) {
+            self.send({ type: CHECK_IN_EVENTS.FAILED, message: CHECK_IN_FAILURE_MESSAGE });
+            return;
           }
+          void Effect.runPromise(persistCheckIn({ selection: context.selection, note: context.note })).then(
+            (saved) => self.send({ type: CHECK_IN_EVENTS.PERSISTED, saved }),
+            () => self.send({ type: CHECK_IN_EVENTS.FAILED, message: CHECK_IN_FAILURE_MESSAGE }),
+          );
+        });
+      },
+      on: {
+        [CHECK_IN_EVENTS.PERSISTED]: ({ context, event }, enq) => {
+          enq(() => checkInHistoryStore.trigger.recorded({ entry: event.saved }));
           return {
-            target: CHECK_IN_STATES.FAILURE,
-            context: { ...context, error: event.output.message },
+            target: CHECK_IN_STATES.SUCCESS,
+            context: { ...context, saved: event.saved, error: null },
           };
         },
-        onError: {
+        [CHECK_IN_EVENTS.FAILED]: ({ context, event }) => ({
           target: CHECK_IN_STATES.FAILURE,
-          context: ({ context }) => ({ ...context, error: CHECK_IN_FAILURE_MESSAGE }),
-        },
+          context: { ...context, error: event.message },
+        }),
       },
     },
     [CHECK_IN_STATES.SUCCESS]: {

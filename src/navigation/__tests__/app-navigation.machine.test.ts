@@ -1,4 +1,5 @@
-import { createActor } from 'xstate';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { createActor, waitFor } from 'xstate';
 
 import {
   APP_ROUTES,
@@ -21,6 +22,11 @@ const selection = {
 } satisfies EmotionSelection;
 
 describe('app navigation model', () => {
+  beforeEach(async () => {
+    await AsyncStorage.clear();
+    jest.restoreAllMocks();
+  });
+
   it('makes tab navigation an explicit state graph', () => {
     const actor = createActor(appNavigationMachine).start();
     expect(routeForStateValue(actor.getSnapshot().value)).toBe(APP_ROUTES.TODAY);
@@ -52,5 +58,41 @@ describe('app navigation model', () => {
     expect(actor.getSnapshot().context.note).toHaveLength(240);
     actor.send({ type: CHECK_IN_EVENTS.CONFIRMED });
     expect(actor.getSnapshot().matches(CHECK_IN_STATES.SAVING)).toBe(true);
+  });
+
+  it('persists through the saving state and reaches success', async () => {
+    const actor = createActor(appNavigationMachine).start();
+    actor.send({ type: CHECK_IN_EVENTS.TOUCH_STARTED });
+    actor.send({ type: CHECK_IN_EVENTS.SELECTION_CHANGED, selection });
+    actor.send({ type: CHECK_IN_EVENTS.SELECTION_RELEASED });
+    actor.send({ type: CHECK_IN_EVENTS.CONFIRMED });
+
+    const snapshot = await waitFor(
+      actor,
+      (candidate) => candidate.matches(CHECK_IN_STATES.SUCCESS),
+      { timeout: 1_000 },
+    );
+
+    expect(routeForStateValue(snapshot.value)).toBe(APP_ROUTES.SUCCESS);
+    expect(snapshot.context.saved?.emotionId).toBe(EMOTION_IDS.JOY);
+  });
+
+  it('models a storage failure and successful retry', async () => {
+    jest.spyOn(AsyncStorage, 'setItem').mockRejectedValueOnce(new Error('storage unavailable'));
+    const actor = createActor(appNavigationMachine).start();
+    actor.send({ type: CHECK_IN_EVENTS.TOUCH_STARTED });
+    actor.send({ type: CHECK_IN_EVENTS.SELECTION_CHANGED, selection });
+    actor.send({ type: CHECK_IN_EVENTS.SELECTION_RELEASED });
+    actor.send({ type: CHECK_IN_EVENTS.CONFIRMED });
+
+    await waitFor(actor, (candidate) => candidate.matches(CHECK_IN_STATES.FAILURE), { timeout: 1_000 });
+    actor.send({ type: CHECK_IN_EVENTS.RETRIED });
+    const snapshot = await waitFor(
+      actor,
+      (candidate) => candidate.matches(CHECK_IN_STATES.SUCCESS),
+      { timeout: 1_000 },
+    );
+
+    expect(snapshot.context.error).toBeNull();
   });
 });
