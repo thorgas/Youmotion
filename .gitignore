@@ -10,6 +10,7 @@ dist/
 web-build/
 .harness/
 coverage/
+.reassure/
 expo-env.d.ts
 
 # Native

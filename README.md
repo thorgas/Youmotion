@@ -67,9 +67,38 @@ pnpm test
 pnpm test:coverage
 pnpm verify
 pnpm test:harness
+pnpm doctor:react
 ```
 
 `pnpm typecheck` invokes TypeScript 7 directly. `typecheck:compat` checks the compatibility compiler used by editor and lint integrations.
+
+## Developer tooling
+
+The repository includes Callstack's project-local React Native, navigation, upgrade, GitHub, and GitHub Actions agent skills. The tooling dependencies are pinned in the pnpm lockfile rather than installed globally.
+
+Use a development build when working with native tooling. Expo Go cannot load Inspector, React Native Grab, Nitro Modules, or the Ottrelite Tracy backend.
+
+```bash
+pnpm start:tools
+pnpm devtools:react
+pnpm devtools:inspector
+```
+
+`start:tools` enables Rozenite with its Metro require profiler and performance monitor. React Native Grab is available from the development menu and is wrapped around every native route. `devtools:react` exposes the React tree and profiler to agent tooling. Inspector is opt-in for release profiling: start its server, then run a release development build with `WITH_INSPECTOR=true`.
+
+Ottrelite installs the Tracy backend only in development JavaScript. Native development builds include the backend and Nitro Modules. Start Tracy 0.12.2 on the host; for Android, run `pnpm tracy:android` to forward port 8086 before recording. Tracy does not support Ottrelite async events, so use synchronous events and counters for Tracy sessions.
+
+Reassure has a first domain performance scenario and keeps measurements under the ignored `.reassure` directory:
+
+```bash
+pnpm perf:baseline
+pnpm perf:measure
+pnpm perf:stability
+```
+
+React Doctor is available through `pnpm doctor:react`. Cali is available through `pnpm cali:review`; its device QA and performance review roles additionally require a built app artifact, provider credentials, and the relevant local device tooling.
+
+Later TODO: evaluate `callstackincubator/eas-agent-device` after an EAS preview-build and secrets strategy exists. It is intentionally not installed or configured yet.
 
 ## Enforced code boundaries
 

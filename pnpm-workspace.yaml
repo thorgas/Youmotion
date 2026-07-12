@@ -1,2 +1,4 @@
 allowBuilds:
+  '@ottrelite/backend-wrapper-tracy': true
+  '@ottrelite/core': true
   esbuild: true

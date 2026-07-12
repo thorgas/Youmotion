@@ -5,6 +5,7 @@ import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
+import { DevelopmentRoot } from '@/development/development-root';
 import { AppNavigationProvider } from '@/navigation/app-navigation.provider';
 
 export default function RootLayout() {
@@ -19,11 +20,13 @@ export default function RootLayout() {
   if (!fontsLoaded && !fontError) return null;
 
   return (
-    <GestureHandlerRootView style={{ flex: 1 }}>
-      <AppNavigationProvider>
-        <StatusBar style="dark" />
-        <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: '#F4F0E8' } }} />
-      </AppNavigationProvider>
-    </GestureHandlerRootView>
+    <DevelopmentRoot>
+      <GestureHandlerRootView style={{ flex: 1 }}>
+        <AppNavigationProvider>
+          <StatusBar style="dark" />
+          <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: '#F4F0E8' } }} />
+        </AppNavigationProvider>
+      </GestureHandlerRootView>
+    </DevelopmentRoot>
   );
 }
