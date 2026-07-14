@@ -48,6 +48,12 @@ describe('app navigation model', () => {
 
     actor.send({ type: CHECK_IN_EVENTS.TOUCH_STARTED });
     actor.send({ type: CHECK_IN_EVENTS.SELECTION_CHANGED, selection });
+    expect(actor.getSnapshot().matches({
+      [NAVIGATION_STATES.TABS]: {
+        [NAVIGATION_STATES.TODAY]: CHECK_IN_STATES.EXPLORING,
+      },
+    })).toBe(true);
+    expect(routeForStateValue(actor.getSnapshot().value)).toBe(APP_ROUTES.TODAY);
     actor.send({ type: CHECK_IN_EVENTS.SELECTION_RELEASED });
     expect(actor.getSnapshot().matches(NAVIGATION_STATES.REFLECTION)).toBe(true);
     expect(routeForStateValue(actor.getSnapshot().value)).toBe(APP_ROUTES.REFLECTION);

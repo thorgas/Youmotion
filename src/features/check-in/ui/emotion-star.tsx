@@ -42,7 +42,7 @@ function EmotionField({ center, radius, rippleOffsetX, rippleOffsetY, selection,
 
         {emotions.map((emotion, index) => {
           const angle = emotionAngle(index);
-          const label = _polar({ center, radius: radius * 0.72, angle });
+          const label = _polar({ center, radius: radius * 0.86, angle });
           const isActive = selection !== null && selection.emotionId === emotion.id;
           return (
             <SvgText
