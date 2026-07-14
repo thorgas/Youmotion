@@ -47,11 +47,14 @@ describe('check-in screens', () => {
     mockActor.stop();
   });
 
-  it('renders the painterly star and current history summary', async () => {
+  it('renders the centered base-state ripple and emotion field', async () => {
     const screen = await _renderLocalized(<CheckInScreen />);
     expect(screen.getByText('How are you feeling?')).toBeTruthy();
     expect(screen.getByLabelText('Emotion star. Drag outward from the center.')).toBeTruthy();
-    expect(screen.getByText('HOLD · DRAG · RELEASE')).toBeTruthy();
+    expect(screen.getByTestId('base-state-ripples')).toHaveStyle({
+      alignItems: 'center',
+      justifyContent: 'center',
+    });
   });
 
   it('maps star responder movement to a selection and release', async () => {

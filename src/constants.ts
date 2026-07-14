@@ -65,3 +65,5 @@ export const CHECK_IN_STORAGE_KEY = 'youmotion.check-ins.v1';
 export const MAX_CHECK_IN_HISTORY = 30;
 export const MAX_NOTE_LENGTH = 240;
 export const CHECK_IN_FAILURE_MESSAGE = 'Your check-in could not be saved.';
+export const BASE_RIPPLE_DURATION = 2800;
+export const BASE_RIPPLE_PHASES = Object.freeze([0, 0.25, 0.5, 0.75]);
