@@ -22,7 +22,17 @@ jest.mock('react-native-reanimated', () => {
     useAnimatedStyle: jest.fn((style) => style()),
     useFrameCallback: jest.fn(),
     useReducedMotion: jest.fn(() => false),
-    useSharedValue: jest.fn((value) => ({ value })),
+    useSharedValue: jest.fn((initialValue) => {
+      let value = initialValue;
+
+      return {
+        get: jest.fn(() => value),
+        set: jest.fn((nextValue) => {
+          value = nextValue;
+        }),
+        value,
+      };
+    }),
   };
 });
 

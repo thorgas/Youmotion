@@ -1,4 +1,3 @@
-import { useCallback } from 'react';
 import { StyleSheet, View } from 'react-native';
 import Animated, {
   interpolate,
@@ -18,6 +17,11 @@ type RippleRingProps = {
   progress: SharedValue<number>;
 };
 
+type BaseStateRipplesProps = {
+  offsetX: SharedValue<number>;
+  offsetY: SharedValue<number>;
+};
+
 function RippleRing({ phase, progress }: RippleRingProps) {
   const animatedStyle = useAnimatedStyle(() => {
     const waveProgress = (progress.value + phase) % 1;
@@ -31,23 +35,29 @@ function RippleRing({ phase, progress }: RippleRingProps) {
   return <Animated.View style={[styles.ring, animatedStyle]} />;
 }
 
-export function BaseStateRipples() {
+export function BaseStateRipples({ offsetX, offsetY }: BaseStateRipplesProps) {
   const progress = useSharedValue(0);
   const reduceMotion = useReducedMotion();
-  const _advanceRipple = useCallback(({ timeSinceFirstFrame }: FrameInfo) => {
+  const originStyle = useAnimatedStyle(() => ({
+    transform: [
+      { translateX: offsetX.get() },
+      { translateY: offsetY.get() },
+    ],
+  }), [offsetX, offsetY]);
+  const _advanceRipple = ({ timeSinceFirstFrame }: FrameInfo) => {
     'worklet';
     progress.value = (timeSinceFirstFrame % BASE_RIPPLE_DURATION) / BASE_RIPPLE_DURATION;
-  }, [progress]);
+  };
 
   useFrameCallback(_advanceRipple, !reduceMotion);
 
   return (
-    <View pointerEvents="none" style={styles.layer} testID="base-state-ripples">
+    <Animated.View pointerEvents="none" style={[styles.layer, originStyle]} testID="base-state-ripples">
       {BASE_RIPPLE_PHASES.map((phase) => (
         <RippleRing key={phase} phase={phase} progress={progress} />
       ))}
       <View style={styles.origin} />
-    </View>
+    </Animated.View>
   );
 }
 

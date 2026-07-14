@@ -1,6 +1,7 @@
 import { useCallback, useMemo } from 'react';
 import { PanResponder, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
-import Svg, { Circle, G, Path, Text as SvgText } from 'react-native-svg';
+import { useSharedValue, type SharedValue } from 'react-native-reanimated';
+import Svg, { Circle, Text as SvgText } from 'react-native-svg';
 
 import { emotionAngle, selectionFromPoint } from '../domain/emotion-selection';
 import { emotions, type EmotionSelection } from '../domain/emotion';
@@ -18,8 +19,9 @@ type EmotionStarProps = {
 
 type EmotionFieldProps = {
   center: number;
-  marker: { x: number; y: number } | null;
   radius: number;
+  rippleOffsetX: SharedValue<number>;
+  rippleOffsetY: SharedValue<number>;
   selection: EmotionSelection | null;
   size: number;
 };
@@ -29,38 +31,14 @@ const _polar = ({ center, radius, angle }: { center: number; radius: number; ang
   y: center + Math.sin(angle) * radius,
 });
 
-const _markerPoint = ({ center, radius, selection }: {
-  center: number;
-  radius: number;
-  selection: EmotionSelection | null;
-}) => {
-  if (!selection) return null;
-  const selectedIndex = emotions.findIndex((emotion) => emotion.id === selection.emotionId);
-  if (selectedIndex < 0) return null;
-  return _polar({
-    center,
-    radius: radius * (0.18 + selection.intensity * 0.62),
-    angle: emotionAngle(selectedIndex),
-  });
-};
-
-function EmotionField({ center, marker, radius, selection, size }: EmotionFieldProps) {
+function EmotionField({ center, radius, rippleOffsetX, rippleOffsetY, selection, size }: EmotionFieldProps) {
   return (
     <>
-      {selection ? null : <BaseStateRipples />}
+      <BaseStateRipples offsetX={rippleOffsetX} offsetY={rippleOffsetY} />
       <Svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
         {selection ? [0.28, 0.5, 0.72, 0.9].map((scale) => (
           <Circle key={scale} cx={center} cy={center} r={radius * scale} fill="none" stroke={palette.hairline} strokeWidth={1} strokeDasharray="2 7" />
         )) : null}
-
-        {marker ? (
-          <G>
-            <Path d={`M ${center} ${center} L ${marker.x} ${marker.y}`} stroke={selection?.color ?? palette.ink} strokeOpacity={0.28} strokeWidth={1} />
-            <Circle cx={center} cy={center} r={4} fill={palette.ink} fillOpacity={0.3} />
-            <Circle cx={marker.x} cy={marker.y} r={12} fill={selection?.color ?? palette.ink} fillOpacity={0.12} />
-            <Circle cx={marker.x} cy={marker.y} r={5} fill={selection?.color ?? palette.ink} />
-          </G>
-        ) : null}
 
         {emotions.map((emotion, index) => {
           const angle = emotionAngle(index);
@@ -91,14 +69,18 @@ export function EmotionStar({ selection, disabled, onTouchStart, onSelectionChan
   const size = Math.min(width - 32, 390);
   const center = size / 2;
   const radius = size * 0.45;
+  const rippleOffsetX = useSharedValue(0);
+  const rippleOffsetY = useSharedValue(0);
 
   const _updateSelection = useCallback(({ x, y }: { x: number; y: number }) => {
+    rippleOffsetX.set(x - center);
+    rippleOffsetY.set(y - center);
     onSelectionChange(selectionFromPoint({
       point: { x, y },
       center: { x: center, y: center },
       maxRadius: radius * 0.8,
     }));
-  }, [center, onSelectionChange, radius]);
+  }, [center, onSelectionChange, radius, rippleOffsetX, rippleOffsetY]);
 
   const responder = useMemo(
     () =>
@@ -116,8 +98,6 @@ export function EmotionStar({ selection, disabled, onTouchStart, onSelectionChan
     [_updateSelection, disabled, onRelease, onTouchStart],
   );
 
-  const marker = _markerPoint({ center, radius, selection });
-
   return (
     <View style={styles.frame}>
       <View
@@ -125,7 +105,14 @@ export function EmotionStar({ selection, disabled, onTouchStart, onSelectionChan
         accessibilityRole="adjustable"
         style={[styles.canvas, { width: size, height: size }]}
         {...responder.panHandlers}>
-        <EmotionField center={center} marker={marker} radius={radius} selection={selection} size={size} />
+        <EmotionField
+          center={center}
+          radius={radius}
+          rippleOffsetX={rippleOffsetX}
+          rippleOffsetY={rippleOffsetY}
+          selection={selection}
+          size={size}
+        />
       </View>
 
       <View style={styles.readout}>
