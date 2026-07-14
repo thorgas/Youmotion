@@ -14,6 +14,7 @@ type EmotionStarProps = {
   disabled?: boolean;
   onTouchStart: () => void;
   onSelectionChange: (selection: EmotionSelection | null) => void;
+  onCancel: () => void;
   onRelease: () => void;
 };
 
@@ -64,7 +65,7 @@ function EmotionField({ center, radius, rippleOffsetX, rippleOffsetY, selection,
   );
 }
 
-export function EmotionStar({ selection, disabled, onTouchStart, onSelectionChange, onRelease }: EmotionStarProps) {
+export function EmotionStar({ selection, disabled, onTouchStart, onSelectionChange, onCancel, onRelease }: EmotionStarProps) {
   const { width } = useWindowDimensions();
   const size = Math.min(width - 32, 390);
   const center = size / 2;
@@ -92,10 +93,11 @@ export function EmotionStar({ selection, disabled, onTouchStart, onSelectionChan
           _updateSelection({ x: event.nativeEvent.locationX, y: event.nativeEvent.locationY });
         },
         onPanResponderMove: (event) => _updateSelection({ x: event.nativeEvent.locationX, y: event.nativeEvent.locationY }),
+        onPanResponderTerminationRequest: () => false,
         onPanResponderRelease: onRelease,
-        onPanResponderTerminate: onRelease,
+        onPanResponderTerminate: onCancel,
       }),
-    [_updateSelection, disabled, onRelease, onTouchStart],
+    [_updateSelection, disabled, onCancel, onRelease, onTouchStart],
   );
 
   return (

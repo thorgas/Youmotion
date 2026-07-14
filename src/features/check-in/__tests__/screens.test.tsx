@@ -60,10 +60,12 @@ describe('check-in screens', () => {
   it('maps star responder movement to a selection and release', async () => {
     const onTouchStart = jest.fn();
     const onSelectionChange = jest.fn();
+    const onCancel = jest.fn();
     const onRelease = jest.fn();
     const screen = await _renderLocalized(
       <EmotionStar
         selection={selection}
+        onCancel={onCancel}
         onTouchStart={onTouchStart}
         onSelectionChange={onSelectionChange}
         onRelease={onRelease}
@@ -110,6 +112,26 @@ describe('check-in screens', () => {
     expect(onTouchStart).toHaveBeenCalledTimes(1);
     expect(onSelectionChange).toHaveBeenCalledTimes(2);
     expect(onRelease).toHaveBeenCalledTimes(1);
+    expect(onCancel).not.toHaveBeenCalled();
+  });
+
+  it('cancels an interrupted drag instead of releasing its preview', async () => {
+    const onCancel = jest.fn();
+    const onRelease = jest.fn();
+    const screen = await _renderLocalized(
+      <EmotionStar
+        selection={selection}
+        onCancel={onCancel}
+        onTouchStart={jest.fn()}
+        onSelectionChange={jest.fn()}
+        onRelease={onRelease}
+      />,
+    );
+
+    await fireEvent(screen.getByLabelText('Joy, Cheerfulness, intensity 50 percent'), 'responderTerminate');
+
+    expect(onCancel).toHaveBeenCalledTimes(1);
+    expect(onRelease).not.toHaveBeenCalled();
   });
 
   it('lets the reflection screen edit and submit a note', async () => {

@@ -1,6 +1,6 @@
 import { useSelector as useActorSelector } from '@xstate/react';
 import { useSelector as useStoreSelector } from '@xstate/store-react';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { CHECK_IN_EVENTS } from '@/constants';
@@ -24,18 +24,20 @@ export function CheckInScreen() {
   const _selectionChanged = (selection: EmotionSelection | null) => {
     actor.send({ type: CHECK_IN_EVENTS.SELECTION_CHANGED, selection });
   };
+  const _selectionCancelled = () => actor.send({ type: CHECK_IN_EVENTS.SELECTION_CANCELLED });
   const _selectionReleased = () => actor.send({ type: CHECK_IN_EVENTS.SELECTION_RELEASED });
 
   return (
     <View style={styles.page}>
       <SafeAreaView edges={['top']} style={styles.safeArea}>
-        <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+        <View style={styles.content}>
           <View style={styles.header}>
             <Text style={styles.title}><fbt desc="Question asking the user about their current feeling">How are you feeling?</fbt></Text>
           </View>
           <View style={styles.starStage}>
             <EmotionStar
               selection={snapshot.context.selection}
+              onCancel={_selectionCancelled}
               onTouchStart={_touchStarted}
               onSelectionChange={_selectionChanged}
               onRelease={_selectionReleased}
@@ -56,7 +58,7 @@ export function CheckInScreen() {
           <Text style={styles.disclaimer}>
             <fbt desc="Health disclaimer shown below the emotion check-in">Youmotion supports self-awareness and does not replace psychotherapeutic or medical treatment.</fbt>
           </Text>
-        </ScrollView>
+        </View>
       </SafeAreaView>
     </View>
   );

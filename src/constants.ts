@@ -13,6 +13,7 @@ export const EMOTION_IDS = Object.freeze({
 export const CHECK_IN_EVENTS = Object.freeze({
   TOUCH_STARTED: literal('touch.started'),
   SELECTION_CHANGED: literal('selection.changed'),
+  SELECTION_CANCELLED: literal('selection.cancelled'),
   SELECTION_RELEASED: literal('selection.released'),
   NOTE_CHANGED: literal('note.changed'),
   CONFIRMED: literal('checkIn.confirmed'),
