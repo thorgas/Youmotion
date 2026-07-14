@@ -55,6 +55,7 @@ describe('check-in screens', () => {
       alignItems: 'center',
       justifyContent: 'center',
     });
+    expect(screen.getByTestId('water-drop-core')).toBeTruthy();
   });
 
   it('maps star responder movement to a selection and release', async () => {
@@ -72,6 +73,8 @@ describe('check-in screens', () => {
       />,
     );
     const star = screen.getByLabelText('Joy, Cheerfulness, intensity 50 percent');
+    expect(screen.getByTestId('emotion-nuance-reveal')).toBeTruthy();
+    expect(screen.getByTestId('emotion-name-reveal')).toBeTruthy();
     const grantEvent = {
       nativeEvent: { locationX: 185, locationY: 40 },
       touchHistory: {

@@ -13,13 +13,15 @@ jest.mock('expo-localization', () => ({
 }));
 
 jest.mock('react-native-reanimated', () => {
-  const { View } = require('react-native');
+  const { Text, View } = require('react-native');
 
   return {
     __esModule: true,
-    default: { View },
+    default: { Text, View },
+    Easing: { bezier: jest.fn(() => (value) => value) },
     interpolate: jest.fn((_value, _input, output) => output[0]),
     useAnimatedStyle: jest.fn((style) => style()),
+    useDerivedValue: jest.fn((derive) => ({ value: derive() })),
     useFrameCallback: jest.fn(),
     useReducedMotion: jest.fn(() => false),
     useSharedValue: jest.fn((initialValue) => {
@@ -33,6 +35,8 @@ jest.mock('react-native-reanimated', () => {
         value,
       };
     }),
+    withDelay: jest.fn((_delay, value) => value),
+    withTiming: jest.fn((value) => value),
   };
 });
 

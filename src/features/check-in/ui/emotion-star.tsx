@@ -1,8 +1,19 @@
 import { useCallback, useMemo } from 'react';
-import { PanResponder, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
-import { useSharedValue, type SharedValue } from 'react-native-reanimated';
+import { PanResponder, StyleSheet, Text, useWindowDimensions, View, type StyleProp, type TextStyle } from 'react-native';
+import Animated, {
+  Easing,
+  interpolate,
+  useAnimatedStyle,
+  useDerivedValue,
+  useReducedMotion,
+  useSharedValue,
+  type SharedValue,
+  withDelay,
+  withTiming,
+} from 'react-native-reanimated';
 import Svg, { Circle, Text as SvgText } from 'react-native-svg';
 
+import { EMOTION_TEXT_REVEAL_DURATION, EMOTION_TEXT_REVEAL_STAGGER } from '@/constants';
 import { emotionAngle, selectionFromPoint } from '../domain/emotion-selection';
 import { emotions, type EmotionSelection } from '../domain/emotion';
 import { BaseStateRipples } from './base-state-ripples';
@@ -27,10 +38,88 @@ type EmotionFieldProps = {
   size: number;
 };
 
+type RevealedTextProps = {
+  delay: number;
+  style: StyleProp<TextStyle>;
+  testID: string;
+  text: string;
+};
+
+type RevealedCharacterProps = {
+  character: string;
+  index: number;
+  length: number;
+  progress: Readonly<Pick<SharedValue<number>, 'value'>>;
+  style: StyleProp<TextStyle>;
+};
+
 const _polar = ({ center, radius, angle }: { center: number; radius: number; angle: number }) => ({
   x: center + Math.cos(angle) * radius,
   y: center + Math.sin(angle) * radius,
 });
+
+function RevealedCharacter({ character, index, length, progress, style }: RevealedCharacterProps) {
+  const animatedStyle = useAnimatedStyle(() => {
+    const staggerRange = 0.42;
+    const start = length <= 1 ? 0 : (index / (length - 1)) * staggerRange;
+    const characterProgress = interpolate(progress.value, [start, Math.min(start + 0.58, 1)], [0, 1]);
+
+    return {
+      opacity: characterProgress,
+      transform: [{ translateX: interpolate(characterProgress, [0, 1], [-2.5, 0]) }],
+    };
+  }, [index, length, progress]);
+
+  return <Animated.Text accessible={false} style={[style, animatedStyle]}>{character}</Animated.Text>;
+}
+
+function RevealedText({ delay, style, testID, text }: RevealedTextProps) {
+  const reduceMotion = useReducedMotion();
+  const characters = Array.from(text);
+  const progress = useDerivedValue(() => {
+    if (reduceMotion) return 1;
+    return withDelay(delay, withTiming(1, {
+      duration: EMOTION_TEXT_REVEAL_DURATION,
+      easing: Easing.bezier(0.22, 1, 0.36, 1),
+    }));
+  }, [delay, reduceMotion]);
+
+  return (
+    <View accessibilityLabel={text} accessible style={styles.revealLine} testID={testID}>
+      {characters.map((character, index) => (
+        <RevealedCharacter
+          key={text.slice(0, index + 1)}
+          character={character}
+          index={index}
+          length={characters.length}
+          progress={progress}
+          style={style}
+        />
+      ))}
+    </View>
+  );
+}
+
+function EmotionReadout({ selection }: { selection: EmotionSelection }) {
+  const revealKey = `${selection.emotionId}-${selection.level}`;
+
+  return (
+    <View key={revealKey} style={styles.readout}>
+      <RevealedText
+        delay={0}
+        style={[styles.readoutEmotion, styles.readoutEmotionSelected]}
+        testID="emotion-nuance-reveal"
+        text={emotionNuance(selection)}
+      />
+      <RevealedText
+        delay={EMOTION_TEXT_REVEAL_STAGGER}
+        style={styles.readoutNuance}
+        testID="emotion-name-reveal"
+        text={emotionName(selection.emotionId)}
+      />
+    </View>
+  );
+}
 
 function EmotionField({ center, radius, rippleOffsetX, rippleOffsetY, selection, size }: EmotionFieldProps) {
   return (
@@ -117,14 +206,12 @@ export function EmotionStar({ selection, disabled, onTouchStart, onSelectionChan
         />
       </View>
 
-      <View style={styles.readout}>
-        <Text style={[styles.readoutEmotion, selection ? styles.readoutEmotionSelected : null]}>
-          {selection ? emotionNuance(selection) : <fbt desc="Prompt inside the emotion star before touching">Touch</fbt>}
-        </Text>
-        <Text style={styles.readoutNuance}>
-          {selection ? emotionName(selection.emotionId) : <fbt desc="Second half of the emotion star gesture prompt">and drag outward</fbt>}
-        </Text>
-      </View>
+      {selection ? <EmotionReadout selection={selection} /> : (
+        <View style={styles.readout}>
+          <Text style={styles.readoutEmotion}><fbt desc="Prompt inside the emotion star before touching">Touch</fbt></Text>
+          <Text style={styles.readoutNuance}><fbt desc="Second half of the emotion star gesture prompt">and drag outward</fbt></Text>
+        </View>
+      )}
     </View>
   );
 }
@@ -145,6 +232,11 @@ const styles = StyleSheet.create({
     width: 260,
     minHeight: 54,
     marginTop: -2,
+  },
+  revealLine: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    width: 260,
   },
   readoutEmotion: {
     color: palette.ink,

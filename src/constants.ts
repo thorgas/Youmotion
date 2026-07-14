@@ -71,3 +71,5 @@ export const EMOTION_AXIS_STEP = Math.PI / 4;
 export const BASE_RIPPLE_DURATION = 2800;
 export const BASE_RIPPLE_PHASES = Object.freeze([0, 0.25, 0.5, 0.75]);
 export const REFLECTION_KEYBOARD_BOTTOM_OFFSET = 82;
+export const EMOTION_TEXT_REVEAL_DURATION = 280;
+export const EMOTION_TEXT_REVEAL_STAGGER = 36;
