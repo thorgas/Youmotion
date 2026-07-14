@@ -45,3 +45,13 @@ jest.mock('pressto', () => {
     PressablesConfig: ({ children }) => React.createElement(React.Fragment, null, children),
   };
 });
+
+jest.mock('react-native-keyboard-controller', () => {
+  const React = require('react');
+  const { ScrollView } = require('react-native');
+
+  return {
+    KeyboardAwareScrollView: ScrollView,
+    KeyboardProvider: ({ children }) => React.createElement(React.Fragment, null, children),
+  };
+});

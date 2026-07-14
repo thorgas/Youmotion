@@ -38,6 +38,7 @@
     "react-native": "0.86.0",
     "react-native-gesture-handler": "~2.32.0",
     "react-native-grab": "1.1.1",
+    "react-native-keyboard-controller": "1.21.9",
     "react-native-nitro-modules": "^0.36.1",
     "react-native-performance": "^6.0.0",
     "react-native-reanimated": "4.5.0",

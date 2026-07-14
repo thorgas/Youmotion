@@ -4,6 +4,7 @@ import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { KeyboardProvider } from 'react-native-keyboard-controller';
 
 import { PressFeedbackProvider } from '@/components/ui/press-feedback-provider';
 import { DevelopmentRoot } from '@/development/development-root';
@@ -22,17 +23,19 @@ export default function RootLayout() {
   if (!fontsLoaded && !fontError) return null;
 
   return (
-    <AppLocaleProvider>
-      <DevelopmentRoot>
-        <GestureHandlerRootView style={{ flex: 1 }}>
-          <PressFeedbackProvider>
-            <AppNavigationProvider>
-              <StatusBar style="dark" />
-              <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: '#F4F0E8' } }} />
-            </AppNavigationProvider>
-          </PressFeedbackProvider>
-        </GestureHandlerRootView>
-      </DevelopmentRoot>
-    </AppLocaleProvider>
+    <KeyboardProvider>
+      <AppLocaleProvider>
+        <DevelopmentRoot>
+          <GestureHandlerRootView style={{ flex: 1 }}>
+            <PressFeedbackProvider>
+              <AppNavigationProvider>
+                <StatusBar style="dark" />
+                <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: '#F4F0E8' } }} />
+              </AppNavigationProvider>
+            </PressFeedbackProvider>
+          </GestureHandlerRootView>
+        </DevelopmentRoot>
+      </AppLocaleProvider>
+    </KeyboardProvider>
   );
 }

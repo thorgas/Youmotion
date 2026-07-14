@@ -137,6 +137,10 @@ describe('check-in screens', () => {
   it('lets the reflection screen edit and submit a note', async () => {
     await act(_reachReflection);
     const screen = await _renderLocalized(<ReflectionScreen />);
+    expect(screen.getByTestId('reflection-keyboard-scroll').props).toMatchObject({
+      keyboardDismissMode: 'interactive',
+      keyboardShouldPersistTaps: 'handled',
+    });
     await fireEvent.changeText(screen.getByLabelText('Optional note about the feeling'), 'Ein heller Moment.');
     await fireEvent.press(screen.getByText('Save check-in'));
 
