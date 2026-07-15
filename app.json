@@ -31,13 +31,33 @@
       "expo-router",
       "expo-localization",
       [
+        "expo-dev-client",
+        {
+          "launchMode": "launcher"
+        }
+      ],
+      [
         "expo-splash-screen",
         {
           "backgroundColor": "#F4F0E8",
           "image": "./assets/images/splash-icon.png",
           "imageWidth": 76
         }
-      ]
+      ],
+      [
+        "expo-build-properties",
+        {
+          "ios": {
+            "buildReactNativeFromSource": true,
+            "ccacheEnabled": true,
+            "usePrecompiledModules": false
+          }
+        }
+      ],
+      "expo-font",
+      "expo-image",
+      "expo-status-bar",
+      "expo-web-browser"
     ],
     "experiments": {
       "typedRoutes": true,

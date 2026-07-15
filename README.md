@@ -56,6 +56,34 @@ pnpm start
 ```
 
 The repository pins pnpm 11.12.0 through the `packageManager` field and commits a pnpm lockfile. Do not generate npm or Yarn lockfiles.
+`pnpm start` targets the Youmotion development client and displays a QR code. Use `pnpm start:tunnel` when a physical device cannot reach the computer over the local network.
+
+Install a development client once on each physical device before scanning Metro QR codes. Android internal builds produce an installable APK. iOS device builds require an Apple Developer account and a registered device:
+
+```bash
+pnpm dlx eas-cli@latest login
+pnpm dlx eas-cli@latest init
+pnpm dlx eas-cli@latest build --platform android --profile development
+pnpm dlx eas-cli@latest build --platform ios --profile development
+```
+
+After installing the resulting build, open Youmotion and scan the QR code printed by `pnpm start`. Rebuild the client only when native dependencies or native configuration change; ordinary TypeScript, styling, and translation changes load through Metro.
+
+Native fingerprints make that rebuild decision explicit. These local commands use Expo's pinned SDK 57 fingerprint implementation and require no Expo account; an unchanged platform hash means the installed development client is still compatible:
+
+```bash
+pnpm fingerprint:android
+pnpm fingerprint:ios
+```
+
+For simulators and emulators, EAS CLI can find and install an existing development build with the same fingerprint, or create one when no match exists:
+
+```bash
+pnpm dlx eas-cli@latest build:dev --platform android
+pnpm dlx eas-cli@latest build:dev --platform ios
+```
+
+EAS dependency caches remain enabled by default, and the development profile enables the EAS compiler cache. Local iOS builds compile React Native from source because the SDK 57 precompiled React framework does not contain a development symbol required by `expo-dev-launcher`; the native project is ccache-ready, and `brew install ccache` enables that cache on this Mac. Do not cache `node_modules` separately because pnpm and EAS already restore dependencies from the lockfile and package caches.
 
 Build and launch the native development apps, or open web from Expo's terminal UI:
 
@@ -75,7 +103,7 @@ pnpm doctor:react
 ```
 
 `pnpm typecheck` invokes TypeScript 7 directly. `typecheck:compat` checks the compatibility compiler used by editor and lint integrations.
-The pnpm patch for `expo-modules-jsi` keeps Expo SDK 57 buildable with the repository host's Xcode 26.1 Swift compiler.
+The pnpm patches for `expo-modules-core` and `expo-modules-jsi` keep Expo SDK 57 buildable with the repository host's Xcode 26.1 Swift compiler. They only replace invalid immutable weak references with mutable weak references and can be removed after moving to Expo's supported Xcode 26.4 or newer toolchain.
 
 ## Internationalization
 

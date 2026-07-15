@@ -13,6 +13,13 @@ diff --git a/apple/Sources/ExpoModulesJSI/Contexts/HostObjectContext.swift b/app
 @@ -8 +8 @@
 -  weak let runtime: JavaScriptRuntime?
 +  nonisolated(unsafe) weak var runtime: JavaScriptRuntime?
+diff --git a/apple/Sources/ExpoModulesJSI/Coding/JavaScriptCodable+Date.swift b/apple/Sources/ExpoModulesJSI/Coding/JavaScriptCodable+Date.swift
+--- a/apple/Sources/ExpoModulesJSI/Coding/JavaScriptCodable+Date.swift
++++ b/apple/Sources/ExpoModulesJSI/Coding/JavaScriptCodable+Date.swift
+@@ -53 +53,2 @@ func dateFromMilliseconds(_ milliseconds: Double) throws -> Date {
+-  guard milliseconds.isFinite, abs(milliseconds) <= maxJavaScriptDateMilliseconds else {
++  let magnitude: Double = Swift.abs(milliseconds)
++  guard milliseconds.isFinite, magnitude <= maxJavaScriptDateMilliseconds else {
 diff --git a/apple/Sources/ExpoModulesJSI/Runtime/JavaScriptActor.swift b/apple/Sources/ExpoModulesJSI/Runtime/JavaScriptActor.swift
 --- a/apple/Sources/ExpoModulesJSI/Runtime/JavaScriptActor.swift
 +++ b/apple/Sources/ExpoModulesJSI/Runtime/JavaScriptActor.swift
