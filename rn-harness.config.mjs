@@ -3,13 +3,13 @@ import { applePlatform, appleSimulator } from '@react-native-harness/platform-ap
 import { chrome, webPlatform } from '@react-native-harness/platform-web';
 
 export default {
-  entryPoint: 'expo-router/entry',
+  entryPoint: './entry.tsx',
   appRegistryComponentName: 'main',
   runners: [
     webPlatform({ name: 'web', browser: chrome('http://localhost:8081/index.html') }),
     applePlatform({
       name: 'ios',
-      device: appleSimulator('iPhone 16 Pro', '18.0'),
+      device: appleSimulator('iPhone 17 Pro', '26.1'),
       bundleId: 'app.youmotion.mobile',
     }),
     androidPlatform({

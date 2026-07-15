@@ -1,4 +1,3 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createActor, waitFor } from 'xstate';
 
 import {
@@ -10,7 +9,16 @@ import {
   NAVIGATION_STATES,
 } from '@/constants';
 import type { EmotionSelection } from '@/features/check-in/domain/check-in';
+import {
+  failNextSurrealUpsert,
+  mockSurrealDatabase,
+  resetSurrealDatabaseMock,
+} from '@/test-utils/surrealdb.repository.mock';
 import { appNavigationMachine, routeForStateValue } from '../app-navigation.machine';
+
+jest.mock('@/features/check-in/infrastructure/surrealdb.database', () => ({
+  getDatabase: jest.fn(() => Promise.resolve(mockSurrealDatabase)),
+}));
 
 const selection = {
   emotionId: EMOTION_IDS.JOY,
@@ -20,9 +28,8 @@ const selection = {
 } satisfies EmotionSelection;
 
 describe('app navigation model', () => {
-  beforeEach(async () => {
-    await AsyncStorage.clear();
-    jest.restoreAllMocks();
+  beforeEach(() => {
+    resetSurrealDatabaseMock();
   });
 
   it('makes tab navigation an explicit state graph', () => {
@@ -97,7 +104,7 @@ describe('app navigation model', () => {
   });
 
   it('models a storage failure and successful retry', async () => {
-    jest.spyOn(AsyncStorage, 'setItem').mockRejectedValueOnce(new Error('storage unavailable'));
+    failNextSurrealUpsert(new Error('storage unavailable'));
     const actor = createActor(appNavigationMachine).start();
     actor.send({ type: CHECK_IN_EVENTS.TOUCH_STARTED });
     actor.send({ type: CHECK_IN_EVENTS.SELECTION_CHANGED, selection });

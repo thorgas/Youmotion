@@ -1,4 +1,3 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { act, fireEvent, render, waitFor } from '@testing-library/react-native';
 import type { ReactElement } from 'react';
 import { createActor, type Actor } from 'xstate';
@@ -8,6 +7,10 @@ import { AppLocaleProvider } from '@/localization/app-locale-provider';
 import { appNavigationMachine } from '@/navigation/app-navigation.machine';
 import type { EmotionSelection } from '../domain/check-in';
 import { checkInHistoryStore } from '../application/check-in-history.store';
+import {
+  mockSurrealDatabase,
+  resetSurrealDatabaseMock,
+} from '@/test-utils/surrealdb.repository.mock';
 import { CheckInScreen } from '../ui/check-in-screen';
 import { EmotionStar } from '../ui/emotion-star';
 import { HistoryScreen } from '../ui/history-screen';
@@ -19,6 +22,10 @@ let mockActor: Actor<typeof appNavigationMachine>;
 
 jest.mock('@/navigation/app-navigation.provider', () => ({
   useAppNavigationActor: () => mockActor,
+}));
+
+jest.mock('../infrastructure/surrealdb.database', () => ({
+  getDatabase: jest.fn(() => Promise.resolve(mockSurrealDatabase)),
 }));
 
 const selection = {
@@ -37,8 +44,8 @@ const _reachReflection = () => {
 const _renderLocalized = (element: ReactElement) => render(<AppLocaleProvider>{element}</AppLocaleProvider>);
 
 describe('check-in screens', () => {
-  beforeEach(async () => {
-    await AsyncStorage.clear();
+  beforeEach(() => {
+    resetSurrealDatabaseMock();
     checkInHistoryStore.trigger.hydrated({ entries: [] });
     mockActor = createActor(appNavigationMachine).start();
   });
