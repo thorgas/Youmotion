@@ -4,7 +4,7 @@ import Animated, {
   Easing,
   interpolate,
   useAnimatedStyle,
-  useDerivedValue,
+  useFrameCallback,
   useReducedMotion,
   useSharedValue,
   type SharedValue,
@@ -60,13 +60,21 @@ const _polar = ({ center, radius, angle }: { center: number; radius: number; ang
 
 function RevealedCharacter({ character, index, length, progress, style }: RevealedCharacterProps) {
   const animatedStyle = useAnimatedStyle(() => {
-    const staggerRange = 0.42;
+    const staggerRange = 0.64;
     const start = length <= 1 ? 0 : (index / (length - 1)) * staggerRange;
-    const characterProgress = interpolate(progress.value, [start, Math.min(start + 0.58, 1)], [0, 1]);
+    const characterProgress = interpolate(
+      progress.value,
+      [start, Math.min(start + 0.36, 1)],
+      [0, 1],
+      'clamp',
+    );
 
     return {
-      opacity: characterProgress,
-      transform: [{ translateX: interpolate(characterProgress, [0, 1], [-2.5, 0]) }],
+      opacity: interpolate(characterProgress, [0, 0.72, 1], [0, 0.92, 1]),
+      transform: [
+        { translateX: interpolate(characterProgress, [0, 0.72, 1], [-9, 1.5, 0]) },
+        { scale: interpolate(characterProgress, [0, 0.72, 1], [0.96, 1.015, 1]) },
+      ],
     };
   }, [index, length, progress]);
 
@@ -76,13 +84,19 @@ function RevealedCharacter({ character, index, length, progress, style }: Reveal
 function RevealedText({ delay, style, testID, text }: RevealedTextProps) {
   const reduceMotion = useReducedMotion();
   const characters = Array.from(text);
-  const progress = useDerivedValue(() => {
-    if (reduceMotion) return 1;
-    return withDelay(delay, withTiming(1, {
+  const progress = useSharedValue(reduceMotion ? 1 : 0);
+  const hasStarted = useSharedValue(reduceMotion);
+  const _startReveal = () => {
+    'worklet';
+    if (hasStarted.value) return;
+    hasStarted.value = true;
+    progress.value = withDelay(delay, withTiming(1, {
       duration: EMOTION_TEXT_REVEAL_DURATION,
-      easing: Easing.bezier(0.22, 1, 0.36, 1),
+      easing: Easing.bezier(0.3, 0, 0.2, 1),
     }));
-  }, [delay, reduceMotion]);
+  };
+
+  useFrameCallback(_startReveal, true);
 
   return (
     <View accessibilityLabel={text} accessible style={styles.revealLine} testID={testID}>
