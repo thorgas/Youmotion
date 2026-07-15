@@ -1,4 +1,3 @@
-import { LinearGradient } from 'expo-linear-gradient';
 import { StyleSheet, View } from 'react-native';
 import Animated, {
   interpolate,
@@ -29,45 +28,23 @@ function RippleRing({ phase, progress }: RippleRingProps) {
 
     return {
       opacity: interpolate(waveProgress, [0, 0.14, 0.56, 1], [0, 0.36, 0.15, 0]),
-      transform: [
-        { rotateZ: '-11deg' },
-        { scaleX: interpolate(waveProgress, [0, 1], [0.38, 4.45]) },
-        { scaleY: interpolate(waveProgress, [0, 1], [0.3, 4.05]) },
-      ],
+      transform: [{ scale: interpolate(waveProgress, [0, 1], [0.35, 4.3]) }],
     };
   }, [phase, progress]);
 
   return (
-    <Animated.View style={[styles.ring, animatedStyle]}>
-      <View style={styles.ringShade} />
+    <Animated.View style={[styles.ring, animatedStyle]} testID="water-ripple-ring">
+      <View style={styles.ringShadow} />
+      <View style={styles.ringHighlight} />
     </Animated.View>
   );
 }
 
-function WaterDrop({ progress, reduceMotion }: { progress: SharedValue<number>; reduceMotion: boolean }) {
-  const animatedStyle = useAnimatedStyle(() => {
-    const pulse = reduceMotion ? 0.5 : progress.value;
-
-    return {
-      opacity: interpolate(pulse, [0, 0.5, 1], [0.74, 0.94, 0.74]),
-      transform: [
-        { rotateZ: `${interpolate(pulse, [0, 0.5, 1], [-13, -9, -13])}deg` },
-        { translateY: interpolate(pulse, [0, 0.5, 1], [1, -1.5, 1]) },
-        { scale: interpolate(pulse, [0, 0.5, 1], [0.94, 1.04, 0.94]) },
-      ],
-    };
-  }, [progress, reduceMotion]);
-
+function RippleOrigin() {
   return (
-    <Animated.View style={[styles.drop, animatedStyle]} testID="water-drop-core">
-      <LinearGradient
-        colors={[palette.whiteWash, palette.hairline, palette.ink]}
-        end={{ x: 0.82, y: 0.9 }}
-        start={{ x: 0.16, y: 0.08 }}
-        style={styles.dropGradient}
-      />
-      <View style={styles.dropHighlight} />
-    </Animated.View>
+    <View style={styles.origin} testID="ripple-origin">
+      <View style={styles.originHighlight} />
+    </View>
   );
 }
 
@@ -92,7 +69,7 @@ export function BaseStateRipples({ offsetX, offsetY }: BaseStateRipplesProps) {
       {BASE_RIPPLE_PHASES.map((phase) => (
         <RippleRing key={phase} phase={phase} progress={progress} />
       ))}
-      <WaterDrop progress={progress} reduceMotion={reduceMotion} />
+      <RippleOrigin />
     </Animated.View>
   );
 }
@@ -109,54 +86,54 @@ const styles = StyleSheet.create({
   },
   ring: {
     position: 'absolute',
-    width: 74,
-    height: 56,
-    borderRadius: 37,
+    width: 72,
+    height: 72,
+    borderRadius: 36,
     borderWidth: 1.25,
     borderColor: palette.ink,
   },
-  ringShade: {
+  ringShadow: {
     position: 'absolute',
-    top: 0,
-    right: 0,
-    bottom: 0,
-    left: 0,
-    borderRadius: 37,
-    borderTopWidth: 0.8,
-    borderLeftWidth: 0.55,
-    borderColor: palette.whiteWash,
-    opacity: 0.78,
+    top: 1,
+    right: -1,
+    bottom: -1,
+    left: 1,
+    borderRadius: 36,
+    borderBottomWidth: 1.4,
+    borderRightWidth: 1.4,
+    borderBottomColor: palette.ink,
+    borderRightColor: palette.ink,
+    opacity: 0.34,
   },
-  drop: {
+  ringHighlight: {
     position: 'absolute',
-    width: 34,
-    height: 40,
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 22,
-    borderBottomRightRadius: 19,
-    borderBottomLeftRadius: 16,
-    backgroundColor: palette.hairline,
-    boxShadow: '4px 7px 9px rgba(42, 39, 34, 0.22)',
+    top: -1,
+    right: 1,
+    bottom: 1,
+    left: -1,
+    borderRadius: 36,
+    borderTopWidth: 1.15,
+    borderLeftWidth: 1.15,
+    borderTopColor: palette.whiteWash,
+    borderLeftColor: palette.whiteWash,
+    opacity: 0.9,
   },
-  dropGradient: {
+  origin: {
     position: 'absolute',
-    top: 0,
-    right: 0,
-    bottom: 0,
-    left: 0,
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 22,
-    borderBottomRightRadius: 19,
-    borderBottomLeftRadius: 16,
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: palette.ink,
+    boxShadow: '1px 2px 3px rgba(42, 39, 34, 0.24)',
   },
-  dropHighlight: {
+  originHighlight: {
     position: 'absolute',
-    top: 7,
-    left: 8,
-    width: 9,
-    height: 6,
-    borderRadius: 5,
+    top: 1,
+    left: 1,
+    width: 2,
+    height: 2,
+    borderRadius: 1,
     backgroundColor: palette.whiteWash,
-    opacity: 0.88,
+    opacity: 0.82,
   },
 });

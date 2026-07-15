@@ -55,7 +55,16 @@ describe('check-in screens', () => {
       alignItems: 'center',
       justifyContent: 'center',
     });
-    expect(screen.getByTestId('water-drop-core')).toBeTruthy();
+    expect(screen.getByTestId('ripple-origin')).toHaveStyle({
+      width: 8,
+      height: 8,
+      borderRadius: 4,
+    });
+    expect(screen.getAllByTestId('water-ripple-ring')[0]).toHaveStyle({
+      width: 72,
+      height: 72,
+      borderRadius: 36,
+    });
   });
 
   it('maps star responder movement to a selection and release', async () => {
