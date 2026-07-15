@@ -39,7 +39,7 @@
       "tokens": [],
       "translations": [
         {
-          "translation": "Wähle die Sprache, die in Youmotion verwendet wird.",
+          "translation": "Wähle die Sprache für Youmotion.",
           "variations": {}
         }
       ],
@@ -72,7 +72,7 @@
       "tokens": [],
       "translations": [
         {
-          "translation": "Privat by Design",
+          "translation": "Von Anfang an privat",
           "variations": {}
         }
       ],
@@ -83,7 +83,7 @@
       "tokens": [],
       "translations": [
         {
-          "translation": "Deine Check-ins werden derzeit ausschließlich lokal auf diesem Gerät gespeichert.",
+          "translation": "Deine Check-ins bleiben auf diesem Gerät und werden nicht hochgeladen.",
           "variations": {}
         }
       ],
@@ -105,7 +105,7 @@
       "tokens": [],
       "translations": [
         {
-          "translation": "Die sieben Grundrichtungen basieren auf dem deutschen Therapiematerial „Der Gefühlsstern“. Die App dient der Selbstreflexion, nicht der Diagnose.",
+          "translation": "Die sieben Gefühlsrichtungen orientieren sich am deutschen Therapiematerial „Der Gefühlsstern“. Youmotion hilft dir bei der Selbstreflexion und stellt keine Diagnose.",
           "variations": {}
         }
       ],
@@ -171,7 +171,7 @@
       "tokens": [],
       "translations": [
         {
-          "translation": "Zuletzt eingecheckt",
+          "translation": "Dein letzter Check-in",
           "variations": {}
         }
       ],
@@ -182,7 +182,7 @@
       "tokens": [],
       "translations": [
         {
-          "translation": "Youmotion unterstützt die Selbstwahrnehmung und ersetzt keine psychotherapeutische oder medizinische Behandlung.",
+          "translation": "Youmotion kann dir helfen, deine Gefühle bewusster wahrzunehmen. Die App ersetzt keine Psychotherapie oder medizinische Behandlung.",
           "variations": {}
         }
       ],
@@ -798,7 +798,7 @@
       "tokens": [],
       "translations": [
         {
-          "translation": "Gefühlsstern. Ziehe vom Zentrum nach außen.",
+          "translation": "Gefühlsstern. Ziehe vom Mittelpunkt nach außen.",
           "variations": {}
         }
       ],
@@ -809,7 +809,7 @@
       "tokens": [],
       "translations": [
         {
-          "translation": "{emotionName}, {emotionNuance}, Intensität {intensity} Prozent",
+          "translation": "{emotionName}, {emotionNuance}, Intensität: {intensity} Prozent",
           "variations": {}
         }
       ],
@@ -820,7 +820,7 @@
       "tokens": [],
       "translations": [
         {
-          "translation": "Berühren",
+          "translation": "Mitte berühren",
           "variations": {}
         }
       ],
@@ -853,7 +853,7 @@
       "tokens": [],
       "translations": [
         {
-          "translation": "Momente, die du bemerkt hast.",
+          "translation": "Momente, die du wahrgenommen hast.",
           "variations": {}
         }
       ],
@@ -875,7 +875,7 @@
       "tokens": [],
       "translations": [
         {
-          "translation": "Noch ganz ruhig hier.",
+          "translation": "Hier ist es noch ganz ruhig.",
           "variations": {}
         }
       ],
@@ -886,7 +886,7 @@
       "tokens": [],
       "translations": [
         {
-          "translation": "Nach deinem ersten Check-in entsteht an dieser Stelle ein behutsamer Verlauf.",
+          "translation": "Nach deinem ersten Check-in findest du hier deinen Verlauf.",
           "variations": {}
         }
       ],
@@ -941,7 +941,7 @@
       "tokens": [],
       "translations": [
         {
-          "translation": "Optionale Notiz zum Gefühl",
+          "translation": "Optional: Notiz zu deinem Gefühl",
           "variations": {}
         }
       ],
@@ -1007,7 +1007,7 @@
       "tokens": [],
       "translations": [
         {
-          "translation": "Bei dir angekommen.",
+          "translation": "Du bist bei dir angekommen.",
           "variations": {}
         }
       ],
@@ -1018,7 +1018,7 @@
       "tokens": [],
       "translations": [
         {
-          "translation": "Dein Check-in „{emotionName} · {emotionNuance}“ wurde nur auf diesem Gerät gespeichert.",
+          "translation": "Dein Check-in „{emotionName} · {emotionNuance}“ ist nur auf diesem Gerät gespeichert.",
           "variations": {}
         }
       ],

@@ -175,6 +175,6 @@ describe('check-in screens', () => {
     const settings = await _renderLocalized(<SettingsScreen />);
     expect(settings.getByText('Private by design')).toBeTruthy();
     await fireEvent.press(settings.getByText('German'));
-    await waitFor(() => expect(settings.getByText('Privat by Design')).toBeTruthy());
+    await waitFor(() => expect(settings.getByText('Von Anfang an privat')).toBeTruthy());
   });
 });
