@@ -10,9 +10,7 @@ export const palette = Object.freeze({
 });
 
 export const type = Object.freeze({
-  sans: 'DMSans_400Regular',
-  sansMedium: 'DMSans_500Medium',
-  sansSemibold: 'DMSans_600SemiBold',
-  serif: 'Fraunces_500Medium',
-  serifSemibold: 'Fraunces_600SemiBold',
+  regular: 'Fraunces_400Regular',
+  medium: 'Fraunces_500Medium',
+  semibold: 'Fraunces_600SemiBold',
 });

@@ -156,7 +156,7 @@ function EmotionField({ center, radius, rippleOffsetX, rippleOffsetY, selection,
               textAnchor="middle"
               fill={palette.ink}
               fillOpacity={isActive ? 0.88 : 0.2}
-              fontFamily={isActive ? type.sansMedium : type.sans}
+              fontFamily={isActive ? type.medium : type.regular}
               fontSize={isActive ? 12 : 10}
               letterSpacing={0.3}>
               {emotionName(emotion.id)}
@@ -254,7 +254,7 @@ const styles = StyleSheet.create({
   },
   readoutEmotion: {
     color: palette.ink,
-    fontFamily: type.sansMedium,
+    fontFamily: type.medium,
     fontSize: 16,
     letterSpacing: 0.8,
     opacity: 0.82,
@@ -266,7 +266,7 @@ const styles = StyleSheet.create({
   },
   readoutNuance: {
     color: palette.inkMuted,
-    fontFamily: type.sans,
+    fontFamily: type.regular,
     fontSize: 11,
     letterSpacing: 0.8,
     marginTop: 7,

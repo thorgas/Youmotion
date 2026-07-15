@@ -35,9 +35,9 @@ const styles = StyleSheet.create({
   page: { flex: 1, backgroundColor: palette.paper },
   content: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 28 },
   halo: { width: 76, height: 76, borderRadius: 38, borderWidth: 1.5, borderColor: palette.moss, alignItems: 'center', justifyContent: 'center', backgroundColor: palette.paperRaised },
-  check: { fontFamily: type.sansSemibold, color: palette.moss, fontSize: 32 },
-  title: { fontFamily: type.serifSemibold, color: palette.ink, fontSize: 32, textAlign: 'center', marginTop: 22 },
-  copy: { fontFamily: type.sans, color: palette.inkMuted, fontSize: 15, lineHeight: 22, textAlign: 'center', maxWidth: 330, marginTop: 10 },
+  check: { fontFamily: type.semibold, color: palette.moss, fontSize: 32 },
+  title: { fontFamily: type.semibold, color: palette.ink, fontSize: 32, textAlign: 'center', marginTop: 22 },
+  copy: { fontFamily: type.regular, color: palette.inkMuted, fontSize: 15, lineHeight: 22, textAlign: 'center', maxWidth: 330, marginTop: 10 },
   button: { minHeight: 50, backgroundColor: palette.ink, borderRadius: 16, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 28, marginTop: 28 },
-  buttonText: { fontFamily: type.sansSemibold, color: '#FFFFFF', fontSize: 14 },
+  buttonText: { fontFamily: type.semibold, color: '#FFFFFF', fontSize: 14 },
 });
