@@ -1,6 +1,7 @@
 allowBuilds:
   '@ottrelite/backend-wrapper-tracy': true
   '@ottrelite/core': true
+  dtrace-provider: false
   esbuild: true
 minimumReleaseAgeExclude:
   - expo-dev-client@57.0.6
