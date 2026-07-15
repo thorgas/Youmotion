@@ -62,6 +62,12 @@ export const APP_LOCALES = Object.freeze({
   GERMAN: literal('de-DE'),
 });
 
+export const APP_TYPE = Object.freeze({
+  regular: 'Fraunces_400Regular',
+  medium: 'Fraunces_500Medium',
+  semibold: 'Fraunces_600SemiBold',
+});
+
 export const CHECK_IN_STORAGE_KEY = 'youmotion.check-ins.v1';
 export const MAX_CHECK_IN_HISTORY = 30;
 export const MAX_NOTE_LENGTH = 240;

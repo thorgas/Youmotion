@@ -1,3 +1,5 @@
+import { APP_TYPE } from '@/constants';
+
 export const palette = Object.freeze({
   paper: '#F9F7F4',
   paperRaised: '#FCFBF9',
@@ -9,8 +11,4 @@ export const palette = Object.freeze({
   danger: '#9D4E42',
 });
 
-export const type = Object.freeze({
-  regular: 'Fraunces_400Regular',
-  medium: 'Fraunces_500Medium',
-  semibold: 'Fraunces_600SemiBold',
-});
+export const type = APP_TYPE;
