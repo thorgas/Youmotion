@@ -55,9 +55,8 @@ export const persistCheckIn = Effect.fn('CheckInRepository.persist')(({
       id: CheckInId.make(`${Date.now()}-${Math.random().toString(16).slice(2)}`),
       createdAt: CheckInTimestamp.make(new Date().toISOString()),
       emotionId: selection.emotionId,
-      emotion: selection.emotion,
-      nuance: selection.nuance,
       intensity: selection.intensity,
+      level: selection.level,
       note: note.trim(),
     };
     const next = [checkIn, ...existing].slice(0, MAX_CHECK_IN_HISTORY);

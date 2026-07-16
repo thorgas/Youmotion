@@ -14,8 +14,6 @@ import { appNavigationMachine, routeForStateValue } from '../app-navigation.mach
 
 const selection = {
   emotionId: EMOTION_IDS.JOY,
-  emotion: 'Freude',
-  nuance: 'Fröhlichkeit',
   intensity: 0.42,
   level: 2,
   color: '#E7AD32',
@@ -50,6 +48,12 @@ describe('app navigation model', () => {
 
     actor.send({ type: CHECK_IN_EVENTS.TOUCH_STARTED });
     actor.send({ type: CHECK_IN_EVENTS.SELECTION_CHANGED, selection });
+    expect(actor.getSnapshot().matches({
+      [NAVIGATION_STATES.TABS]: {
+        [NAVIGATION_STATES.TODAY]: CHECK_IN_STATES.EXPLORING,
+      },
+    })).toBe(true);
+    expect(routeForStateValue(actor.getSnapshot().value)).toBe(APP_ROUTES.TODAY);
     actor.send({ type: CHECK_IN_EVENTS.SELECTION_RELEASED });
     expect(actor.getSnapshot().matches(NAVIGATION_STATES.REFLECTION)).toBe(true);
     expect(routeForStateValue(actor.getSnapshot().value)).toBe(APP_ROUTES.REFLECTION);
@@ -58,6 +62,21 @@ describe('app navigation model', () => {
     expect(actor.getSnapshot().context.note).toHaveLength(240);
     actor.send({ type: CHECK_IN_EVENTS.CONFIRMED });
     expect(actor.getSnapshot().matches(CHECK_IN_STATES.SAVING)).toBe(true);
+  });
+
+  it('cancels an interrupted drag without selecting its preview', () => {
+    const actor = createActor(appNavigationMachine).start();
+    actor.send({ type: CHECK_IN_EVENTS.TOUCH_STARTED });
+    actor.send({ type: CHECK_IN_EVENTS.SELECTION_CHANGED, selection });
+    actor.send({ type: CHECK_IN_EVENTS.SELECTION_CANCELLED });
+
+    expect(actor.getSnapshot().matches({
+      [NAVIGATION_STATES.TABS]: {
+        [NAVIGATION_STATES.TODAY]: CHECK_IN_STATES.IDLE,
+      },
+    })).toBe(true);
+    expect(actor.getSnapshot().context.selection).toBeNull();
+    expect(routeForStateValue(actor.getSnapshot().value)).toBe(APP_ROUTES.TODAY);
   });
 
   it('persists through the saving state and reaches success', async () => {

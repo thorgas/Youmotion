@@ -29,6 +29,13 @@
     },
     "plugins": [
       "expo-router",
+      "expo-localization",
+      [
+        "expo-dev-client",
+        {
+          "launchMode": "launcher"
+        }
+      ],
       [
         "expo-splash-screen",
         {
@@ -36,7 +43,21 @@
           "image": "./assets/images/splash-icon.png",
           "imageWidth": 76
         }
-      ]
+      ],
+      [
+        "expo-build-properties",
+        {
+          "ios": {
+            "buildReactNativeFromSource": true,
+            "ccacheEnabled": true,
+            "usePrecompiledModules": false
+          }
+        }
+      ],
+      "expo-font",
+      "expo-image",
+      "expo-status-bar",
+      "expo-web-browser"
     ],
     "experiments": {
       "typedRoutes": true,

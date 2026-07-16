@@ -7,8 +7,6 @@ import { loadCheckIns, persistCheckIn } from '../infrastructure/check-in.reposit
 
 const selection = {
   emotionId: EMOTION_IDS.JOY,
-  emotion: 'Freude',
-  nuance: 'Fröhlichkeit',
   intensity: 0.5,
   level: 2,
   color: '#E7AD32',
@@ -26,6 +24,27 @@ describe('Effect check-in repository', () => {
 
     expect(saved.note).toBe('Ein heller Moment.');
     expect(loaded).toEqual([saved]);
+  });
+
+  it('loads legacy check-ins without persisting localized labels', async () => {
+    await AsyncStorage.setItem(CHECK_IN_STORAGE_KEY, JSON.stringify([{
+      id: 'legacy-check-in',
+      createdAt: '2026-07-12T12:00:00.000Z',
+      emotionId: EMOTION_IDS.JOY,
+      emotion: 'Freude',
+      nuance: 'Fröhlichkeit',
+      intensity: 0.5,
+      note: '',
+    }]));
+
+    const loaded = await Effect.runPromise(loadCheckIns);
+    expect(loaded).toEqual([{
+      id: 'legacy-check-in',
+      createdAt: '2026-07-12T12:00:00.000Z',
+      emotionId: EMOTION_IDS.JOY,
+      intensity: 0.5,
+      note: '',
+    }]);
   });
 
   it('surfaces invalid persisted JSON as a tagged data error', async () => {

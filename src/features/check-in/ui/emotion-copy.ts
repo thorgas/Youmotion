@@ -1,0 +1,178 @@
+import { fbs } from 'fbtee';
+
+import { EMOTION_IDS } from '@/constants';
+import type { EmotionId, EmotionSelection } from '../domain/check-in';
+
+type Copy = () => string;
+type EmotionCopy = Readonly<{ name: Copy; nuances: readonly Copy[] }>;
+type LocalizedEmotionSelection = Readonly<{
+  emotionId: EmotionId;
+  intensity: number;
+  level?: number | undefined;
+}>;
+
+const emotionCopy = new Map<EmotionId, EmotionCopy>([
+  [EMOTION_IDS.JOY, {
+    name: () => String(fbs('Joy', 'Name of the joy emotion')),
+    nuances: [
+      () => String(fbs('Pleasure', 'Low-intensity nuance of joy')),
+      () => String(fbs('Enjoyment', 'Nuance of joy')),
+      () => String(fbs('Cheerfulness', 'Nuance of joy')),
+      () => String(fbs('Optimism', 'Nuance of joy')),
+      () => String(fbs('Enthusiasm', 'Nuance of joy')),
+      () => String(fbs('Contentment', 'Nuance of joy')),
+      () => String(fbs('Happiness', 'High-intensity nuance of joy')),
+    ],
+  }],
+  [EMOTION_IDS.LOVE, {
+    name: () => String(fbs('Love', 'Name of the love emotion')),
+    nuances: [
+      () => String(fbs('Fondness', 'Low-intensity nuance of love')),
+      () => String(fbs('Affection', 'Nuance of love')),
+      () => String(fbs('Familiarity', 'Nuance of love')),
+      () => String(fbs('Admiration', 'Nuance of love')),
+      () => String(fbs('Passion', 'Nuance of love')),
+      () => String(fbs('Desire', 'High-intensity nuance of love')),
+    ],
+  }],
+  [EMOTION_IDS.SHAME, {
+    name: () => String(fbs('Shame', 'Name of the shame emotion')),
+    nuances: [
+      () => String(fbs('Confusion', 'Low-intensity nuance of shame')),
+      () => String(fbs('Self-consciousness', 'Nuance of shame')),
+      () => String(fbs('Embarrassment', 'Nuance of shame')),
+      () => String(fbs('Humiliation', 'Nuance of shame')),
+      () => String(fbs('Regret', 'Nuance of shame')),
+      () => String(fbs('Remorse', 'Nuance of shame')),
+      () => String(fbs('Guilt', 'High-intensity nuance of shame')),
+    ],
+  }],
+  [EMOTION_IDS.DISGUST, {
+    name: () => String(fbs('Disgust', 'Name of the disgust emotion')),
+    nuances: [
+      () => String(fbs('Aversion', 'Low-intensity nuance of disgust')),
+      () => String(fbs('Reluctance', 'Nuance of disgust')),
+      () => String(fbs('Contempt', 'Nuance of disgust')),
+      () => String(fbs('Revulsion', 'Nuance of disgust')),
+      () => String(fbs('Repulsion', 'High-intensity nuance of disgust')),
+    ],
+  }],
+  [EMOTION_IDS.SADNESS, {
+    name: () => String(fbs('Sadness', 'Name of the sadness emotion')),
+    nuances: [
+      () => String(fbs('Gloom', 'Low-intensity nuance of sadness')),
+      () => String(fbs('Sorrow', 'Nuance of sadness')),
+      () => String(fbs('Disappointment', 'Nuance of sadness')),
+      () => String(fbs('Hopelessness', 'Nuance of sadness')),
+      () => String(fbs('Loneliness', 'Nuance of sadness')),
+      () => String(fbs('Despair', 'High-intensity nuance of sadness')),
+    ],
+  }],
+  [EMOTION_IDS.ANGER, {
+    name: () => String(fbs('Anger', 'Name of the anger emotion')),
+    nuances: [
+      () => String(fbs('Displeasure', 'Low-intensity nuance of anger')),
+      () => String(fbs('Annoyance', 'Nuance of anger')),
+      () => String(fbs('Irritation', 'Nuance of anger')),
+      () => String(fbs('Anger', 'Nuance of anger')),
+      () => String(fbs('Resentment', 'Nuance of anger')),
+      () => String(fbs('Rage', 'Nuance of anger')),
+      () => String(fbs('Aggression', 'High-intensity nuance of anger')),
+    ],
+  }],
+  [EMOTION_IDS.FEAR, {
+    name: () => String(fbs('Fear', 'Name of the fear emotion')),
+    nuances: [
+      () => String(fbs('Uncertainty', 'Low-intensity nuance of fear')),
+      () => String(fbs('Apprehension', 'Nuance of fear')),
+      () => String(fbs('Concern', 'Nuance of fear')),
+      () => String(fbs('Worry', 'Nuance of fear')),
+      () => String(fbs('Helplessness', 'Nuance of fear')),
+      () => String(fbs('Fright', 'Nuance of fear')),
+      () => String(fbs('Horror', 'Nuance of fear')),
+      () => String(fbs('Panic', 'High-intensity nuance of fear')),
+    ],
+  }],
+]);
+
+const _fallbackName = () => String(fbs('Emotion', 'Fallback emotion name'));
+const _fallbackNuance = () => String(fbs('Feeling', 'Fallback emotion nuance'));
+
+export function emotionName(emotionId: EmotionId) {
+  return emotionCopy.get(emotionId)?.name() ?? _fallbackName();
+}
+
+export function emotionNuance({
+  emotionId,
+  intensity,
+  level,
+}: {
+  emotionId: EmotionId;
+  intensity: number;
+  level?: number | undefined;
+}) {
+  const copy = emotionCopy.get(emotionId);
+  if (!copy) return _fallbackNuance();
+  const resolvedLevel = level ?? Math.min(Math.floor(intensity * copy.nuances.length), copy.nuances.length - 1);
+  return copy.nuances[resolvedLevel]?.() ?? copy.nuances[0]?.() ?? _fallbackNuance();
+}
+
+export function emotionSummary(selection: LocalizedEmotionSelection) {
+  return String(fbs(
+    fbs.param('emotionName', emotionName(selection.emotionId))
+      + ' · '
+      + fbs.param('emotionNuance', emotionNuance(selection)),
+    'Localized emotion and nuance in a check-in',
+  ));
+}
+
+export function intensityCopy(intensity: number) {
+  return String(fbs(
+    fbs.param('intensity', String(Math.round(intensity * 100))) + '% intensity',
+    'Intensity percentage for a check-in',
+  ));
+}
+
+export function nuanceIntensityCopy(selection: LocalizedEmotionSelection) {
+  return String(fbs(
+    fbs.param('emotionNuance', emotionNuance(selection))
+      + ' · '
+      + fbs.param('intensity', String(Math.round(selection.intensity * 100)))
+      + '%',
+    'Selected emotion nuance and intensity on reflection screen',
+  ));
+}
+
+export function emotionStarAccessibility(selection: EmotionSelection | null) {
+  if (!selection) return String(fbs('Emotion star. Drag outward from the center.', 'Emotion star accessibility instructions'));
+  return String(fbs(
+    fbs.param('emotionName', emotionName(selection.emotionId))
+      + ', '
+      + fbs.param('emotionNuance', emotionNuance(selection))
+      + ', intensity '
+      + fbs.param('intensity', String(Math.round(selection.intensity * 100)))
+      + ' percent',
+    'Selected emotion, nuance and intensity for accessibility',
+  ));
+}
+
+export function savedCheckInCopy(selection: LocalizedEmotionSelection) {
+  return String(fbs(
+    'Your check-in “'
+      + fbs.param('emotionName', emotionName(selection.emotionId))
+      + ' · '
+      + fbs.param('emotionNuance', emotionNuance(selection))
+      + '” was saved only on this device.',
+    'Confirmation that the localized check-in was saved locally',
+  ));
+}
+
+export const optionalNoteAccessibilityLabel = () => String(fbs(
+  'Optional note about the feeling',
+  'Accessibility label for the reflection note input',
+));
+
+export const optionalNotePlaceholder = () => String(fbs(
+  'A thought, a body sensation, a situation…',
+  'Placeholder for the optional reflection note',
+));

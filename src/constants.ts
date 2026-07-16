@@ -13,6 +13,7 @@ export const EMOTION_IDS = Object.freeze({
 export const CHECK_IN_EVENTS = Object.freeze({
   TOUCH_STARTED: literal('touch.started'),
   SELECTION_CHANGED: literal('selection.changed'),
+  SELECTION_CANCELLED: literal('selection.cancelled'),
   SELECTION_RELEASED: literal('selection.released'),
   NOTE_CHANGED: literal('note.changed'),
   CONFIRMED: literal('checkIn.confirmed'),
@@ -56,7 +57,25 @@ export const APP_ROUTES = Object.freeze({
   SUCCESS: literal('/success'),
 });
 
+export const APP_LOCALES = Object.freeze({
+  ENGLISH: literal('en-US'),
+  GERMAN: literal('de-DE'),
+});
+
+export const APP_TYPE = Object.freeze({
+  regular: 'Fraunces_400Regular',
+  medium: 'Fraunces_500Medium',
+  semibold: 'Fraunces_600SemiBold',
+});
+
 export const CHECK_IN_STORAGE_KEY = 'youmotion.check-ins.v1';
 export const MAX_CHECK_IN_HISTORY = 30;
 export const MAX_NOTE_LENGTH = 240;
-export const CHECK_IN_FAILURE_MESSAGE = 'Dein Check-in konnte nicht gespeichert werden.';
+export const CHECK_IN_FAILURE_MESSAGE = 'Your check-in could not be saved.';
+export const EMOTION_AXIS_START_ANGLE = -Math.PI / 4;
+export const EMOTION_AXIS_STEP = Math.PI / 4;
+export const BASE_RIPPLE_DURATION = 2800;
+export const BASE_RIPPLE_PHASES = Object.freeze([0, 0.25, 0.5, 0.75]);
+export const REFLECTION_KEYBOARD_BOTTOM_OFFSET = 82;
+export const EMOTION_TEXT_REVEAL_DURATION = 620;
+export const EMOTION_TEXT_REVEAL_STAGGER = 150;

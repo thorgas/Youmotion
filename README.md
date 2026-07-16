@@ -1,5 +1,7 @@
 # Youmotion
 
+Build, internal distribution, TestFlight, Google Play, and App Store release instructions are in [BUILD.md](./BUILD.md).
+
 Youmotion is a private, local-first Expo app for noticing and recording emotions with a seven-direction German `Gefühlsstern`. Dragging from the center chooses an emotion; distance chooses nuance and intensity. Releasing opens a short reflection, and a confirmed check-in is schema-validated before local persistence.
 
 This is a self-reflection tool, not a substitute for psychotherapy, medical advice, diagnosis, or emergency support.
@@ -11,6 +13,7 @@ This is a self-reflection tool, not a substitute for psychotherapy, medical advi
 - XState 6 alpha for the complete app and navigation state graph
 - XState Store for reactive check-in history
 - Effect and Effect Schema for workflows, validation, errors, and JSON persistence
+- fbtee 2 with English source strings and a German BCP 47 translation catalog
 - Jest, React Native Testing Library 14, and React Native Harness
 - Oxlint with TypeScript-7-powered type-aware linting and a project-local architecture plugin
 
@@ -55,10 +58,41 @@ pnpm start
 ```
 
 The repository pins pnpm 11.12.0 through the `packageManager` field and commits a pnpm lockfile. Do not generate npm or Yarn lockfiles.
+`pnpm start` targets the Youmotion development client and displays a QR code. Use `pnpm start:tunnel` when a physical device cannot reach the computer over the local network.
 
-Open iOS, Android, or web from Expo's terminal UI. Useful commands:
+Install a development client once on each physical device before scanning Metro QR codes. Android internal builds produce an installable APK. iOS device builds require an Apple Developer account and a registered device:
 
 ```bash
+pnpm dlx eas-cli@latest login
+pnpm dlx eas-cli@latest init
+pnpm dlx eas-cli@latest build --platform android --profile development
+pnpm dlx eas-cli@latest build --platform ios --profile development
+```
+
+After installing the resulting build, open Youmotion and scan the QR code printed by `pnpm start`. Rebuild the client only when native dependencies or native configuration change; ordinary TypeScript, styling, and translation changes load through Metro.
+
+Native fingerprints make that rebuild decision explicit. These local commands use Expo's pinned SDK 57 fingerprint implementation and require no Expo account; an unchanged platform hash means the installed development client is still compatible:
+
+```bash
+pnpm fingerprint:android
+pnpm fingerprint:ios
+```
+
+For simulators and emulators, EAS CLI can find and install an existing development build with the same fingerprint, or create one when no match exists:
+
+```bash
+pnpm dlx eas-cli@latest build:dev --platform android
+pnpm dlx eas-cli@latest build:dev --platform ios
+```
+
+EAS dependency caches remain enabled by default, and the development profile enables the EAS compiler cache. Local iOS builds compile React Native from source because the SDK 57 precompiled React framework does not contain a development symbol required by `expo-dev-launcher`; the native project is ccache-ready, and `brew install ccache` enables that cache on this Mac. Do not cache `node_modules` separately because pnpm and EAS already restore dependencies from the lockfile and package caches.
+
+Build and launch the native development apps, or open web from Expo's terminal UI:
+
+```bash
+pnpm ios
+pnpm android
+pnpm web
 pnpm lint
 pnpm lint:rules
 pnpm typecheck
@@ -71,10 +105,28 @@ pnpm doctor:react
 ```
 
 `pnpm typecheck` invokes TypeScript 7 directly. `typecheck:compat` checks the compatibility compiler used by editor and lint integrations.
+The pnpm patches for `expo-modules-core` and `expo-modules-jsi` keep Expo SDK 57 buildable with the repository host's Xcode 26.1 Swift compiler. They only replace invalid immutable weak references with mutable weak references and can be removed after moving to Expo's supported Xcode 26.4 or newer toolchain.
+
+## Internationalization
+
+fbtee compiles inline translator-aware source strings through Babel. English (`en-US`) is the source language, German (`de-DE`) is maintained in `translations/de-DE.json`, and the initial locale follows the device preference from `expo-localization`. The language can be changed from Settings.
+
+```bash
+pnpm i18n:collect
+pnpm i18n:prepare
+pnpm i18n:compile
+pnpm i18n:all
+```
+
+`i18n:prepare` adds new phrases to the editable German catalog with a `new` status. Translate those entries and remove the status before committing. The compact runtime catalog under `src/translations` is generated during `pnpm install` and intentionally ignored.
+
+Persisted check-ins store stable emotion IDs, intensity, and nuance levels rather than localized labels. Existing German-label records remain readable and are projected into the active locale at render time.
 
 ## Developer tooling
 
 The repository includes Callstack's project-local React Native, navigation, upgrade, GitHub, and GitHub Actions agent skills. The tooling dependencies are pinned in the pnpm lockfile rather than installed globally.
+
+Pressto provides consistent press feedback for the app's tap controls. A shared configuration uses subtle scale compression, a near-critically damped spring, and the system reduced-motion preference; direct-manipulation gestures such as the emotion star keep their gesture-specific feedback.
 
 Use a development build when working with native tooling. Expo Go cannot load Inspector, React Native Grab, Nitro Modules, or the Ottrelite Tracy backend.
 
@@ -86,7 +138,7 @@ pnpm devtools:inspector
 
 `start:tools` enables Rozenite with its Metro require profiler and performance monitor. React Native Grab is available from the development menu and is wrapped around every native route. `devtools:react` exposes the React tree and profiler to agent tooling. Inspector is opt-in for release profiling: start its server, then run a release development build with `WITH_INSPECTOR=true`.
 
-Ottrelite installs the Tracy backend only in development JavaScript. Native development builds include the backend and Nitro Modules. Start Tracy 0.12.2 on the host; for Android, run `pnpm tracy:android` to forward port 8086 before recording. Tracy does not support Ottrelite async events, so use synchronous events and counters for Tracy sessions.
+Ottrelite installs the Tracy backend only in development JavaScript. Native development builds include the backend and Nitro Modules. `pnpm ios` prepares the pinned Tracy 0.12.2 sources before CocoaPods runs. Start Tracy 0.12.2 on the host; for Android, run `pnpm tracy:android` to forward port 8086 before recording. Tracy does not support Ottrelite async events, so use synchronous events and counters for Tracy sessions.
 
 Reassure has a first domain performance scenario and keeps measurements under the ignored `.reassure` directory:
 

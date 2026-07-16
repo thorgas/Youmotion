@@ -1,7 +1,7 @@
+import { EMOTION_AXIS_START_ANGLE, EMOTION_AXIS_STEP } from '@/constants';
 import { emotions, type EmotionSelection } from './emotion';
 
 const TAU = Math.PI * 2;
-const START_ANGLE = -Math.PI / 2;
 
 export type Point = Readonly<{ x: number; y: number }>;
 
@@ -13,7 +13,7 @@ const _circularDistance = ({ a, b }: { a: number; b: number }) => {
 };
 
 export function emotionAngle(index: number) {
-  return START_ANGLE + index * (TAU / emotions.length);
+  return EMOTION_AXIS_START_ANGLE + index * EMOTION_AXIS_STEP;
 }
 
 export function selectionFromPoint({
@@ -47,13 +47,10 @@ export function selectionFromPoint({
   const emotion = emotions[closestIndex] ?? emotions[0];
   if (!emotion) return null;
   const intensity = _clamp({ value: (distance - deadZone) / Math.max(maxRadius - deadZone, 1), min: 0, max: 1 });
-  const level = Math.min(Math.floor(intensity * emotion.nuances.length), emotion.nuances.length - 1);
-  const nuance = emotion.nuances[level] ?? emotion.nuances[0] ?? emotion.name;
+  const level = Math.min(Math.floor(intensity * emotion.nuanceCount), emotion.nuanceCount - 1);
 
   return {
     emotionId: emotion.id,
-    emotion: emotion.name,
-    nuance,
     intensity,
     level,
     color: emotion.color,

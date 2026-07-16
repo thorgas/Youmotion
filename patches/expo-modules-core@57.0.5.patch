@@ -1,0 +1,30 @@
+diff --git a/ios/Core/Events/EventEmitter.swift b/ios/Core/Events/EventEmitter.swift
+--- a/ios/Core/Events/EventEmitter.swift
++++ b/ios/Core/Events/EventEmitter.swift
+@@ -3,0 +4,8 @@ import ExpoModulesJSI
++private final class WeakEventEmitterReference: @unchecked Sendable {
++  weak var value: (any EventEmitter)?
++
++  init(_ value: any EventEmitter) {
++    self.value = value
++  }
++}
++
+@@ -49 +57 @@ public class EventEmitter: AnyEventEmitter {
+-    nonisolated(unsafe) weak let emitter = self
++    let emitterReference = WeakEventEmitterReference(self)
+@@ -52 +60 @@ public class EventEmitter: AnyEventEmitter {
+-      guard let emitter else {
++      guard let emitter = emitterReference.value else {
+@@ -76 +84 @@ public class EventEmitter: AnyEventEmitter {
+-    nonisolated(unsafe) weak let emitter = self
++    let emitterReference = WeakEventEmitterReference(self)
+@@ -79 +87 @@ public class EventEmitter: AnyEventEmitter {
+-      guard let emitter, let appContext else {
++      guard let emitter = emitterReference.value, let appContext else {
+diff --git a/ios/Core/SharedObjects/SharedObjectRegistry.swift b/ios/Core/SharedObjects/SharedObjectRegistry.swift
+--- a/ios/Core/SharedObjects/SharedObjectRegistry.swift
++++ b/ios/Core/SharedObjects/SharedObjectRegistry.swift
+@@ -37 +37 @@ public final class SharedObjectRegistry: @unchecked Sendable {
+-  private weak let appContext: AppContext?
++  nonisolated(unsafe) private weak var appContext: AppContext?

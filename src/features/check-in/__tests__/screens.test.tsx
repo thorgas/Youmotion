@@ -1,8 +1,10 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { act, fireEvent, render, waitFor } from '@testing-library/react-native';
+import type { ReactElement } from 'react';
 import { createActor, type Actor } from 'xstate';
 
 import { CHECK_IN_EVENTS, CHECK_IN_STATES, EMOTION_IDS } from '@/constants';
+import { AppLocaleProvider } from '@/localization/app-locale-provider';
 import { appNavigationMachine } from '@/navigation/app-navigation.machine';
 import type { EmotionSelection } from '../domain/check-in';
 import { checkInHistoryStore } from '../application/check-in-history.store';
@@ -21,8 +23,6 @@ jest.mock('@/navigation/app-navigation.provider', () => ({
 
 const selection = {
   emotionId: EMOTION_IDS.JOY,
-  emotion: 'Freude',
-  nuance: 'Fröhlichkeit',
   intensity: 0.5,
   level: 2,
   color: '#E7AD32',
@@ -33,6 +33,8 @@ const _reachReflection = () => {
   mockActor.send({ type: CHECK_IN_EVENTS.SELECTION_CHANGED, selection });
   mockActor.send({ type: CHECK_IN_EVENTS.SELECTION_RELEASED });
 };
+
+const _renderLocalized = (element: ReactElement) => render(<AppLocaleProvider>{element}</AppLocaleProvider>);
 
 describe('check-in screens', () => {
   beforeEach(async () => {
@@ -45,26 +47,43 @@ describe('check-in screens', () => {
     mockActor.stop();
   });
 
-  it('renders the painterly star and current history summary', async () => {
-    const screen = await render(<CheckInScreen />);
-    expect(screen.getByText('Wie fühlst du dich?')).toBeTruthy();
-    expect(screen.getByLabelText('Gefühlsstern. Ziehe vom Zentrum nach außen.')).toBeTruthy();
-    expect(screen.getByText('HALTEN · ZIEHEN · LOSLASSEN')).toBeTruthy();
+  it('renders the centered base-state ripple and emotion field', async () => {
+    const screen = await _renderLocalized(<CheckInScreen />);
+    expect(screen.getByText('How are you feeling?')).toBeTruthy();
+    expect(screen.getByLabelText('Emotion star. Drag outward from the center.')).toBeTruthy();
+    expect(screen.getByTestId('base-state-ripples')).toHaveStyle({
+      alignItems: 'center',
+      justifyContent: 'center',
+    });
+    expect(screen.getByTestId('ripple-origin')).toHaveStyle({
+      width: 8,
+      height: 8,
+      borderRadius: 4,
+    });
+    expect(screen.getAllByTestId('water-ripple-ring')[0]).toHaveStyle({
+      width: 72,
+      height: 72,
+      borderRadius: 36,
+    });
   });
 
   it('maps star responder movement to a selection and release', async () => {
     const onTouchStart = jest.fn();
     const onSelectionChange = jest.fn();
+    const onCancel = jest.fn();
     const onRelease = jest.fn();
-    const screen = await render(
+    const screen = await _renderLocalized(
       <EmotionStar
         selection={selection}
+        onCancel={onCancel}
         onTouchStart={onTouchStart}
         onSelectionChange={onSelectionChange}
         onRelease={onRelease}
       />,
     );
-    const star = screen.getByLabelText('Freude, Fröhlichkeit, Intensität 50 Prozent');
+    const star = screen.getByLabelText('Joy, Cheerfulness, intensity 50 percent');
+    expect(screen.getByTestId('emotion-nuance-reveal')).toBeTruthy();
+    expect(screen.getByTestId('emotion-name-reveal')).toBeTruthy();
     const grantEvent = {
       nativeEvent: { locationX: 185, locationY: 40 },
       touchHistory: {
@@ -105,13 +124,37 @@ describe('check-in screens', () => {
     expect(onTouchStart).toHaveBeenCalledTimes(1);
     expect(onSelectionChange).toHaveBeenCalledTimes(2);
     expect(onRelease).toHaveBeenCalledTimes(1);
+    expect(onCancel).not.toHaveBeenCalled();
+  });
+
+  it('cancels an interrupted drag instead of releasing its preview', async () => {
+    const onCancel = jest.fn();
+    const onRelease = jest.fn();
+    const screen = await _renderLocalized(
+      <EmotionStar
+        selection={selection}
+        onCancel={onCancel}
+        onTouchStart={jest.fn()}
+        onSelectionChange={jest.fn()}
+        onRelease={onRelease}
+      />,
+    );
+
+    await fireEvent(screen.getByLabelText('Joy, Cheerfulness, intensity 50 percent'), 'responderTerminate');
+
+    expect(onCancel).toHaveBeenCalledTimes(1);
+    expect(onRelease).not.toHaveBeenCalled();
   });
 
   it('lets the reflection screen edit and submit a note', async () => {
     await act(_reachReflection);
-    const screen = await render(<ReflectionScreen />);
-    await fireEvent.changeText(screen.getByLabelText('Optionale Notiz zum Gefühl'), 'Ein heller Moment.');
-    await fireEvent.press(screen.getByText('Check-in speichern'));
+    const screen = await _renderLocalized(<ReflectionScreen />);
+    expect(screen.getByTestId('reflection-keyboard-scroll').props).toMatchObject({
+      keyboardDismissMode: 'interactive',
+      keyboardShouldPersistTaps: 'handled',
+    });
+    await fireEvent.changeText(screen.getByLabelText('Optional note about the feeling'), 'Ein heller Moment.');
+    await fireEvent.press(screen.getByText('Save check-in'));
 
     await waitFor(() => expect(mockActor.getSnapshot().matches(CHECK_IN_STATES.SUCCESS)).toBe(true));
     expect(mockActor.getSnapshot().context.saved?.note).toBe('Ein heller Moment.');
@@ -123,13 +166,15 @@ describe('check-in screens', () => {
     await waitFor(() => expect(mockActor.getSnapshot().matches(CHECK_IN_STATES.SUCCESS)).toBe(true));
     expect(mockActor.getSnapshot().context.saved).not.toBeNull();
 
-    const success = await render(<SuccessScreen />);
-    expect(success.getByText('Bei dir angekommen.')).toBeTruthy();
+    const success = await _renderLocalized(<SuccessScreen />);
+    expect(success.getByText('You arrived with yourself.')).toBeTruthy();
 
-    const history = await render(<HistoryScreen />);
-    expect(history.getByText(/Freude · Fröhlichkeit/)).toBeTruthy();
+    const history = await _renderLocalized(<HistoryScreen />);
+    expect(history.getByText(/Joy · Cheerfulness/)).toBeTruthy();
 
-    const settings = await render(<SettingsScreen />);
-    expect(settings.getByText('Privat by design')).toBeTruthy();
+    const settings = await _renderLocalized(<SettingsScreen />);
+    expect(settings.getByText('Private by design')).toBeTruthy();
+    await fireEvent.press(settings.getByText('German'));
+    await waitFor(() => expect(settings.getByText('Von Anfang an privat')).toBeTruthy());
   });
 });

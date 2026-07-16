@@ -62,6 +62,7 @@ export const appNavigationMachine = setup({
       [CHECK_IN_EVENTS.SELECTION_CHANGED]: Schema.standardSchemaV1(
         Schema.Struct({ selection: Schema.NullOr(EmotionSelectionSchema) }),
       ),
+      [CHECK_IN_EVENTS.SELECTION_CANCELLED]: EmptyEventSchema,
       [CHECK_IN_EVENTS.SELECTION_RELEASED]: EmptyEventSchema,
       [CHECK_IN_EVENTS.NOTE_CHANGED]: Schema.standardSchemaV1(Schema.Struct({ note: Schema.String })),
       [CHECK_IN_EVENTS.CONFIRMED]: EmptyEventSchema,
@@ -131,6 +132,10 @@ export const appNavigationMachine = setup({
                     enq(() => { void Haptics.selectionAsync(); });
                   }
                   return { context: { selection: event.selection } };
+                },
+                [CHECK_IN_EVENTS.SELECTION_CANCELLED]: {
+                  target: CHECK_IN_STATES.IDLE,
+                  context: { selection: null },
                 },
                 [CHECK_IN_EVENTS.SELECTION_RELEASED]: ({ context }) => ({
                   target: context.selection

@@ -13,6 +13,12 @@ coverage/
 .reassure/
 expo-env.d.ts
 
+# fbtee
+.enum_manifest.json
+.src_manifest.json
+source_strings.json
+src/translations/
+
 # Native
 .kotlin/
 *.orig.*
