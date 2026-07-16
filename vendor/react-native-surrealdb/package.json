@@ -2,6 +2,8 @@
   "name": "react-native-surrealdb",
   "version": "0.1.0-alpha.0",
   "description": "Embedded and remote SurrealDB for React Native",
+  "author": "Tim Horgas",
+  "homepage": "https://github.com/timhorgas/react-native-surrealdb#readme",
   "license": "MIT",
   "main": "./src/index.ts",
   "types": "./src/index.ts",
