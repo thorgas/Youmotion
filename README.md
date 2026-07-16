@@ -107,6 +107,8 @@ pnpm doctor:react
 `pnpm typecheck` invokes TypeScript 7 directly. `typecheck:compat` checks the compatibility compiler used by editor and lint integrations.
 The pnpm patches for `expo-modules-core` and `expo-modules-jsi` keep Expo SDK 57 buildable with the repository host's Xcode 26.1 Swift compiler. They only replace invalid immutable weak references with mutable weak references and can be removed after moving to Expo's supported Xcode 26.4 or newer toolchain.
 
+The `expo-dev-launcher` patch backports Expo's Android `onUserLeaveHint` fix for the launcher delegate. Remove it after upgrading to an Expo SDK 57 package that includes [expo/expo#47347](https://github.com/expo/expo/pull/47347).
+
 ## Internationalization
 
 fbtee compiles inline translator-aware source strings through Babel. English (`en-US`) is the source language, German (`de-DE`) is maintained in `translations/de-DE.json`, and the initial locale follows the device preference from `expo-localization`. The language can be changed from Settings.

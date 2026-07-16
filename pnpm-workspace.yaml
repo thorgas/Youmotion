@@ -58,5 +58,6 @@ minimumReleaseAgeExclude:
   - expo-web-browser@57.0.1
   - jest-expo@57.0.2
 patchedDependencies:
+  expo-dev-launcher@57.0.6: patches/expo-dev-launcher@57.0.6.patch
   expo-modules-core@57.0.5: patches/expo-modules-core@57.0.5.patch
   expo-modules-jsi@57.0.3: patches/expo-modules-jsi@57.0.3.patch
