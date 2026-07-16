@@ -1,7 +1,7 @@
 import { useSelector as useActorSelector } from '@xstate/react';
 import { useSelector as useStoreSelector } from '@xstate/store-react';
 import { PressableScale } from 'pressto';
-import { StyleSheet, Text, View } from 'react-native';
+import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { CHECK_IN_EVENTS } from '@/constants';
@@ -35,7 +35,12 @@ export function CheckInScreen() {
   return (
     <View style={styles.page}>
       <SafeAreaView edges={['top']} style={styles.safeArea}>
-        <View style={styles.content}>
+        <ScrollView
+          contentContainerStyle={styles.content}
+          contentInsetAdjustmentBehavior="automatic"
+          showsVerticalScrollIndicator={false}
+          style={styles.scroll}
+          testID="check-in-scroll">
           <View style={styles.header}>
             <Text style={styles.title}>
               {editing
@@ -66,7 +71,7 @@ export function CheckInScreen() {
           <Text style={styles.disclaimer}>
             <fbt desc="Health disclaimer shown below the emotion check-in">Youmotion supports self-awareness and does not replace psychotherapeutic or medical treatment.</fbt>
           </Text>
-        </View>
+        </ScrollView>
       </SafeAreaView>
     </View>
   );
@@ -75,7 +80,8 @@ export function CheckInScreen() {
 const styles = StyleSheet.create({
   page: { flex: 1, backgroundColor: palette.paper },
   safeArea: { flex: 1 },
-  content: { width: '100%', maxWidth: 520, minHeight: '100%', alignSelf: 'center', paddingHorizontal: 16, paddingBottom: 32 },
+  scroll: { flex: 1 },
+  content: { flexGrow: 1, width: '100%', maxWidth: 520, alignSelf: 'center', paddingHorizontal: 16, paddingBottom: 32 },
   header: { marginTop: 34, alignItems: 'center', paddingHorizontal: 32 },
   title: { fontFamily: type.semibold, color: palette.ink, fontSize: 30, lineHeight: 36, letterSpacing: -0.5, textAlign: 'center', opacity: 0.9 },
   starStage: { marginTop: 24, alignItems: 'center' },

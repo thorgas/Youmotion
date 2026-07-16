@@ -1,5 +1,6 @@
 import { act, fireEvent, render, waitFor } from '@testing-library/react-native';
 import type { ReactElement } from 'react';
+import { StyleSheet } from 'react-native';
 import { createActor, type Actor } from 'xstate';
 
 import {
@@ -232,6 +233,14 @@ describe('check-in screens', () => {
 
     const today = await _renderLocalized(<CheckInScreen />);
     expect(today.queryByText(/50%/)).toBeNull();
+    expect(today.getByTestId('check-in-scroll').props).toMatchObject({
+      contentInsetAdjustmentBehavior: 'automatic',
+      showsVerticalScrollIndicator: false,
+    });
+    expect(StyleSheet.flatten(today.getByTestId('check-in-scroll').props['contentContainerStyle'])).toMatchObject({
+      flexGrow: 1,
+      paddingBottom: 32,
+    });
     await fireEvent.press(today.getByText(/Joy · Cheerfulness/));
 
     expect(mockActor.getSnapshot().matches(NAVIGATION_STATES.REFLECTION)).toBe(true);
