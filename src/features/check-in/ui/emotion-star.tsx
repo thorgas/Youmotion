@@ -18,7 +18,7 @@ import { emotionAngle, selectionFromPoint } from '../domain/emotion-selection';
 import { emotions, type EmotionSelection } from '../domain/emotion';
 import { BaseStateRipples } from './base-state-ripples';
 import { emotionName, emotionNuance, emotionStarAccessibility } from './emotion-copy';
-import { palette, type } from './theme';
+import { palette, textSize, type } from './theme';
 
 type EmotionStarProps = {
   selection: EmotionSelection | null;
@@ -151,13 +151,14 @@ function EmotionField({ center, radius, rippleOffsetX, rippleOffsetY, selection,
           return (
             <SvgText
               key={`${emotion.id}-label`}
+              testID={`base-emotion-label-${emotion.id}`}
               x={label.x}
               y={label.y + 4}
               textAnchor="middle"
               fill={palette.ink}
               fillOpacity={isActive ? 0.88 : 0.2}
               fontFamily={isActive ? type.medium : type.regular}
-              fontSize={isActive ? 14 : 12}
+              fontSize={isActive ? textSize.emphasis : textSize.label}
               letterSpacing={0.3}>
               {emotionName(emotion.id)}
             </SvgText>
@@ -257,19 +258,19 @@ const styles = StyleSheet.create({
   readoutEmotion: {
     color: palette.ink,
     fontFamily: type.medium,
-    fontSize: 16,
-    letterSpacing: 0.8,
+    fontSize: textSize.emphasis,
+    letterSpacing: 0.3,
     opacity: 0.82,
   },
   readoutEmotionSelected: {
-    fontSize: 20,
+    fontSize: textSize.section,
     letterSpacing: 0.7,
     opacity: 0.92,
   },
   readoutNuance: {
     color: palette.inkMuted,
     fontFamily: type.regular,
-    fontSize: 11,
+    fontSize: textSize.caption,
     letterSpacing: 0.8,
     marginTop: 7,
     textAlign: 'center',
@@ -277,7 +278,7 @@ const styles = StyleSheet.create({
   intensityHint: {
     color: palette.inkMuted,
     fontFamily: type.regular,
-    fontSize: 12,
+    fontSize: textSize.metadata,
     lineHeight: 18,
     maxWidth: 300,
     textAlign: 'center',

@@ -64,6 +64,11 @@ describe('check-in screens', () => {
     const screen = await _renderLocalized(<CheckInScreen />);
     expect(screen.getByText('How are you feeling right now?')).toBeTruthy();
     expect(screen.getByText('Touch the point.')).toBeTruthy();
+    expect(screen.getByText('Touch the point.')).toHaveStyle({
+      fontSize: 16,
+      letterSpacing: 0.3,
+    });
+    expect(screen.getByTestId('base-emotion-label-freude').props['font']).toMatchObject({ fontSize: 14 });
     expect(screen.getByText('The farther you move from the center, the more intense the feeling.')).toBeTruthy();
     expect(screen.getByLabelText('Emotion star. Drag outward from the center.')).toBeTruthy();
     expect(screen.getByTestId('base-state-ripples')).toHaveStyle({
@@ -99,6 +104,8 @@ describe('check-in screens', () => {
     const star = screen.getByLabelText('Joy · Cheerfulness');
     expect(screen.getByTestId('emotion-nuance-reveal')).toBeTruthy();
     expect(screen.getByTestId('emotion-name-reveal')).toBeTruthy();
+    expect(screen.getByTestId('base-emotion-label-freude').props['font']).toMatchObject({ fontSize: 16 });
+    expect(screen.getByTestId('base-emotion-label-furcht').props['font']).toMatchObject({ fontSize: 14 });
     const grantEvent = {
       nativeEvent: { locationX: 185, locationY: 40 },
       touchHistory: {

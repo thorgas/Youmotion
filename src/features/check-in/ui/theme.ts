@@ -12,3 +12,11 @@ export const palette = Object.freeze({
 });
 
 export const type = APP_TYPE;
+
+export const textSize = Object.freeze({
+  caption: 11,
+  metadata: 12,
+  label: 14,
+  emphasis: 16,
+  section: 20,
+});
