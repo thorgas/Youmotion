@@ -237,7 +237,7 @@ describe('check-in screens', () => {
     const detailsScroll = today.getByTestId('check-in-details-scroll');
     expect(within(gestureRegion).getByLabelText('Emotion star. Drag outward from the center.')).toBeTruthy();
     expect(within(detailsScroll).getByText('Latest check-in')).toBeTruthy();
-    expect(within(detailsScroll).getByText('Youmotion supports self-awareness and does not replace psychotherapeutic or medical treatment.')).toBeTruthy();
+    expect(within(detailsScroll).getByText('Youmotion supports self-awareness and does not replace psychotherapeutic or medical treatment.')).toHaveStyle({ marginTop: 24 });
     expect(detailsScroll.props).toMatchObject({
       contentInsetAdjustmentBehavior: 'automatic',
       showsVerticalScrollIndicator: false,

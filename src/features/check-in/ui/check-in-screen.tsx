@@ -94,5 +94,5 @@ const styles = StyleSheet.create({
   recentDot: { width: 10, height: 10, borderRadius: 5, marginRight: 12, backgroundColor: '#8D8278' },
   recentCopy: { flex: 1 },
   recentEmotion: { fontFamily: type.medium, color: palette.ink, fontSize: 14 },
-  disclaimer: { fontFamily: type.regular, color: palette.inkMuted, fontSize: 11, lineHeight: 16, marginTop: 34, textAlign: 'center', paddingHorizontal: 32, opacity: 0.58 },
+  disclaimer: { fontFamily: type.regular, color: palette.inkMuted, fontSize: 11, lineHeight: 16, marginTop: 24, textAlign: 'center', paddingHorizontal: 32, opacity: 0.58 },
 });
