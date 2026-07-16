@@ -35,12 +35,7 @@ export function CheckInScreen() {
   return (
     <View style={styles.page}>
       <SafeAreaView edges={['top']} style={styles.safeArea}>
-        <ScrollView
-          contentContainerStyle={styles.content}
-          contentInsetAdjustmentBehavior="automatic"
-          showsVerticalScrollIndicator={false}
-          style={styles.scroll}
-          testID="check-in-scroll">
+        <View style={styles.gestureRegion} testID="check-in-gesture-region">
           <View style={styles.header}>
             <Text style={styles.title}>
               {editing
@@ -57,6 +52,13 @@ export function CheckInScreen() {
               onRelease={_selectionReleased}
             />
           </View>
+        </View>
+        <ScrollView
+          contentContainerStyle={styles.detailsContent}
+          contentInsetAdjustmentBehavior="automatic"
+          showsVerticalScrollIndicator={false}
+          style={styles.detailsScroll}
+          testID="check-in-details-scroll">
           {latest && !editing ? (
             <View style={styles.recent}>
               <Text style={styles.sectionTitle}><fbt desc="Heading for the most recent check-in">Latest check-in</fbt></Text>
@@ -80,8 +82,9 @@ export function CheckInScreen() {
 const styles = StyleSheet.create({
   page: { flex: 1, backgroundColor: palette.paper },
   safeArea: { flex: 1 },
-  scroll: { flex: 1 },
-  content: { flexGrow: 1, width: '100%', maxWidth: 520, alignSelf: 'center', paddingHorizontal: 16, paddingBottom: 32 },
+  gestureRegion: { width: '100%', maxWidth: 520, alignSelf: 'center', paddingHorizontal: 16 },
+  detailsScroll: { flex: 1, width: '100%', maxWidth: 520, alignSelf: 'center' },
+  detailsContent: { flexGrow: 1, paddingHorizontal: 16, paddingBottom: 32 },
   header: { marginTop: 34, alignItems: 'center', paddingHorizontal: 32 },
   title: { fontFamily: type.semibold, color: palette.ink, fontSize: 30, lineHeight: 36, letterSpacing: -0.5, textAlign: 'center', opacity: 0.9 },
   starStage: { marginTop: 24, alignItems: 'center' },

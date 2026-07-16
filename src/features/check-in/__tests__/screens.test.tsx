@@ -1,4 +1,4 @@
-import { act, fireEvent, render, waitFor } from '@testing-library/react-native';
+import { act, fireEvent, render, waitFor, within } from '@testing-library/react-native';
 import type { ReactElement } from 'react';
 import { StyleSheet } from 'react-native';
 import { createActor, type Actor } from 'xstate';
@@ -233,11 +233,16 @@ describe('check-in screens', () => {
 
     const today = await _renderLocalized(<CheckInScreen />);
     expect(today.queryByText(/50%/)).toBeNull();
-    expect(today.getByTestId('check-in-scroll').props).toMatchObject({
+    const gestureRegion = today.getByTestId('check-in-gesture-region');
+    const detailsScroll = today.getByTestId('check-in-details-scroll');
+    expect(within(gestureRegion).getByLabelText('Emotion star. Drag outward from the center.')).toBeTruthy();
+    expect(within(detailsScroll).getByText('Latest check-in')).toBeTruthy();
+    expect(within(detailsScroll).getByText('Youmotion supports self-awareness and does not replace psychotherapeutic or medical treatment.')).toBeTruthy();
+    expect(detailsScroll.props).toMatchObject({
       contentInsetAdjustmentBehavior: 'automatic',
       showsVerticalScrollIndicator: false,
     });
-    expect(StyleSheet.flatten(today.getByTestId('check-in-scroll').props['contentContainerStyle'])).toMatchObject({
+    expect(StyleSheet.flatten(detailsScroll.props['contentContainerStyle'])).toMatchObject({
       flexGrow: 1,
       paddingBottom: 32,
     });
