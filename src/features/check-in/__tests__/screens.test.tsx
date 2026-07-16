@@ -64,11 +64,13 @@ describe('check-in screens', () => {
   it('renders the centered base-state ripple and emotion field', async () => {
     const screen = await _renderLocalized(<CheckInScreen />);
     expect(screen.getByText('How are you feeling right now?')).toBeTruthy();
-    expect(screen.getByText('Touch the point.')).toBeTruthy();
-    expect(screen.getByText('Touch the point.')).toHaveStyle({
+    expect(screen.getByText('Touch the point')).toBeTruthy();
+    expect(screen.getByText('Touch the point')).toHaveStyle({
       fontSize: 16,
       letterSpacing: 0.3,
     });
+    expect(screen.getByText('and move your finger.')).toBeTruthy();
+    expect(screen.getByText('Release your finger to select the feeling.')).toBeTruthy();
     expect(screen.getByTestId('base-emotion-label-freude').props['font']).toMatchObject({ fontSize: 14 });
     expect(screen.getByText('The farther you move from the center, the more intense the feeling.')).toBeTruthy();
     expect(screen.getByLabelText('Emotion star. Drag outward from the center.')).toBeTruthy();

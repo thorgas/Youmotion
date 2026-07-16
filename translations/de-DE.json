@@ -1123,17 +1123,6 @@
       ],
       "types": []
     },
-    "HjAuSW2oDA2hrkEVOQ2n1Q==": {
-      "description": "Prompt above the emotion star before touching",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "Berühre den Punkt.",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
     "DqLfANWwCFHSqr8meE32MA==": {
       "description": "Second line of the emotion star gesture prompt",
       "tokens": [],
@@ -1206,6 +1195,28 @@
       "translations": [
         {
           "translation": "Gefühl ändern",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "8c84c2QASHn6IlkM9iVP6w==": {
+      "description": "Prompt above the emotion star before touching",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Berühre den Punkt",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "6EV0v4A13WCxh58rfpXCRg==": {
+      "description": "Third line explaining how to confirm an emotion selection",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Lass deinen Finger los, um das Gefühl auszuwählen.",
           "variations": {}
         }
       ],

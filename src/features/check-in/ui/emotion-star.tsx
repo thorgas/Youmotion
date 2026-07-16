@@ -208,8 +208,9 @@ export function EmotionStar({ selection, disabled, onTouchStart, onSelectionChan
     <View style={styles.frame}>
       {selection ? <EmotionReadout selection={selection} /> : (
         <View style={styles.readout}>
-          <Text style={styles.readoutEmotion}><fbt desc="Prompt above the emotion star before touching">Touch the point.</fbt></Text>
+          <Text style={styles.readoutEmotion}><fbt desc="Prompt above the emotion star before touching">Touch the point</fbt></Text>
           <Text style={styles.readoutNuance}><fbt desc="Second line of the emotion star gesture prompt">and move your finger.</fbt></Text>
+          <Text style={styles.readoutRelease}><fbt desc="Third line explaining how to confirm an emotion selection">Release your finger to select the feeling.</fbt></Text>
         </View>
       )}
       <View
@@ -273,6 +274,14 @@ const styles = StyleSheet.create({
     fontSize: textSize.caption,
     letterSpacing: 0.8,
     marginTop: 7,
+    textAlign: 'center',
+  },
+  readoutRelease: {
+    color: palette.inkMuted,
+    fontFamily: type.regular,
+    fontSize: textSize.metadata,
+    letterSpacing: 0.3,
+    marginTop: 4,
     textAlign: 'center',
   },
   intensityHint: {
