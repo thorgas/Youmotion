@@ -4,22 +4,17 @@
     "slug": "youmotion",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
+    "icon": "./assets/images/app-icon-ios.png",
     "scheme": "youmotion",
     "userInterfaceStyle": "light",
     "backgroundColor": "#F4F0E8",
     "ios": {
-      "icon": "./assets/expo.icon",
+      "icon": "./assets/images/app-icon-ios.png",
       "bundleIdentifier": "app.youmotion.mobile",
       "supportsTablet": true
     },
     "android": {
-      "adaptiveIcon": {
-        "backgroundColor": "#F4F0E8",
-        "foregroundImage": "./assets/images/android-icon-foreground.png",
-        "backgroundImage": "./assets/images/android-icon-background.png",
-        "monochromeImage": "./assets/images/android-icon-monochrome.png"
-      },
+      "icon": "./assets/images/app-icon-android.png",
       "package": "app.youmotion.mobile",
       "predictiveBackGestureEnabled": false
     },
