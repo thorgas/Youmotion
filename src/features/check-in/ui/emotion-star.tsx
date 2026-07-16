@@ -157,7 +157,7 @@ function EmotionField({ center, radius, rippleOffsetX, rippleOffsetY, selection,
               fill={palette.ink}
               fillOpacity={isActive ? 0.88 : 0.2}
               fontFamily={isActive ? type.medium : type.regular}
-              fontSize={isActive ? 12 : 10}
+              fontSize={isActive ? 14 : 12}
               letterSpacing={0.3}>
               {emotionName(emotion.id)}
             </SvgText>
@@ -205,6 +205,12 @@ export function EmotionStar({ selection, disabled, onTouchStart, onSelectionChan
 
   return (
     <View style={styles.frame}>
+      {selection ? <EmotionReadout selection={selection} /> : (
+        <View style={styles.readout}>
+          <Text style={styles.readoutEmotion}><fbt desc="Prompt above the emotion star before touching">Touch the point.</fbt></Text>
+          <Text style={styles.readoutNuance}><fbt desc="Second line of the emotion star gesture prompt">and move your finger.</fbt></Text>
+        </View>
+      )}
       <View
         accessibilityLabel={emotionStarAccessibility(selection)}
         accessibilityRole="adjustable"
@@ -219,13 +225,9 @@ export function EmotionStar({ selection, disabled, onTouchStart, onSelectionChan
           size={size}
         />
       </View>
-
-      {selection ? <EmotionReadout selection={selection} /> : (
-        <View style={styles.readout}>
-          <Text style={styles.readoutEmotion}><fbt desc="Prompt inside the emotion star before touching">Touch</fbt></Text>
-          <Text style={styles.readoutNuance}><fbt desc="Second half of the emotion star gesture prompt">and drag outward</fbt></Text>
-        </View>
-      )}
+      <Text style={styles.intensityHint}>
+        <fbt desc="Explanation of how distance controls emotion intensity">The farther you move from the center, the more intense the feeling.</fbt>
+      </Text>
     </View>
   );
 }
@@ -245,7 +247,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     width: 260,
     minHeight: 54,
-    marginTop: -2,
+    marginBottom: 8,
   },
   revealLine: {
     flexDirection: 'row',
@@ -271,5 +273,14 @@ const styles = StyleSheet.create({
     letterSpacing: 0.8,
     marginTop: 7,
     textAlign: 'center',
+  },
+  intensityHint: {
+    color: palette.inkMuted,
+    fontFamily: type.regular,
+    fontSize: 12,
+    lineHeight: 18,
+    maxWidth: 300,
+    textAlign: 'center',
+    marginTop: 4,
   },
 });

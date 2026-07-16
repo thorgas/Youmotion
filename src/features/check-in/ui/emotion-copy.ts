@@ -126,34 +126,9 @@ export function emotionSummary(selection: LocalizedEmotionSelection) {
   ));
 }
 
-export function intensityCopy(intensity: number) {
-  return String(fbs(
-    fbs.param('intensity', String(Math.round(intensity * 100))) + '% intensity',
-    'Intensity percentage for a check-in',
-  ));
-}
-
-export function nuanceIntensityCopy(selection: LocalizedEmotionSelection) {
-  return String(fbs(
-    fbs.param('emotionNuance', emotionNuance(selection))
-      + ' · '
-      + fbs.param('intensity', String(Math.round(selection.intensity * 100)))
-      + '%',
-    'Selected emotion nuance and intensity on reflection screen',
-  ));
-}
-
 export function emotionStarAccessibility(selection: EmotionSelection | null) {
   if (!selection) return String(fbs('Emotion star. Drag outward from the center.', 'Emotion star accessibility instructions'));
-  return String(fbs(
-    fbs.param('emotionName', emotionName(selection.emotionId))
-      + ', '
-      + fbs.param('emotionNuance', emotionNuance(selection))
-      + ', intensity '
-      + fbs.param('intensity', String(Math.round(selection.intensity * 100)))
-      + ' percent',
-    'Selected emotion, nuance and intensity for accessibility',
-  ));
+  return emotionSummary(selection);
 }
 
 export function savedCheckInCopy(selection: LocalizedEmotionSelection) {

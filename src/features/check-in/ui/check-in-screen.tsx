@@ -1,5 +1,6 @@
 import { useSelector as useActorSelector } from '@xstate/react';
 import { useSelector as useStoreSelector } from '@xstate/store-react';
+import { PressableScale } from 'pressto';
 import { StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -8,7 +9,7 @@ import { useAppNavigationActor } from '@/navigation/app-navigation.provider';
 import type { EmotionSelection } from '../domain/check-in';
 import { checkInHistoryStore } from '../application/check-in-history.store';
 import { EmotionStar } from './emotion-star';
-import { emotionSummary, intensityCopy } from './emotion-copy';
+import { emotionSummary } from './emotion-copy';
 import { palette, type } from './theme';
 
 const _selectSnapshot = (snapshot: ReturnType<ReturnType<typeof useAppNavigationActor>['getSnapshot']>) => snapshot;
@@ -19,6 +20,7 @@ export function CheckInScreen() {
   const snapshot = useActorSelector(actor, _selectSnapshot);
   const entries = useStoreSelector(checkInHistoryStore, _selectHistory);
   const latest = entries[0];
+  const editing = snapshot.context.editing !== null;
 
   const _touchStarted = () => actor.send({ type: CHECK_IN_EVENTS.TOUCH_STARTED });
   const _selectionChanged = (selection: EmotionSelection | null) => {
@@ -26,13 +28,20 @@ export function CheckInScreen() {
   };
   const _selectionCancelled = () => actor.send({ type: CHECK_IN_EVENTS.SELECTION_CANCELLED });
   const _selectionReleased = () => actor.send({ type: CHECK_IN_EVENTS.SELECTION_RELEASED });
+  const _editLatest = () => {
+    if (latest) actor.send({ type: CHECK_IN_EVENTS.EDIT_REQUESTED, entry: latest });
+  };
 
   return (
     <View style={styles.page}>
       <SafeAreaView edges={['top']} style={styles.safeArea}>
         <View style={styles.content}>
           <View style={styles.header}>
-            <Text style={styles.title}><fbt desc="Question asking the user about their current feeling">How are you feeling?</fbt></Text>
+            <Text style={styles.title}>
+              {editing
+                ? <fbt desc="Question shown while changing the feeling in an existing check-in">How did you feel then?</fbt>
+                : <fbt desc="Question asking the user about their current feeling">How are you feeling right now?</fbt>}
+            </Text>
           </View>
           <View style={styles.starStage}>
             <EmotionStar
@@ -43,16 +52,15 @@ export function CheckInScreen() {
               onRelease={_selectionReleased}
             />
           </View>
-          {latest ? (
+          {latest && !editing ? (
             <View style={styles.recent}>
               <Text style={styles.sectionTitle}><fbt desc="Heading for the most recent check-in">Latest check-in</fbt></Text>
-              <View style={styles.recentCard}>
+              <PressableScale accessibilityRole="button" onPress={_editLatest} style={styles.recentCard}>
                 <View style={styles.recentDot} />
                 <View style={styles.recentCopy}>
                   <Text style={styles.recentEmotion}>{emotionSummary(latest)}</Text>
-                  <Text style={styles.recentTime}>{intensityCopy(latest.intensity)}</Text>
                 </View>
-              </View>
+              </PressableScale>
             </View>
           ) : null}
           <Text style={styles.disclaimer}>
@@ -77,6 +85,5 @@ const styles = StyleSheet.create({
   recentDot: { width: 10, height: 10, borderRadius: 5, marginRight: 12, backgroundColor: '#8D8278' },
   recentCopy: { flex: 1 },
   recentEmotion: { fontFamily: type.medium, color: palette.ink, fontSize: 14 },
-  recentTime: { fontFamily: type.regular, color: palette.inkMuted, fontSize: 12, marginTop: 2 },
   disclaimer: { fontFamily: type.regular, color: palette.inkMuted, fontSize: 11, lineHeight: 16, marginTop: 34, textAlign: 'center', paddingHorizontal: 32, opacity: 0.58 },
 });

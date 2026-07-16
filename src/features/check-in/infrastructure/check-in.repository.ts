@@ -129,13 +129,19 @@ export const loadCheckIns = selectRecentCheckIns.pipe(
 export const persistCheckIn = Effect.fn('CheckInRepository.persist')(({
   selection,
   note,
+  existing,
 }: {
   selection: EmotionSelection;
   note: string;
+  existing: CheckIn | null;
 }) => {
-  const checkIn: CheckIn = {
+  const identity = existing ?? {
     id: CheckInId.make(`${Date.now()}-${Math.random().toString(16).slice(2)}`),
     createdAt: CheckInTimestamp.make(new Date().toISOString()),
+  };
+  const checkIn: CheckIn = {
+    id: identity.id,
+    createdAt: identity.createdAt,
     emotionId: selection.emotionId,
     intensity: selection.intensity,
     level: selection.level,

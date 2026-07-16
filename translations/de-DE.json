@@ -111,61 +111,6 @@
       ],
       "types": []
     },
-    "4ndMAcSgIsmhjzeKNPbj9w==": {
-      "description": "Question asking the user about their current feeling",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "Wie fühlst du dich?",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "9pgy6Emm9X1zm29YC4ikrg==": {
-      "description": "Instructions introducing the emotion star gesture",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "Nimm dir einen Moment. Ziehe vom Zentrum in die Richtung, die gerade am besten passt.",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "Qy5Bp6g9FTNvMIoMbNceDg==": {
-      "description": "Emotion star card label",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "GEFÜHLSSTERN",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "911/eCqamTAN6gGCpeGymQ==": {
-      "description": "First step label for exploring emotions",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "01 · Erkunden",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "bHBoBzT4OLullxzes67R+Q==": {
-      "description": "Short gesture instructions",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "HALTEN · ZIEHEN · LOSLASSEN",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
     "3kkTuAL7PCZ9OHsto/IQxQ==": {
       "description": "Heading for the most recent check-in",
       "tokens": [],
@@ -804,39 +749,6 @@
       ],
       "types": []
     },
-    "9iVg0IUNz+gTUJfMMaDPQw==": {
-      "description": "Selected emotion, nuance and intensity for accessibility",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "{emotionName}, {emotionNuance}, Intensität: {intensity} Prozent",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "mIK3j2vTbcghohLLsfYyrw==": {
-      "description": "Prompt inside the emotion star before touching",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "Mitte berühren",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "SWDR/hbIMbxIJympAZPfqg==": {
-      "description": "Second half of the emotion star gesture prompt",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "und nach außen ziehen",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
     "bur8y6WgEM3yYFGxxKlvMw==": {
       "description": "Check-in history eyebrow heading",
       "tokens": [],
@@ -920,17 +832,6 @@
       "translations": [
         {
           "translation": "Du musst nichts erklären. Ein paar Worte können helfen, den Moment festzuhalten.",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "Jja2boA4+WqeI34t/kbrQg==": {
-      "description": "Selected emotion nuance and intensity on reflection screen",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "{emotionNuance} · {intensity}%",
           "variations": {}
         }
       ],
@@ -1211,12 +1112,100 @@
       ],
       "types": []
     },
-    "8G6QMIcIk+d7yoZ3rGL7DQ==": {
-      "description": "Intensity percentage for a check-in",
+    "B1A8T9YSJ9aI3HWphOW3Ow==": {
+      "description": "Question asking the user about their current feeling",
       "tokens": [],
       "translations": [
         {
-          "translation": "{intensity} % Intensität",
+          "translation": "Wie fühlst du dich gerade?",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "HjAuSW2oDA2hrkEVOQ2n1Q==": {
+      "description": "Prompt above the emotion star before touching",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Berühre den Punkt.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "DqLfANWwCFHSqr8meE32MA==": {
+      "description": "Second line of the emotion star gesture prompt",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "und bewege deinen Finger.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "zKESnhsAv6zPMV0BVfNExA==": {
+      "description": "Explanation of how distance controls emotion intensity",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Je weiter du dich vom Mittelpunkt entfernst, desto intensiver wird das Gefühl.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "v77XkAy4rXjsqwiytOiFIQ==": {
+      "description": "Label for editing an existing check-in",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "MOMENT BEARBEITEN",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "qAax2x7Q2nMs2SjmaDn6BQ==": {
+      "description": "Title for editing an existing check-in",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Bearbeite diesen Moment.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "ph8mrzVzHC2xOKG7jojHkA==": {
+      "description": "Button saving changes to an existing check-in",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Änderungen speichern",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "yRgINGnB4Udo7ne2pjiruw==": {
+      "description": "Question shown while changing the feeling in an existing check-in",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Wie hast du dich damals gefühlt?",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "jLru9zhsQoa3iCsMUGnO/w==": {
+      "description": "Button for changing the feeling of an existing check-in",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Gefühl ändern",
           "variations": {}
         }
       ],

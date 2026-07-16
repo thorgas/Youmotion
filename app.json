@@ -11,7 +11,10 @@
     "ios": {
       "icon": "./assets/images/app-icon-ios.png",
       "bundleIdentifier": "app.youmotion.mobile",
-      "supportsTablet": true
+      "supportsTablet": true,
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
       "icon": "./assets/images/app-icon-android.png",
@@ -57,6 +60,13 @@
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
-    }
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "7f37690f-c632-408c-a4ab-1b240610bd12"
+      }
+    },
+    "owner": "youmotion"
   }
 }

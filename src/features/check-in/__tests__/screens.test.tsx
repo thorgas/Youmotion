@@ -2,7 +2,13 @@ import { act, fireEvent, render, waitFor } from '@testing-library/react-native';
 import type { ReactElement } from 'react';
 import { createActor, type Actor } from 'xstate';
 
-import { CHECK_IN_EVENTS, CHECK_IN_STATES, EMOTION_IDS } from '@/constants';
+import {
+  CHECK_IN_EVENTS,
+  CHECK_IN_STATES,
+  EMOTION_IDS,
+  NAVIGATION_EVENTS,
+  NAVIGATION_STATES,
+} from '@/constants';
 import { AppLocaleProvider } from '@/localization/app-locale-provider';
 import { appNavigationMachine } from '@/navigation/app-navigation.machine';
 import type { EmotionSelection } from '../domain/check-in';
@@ -56,7 +62,9 @@ describe('check-in screens', () => {
 
   it('renders the centered base-state ripple and emotion field', async () => {
     const screen = await _renderLocalized(<CheckInScreen />);
-    expect(screen.getByText('How are you feeling?')).toBeTruthy();
+    expect(screen.getByText('How are you feeling right now?')).toBeTruthy();
+    expect(screen.getByText('Touch the point.')).toBeTruthy();
+    expect(screen.getByText('The farther you move from the center, the more intense the feeling.')).toBeTruthy();
     expect(screen.getByLabelText('Emotion star. Drag outward from the center.')).toBeTruthy();
     expect(screen.getByTestId('base-state-ripples')).toHaveStyle({
       alignItems: 'center',
@@ -88,7 +96,7 @@ describe('check-in screens', () => {
         onRelease={onRelease}
       />,
     );
-    const star = screen.getByLabelText('Joy, Cheerfulness, intensity 50 percent');
+    const star = screen.getByLabelText('Joy · Cheerfulness');
     expect(screen.getByTestId('emotion-nuance-reveal')).toBeTruthy();
     expect(screen.getByTestId('emotion-name-reveal')).toBeTruthy();
     const grantEvent = {
@@ -147,7 +155,7 @@ describe('check-in screens', () => {
       />,
     );
 
-    await fireEvent(screen.getByLabelText('Joy, Cheerfulness, intensity 50 percent'), 'responderTerminate');
+    await fireEvent(screen.getByLabelText('Joy · Cheerfulness'), 'responderTerminate');
 
     expect(onCancel).toHaveBeenCalledTimes(1);
     expect(onRelease).not.toHaveBeenCalled();
@@ -156,6 +164,9 @@ describe('check-in screens', () => {
   it('lets the reflection screen edit and submit a note', async () => {
     await act(_reachReflection);
     const screen = await _renderLocalized(<ReflectionScreen />);
+    expect(screen.getByLabelText('Optional note about the feeling').props['autoFocus']).toBe(true);
+    expect(screen.getByText('Cheerfulness')).toBeTruthy();
+    expect(screen.queryByText(/50%/)).toBeNull();
     expect(screen.getByTestId('reflection-keyboard-scroll').props).toMatchObject({
       keyboardDismissMode: 'interactive',
       keyboardShouldPersistTaps: 'handled',
@@ -183,5 +194,40 @@ describe('check-in screens', () => {
     expect(settings.getByText('Private by design')).toBeTruthy();
     await fireEvent.press(settings.getByText('German'));
     await waitFor(() => expect(settings.getByText('Von Anfang an privat')).toBeTruthy());
+    await fireEvent.press(settings.getByText('Englisch'));
+    await waitFor(() => expect(settings.getByText('Private by design')).toBeTruthy());
+  });
+
+  it('opens a captured moment for editing when its history row is pressed', async () => {
+    await act(_reachReflection);
+    await act(() => mockActor.send({ type: CHECK_IN_EVENTS.NOTE_CHANGED, note: 'Before' }));
+    await act(() => mockActor.send({ type: CHECK_IN_EVENTS.CONFIRMED }));
+    await waitFor(() => expect(mockActor.getSnapshot().matches(CHECK_IN_STATES.SUCCESS)).toBe(true));
+    await act(() => mockActor.send({ type: CHECK_IN_EVENTS.RESTARTED }));
+    await act(() => mockActor.send({ type: NAVIGATION_EVENTS.HISTORY_OPENED }));
+
+    const history = await _renderLocalized(<HistoryScreen />);
+    expect(history.queryByText(/50%/)).toBeNull();
+    await fireEvent.press(history.getByText(/Joy · Cheerfulness/));
+
+    expect(mockActor.getSnapshot().matches(NAVIGATION_STATES.REFLECTION)).toBe(true);
+    const reflection = await _renderLocalized(<ReflectionScreen />);
+    expect(reflection.getByText('Edit this moment.')).toBeTruthy();
+    expect(reflection.getByText('Change feeling')).toBeTruthy();
+    expect(reflection.getByDisplayValue('Before').props['autoFocus']).toBe(true);
+  });
+
+  it('opens the latest captured moment for editing from Today', async () => {
+    await act(_reachReflection);
+    await act(() => mockActor.send({ type: CHECK_IN_EVENTS.CONFIRMED }));
+    await waitFor(() => expect(mockActor.getSnapshot().matches(CHECK_IN_STATES.SUCCESS)).toBe(true));
+    await act(() => mockActor.send({ type: CHECK_IN_EVENTS.RESTARTED }));
+
+    const today = await _renderLocalized(<CheckInScreen />);
+    expect(today.queryByText(/50%/)).toBeNull();
+    await fireEvent.press(today.getByText(/Joy · Cheerfulness/));
+
+    expect(mockActor.getSnapshot().matches(NAVIGATION_STATES.REFLECTION)).toBe(true);
+    expect(mockActor.getSnapshot().context.editing).not.toBeNull();
   });
 });

@@ -54,3 +54,11 @@ tester.run('no-type-assertion', architecture.rules['no-type-assertion'], {
   valid: [{ code: 'const value = input;', languageOptions: { parser: require('typescript-eslint').parser } }],
   invalid: [{ code: 'const value = input as string;', languageOptions: { parser: require('typescript-eslint').parser }, errors: [{ messageId: 'assertion' }] }],
 });
+
+tester.run('no-comments', architecture.rules['no-comments'], {
+  valid: [{ code: '/* oxlint-disable jsx-a11y/no-autofocus -- This flow opens directly into writing. */\nconst value = true;\n/* oxlint-enable jsx-a11y/no-autofocus */' }],
+  invalid: [
+    { code: '/* Explain this code. */\nconst value = true;', errors: [{ messageId: 'comment' }] },
+    { code: '/* oxlint-disable jsx-a11y/no-autofocus */\nconst value = true;', errors: [{ messageId: 'comment' }] },
+  ],
+});

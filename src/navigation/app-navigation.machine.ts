@@ -21,6 +21,7 @@ import {
   CheckInListSchema,
   EmotionSelectionSchema,
 } from '@/features/check-in/domain/check-in';
+import { selectionForCheckIn } from '@/features/check-in/domain/emotion';
 import { loadCheckIns, persistCheckIn } from '@/features/check-in/infrastructure/check-in.repository';
 import { checkInHistoryStore } from '@/features/check-in/application/check-in-history.store';
 
@@ -28,6 +29,7 @@ const AppContextSchema = Schema.Struct({
   selection: Schema.NullOr(EmotionSelectionSchema),
   note: Schema.String,
   saved: Schema.NullOr(CheckInSchema),
+  editing: Schema.NullOr(CheckInSchema),
   error: Schema.NullOr(Schema.String),
 });
 
@@ -74,6 +76,10 @@ export const appNavigationMachine = setup({
       [CHECK_IN_EVENTS.HISTORY_HYDRATION_FAILED]: Schema.standardSchemaV1(
         Schema.Struct({ message: Schema.String }),
       ),
+      [CHECK_IN_EVENTS.EDIT_REQUESTED]: Schema.standardSchemaV1(
+        Schema.Struct({ entry: CheckInSchema }),
+      ),
+      [CHECK_IN_EVENTS.EDIT_SELECTION_REQUESTED]: EmptyEventSchema,
       [CHECK_IN_EVENTS.RETRIED]: EmptyEventSchema,
       [CHECK_IN_EVENTS.RESTARTED]: EmptyEventSchema,
       [CHECK_IN_EVENTS.REFLECTION_CANCELLED]: EmptyEventSchema,
@@ -82,7 +88,7 @@ export const appNavigationMachine = setup({
 }).createMachine({
   id: 'appNavigation',
   initial: NAVIGATION_STATES.TABS,
-  context: { selection: null, note: '', saved: null, error: null },
+  context: { selection: null, note: '', saved: null, editing: null, error: null },
   entry: ({ self }, enq) => {
     enq(() => {
       void Effect.runPromise(loadCheckIns).then(
@@ -106,9 +112,28 @@ export const appNavigationMachine = setup({
     [NAVIGATION_STATES.TABS]: {
       initial: NAVIGATION_STATES.TODAY,
       on: {
-        [NAVIGATION_EVENTS.TODAY_OPENED]: { target: `.${NAVIGATION_STATES.TODAY}` },
-        [NAVIGATION_EVENTS.HISTORY_OPENED]: { target: `.${NAVIGATION_STATES.HISTORY}` },
-        [NAVIGATION_EVENTS.SETTINGS_OPENED]: { target: `.${NAVIGATION_STATES.SETTINGS}` },
+        [NAVIGATION_EVENTS.TODAY_OPENED]: {
+          target: `.${NAVIGATION_STATES.TODAY}`,
+          context: { selection: null, note: '', saved: null, editing: null, error: null },
+        },
+        [NAVIGATION_EVENTS.HISTORY_OPENED]: {
+          target: `.${NAVIGATION_STATES.HISTORY}`,
+          context: { selection: null, note: '', saved: null, editing: null, error: null },
+        },
+        [NAVIGATION_EVENTS.SETTINGS_OPENED]: {
+          target: `.${NAVIGATION_STATES.SETTINGS}`,
+          context: { selection: null, note: '', saved: null, editing: null, error: null },
+        },
+        [CHECK_IN_EVENTS.EDIT_REQUESTED]: ({ event }) => ({
+          target: `#appNavigation.${NAVIGATION_STATES.REFLECTION}`,
+          context: {
+            selection: selectionForCheckIn(event.entry),
+            note: event.entry.note,
+            saved: null,
+            editing: event.entry,
+            error: null,
+          },
+        }),
       },
       states: {
         [NAVIGATION_STATES.TODAY]: {
@@ -135,7 +160,9 @@ export const appNavigationMachine = setup({
                 },
                 [CHECK_IN_EVENTS.SELECTION_CANCELLED]: {
                   target: CHECK_IN_STATES.IDLE,
-                  context: { selection: null },
+                  context: ({ context }) => ({
+                    selection: context.editing ? selectionForCheckIn(context.editing) : null,
+                  }),
                 },
                 [CHECK_IN_EVENTS.SELECTION_RELEASED]: ({ context }) => ({
                   target: context.selection
@@ -155,10 +182,15 @@ export const appNavigationMachine = setup({
         [CHECK_IN_EVENTS.NOTE_CHANGED]: {
           context: ({ event }) => ({ note: event.note.slice(0, MAX_NOTE_LENGTH) }),
         },
-        [CHECK_IN_EVENTS.REFLECTION_CANCELLED]: {
+        [CHECK_IN_EVENTS.EDIT_SELECTION_REQUESTED]: {
           target: `#appNavigation.${NAVIGATION_STATES.TABS}.${NAVIGATION_STATES.TODAY}.${CHECK_IN_STATES.IDLE}`,
-          context: { selection: null, note: '', saved: null, error: null },
         },
+        [CHECK_IN_EVENTS.REFLECTION_CANCELLED]: ({ context }) => ({
+          target: context.editing
+            ? `#appNavigation.${NAVIGATION_STATES.TABS}.${NAVIGATION_STATES.HISTORY}`
+            : `#appNavigation.${NAVIGATION_STATES.TABS}.${NAVIGATION_STATES.TODAY}.${CHECK_IN_STATES.IDLE}`,
+          context: { selection: null, note: '', saved: null, editing: null, error: null },
+        }),
         [CHECK_IN_EVENTS.CONFIRMED]: ({ context }) => (
           context.selection ? { target: CHECK_IN_STATES.SAVING } : undefined
         ),
@@ -171,7 +203,11 @@ export const appNavigationMachine = setup({
             self.send({ type: CHECK_IN_EVENTS.FAILED, message: CHECK_IN_FAILURE_MESSAGE });
             return;
           }
-          void Effect.runPromise(persistCheckIn({ selection: context.selection, note: context.note })).then(
+          void Effect.runPromise(persistCheckIn({
+            selection: context.selection,
+            note: context.note,
+            existing: context.editing,
+          })).then(
             (saved) => self.send({ type: CHECK_IN_EVENTS.PERSISTED, saved }),
             () => self.send({ type: CHECK_IN_EVENTS.FAILED, message: CHECK_IN_FAILURE_MESSAGE }),
           );
@@ -180,6 +216,12 @@ export const appNavigationMachine = setup({
       on: {
         [CHECK_IN_EVENTS.PERSISTED]: ({ context, event }, enq) => {
           enq(() => checkInHistoryStore.trigger.recorded({ entry: event.saved }));
+          if (context.editing) {
+            return {
+              target: `#appNavigation.${NAVIGATION_STATES.TABS}.${NAVIGATION_STATES.HISTORY}`,
+              context: { selection: null, note: '', saved: null, editing: null, error: null },
+            };
+          }
           return {
             target: CHECK_IN_STATES.SUCCESS,
             context: { ...context, saved: event.saved, error: null },
@@ -195,7 +237,7 @@ export const appNavigationMachine = setup({
       on: {
         [CHECK_IN_EVENTS.RESTARTED]: {
           target: `#appNavigation.${NAVIGATION_STATES.TABS}.${NAVIGATION_STATES.TODAY}.${CHECK_IN_STATES.IDLE}`,
-          context: { selection: null, note: '', saved: null, error: null },
+          context: { selection: null, note: '', saved: null, editing: null, error: null },
         },
       },
     },

@@ -1,0 +1,65 @@
+# Keep this file aligned with .gitignore. EAS prioritizes it when creating the
+# project archive.
+
+# dependencies
+node_modules/
+.pnpm-store/
+
+# Expo
+.expo/
+dist/
+web-build/
+.harness/
+coverage/
+.reassure/
+expo-env.d.ts
+
+# fbtee
+.enum_manifest.json
+.src_manifest.json
+source_strings.json
+src/translations/
+
+# Native
+.kotlin/
+*.orig.*
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+
+# Metro
+.metro-health-check*
+
+# debug
+npm-debug.*
+pnpm-debug.*
+yarn-debug.*
+yarn-error.*
+
+# macOS
+.DS_Store
+*.pem
+
+# local env files
+.env*.local
+
+# typescript
+*.tsbuildinfo
+
+example
+
+# generated native folders
+/ios
+/android
+
+# Exclude local Android build output from the vendored package.
+/vendor/react-native-surrealdb/android/.cxx/
+/vendor/react-native-surrealdb/android/build/
+
+# Include the untracked vendored native binaries in local EAS uploads.
+!/vendor/react-native-surrealdb/SurrealDbRnFramework.xcframework/
+!/vendor/react-native-surrealdb/SurrealDbRnFramework.xcframework/**
+!/vendor/react-native-surrealdb/android/src/main/jniLibs/
+!/vendor/react-native-surrealdb/android/src/main/jniLibs/**

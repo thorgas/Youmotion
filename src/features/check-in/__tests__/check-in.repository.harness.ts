@@ -30,6 +30,7 @@ describe('SurrealDB check-in repository', () => {
     saved = await Effect.runPromise(persistCheckIn({
       selection,
       note: 'Native SurrealKV harness check',
+      existing: null,
     }));
 
     const loaded = await Effect.runPromise(loadCheckIns);

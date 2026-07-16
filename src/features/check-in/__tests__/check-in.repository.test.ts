@@ -29,7 +29,11 @@ describe('Effect check-in repository', () => {
   });
 
   it('persists a schema-validated check-in', async () => {
-    const saved = await Effect.runPromise(persistCheckIn({ selection, note: '  Ein heller Moment.  ' }));
+    const saved = await Effect.runPromise(persistCheckIn({
+      selection,
+      note: '  Ein heller Moment.  ',
+      existing: null,
+    }));
 
     expect(saved.note).toBe('Ein heller Moment.');
     expect(mockSurrealQuery).toHaveBeenCalledWith(
@@ -41,6 +45,23 @@ describe('Effect check-in repository', () => {
         }),
       }),
     );
+  });
+
+  it('updates an existing check-in without changing its identity or timestamp', async () => {
+    const saved = await Effect.runPromise(persistCheckIn({ selection, note: 'Before', existing: null }));
+    const updated = await Effect.runPromise(persistCheckIn({
+      selection: { ...selection, intensity: 0.8, level: 4 },
+      note: 'After',
+      existing: saved,
+    }));
+
+    expect(updated).toMatchObject({
+      id: saved.id,
+      createdAt: saved.createdAt,
+      intensity: 0.8,
+      level: 4,
+      note: 'After',
+    });
   });
 
   it('loads schema-validated check-ins from SurrealDB', async () => {
@@ -89,7 +110,11 @@ describe('Effect check-in repository', () => {
 
   it('surfaces native storage failures as tagged errors', async () => {
     failNextSurrealUpsert(new Error('storage unavailable'));
-    const error = await Effect.runPromise(Effect.flip(persistCheckIn({ selection, note: '' })));
+    const error = await Effect.runPromise(Effect.flip(persistCheckIn({
+      selection,
+      note: '',
+      existing: null,
+    })));
     expect(error).toMatchObject({
       _tag: 'CheckInStorageError',
       operation: 'write',

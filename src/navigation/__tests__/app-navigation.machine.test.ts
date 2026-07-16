@@ -9,6 +9,7 @@ import {
   NAVIGATION_STATES,
 } from '@/constants';
 import type { EmotionSelection } from '@/features/check-in/domain/check-in';
+import { checkInHistoryStore } from '@/features/check-in/application/check-in-history.store';
 import {
   failNextSurrealUpsert,
   mockSurrealDatabase,
@@ -30,6 +31,7 @@ const selection = {
 describe('app navigation model', () => {
   beforeEach(() => {
     resetSurrealDatabaseMock();
+    checkInHistoryStore.trigger.hydrated({ entries: [] });
   });
 
   it('makes tab navigation an explicit state graph', () => {
@@ -120,5 +122,54 @@ describe('app navigation model', () => {
     );
 
     expect(snapshot.context.error).toBeNull();
+  });
+
+  it('loads, changes, and updates an existing moment without duplicating it', async () => {
+    const actor = createActor(appNavigationMachine).start();
+    actor.send({ type: CHECK_IN_EVENTS.TOUCH_STARTED });
+    actor.send({ type: CHECK_IN_EVENTS.SELECTION_CHANGED, selection });
+    actor.send({ type: CHECK_IN_EVENTS.SELECTION_RELEASED });
+    actor.send({ type: CHECK_IN_EVENTS.NOTE_CHANGED, note: 'Before' });
+    actor.send({ type: CHECK_IN_EVENTS.CONFIRMED });
+
+    const created = await waitFor(
+      actor,
+      (candidate) => candidate.matches(CHECK_IN_STATES.SUCCESS),
+      { timeout: 1_000 },
+    );
+    const saved = created.context.saved;
+    if (!saved) throw new Error('Successful persistence must expose the saved check-in.');
+
+    actor.send({ type: CHECK_IN_EVENTS.RESTARTED });
+    actor.send({ type: NAVIGATION_EVENTS.HISTORY_OPENED });
+    actor.send({ type: CHECK_IN_EVENTS.EDIT_REQUESTED, entry: saved });
+    expect(actor.getSnapshot().matches(NAVIGATION_STATES.REFLECTION)).toBe(true);
+    expect(actor.getSnapshot().context).toMatchObject({ note: 'Before', editing: saved });
+
+    actor.send({ type: CHECK_IN_EVENTS.EDIT_SELECTION_REQUESTED });
+    expect(routeForStateValue(actor.getSnapshot().value)).toBe(APP_ROUTES.TODAY);
+    actor.send({ type: CHECK_IN_EVENTS.TOUCH_STARTED });
+    actor.send({
+      type: CHECK_IN_EVENTS.SELECTION_CHANGED,
+      selection: { ...selection, intensity: 0.8, level: 4 },
+    });
+    actor.send({ type: CHECK_IN_EVENTS.SELECTION_RELEASED });
+    actor.send({ type: CHECK_IN_EVENTS.NOTE_CHANGED, note: 'After' });
+    actor.send({ type: CHECK_IN_EVENTS.CONFIRMED });
+
+    await waitFor(
+      actor,
+      (candidate) => candidate.matches({ [NAVIGATION_STATES.TABS]: NAVIGATION_STATES.HISTORY }),
+      { timeout: 1_000 },
+    );
+    const entries = checkInHistoryStore.getSnapshot().context.entries;
+    expect(entries).toHaveLength(1);
+    expect(entries[0]).toMatchObject({
+      id: saved.id,
+      createdAt: saved.createdAt,
+      intensity: 0.8,
+      level: 4,
+      note: 'After',
+    });
   });
 });

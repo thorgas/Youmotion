@@ -15,6 +15,12 @@ const initialContext = {
   error: string | null;
 };
 
+const _recordEntry = ({ entries, entry }: { entries: readonly CheckIn[]; entry: CheckIn }) => {
+  const alreadyRecorded = entries.some((candidate) => candidate.id === entry.id);
+  if (!alreadyRecorded) return [entry, ...entries].slice(0, MAX_CHECK_IN_HISTORY);
+  return entries.map((candidate) => candidate.id === entry.id ? entry : candidate);
+};
+
 export const checkInHistoryStore = createStore({
   schemas: {
     context: Schema.standardSchemaV1(Schema.Struct({
@@ -34,7 +40,7 @@ export const checkInHistoryStore = createStore({
     hydrationFailed: (context, event) => ({ ...context, hydrated: true, error: event.message }),
     recorded: (context, event) => ({
       ...context,
-      entries: [event.entry, ...context.entries].slice(0, MAX_CHECK_IN_HISTORY),
+      entries: _recordEntry({ entries: context.entries, entry: event.entry }),
     }),
   },
 });
