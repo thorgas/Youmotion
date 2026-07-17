@@ -11,6 +11,7 @@ web-build/
 .harness/
 coverage/
 .reassure/
+/artifacts/maestro/
 expo-env.d.ts
 
 # fbtee

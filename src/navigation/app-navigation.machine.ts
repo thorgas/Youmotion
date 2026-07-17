@@ -15,6 +15,8 @@ import {
   MAX_NOTE_LENGTH,
   NAVIGATION_EVENTS,
   NAVIGATION_STATES,
+  SETTINGS_EVENTS,
+  SETTINGS_FAILURE_MESSAGE,
 } from '@/constants';
 import {
   CheckInSchema,
@@ -24,6 +26,12 @@ import {
 import { selectionForCheckIn } from '@/features/check-in/domain/emotion';
 import { loadCheckIns, persistCheckIn } from '@/features/check-in/infrastructure/check-in.repository';
 import { checkInHistoryStore } from '@/features/check-in/application/check-in-history.store';
+import { emotionLabelModeStore } from '@/features/settings/application/emotion-label-mode.store';
+import { EmotionLabelModeSchema } from '@/features/settings/domain/emotion-label-mode';
+import {
+  loadEmotionLabelMode,
+  persistEmotionLabelMode,
+} from '@/features/settings/infrastructure/emotion-label-mode.repository';
 
 const AppContextSchema = Schema.Struct({
   selection: Schema.NullOr(EmotionSelectionSchema),
@@ -83,6 +91,18 @@ export const appNavigationMachine = setup({
       [CHECK_IN_EVENTS.RETRIED]: EmptyEventSchema,
       [CHECK_IN_EVENTS.RESTARTED]: EmptyEventSchema,
       [CHECK_IN_EVENTS.REFLECTION_CANCELLED]: EmptyEventSchema,
+      [SETTINGS_EVENTS.EMOTION_LABEL_MODE_CHANGED]: Schema.standardSchemaV1(
+        Schema.Struct({ mode: EmotionLabelModeSchema }),
+      ),
+      [SETTINGS_EVENTS.EMOTION_LABEL_MODE_HYDRATED]: Schema.standardSchemaV1(
+        Schema.Struct({ mode: EmotionLabelModeSchema }),
+      ),
+      [SETTINGS_EVENTS.EMOTION_LABEL_MODE_HYDRATION_FAILED]: Schema.standardSchemaV1(
+        Schema.Struct({ message: Schema.String }),
+      ),
+      [SETTINGS_EVENTS.EMOTION_LABEL_MODE_PERSISTENCE_FAILED]: Schema.standardSchemaV1(
+        Schema.Struct({ message: Schema.String }),
+      ),
     },
   },
 }).createMachine({
@@ -98,6 +118,13 @@ export const appNavigationMachine = setup({
           message: CHECK_IN_FAILURE_MESSAGE,
         }),
       );
+      void Effect.runPromise(loadEmotionLabelMode).then(
+        (mode) => self.send({ type: SETTINGS_EVENTS.EMOTION_LABEL_MODE_HYDRATED, mode }),
+        () => self.send({
+          type: SETTINGS_EVENTS.EMOTION_LABEL_MODE_HYDRATION_FAILED,
+          message: SETTINGS_FAILURE_MESSAGE,
+        }),
+      );
     });
   },
   on: {
@@ -106,6 +133,24 @@ export const appNavigationMachine = setup({
     },
     [CHECK_IN_EVENTS.HISTORY_HYDRATION_FAILED]: ({ event }, enq) => {
       enq(() => checkInHistoryStore.trigger.hydrationFailed({ message: event.message }));
+    },
+    [SETTINGS_EVENTS.EMOTION_LABEL_MODE_CHANGED]: ({ event, self }, enq) => {
+      enq(() => emotionLabelModeStore.trigger.changed({ mode: event.mode }));
+      enq(() => {
+        void Effect.runPromise(persistEmotionLabelMode(event.mode)).catch(() => self.send({
+          type: SETTINGS_EVENTS.EMOTION_LABEL_MODE_PERSISTENCE_FAILED,
+          message: SETTINGS_FAILURE_MESSAGE,
+        }));
+      });
+    },
+    [SETTINGS_EVENTS.EMOTION_LABEL_MODE_HYDRATED]: ({ event }, enq) => {
+      enq(() => emotionLabelModeStore.trigger.hydrated({ mode: event.mode }));
+    },
+    [SETTINGS_EVENTS.EMOTION_LABEL_MODE_HYDRATION_FAILED]: ({ event }, enq) => {
+      enq(() => emotionLabelModeStore.trigger.hydrationFailed({ message: event.message }));
+    },
+    [SETTINGS_EVENTS.EMOTION_LABEL_MODE_PERSISTENCE_FAILED]: ({ event }, enq) => {
+      enq(() => emotionLabelModeStore.trigger.persistenceFailed({ message: event.message }));
     },
   },
   states: {

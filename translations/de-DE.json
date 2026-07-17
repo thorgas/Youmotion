@@ -1221,6 +1221,61 @@
         }
       ],
       "types": []
+    },
+    "DVtzoSc8xL5kjA1bmnsdNg==": {
+      "description": "Emotion star label display setting title",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Emotionsbeschriftungen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "2sJq2xy1JcbPkw8DAHFahg==": {
+      "description": "Explanation of the emotion star label display setting",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Wähle, was um den Gefühlsstern erscheint, bevor du ihn berührst.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "5iXNJOxEJsQDSf/53fFL3w==": {
+      "description": "Emoji-only emotion label display option",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Emoji",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "+mB+ZTfSyNDTEA7Uv4eVNg==": {
+      "description": "Text-only emotion label display option",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Text",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "ZLxJS7GS8MxUIkcLUjPBiw==": {
+      "description": "Emoji and text emotion label display option",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Beides",
+          "variations": {}
+        }
+      ],
+      "types": []
     }
   }
 }

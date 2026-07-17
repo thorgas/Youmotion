@@ -38,7 +38,7 @@ export function ReflectionScreen() {
   if (!selection || snapshot.matches(NAVIGATION_STATES.TABS)) return null;
 
   return (
-    <View style={styles.page}>
+    <View style={styles.page} testID="reflection-screen">
       <SafeAreaView style={styles.safeArea}>
         <KeyboardAwareScrollView
           bottomOffset={REFLECTION_KEYBOARD_BOTTOM_OFFSET}
@@ -84,15 +84,18 @@ export function ReflectionScreen() {
               onChangeText={_noteChanged}
               placeholder={optionalNotePlaceholder()}
               placeholderTextColor="#A39A8F"
+              returnKeyType="done"
               style={styles.input}
+              submitBehavior="blurAndSubmit"
+              testID="reflection-note-input"
               value={snapshot.context.note}
             />
             {failed ? <Text style={styles.error}><fbt desc="Error shown when saving a check-in fails">Your check-in could not be saved.</fbt></Text> : null}
             <View style={styles.actions}>
-              <PressableScale accessibilityRole="button" disabled={saving} onPress={_back} style={styles.secondaryButton}>
+              <PressableScale accessibilityRole="button" disabled={saving} onPress={_back} style={styles.secondaryButton} testID="reflection-back">
                 <Text style={styles.secondaryText}><fbt desc="Button returning from reflection to the emotion star">Back</fbt></Text>
               </PressableScale>
-              <PressableScale accessibilityRole="button" disabled={saving} onPress={_submit} style={styles.primaryButton}>
+              <PressableScale accessibilityRole="button" disabled={saving} onPress={_submit} style={styles.primaryButton} testID="reflection-save">
                 {saving ? <ActivityIndicator color="#FFFFFF" /> : (
                   <Text style={styles.primaryText}>
                     {failed

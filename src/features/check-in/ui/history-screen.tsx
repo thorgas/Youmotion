@@ -40,7 +40,7 @@ export function HistoryScreen() {
   const { locale } = useLocaleContext();
 
   return (
-    <View style={styles.page}>
+    <View style={styles.page} testID="history-screen">
       <SafeAreaView edges={['top']} style={styles.safeArea}>
         <ScrollView contentContainerStyle={styles.content}>
           <Text style={styles.eyebrow}><fbt desc="Check-in history eyebrow heading">YOUR HISTORY</fbt></Text>

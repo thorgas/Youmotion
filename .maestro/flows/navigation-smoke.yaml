@@ -1,0 +1,21 @@
+appId: app.youmotion.mobile
+name: Navigation smoke test
+tags:
+  - smoke
+  - navigation
+---
+- runFlow: ../helpers/open-app.yaml
+- assertVisible:
+    id: today-screen
+- tapOn:
+    id: tab-history
+- assertVisible:
+    id: history-screen
+- tapOn:
+    id: tab-settings
+- assertVisible:
+    id: settings-screen
+- tapOn:
+    id: tab-today
+- assertVisible:
+    id: today-screen

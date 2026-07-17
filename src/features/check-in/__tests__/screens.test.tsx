@@ -6,6 +6,7 @@ import { createActor, type Actor } from 'xstate';
 import {
   CHECK_IN_EVENTS,
   CHECK_IN_STATES,
+  EMOTION_LABEL_MODES,
   EMOTION_IDS,
   NAVIGATION_EVENTS,
   NAVIGATION_STATES,
@@ -24,6 +25,7 @@ import { HistoryScreen } from '../ui/history-screen';
 import { ReflectionScreen } from '../ui/reflection-screen';
 import { SuccessScreen } from '../ui/success-screen';
 import { SettingsScreen } from '@/features/settings/ui/settings-screen';
+import { emotionLabelModeStore } from '@/features/settings/application/emotion-label-mode.store';
 
 let mockActor: Actor<typeof appNavigationMachine>;
 
@@ -54,6 +56,7 @@ describe('check-in screens', () => {
   beforeEach(() => {
     resetSurrealDatabaseMock();
     checkInHistoryStore.trigger.hydrated({ entries: [] });
+    emotionLabelModeStore.trigger.hydrated({ mode: EMOTION_LABEL_MODES.EMOJI });
     mockActor = createActor(appNavigationMachine).start();
   });
 
@@ -71,7 +74,11 @@ describe('check-in screens', () => {
     });
     expect(screen.getByText('and move your finger.')).toBeTruthy();
     expect(screen.getByText('Release your finger to select the feeling.')).toBeTruthy();
-    expect(screen.getByTestId('base-emotion-label-freude').props['font']).toMatchObject({ fontSize: 14 });
+    expect(screen.getByTestId('emotion-readout-prompt')).toHaveStyle({
+      alignItems: 'center',
+    });
+    expect(screen.getByTestId('base-emotion-emoji-freude').props['children'].props['children']).toBe('😊');
+    expect(screen.getByTestId('base-emotion-emoji-liebe').props['children'].props['children']).toBe('❤️');
     expect(screen.getByText('The farther you move from the center, the more intense the feeling.')).toBeTruthy();
     expect(screen.getByLabelText('Emotion star. Drag outward from the center.')).toBeTruthy();
     expect(screen.getByTestId('base-state-ripples')).toHaveStyle({
@@ -87,6 +94,44 @@ describe('check-in screens', () => {
       width: 72,
       height: 72,
       borderRadius: 36,
+    });
+  });
+
+  it('keeps the star frame and reserved prompt layout stable while selecting an emotion', async () => {
+    const props = {
+      onCancel: jest.fn(),
+      onTouchStart: jest.fn(),
+      onSelectionChange: jest.fn(),
+      onRelease: jest.fn(),
+    };
+    const screen = await render(
+      <AppLocaleProvider>
+        <EmotionStar {...props} selection={null} />
+      </AppLocaleProvider>,
+    );
+    const baseFrameStyle = StyleSheet.flatten(screen.getByTestId('emotion-star-frame').props['style']);
+    const baseReadoutStyle = StyleSheet.flatten(screen.getByTestId('emotion-readout').props['style']);
+    const baseStarStyle = StyleSheet.flatten(screen.getByTestId('emotion-star').props['style']);
+
+    await screen.rerender(
+      <AppLocaleProvider>
+        <EmotionStar {...props} selection={selection} />
+      </AppLocaleProvider>,
+    );
+
+    expect(StyleSheet.flatten(screen.getByTestId('emotion-star-frame').props['style'])).toEqual(baseFrameStyle);
+    expect(StyleSheet.flatten(screen.getByTestId('emotion-readout').props['style'])).toEqual(baseReadoutStyle);
+    expect(StyleSheet.flatten(screen.getByTestId('emotion-star').props['style'])).toEqual(baseStarStyle);
+    expect(screen.getByTestId('emotion-readout-prompt', { includeHiddenElements: true })).toHaveStyle({
+      alignItems: 'center',
+      opacity: 0,
+    });
+    expect(screen.getByTestId('emotion-readout-selection')).toHaveStyle({
+      position: 'absolute',
+      top: 0,
+      right: 0,
+      bottom: 0,
+      left: 0,
     });
   });
 
@@ -107,8 +152,16 @@ describe('check-in screens', () => {
     const star = screen.getByLabelText('Joy · Cheerfulness');
     expect(screen.getByTestId('emotion-nuance-reveal')).toBeTruthy();
     expect(screen.getByTestId('emotion-name-reveal')).toBeTruthy();
-    expect(screen.getByTestId('base-emotion-label-freude').props['font']).toMatchObject({ fontSize: 16 });
-    expect(screen.getByTestId('base-emotion-label-furcht').props['font']).toMatchObject({ fontSize: 14 });
+    expect(screen.getByTestId('emotion-readout-prompt', { includeHiddenElements: true })).toHaveStyle({ opacity: 0 });
+    expect(screen.getByTestId('emotion-readout-selection')).toHaveStyle({
+      position: 'absolute',
+      top: 0,
+      right: 0,
+      bottom: 0,
+      left: 0,
+    });
+    expect(screen.getByTestId('base-emotion-label-freude').props['children'].props['children']).toBe('Joy');
+    expect(screen.getByTestId('base-emotion-emoji-furcht').props['children'].props['children']).toBe('😨');
     const grantEvent = {
       nativeEvent: { locationX: 185, locationY: 40 },
       touchHistory: {
@@ -150,6 +203,25 @@ describe('check-in screens', () => {
     expect(onSelectionChange).toHaveBeenCalledTimes(2);
     expect(onRelease).toHaveBeenCalledTimes(1);
     expect(onCancel).not.toHaveBeenCalled();
+  });
+
+  it('shows emoji, text, or both around the untouched star from the app setting', async () => {
+    const screen = await _renderLocalized(
+      <EmotionStar
+        selection={null}
+        onCancel={jest.fn()}
+        onTouchStart={jest.fn()}
+        onSelectionChange={jest.fn()}
+        onRelease={jest.fn()}
+      />,
+    );
+    expect(screen.getByTestId('emotion-star').props['accessibilityValue']).toEqual({ text: EMOTION_LABEL_MODES.EMOJI });
+
+    await act(() => emotionLabelModeStore.trigger.changed({ mode: EMOTION_LABEL_MODES.TEXT }));
+    expect(screen.getByTestId('emotion-star').props['accessibilityValue']).toEqual({ text: EMOTION_LABEL_MODES.TEXT });
+
+    await act(() => emotionLabelModeStore.trigger.changed({ mode: EMOTION_LABEL_MODES.BOTH }));
+    expect(screen.getByTestId('emotion-star').props['accessibilityValue']).toEqual({ text: EMOTION_LABEL_MODES.BOTH });
   });
 
   it('cancels an interrupted drag instead of releasing its preview', async () => {

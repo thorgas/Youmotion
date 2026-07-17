@@ -91,6 +91,7 @@
   },
   "scripts": {
     "start": "expo start --dev-client",
+    "start:maestro": "EXPO_PUBLIC_MAESTRO=true expo start --dev-client --port 8082",
     "start:tunnel": "expo start --dev-client --tunnel",
     "start:tools": "WITH_ROZENITE=true expo start --dev-client",
     "android": "expo run:android",
@@ -145,6 +146,8 @@
     "test": "jest --runInBand --no-watchman",
     "test:watch": "jest --watch --no-watchman",
     "test:coverage": "jest --coverage --runInBand --no-watchman",
+    "test:maestro": "maestro test .maestro",
+    "test:maestro:smoke": "maestro test .maestro --include-tags=smoke",
     "test:harness": "harness --config jest.harness.config.mjs --no-watchman",
     "verify": "pnpm lint && pnpm typecheck && pnpm test",
     "verify:surrealdb-vendor": "node scripts/verify-vendored-surrealdb.mjs"

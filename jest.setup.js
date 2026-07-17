@@ -29,9 +29,11 @@ jest.mock('react-native-reanimated', () => {
 
   return {
     __esModule: true,
-    default: { Text, View },
+    default: { Text, View, createAnimatedComponent: (component) => component },
+    createAnimatedComponent: (component) => component,
     Easing: { bezier: jest.fn(() => (value) => value) },
     interpolate: jest.fn((_value, _input, output) => output[0]),
+    useAnimatedProps: jest.fn((props) => props()),
     useAnimatedStyle: jest.fn((style) => style()),
     useDerivedValue: jest.fn((derive) => ({ value: derive() })),
     useFrameCallback: jest.fn(),

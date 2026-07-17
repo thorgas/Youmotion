@@ -1,0 +1,34 @@
+appId: app.youmotion.mobile
+name: Save a check-in and find it in history
+tags:
+  - check-in
+  - persistence
+---
+- runFlow: ../helpers/open-app.yaml
+- tapOn:
+    id: tab-today
+- swipe:
+    start: 50%, 54%
+    end: 50%, 34%
+    duration: 1000
+- extendedWaitUntil:
+    visible:
+      id: reflection-screen
+    timeout: 10000
+- tapOn:
+    id: reflection-note-input
+- inputText: MaestroTestEntry
+- pressKey: Enter
+- tapOn:
+    id: reflection-save
+- extendedWaitUntil:
+    visible:
+      id: success-screen
+    timeout: 10000
+- tapOn:
+    id: new-check-in
+- tapOn:
+    id: tab-history
+- extendedWaitUntil:
+    visible: '.*MaestroTestEntry.*'
+    timeout: 10000

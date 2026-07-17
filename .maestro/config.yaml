@@ -1,0 +1,5 @@
+flows:
+  - flows/*.yaml
+testOutputDir: ../artifacts/maestro
+executionOrder:
+  continueOnFailure: false

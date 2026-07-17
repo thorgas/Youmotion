@@ -4,12 +4,15 @@ import {
   APP_ROUTES,
   CHECK_IN_EVENTS,
   CHECK_IN_STATES,
+  EMOTION_LABEL_MODES,
   EMOTION_IDS,
   NAVIGATION_EVENTS,
   NAVIGATION_STATES,
+  SETTINGS_EVENTS,
 } from '@/constants';
 import type { EmotionSelection } from '@/features/check-in/domain/check-in';
 import { checkInHistoryStore } from '@/features/check-in/application/check-in-history.store';
+import { emotionLabelModeStore } from '@/features/settings/application/emotion-label-mode.store';
 import {
   failNextSurrealUpsert,
   mockSurrealDatabase,
@@ -32,6 +35,7 @@ describe('app navigation model', () => {
   beforeEach(() => {
     resetSurrealDatabaseMock();
     checkInHistoryStore.trigger.hydrated({ entries: [] });
+    emotionLabelModeStore.trigger.hydrated({ mode: EMOTION_LABEL_MODES.EMOJI });
   });
 
   it('makes tab navigation an explicit state graph', () => {
@@ -47,6 +51,19 @@ describe('app navigation model', () => {
 
     actor.send({ type: NAVIGATION_EVENTS.TODAY_OPENED });
     expect(routeForStateValue(actor.getSnapshot().value)).toBe(APP_ROUTES.TODAY);
+  });
+
+  it('models all emotion-label setting choices', () => {
+    const actor = createActor(appNavigationMachine).start();
+
+    actor.send({ type: SETTINGS_EVENTS.EMOTION_LABEL_MODE_CHANGED, mode: EMOTION_LABEL_MODES.TEXT });
+    expect(emotionLabelModeStore.getSnapshot().context.mode).toBe(EMOTION_LABEL_MODES.TEXT);
+
+    actor.send({ type: SETTINGS_EVENTS.EMOTION_LABEL_MODE_CHANGED, mode: EMOTION_LABEL_MODES.BOTH });
+    expect(emotionLabelModeStore.getSnapshot().context.mode).toBe(EMOTION_LABEL_MODES.BOTH);
+
+    actor.send({ type: SETTINGS_EVENTS.EMOTION_LABEL_MODE_CHANGED, mode: EMOTION_LABEL_MODES.EMOJI });
+    expect(emotionLabelModeStore.getSnapshot().context.mode).toBe(EMOTION_LABEL_MODES.EMOJI);
   });
 
   it('reaches reflection only through a valid star interaction', () => {

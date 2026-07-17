@@ -33,7 +33,7 @@ export function CheckInScreen() {
   };
 
   return (
-    <View style={styles.page}>
+    <View style={styles.page} testID="today-screen">
       <SafeAreaView edges={['top']} style={styles.safeArea}>
         <View style={styles.gestureRegion} testID="check-in-gesture-region">
           <View style={styles.header}>
