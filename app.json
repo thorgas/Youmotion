@@ -10,7 +10,7 @@
     "backgroundColor": "#F4F0E8",
     "ios": {
       "icon": "./assets/images/app-icon-ios.png",
-      "bundleIdentifier": "app.youmotion.mobile",
+      "bundleIdentifier": "com.youmotion.mobile",
       "supportsTablet": true,
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
@@ -18,7 +18,7 @@
     },
     "android": {
       "icon": "./assets/images/app-icon-android.png",
-      "package": "app.youmotion.mobile",
+      "package": "com.youmotion.mobile",
       "predictiveBackGestureEnabled": false
     },
     "web": {

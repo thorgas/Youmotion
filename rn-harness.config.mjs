@@ -12,12 +12,12 @@ export default {
     applePlatform({
       name: 'ios',
       device: appleSimulator('iPhone 17 Pro', '26.1'),
-      bundleId: 'app.youmotion.mobile',
+      bundleId: 'com.youmotion.mobile',
     }),
     androidPlatform({
       name: 'android',
       device: androidEmulator('Pixel_9'),
-      bundleId: 'app.youmotion.mobile',
+      bundleId: 'com.youmotion.mobile',
     }),
   ],
   defaultRunner: 'web',

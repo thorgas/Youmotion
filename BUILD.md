@@ -25,8 +25,8 @@ EAS has plan-dependent build quotas and pricing. Store distribution also require
 
 3. Create the application records before the first store release:
 
-   - App Store Connect: create an app using bundle ID `app.youmotion.mobile`.
-   - Google Play Console: create an app using package `app.youmotion.mobile`.
+   - App Store Connect: create an app using bundle ID `com.youmotion.mobile`.
+   - Google Play Console: create an app using package `com.youmotion.mobile`.
    - Complete the privacy, content-rating, export-compliance, pricing, tester, screenshot, and store-listing forms in each portal.
 
 4. Keep secrets in EAS rather than Git:
@@ -163,7 +163,7 @@ pnpm eas:credentials:android
 ```
 
 - Remote versioning and `autoIncrement` prevent duplicate iOS build numbers and Android version codes.
-- If App Store Connect cannot find the app, verify its record and `app.youmotion.mobile` bundle ID.
+- If App Store Connect cannot find the app, verify its record and `com.youmotion.mobile` bundle ID.
 - If Play submission fails, verify the first manual upload and the service account's Play Console permissions.
 - If a build fails, inspect its EAS dashboard logs before changing native configuration or clearing caches.
 

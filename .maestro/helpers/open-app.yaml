@@ -1,4 +1,4 @@
-appId: app.youmotion.mobile
+appId: com.youmotion.mobile
 ---
 - launchApp
 - openLink:
