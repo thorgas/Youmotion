@@ -1,6 +1,7 @@
 import { useSelector as useActorSelector } from '@xstate/react';
 import { useSelector as useStoreSelector } from '@xstate/store-react';
 import { PressableScale } from 'pressto';
+import { useRef } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -14,20 +15,56 @@ import { palette, type } from './theme';
 
 const _selectSnapshot = (snapshot: ReturnType<ReturnType<typeof useAppNavigationActor>['getSnapshot']>) => snapshot;
 const _selectHistory = (state: ReturnType<typeof checkInHistoryStore.getSnapshot>) => state.context.entries;
+const _samePreview = ({
+  current,
+  next,
+}: {
+  current: EmotionSelection | null;
+  next: EmotionSelection | null;
+}) => {
+  if (!current || !next) return current === next;
+  return current.emotionId === next.emotionId && current.level === next.level;
+};
+const _sameSelection = ({
+  current,
+  next,
+}: {
+  current: EmotionSelection | null;
+  next: EmotionSelection | null;
+}) => {
+  if (!_samePreview({ current, next })) return false;
+  if (!current || !next) return true;
+  return current.intensity === next.intensity && current.color === next.color;
+};
 
 export function CheckInScreen() {
   const actor = useAppNavigationActor();
   const snapshot = useActorSelector(actor, _selectSnapshot);
   const entries = useStoreSelector(checkInHistoryStore, _selectHistory);
+  const latestSelection = useRef(snapshot.context.selection);
+  const publishedSelection = useRef(snapshot.context.selection);
   const latest = entries[0];
   const editing = snapshot.context.editing !== null;
 
-  const _touchStarted = () => actor.send({ type: CHECK_IN_EVENTS.TOUCH_STARTED });
+  const _touchStarted = () => {
+    latestSelection.current = snapshot.context.selection;
+    publishedSelection.current = snapshot.context.selection;
+    actor.send({ type: CHECK_IN_EVENTS.TOUCH_STARTED });
+  };
   const _selectionChanged = (selection: EmotionSelection | null) => {
+    latestSelection.current = selection;
+    if (_samePreview({ current: publishedSelection.current, next: selection })) return;
+    publishedSelection.current = selection;
     actor.send({ type: CHECK_IN_EVENTS.SELECTION_CHANGED, selection });
   };
   const _selectionCancelled = () => actor.send({ type: CHECK_IN_EVENTS.SELECTION_CANCELLED });
-  const _selectionReleased = () => actor.send({ type: CHECK_IN_EVENTS.SELECTION_RELEASED });
+  const _selectionReleased = () => {
+    if (!_sameSelection({ current: publishedSelection.current, next: latestSelection.current })) {
+      publishedSelection.current = latestSelection.current;
+      actor.send({ type: CHECK_IN_EVENTS.SELECTION_CHANGED, selection: latestSelection.current });
+    }
+    actor.send({ type: CHECK_IN_EVENTS.SELECTION_RELEASED });
+  };
   const _editLatest = () => {
     if (latest) actor.send({ type: CHECK_IN_EVENTS.EDIT_REQUESTED, entry: latest });
   };

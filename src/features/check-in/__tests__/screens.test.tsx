@@ -20,6 +20,7 @@ import {
   resetSurrealDatabaseMock,
 } from '@/test-utils/surrealdb.repository.mock';
 import { CheckInScreen } from '../ui/check-in-screen';
+import { selectionFromPoint } from '../domain/emotion-selection';
 import { EmotionStar } from '../ui/emotion-star';
 import { HistoryScreen } from '../ui/history-screen';
 import { ReflectionScreen } from '../ui/reflection-screen';
@@ -51,6 +52,22 @@ const _reachReflection = () => {
 };
 
 const _renderLocalized = (element: ReactElement) => render(<AppLocaleProvider>{element}</AppLocaleProvider>);
+const _panEvent = ({ x, y, timestamp }: { x: number; y: number; timestamp: number }) => ({
+  nativeEvent: { locationX: x, locationY: y },
+  touchHistory: {
+    touchBank: [{
+      touchActive: true,
+      currentTimeStamp: timestamp,
+      currentPageX: x,
+      currentPageY: y,
+      previousPageX: x,
+      previousPageY: y,
+    }],
+    numberActiveTouches: 1,
+    indexOfSingleActiveTouch: 0,
+    mostRecentTimeStamp: timestamp,
+  },
+});
 
 describe('check-in screens', () => {
   beforeEach(() => {
@@ -135,6 +152,37 @@ describe('check-in screens', () => {
     });
   });
 
+  it('coalesces continuous drag positions and publishes the exact released intensity', async () => {
+    const send = jest.spyOn(mockActor, 'send');
+    const screen = await _renderLocalized(<CheckInScreen />);
+    const star = screen.getByTestId('emotion-star');
+    const grantPoint = { x: 195, y: 115, timestamp: 1 };
+    const movePointOne = { x: 195, y: 114, timestamp: 2 };
+    const movePointTwo = { x: 195, y: 113, timestamp: 3 };
+    const finalPoint = { x: 195, y: 112, timestamp: 4 };
+
+    await fireEvent(star, 'responderGrant', _panEvent(grantPoint));
+    await fireEvent(star, 'responderMove', _panEvent(movePointOne));
+    await fireEvent(star, 'responderMove', _panEvent(movePointTwo));
+    await fireEvent(star, 'responderMove', _panEvent(finalPoint));
+
+    const previewEvents = send.mock.calls.filter(([event]) => event.type === CHECK_IN_EVENTS.SELECTION_CHANGED);
+    expect(previewEvents).toHaveLength(1);
+
+    await fireEvent(star, 'responderRelease');
+
+    const selectionEvents = send.mock.calls.filter(([event]) => event.type === CHECK_IN_EVENTS.SELECTION_CHANGED);
+    expect(selectionEvents).toHaveLength(2);
+    expect(selectionEvents[1]?.[0]).toEqual({
+      type: CHECK_IN_EVENTS.SELECTION_CHANGED,
+      selection: selectionFromPoint({
+        point: finalPoint,
+        center: { x: 195, y: 195 },
+        maxRadius: 140.4,
+      }),
+    });
+  });
+
   it('maps star responder movement to a selection and release', async () => {
     const onTouchStart = jest.fn();
     const onSelectionChange = jest.fn();
@@ -162,38 +210,8 @@ describe('check-in screens', () => {
     });
     expect(screen.getByTestId('base-emotion-label-freude').props['children'].props['children']).toBe('Joy');
     expect(screen.getByTestId('base-emotion-emoji-furcht').props['children'].props['children']).toBe('😨');
-    const grantEvent = {
-      nativeEvent: { locationX: 185, locationY: 40 },
-      touchHistory: {
-        touchBank: [{
-          touchActive: true,
-          currentTimeStamp: 1,
-          currentPageX: 185,
-          currentPageY: 40,
-          previousPageX: 185,
-          previousPageY: 40,
-        }],
-        numberActiveTouches: 1,
-        indexOfSingleActiveTouch: 0,
-        mostRecentTimeStamp: 1,
-      },
-    };
-    const moveEvent = {
-      nativeEvent: { locationX: 240, locationY: 185 },
-      touchHistory: {
-        touchBank: [{
-          touchActive: true,
-          currentTimeStamp: 2,
-          currentPageX: 240,
-          currentPageY: 185,
-          previousPageX: 185,
-          previousPageY: 40,
-        }],
-        numberActiveTouches: 1,
-        indexOfSingleActiveTouch: 0,
-        mostRecentTimeStamp: 2,
-      },
-    };
+    const grantEvent = _panEvent({ x: 185, y: 40, timestamp: 1 });
+    const moveEvent = _panEvent({ x: 240, y: 185, timestamp: 2 });
 
     await fireEvent(star, 'responderGrant', grantEvent);
     await fireEvent(star, 'responderMove', moveEvent);
