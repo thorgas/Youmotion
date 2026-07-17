@@ -4,23 +4,21 @@
     "slug": "youmotion",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
+    "icon": "./assets/images/app-icon-ios.png",
     "scheme": "youmotion",
     "userInterfaceStyle": "light",
     "backgroundColor": "#F4F0E8",
     "ios": {
-      "icon": "./assets/expo.icon",
-      "bundleIdentifier": "app.youmotion.mobile",
-      "supportsTablet": true
+      "icon": "./assets/images/app-icon-ios.png",
+      "bundleIdentifier": "com.youmotion.mobile",
+      "supportsTablet": true,
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
-      "adaptiveIcon": {
-        "backgroundColor": "#F4F0E8",
-        "foregroundImage": "./assets/images/android-icon-foreground.png",
-        "backgroundImage": "./assets/images/android-icon-background.png",
-        "monochromeImage": "./assets/images/android-icon-monochrome.png"
-      },
-      "package": "app.youmotion.mobile",
+      "icon": "./assets/images/app-icon-android.png",
+      "package": "com.youmotion.mobile",
       "predictiveBackGestureEnabled": false
     },
     "web": {
@@ -62,6 +60,13 @@
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
-    }
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "7f37690f-c632-408c-a4ab-1b240610bd12"
+      }
+    },
+    "owner": "youmotion"
   }
 }

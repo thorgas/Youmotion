@@ -11,6 +11,7 @@ web-build/
 .harness/
 coverage/
 .reassure/
+/artifacts/maestro/
 expo-env.d.ts
 
 # fbtee
@@ -52,3 +53,9 @@ example
 # generated native folders
 /ios
 /android
+
+# Generated native binaries for the temporary vendored SurrealDB package.
+/vendor/react-native-surrealdb/SurrealDbRnFramework.xcframework/
+/vendor/react-native-surrealdb/android/.cxx/
+/vendor/react-native-surrealdb/android/build/
+/vendor/react-native-surrealdb/android/src/main/jniLibs/

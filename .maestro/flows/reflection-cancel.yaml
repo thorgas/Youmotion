@@ -1,0 +1,23 @@
+appId: com.youmotion.mobile
+name: Cancel an emotion reflection
+tags:
+  - check-in
+---
+- runFlow: ../helpers/open-app.yaml
+- tapOn:
+    id: tab-today
+- swipe:
+    start: 50%, 54%
+    end: 50%, 34%
+    duration: 1000
+- extendedWaitUntil:
+    visible:
+      id: reflection-screen
+    timeout: 10000
+- pressKey: Enter
+- tapOn:
+    id: reflection-back
+- assertVisible:
+    id: today-screen
+- assertVisible:
+    id: emotion-star

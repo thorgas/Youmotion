@@ -4,7 +4,7 @@ import { EMOTION_IDS } from '@/constants';
 import type { EmotionId, EmotionSelection } from '../domain/check-in';
 
 type Copy = () => string;
-type EmotionCopy = Readonly<{ name: Copy; nuances: readonly Copy[] }>;
+type EmotionCopy = Readonly<{ emoji: string; name: Copy; nuances: readonly Copy[] }>;
 type LocalizedEmotionSelection = Readonly<{
   emotionId: EmotionId;
   intensity: number;
@@ -13,6 +13,7 @@ type LocalizedEmotionSelection = Readonly<{
 
 const emotionCopy = new Map<EmotionId, EmotionCopy>([
   [EMOTION_IDS.JOY, {
+    emoji: '😊',
     name: () => String(fbs('Joy', 'Name of the joy emotion')),
     nuances: [
       () => String(fbs('Pleasure', 'Low-intensity nuance of joy')),
@@ -25,6 +26,7 @@ const emotionCopy = new Map<EmotionId, EmotionCopy>([
     ],
   }],
   [EMOTION_IDS.LOVE, {
+    emoji: '❤️',
     name: () => String(fbs('Love', 'Name of the love emotion')),
     nuances: [
       () => String(fbs('Fondness', 'Low-intensity nuance of love')),
@@ -36,6 +38,7 @@ const emotionCopy = new Map<EmotionId, EmotionCopy>([
     ],
   }],
   [EMOTION_IDS.SHAME, {
+    emoji: '🫣',
     name: () => String(fbs('Shame', 'Name of the shame emotion')),
     nuances: [
       () => String(fbs('Confusion', 'Low-intensity nuance of shame')),
@@ -48,6 +51,7 @@ const emotionCopy = new Map<EmotionId, EmotionCopy>([
     ],
   }],
   [EMOTION_IDS.DISGUST, {
+    emoji: '🤢',
     name: () => String(fbs('Disgust', 'Name of the disgust emotion')),
     nuances: [
       () => String(fbs('Aversion', 'Low-intensity nuance of disgust')),
@@ -58,6 +62,7 @@ const emotionCopy = new Map<EmotionId, EmotionCopy>([
     ],
   }],
   [EMOTION_IDS.SADNESS, {
+    emoji: '😢',
     name: () => String(fbs('Sadness', 'Name of the sadness emotion')),
     nuances: [
       () => String(fbs('Gloom', 'Low-intensity nuance of sadness')),
@@ -69,6 +74,7 @@ const emotionCopy = new Map<EmotionId, EmotionCopy>([
     ],
   }],
   [EMOTION_IDS.ANGER, {
+    emoji: '😠',
     name: () => String(fbs('Anger', 'Name of the anger emotion')),
     nuances: [
       () => String(fbs('Displeasure', 'Low-intensity nuance of anger')),
@@ -81,6 +87,7 @@ const emotionCopy = new Map<EmotionId, EmotionCopy>([
     ],
   }],
   [EMOTION_IDS.FEAR, {
+    emoji: '😨',
     name: () => String(fbs('Fear', 'Name of the fear emotion')),
     nuances: [
       () => String(fbs('Uncertainty', 'Low-intensity nuance of fear')),
@@ -97,6 +104,11 @@ const emotionCopy = new Map<EmotionId, EmotionCopy>([
 
 const _fallbackName = () => String(fbs('Emotion', 'Fallback emotion name'));
 const _fallbackNuance = () => String(fbs('Feeling', 'Fallback emotion nuance'));
+const _fallbackEmoji = '😶';
+
+export function emotionEmoji(emotionId: EmotionId) {
+  return emotionCopy.get(emotionId)?.emoji ?? _fallbackEmoji;
+}
 
 export function emotionName(emotionId: EmotionId) {
   return emotionCopy.get(emotionId)?.name() ?? _fallbackName();
@@ -126,34 +138,9 @@ export function emotionSummary(selection: LocalizedEmotionSelection) {
   ));
 }
 
-export function intensityCopy(intensity: number) {
-  return String(fbs(
-    fbs.param('intensity', String(Math.round(intensity * 100))) + '% intensity',
-    'Intensity percentage for a check-in',
-  ));
-}
-
-export function nuanceIntensityCopy(selection: LocalizedEmotionSelection) {
-  return String(fbs(
-    fbs.param('emotionNuance', emotionNuance(selection))
-      + ' · '
-      + fbs.param('intensity', String(Math.round(selection.intensity * 100)))
-      + '%',
-    'Selected emotion nuance and intensity on reflection screen',
-  ));
-}
-
 export function emotionStarAccessibility(selection: EmotionSelection | null) {
   if (!selection) return String(fbs('Emotion star. Drag outward from the center.', 'Emotion star accessibility instructions'));
-  return String(fbs(
-    fbs.param('emotionName', emotionName(selection.emotionId))
-      + ', '
-      + fbs.param('emotionNuance', emotionNuance(selection))
-      + ', intensity '
-      + fbs.param('intensity', String(Math.round(selection.intensity * 100)))
-      + ' percent',
-    'Selected emotion, nuance and intensity for accessibility',
-  ));
+  return emotionSummary(selection);
 }
 
 export function savedCheckInCopy(selection: LocalizedEmotionSelection) {

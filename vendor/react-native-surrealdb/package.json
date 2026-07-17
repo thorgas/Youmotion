@@ -1,0 +1,37 @@
+{
+  "name": "react-native-surrealdb",
+  "version": "0.1.0-alpha.0",
+  "description": "Embedded and remote SurrealDB for React Native",
+  "author": "Tim Horgas",
+  "homepage": "https://github.com/timhorgas/react-native-surrealdb#readme",
+  "license": "MIT",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "react-native": "./src/index.ts",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "react-native": "./src/index.ts",
+      "source": "./src/index.ts",
+      "default": "./src/index.ts"
+    },
+    "./package.json": "./package.json"
+  },
+  "dependencies": {
+    "@babel/runtime": "7.29.7",
+    "@ubjs/core": "0.31.0-3",
+    "uniffi-bindgen-react-native": "0.31.0-3"
+  },
+  "peerDependencies": {
+    "react": ">=18",
+    "react-native": ">=0.82"
+  },
+  "codegenConfig": {
+    "name": "SurrealDbRnSpec",
+    "type": "modules",
+    "jsSrcsDir": "src",
+    "android": {
+      "javaPackageName": "com.surrealdb.rn"
+    }
+  }
+}

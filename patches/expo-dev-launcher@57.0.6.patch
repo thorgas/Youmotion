@@ -1,0 +1,12 @@
+diff --git a/android/src/debug/java/expo/modules/devlauncher/react/activitydelegates/DevLauncherReactActivityNOPDelegate.kt b/android/src/debug/java/expo/modules/devlauncher/react/activitydelegates/DevLauncherReactActivityNOPDelegate.kt
+index ad1f826161ab13a716e682df9825440bb233b944..1f75264e93c13e2dd77101c78314f3f82fe23323 100644
+--- a/android/src/debug/java/expo/modules/devlauncher/react/activitydelegates/DevLauncherReactActivityNOPDelegate.kt
++++ b/android/src/debug/java/expo/modules/devlauncher/react/activitydelegates/DevLauncherReactActivityNOPDelegate.kt
+@@ -12,6 +12,7 @@ open class DevLauncherReactActivityNOPDelegate(activity: ReactActivity) :
+   override fun onCreate(savedInstanceState: Bundle?) {}
+   override fun onResume() {}
+   override fun onPause() {}
++  override fun onUserLeaveHint() {}
+   override fun onDestroy() {}
+   override fun onNewIntent(intent: Intent?): Boolean = true
+   override fun onBackPressed(): Boolean = true

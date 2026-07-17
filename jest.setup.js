@@ -2,6 +2,18 @@ jest.mock('@react-native-async-storage/async-storage', () => (
   require('@react-native-async-storage/async-storage/jest/async-storage-mock')
 ));
 
+jest.mock('react-native-surrealdb', () => {
+  class SurrealRecordId {
+    kind = 'record';
+
+    constructor(value) {
+      this.value = value;
+    }
+  }
+
+  return { SurrealRecordId };
+});
+
 jest.mock('expo-haptics', () => ({
   selectionAsync: jest.fn(() => Promise.resolve()),
   impactAsync: jest.fn(() => Promise.resolve()),
@@ -17,9 +29,11 @@ jest.mock('react-native-reanimated', () => {
 
   return {
     __esModule: true,
-    default: { Text, View },
+    default: { Text, View, createAnimatedComponent: (component) => component },
+    createAnimatedComponent: (component) => component,
     Easing: { bezier: jest.fn(() => (value) => value) },
     interpolate: jest.fn((_value, _input, output) => output[0]),
+    useAnimatedProps: jest.fn((props) => props()),
     useAnimatedStyle: jest.fn((style) => style()),
     useDerivedValue: jest.fn((derive) => ({ value: derive() })),
     useFrameCallback: jest.fn(),

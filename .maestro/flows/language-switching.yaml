@@ -1,0 +1,43 @@
+appId: com.youmotion.mobile
+name: Switch language and restore English
+tags:
+  - settings
+---
+- runFlow: ../helpers/open-app.yaml
+- tapOn:
+    id: tab-settings
+- tapOn:
+    id: language-german
+- extendedWaitUntil:
+    visible: Ein geschützter Raum.
+    timeout: 10000
+- tapOn:
+    id: language-english
+- extendedWaitUntil:
+    visible: A protected space.
+    timeout: 10000
+- tapOn:
+    id: emotion-label-mode-text
+- tapOn:
+    id: tab-today
+- assertVisible:
+    id: emotion-star
+    text: text
+- tapOn:
+    id: tab-settings
+- tapOn:
+    id: emotion-label-mode-both
+- tapOn:
+    id: tab-today
+- assertVisible:
+    id: emotion-star
+    text: both
+- tapOn:
+    id: tab-settings
+- tapOn:
+    id: emotion-label-mode-emoji
+- tapOn:
+    id: tab-today
+- assertVisible:
+    id: emotion-star
+    text: emoji

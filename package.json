@@ -4,12 +4,14 @@
   "version": "1.0.0",
   "packageManager": "pnpm@11.12.0",
   "dependencies": {
+    "@babel/runtime": "7.29.7",
     "@callstack/inspector": "0.1.1",
     "@expo-google-fonts/fraunces": "^0.4.1",
     "@expo/ui": "~57.0.6",
     "@ottrelite/backend-wrapper-tracy": "0.1.1",
     "@ottrelite/core": "0.1.1",
     "@react-native-async-storage/async-storage": "2.2.0",
+    "@ubjs/core": "0.31.0-3",
     "@xstate/react": "^7.0.0-alpha.1",
     "@xstate/store": "^4.1.0",
     "@xstate/store-react": "^2.0.0",
@@ -19,6 +21,7 @@
     "expo-constants": "~57.0.5",
     "expo-dev-client": "~57.0.6",
     "expo-device": "~57.0.1",
+    "expo-file-system": "~57.0.1",
     "expo-font": "~57.0.1",
     "expo-glass-effect": "~57.0.1",
     "expo-haptics": "~57.0.1",
@@ -45,9 +48,11 @@
     "react-native-reanimated": "4.5.0",
     "react-native-safe-area-context": "~5.7.0",
     "react-native-screens": "4.25.2",
+    "react-native-surrealdb": "link:vendor/react-native-surrealdb",
     "react-native-svg": "15.15.4",
     "react-native-web": "~0.21.0",
     "react-native-worklets": "0.10.0",
+    "uniffi-bindgen-react-native": "0.31.0-3",
     "xstate": "^6.0.0-alpha.20"
   },
   "devDependencies": {
@@ -58,6 +63,7 @@
     "@react-native-harness/platform-apple": "^1.3.0",
     "@react-native-harness/platform-web": "^1.3.0",
     "@react-native-harness/runtime": "^1.3.0",
+    "@react-native-harness/ui": "^1.3.0",
     "@react-native/jest-preset": "^0.86.0",
     "@rozenite/metro": "1.13.0",
     "@rozenite/performance-monitor-plugin": "1.13.0",
@@ -85,6 +91,7 @@
   },
   "scripts": {
     "start": "expo start --dev-client",
+    "start:maestro": "EXPO_PUBLIC_MAESTRO=true expo start --dev-client --port 8082",
     "start:tunnel": "expo start --dev-client --tunnel",
     "start:tools": "WITH_ROZENITE=true expo start --dev-client",
     "android": "expo run:android",
@@ -99,6 +106,7 @@
     "eas:whoami": "eas whoami",
     "eas:init": "eas init",
     "eas:open": "eas open",
+    "eas-build-pre-install": "node scripts/verify-vendored-surrealdb.mjs",
     "eas:credentials:ios": "eas credentials --platform ios",
     "eas:credentials:android": "eas credentials --platform android",
     "eas:builds": "eas build:list",
@@ -138,8 +146,11 @@
     "test": "jest --runInBand --no-watchman",
     "test:watch": "jest --watch --no-watchman",
     "test:coverage": "jest --coverage --runInBand --no-watchman",
+    "test:maestro": "maestro test .maestro",
+    "test:maestro:smoke": "maestro test .maestro --include-tags=smoke",
     "test:harness": "harness --config jest.harness.config.mjs --no-watchman",
-    "verify": "pnpm lint && pnpm typecheck && pnpm test"
+    "verify": "pnpm lint && pnpm typecheck && pnpm test",
+    "verify:surrealdb-vendor": "node scripts/verify-vendored-surrealdb.mjs"
   },
   "private": true
 }

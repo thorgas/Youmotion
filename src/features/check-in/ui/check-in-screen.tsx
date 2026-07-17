@@ -1,6 +1,8 @@
 import { useSelector as useActorSelector } from '@xstate/react';
 import { useSelector as useStoreSelector } from '@xstate/store-react';
-import { StyleSheet, Text, View } from 'react-native';
+import { PressableScale } from 'pressto';
+import { useRef } from 'react';
+import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { CHECK_IN_EVENTS } from '@/constants';
@@ -8,31 +10,75 @@ import { useAppNavigationActor } from '@/navigation/app-navigation.provider';
 import type { EmotionSelection } from '../domain/check-in';
 import { checkInHistoryStore } from '../application/check-in-history.store';
 import { EmotionStar } from './emotion-star';
-import { emotionSummary, intensityCopy } from './emotion-copy';
+import { emotionSummary } from './emotion-copy';
 import { palette, type } from './theme';
 
 const _selectSnapshot = (snapshot: ReturnType<ReturnType<typeof useAppNavigationActor>['getSnapshot']>) => snapshot;
 const _selectHistory = (state: ReturnType<typeof checkInHistoryStore.getSnapshot>) => state.context.entries;
+const _samePreview = ({
+  current,
+  next,
+}: {
+  current: EmotionSelection | null;
+  next: EmotionSelection | null;
+}) => {
+  if (!current || !next) return current === next;
+  return current.emotionId === next.emotionId && current.level === next.level;
+};
+const _sameSelection = ({
+  current,
+  next,
+}: {
+  current: EmotionSelection | null;
+  next: EmotionSelection | null;
+}) => {
+  if (!_samePreview({ current, next })) return false;
+  if (!current || !next) return true;
+  return current.intensity === next.intensity && current.color === next.color;
+};
 
 export function CheckInScreen() {
   const actor = useAppNavigationActor();
   const snapshot = useActorSelector(actor, _selectSnapshot);
   const entries = useStoreSelector(checkInHistoryStore, _selectHistory);
+  const latestSelection = useRef(snapshot.context.selection);
+  const publishedSelection = useRef(snapshot.context.selection);
   const latest = entries[0];
+  const editing = snapshot.context.editing !== null;
 
-  const _touchStarted = () => actor.send({ type: CHECK_IN_EVENTS.TOUCH_STARTED });
+  const _touchStarted = () => {
+    latestSelection.current = snapshot.context.selection;
+    publishedSelection.current = snapshot.context.selection;
+    actor.send({ type: CHECK_IN_EVENTS.TOUCH_STARTED });
+  };
   const _selectionChanged = (selection: EmotionSelection | null) => {
+    latestSelection.current = selection;
+    if (_samePreview({ current: publishedSelection.current, next: selection })) return;
+    publishedSelection.current = selection;
     actor.send({ type: CHECK_IN_EVENTS.SELECTION_CHANGED, selection });
   };
   const _selectionCancelled = () => actor.send({ type: CHECK_IN_EVENTS.SELECTION_CANCELLED });
-  const _selectionReleased = () => actor.send({ type: CHECK_IN_EVENTS.SELECTION_RELEASED });
+  const _selectionReleased = () => {
+    if (!_sameSelection({ current: publishedSelection.current, next: latestSelection.current })) {
+      publishedSelection.current = latestSelection.current;
+      actor.send({ type: CHECK_IN_EVENTS.SELECTION_CHANGED, selection: latestSelection.current });
+    }
+    actor.send({ type: CHECK_IN_EVENTS.SELECTION_RELEASED });
+  };
+  const _editLatest = () => {
+    if (latest) actor.send({ type: CHECK_IN_EVENTS.EDIT_REQUESTED, entry: latest });
+  };
 
   return (
-    <View style={styles.page}>
+    <View style={styles.page} testID="today-screen">
       <SafeAreaView edges={['top']} style={styles.safeArea}>
-        <View style={styles.content}>
+        <View style={styles.gestureRegion} testID="check-in-gesture-region">
           <View style={styles.header}>
-            <Text style={styles.title}><fbt desc="Question asking the user about their current feeling">How are you feeling?</fbt></Text>
+            <Text style={styles.title}>
+              {editing
+                ? <fbt desc="Question shown while changing the feeling in an existing check-in">How did you feel then?</fbt>
+                : <fbt desc="Question asking the user about their current feeling">How are you feeling right now?</fbt>}
+            </Text>
           </View>
           <View style={styles.starStage}>
             <EmotionStar
@@ -43,22 +89,28 @@ export function CheckInScreen() {
               onRelease={_selectionReleased}
             />
           </View>
-          {latest ? (
+        </View>
+        <ScrollView
+          contentContainerStyle={styles.detailsContent}
+          contentInsetAdjustmentBehavior="automatic"
+          showsVerticalScrollIndicator={false}
+          style={styles.detailsScroll}
+          testID="check-in-details-scroll">
+          {latest && !editing ? (
             <View style={styles.recent}>
               <Text style={styles.sectionTitle}><fbt desc="Heading for the most recent check-in">Latest check-in</fbt></Text>
-              <View style={styles.recentCard}>
+              <PressableScale accessibilityRole="button" onPress={_editLatest} style={styles.recentCard}>
                 <View style={styles.recentDot} />
                 <View style={styles.recentCopy}>
                   <Text style={styles.recentEmotion}>{emotionSummary(latest)}</Text>
-                  <Text style={styles.recentTime}>{intensityCopy(latest.intensity)}</Text>
                 </View>
-              </View>
+              </PressableScale>
             </View>
           ) : null}
           <Text style={styles.disclaimer}>
             <fbt desc="Health disclaimer shown below the emotion check-in">Youmotion supports self-awareness and does not replace psychotherapeutic or medical treatment.</fbt>
           </Text>
-        </View>
+        </ScrollView>
       </SafeAreaView>
     </View>
   );
@@ -67,7 +119,9 @@ export function CheckInScreen() {
 const styles = StyleSheet.create({
   page: { flex: 1, backgroundColor: palette.paper },
   safeArea: { flex: 1 },
-  content: { width: '100%', maxWidth: 520, minHeight: '100%', alignSelf: 'center', paddingHorizontal: 16, paddingBottom: 32 },
+  gestureRegion: { width: '100%', maxWidth: 520, alignSelf: 'center', paddingHorizontal: 16 },
+  detailsScroll: { flex: 1, width: '100%', maxWidth: 520, alignSelf: 'center' },
+  detailsContent: { flexGrow: 1, paddingHorizontal: 16, paddingBottom: 32 },
   header: { marginTop: 34, alignItems: 'center', paddingHorizontal: 32 },
   title: { fontFamily: type.semibold, color: palette.ink, fontSize: 30, lineHeight: 36, letterSpacing: -0.5, textAlign: 'center', opacity: 0.9 },
   starStage: { marginTop: 24, alignItems: 'center' },
@@ -77,6 +131,5 @@ const styles = StyleSheet.create({
   recentDot: { width: 10, height: 10, borderRadius: 5, marginRight: 12, backgroundColor: '#8D8278' },
   recentCopy: { flex: 1 },
   recentEmotion: { fontFamily: type.medium, color: palette.ink, fontSize: 14 },
-  recentTime: { fontFamily: type.regular, color: palette.inkMuted, fontSize: 12, marginTop: 2 },
-  disclaimer: { fontFamily: type.regular, color: palette.inkMuted, fontSize: 11, lineHeight: 16, marginTop: 34, textAlign: 'center', paddingHorizontal: 32, opacity: 0.58 },
+  disclaimer: { fontFamily: type.regular, color: palette.inkMuted, fontSize: 11, lineHeight: 16, marginTop: 24, textAlign: 'center', paddingHorizontal: 32, opacity: 0.58 },
 });

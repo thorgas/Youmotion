@@ -28,9 +28,9 @@ export default function TabLayout() {
 
   return (
     <Tabs screenOptions={{ headerShown: false, tabBarActiveTintColor: '#292722', tabBarLabelStyle: { fontFamily: APP_TYPE.medium }, tabBarStyle: { backgroundColor: '#FBF8F2' } }}>
-      <Tabs.Screen name="today" listeners={_todayListeners} options={{ title: todayTabTitle(), tabBarIcon: TodayTabIcon }} />
-      <Tabs.Screen name="history" listeners={_historyListeners} options={{ title: historyTabTitle(), tabBarIcon: HistoryTabIcon }} />
-      <Tabs.Screen name="settings" listeners={_settingsListeners} options={{ title: settingsTabTitle(), tabBarIcon: SettingsTabIcon }} />
+      <Tabs.Screen name="today" listeners={_todayListeners} options={{ title: todayTabTitle(), tabBarButtonTestID: 'tab-today', tabBarIcon: TodayTabIcon }} />
+      <Tabs.Screen name="history" listeners={_historyListeners} options={{ title: historyTabTitle(), tabBarButtonTestID: 'tab-history', tabBarIcon: HistoryTabIcon }} />
+      <Tabs.Screen name="settings" listeners={_settingsListeners} options={{ title: settingsTabTitle(), tabBarButtonTestID: 'tab-settings', tabBarIcon: SettingsTabIcon }} />
     </Tabs>
   );
 }

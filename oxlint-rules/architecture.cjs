@@ -193,7 +193,13 @@ const noComments = {
     return {
       Program() {
         context.sourceCode.getAllComments().forEach((comment) => {
-          if (!/(eslint|@ts-|istanbul|c8)/.test(comment.value)) context.report({ node: comment, messageId: 'comment' });
+          const value = comment.value.trim();
+          const isExistingToolDirective = /(eslint|@ts-|istanbul|c8)/.test(value);
+          const isReasonedOxlintDisable = /^oxlint-disable(?:-next-line|-line)?\s+\S.*\s--\s+\S/.test(value);
+          const isOxlintEnable = /^oxlint-enable\b/.test(value);
+          if (!isExistingToolDirective && !isReasonedOxlintDisable && !isOxlintEnable) {
+            context.report({ node: comment, messageId: 'comment' });
+          }
         });
       },
     };

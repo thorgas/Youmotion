@@ -1,0 +1,14 @@
+appId: com.youmotion.mobile
+---
+- launchApp
+- openLink:
+    link: exp+youmotion://expo-development-client/?url=http%3A%2F%2F127.0.0.1%3A8082
+- runFlow:
+    when:
+      visible: 'Open in "Youmotion"'
+    commands:
+      - tapOn: Open
+- extendedWaitUntil:
+    visible:
+      id: today-screen
+    timeout: 30000

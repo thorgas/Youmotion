@@ -13,7 +13,7 @@ import {
 import { useAppNavigationActor } from '@/navigation/app-navigation.provider';
 import {
   emotionName,
-  nuanceIntensityCopy,
+  emotionNuance,
   optionalNoteAccessibilityLabel,
   optionalNotePlaceholder,
 } from './emotion-copy';
@@ -21,21 +21,24 @@ import { palette, type } from './theme';
 
 const _selectSnapshot = (snapshot: ReturnType<ReturnType<typeof useAppNavigationActor>['getSnapshot']>) => snapshot;
 
+/* oxlint-disable jsx-a11y/no-autofocus -- Reflection is an explicit writing step; create and edit modes have regression coverage. */
 export function ReflectionScreen() {
   const actor = useAppNavigationActor();
   const snapshot = useSelector(actor, _selectSnapshot);
   const selection = snapshot.context.selection;
   const saving = snapshot.matches(CHECK_IN_STATES.SAVING);
   const failed = snapshot.matches(CHECK_IN_STATES.FAILURE);
+  const editing = snapshot.context.editing !== null;
 
   const _noteChanged = (note: string) => actor.send({ type: CHECK_IN_EVENTS.NOTE_CHANGED, note });
   const _back = () => actor.send({ type: CHECK_IN_EVENTS.REFLECTION_CANCELLED });
   const _submit = () => actor.send({ type: failed ? CHECK_IN_EVENTS.RETRIED : CHECK_IN_EVENTS.CONFIRMED });
+  const _editSelection = () => actor.send({ type: CHECK_IN_EVENTS.EDIT_SELECTION_REQUESTED });
 
   if (!selection || snapshot.matches(NAVIGATION_STATES.TABS)) return null;
 
   return (
-    <View style={styles.page}>
+    <View style={styles.page} testID="reflection-screen">
       <SafeAreaView style={styles.safeArea}>
         <KeyboardAwareScrollView
           bottomOffset={REFLECTION_KEYBOARD_BOTTOM_OFFSET}
@@ -46,40 +49,60 @@ export function ReflectionScreen() {
           testID="reflection-keyboard-scroll"
         >
           <View style={styles.header}>
-            <Text style={styles.eyebrow}><fbt desc="Second step label for reflecting on a feeling">02 · REFLECT</fbt></Text>
-            <Text style={styles.title}><fbt desc="Reflection screen question">What is present right now?</fbt></Text>
+            <Text style={styles.eyebrow}>
+              {editing
+                ? <fbt desc="Label for editing an existing check-in">EDIT MOMENT</fbt>
+                : <fbt desc="Second step label for reflecting on a feeling">02 · REFLECT</fbt>}
+            </Text>
+            <Text style={styles.title}>
+              {editing
+                ? <fbt desc="Title for editing an existing check-in">Edit this moment.</fbt>
+                : <fbt desc="Reflection screen question">What is present right now?</fbt>}
+            </Text>
             <Text style={styles.copy}><fbt desc="Gentle instructions for the optional reflection">You do not have to explain anything. A few words can help hold onto the moment.</fbt></Text>
           </View>
           <View style={styles.card}>
-            <View style={styles.selectionRow}>
+            <PressableScale
+              accessibilityRole={editing ? 'button' : undefined}
+              disabled={!editing || saving}
+              onPress={_editSelection}
+              style={styles.selectionRow}
+            >
               <View style={[styles.dot, { backgroundColor: selection.color }]} />
-              <View>
+              <View style={styles.selectionCopy}>
                 <Text style={styles.emotion}>{emotionName(selection.emotionId)}</Text>
-                <Text style={styles.nuance}>{nuanceIntensityCopy(selection)}</Text>
+                <Text style={styles.nuance}>{emotionNuance(selection)}</Text>
               </View>
-            </View>
+              {editing ? <Text style={styles.changeSelection}><fbt desc="Button for changing the feeling of an existing check-in">Change feeling</fbt></Text> : null}
+            </PressableScale>
             <TextInput
               accessibilityLabel={optionalNoteAccessibilityLabel()}
+              autoFocus
               editable={!saving}
               maxLength={240}
               multiline
               onChangeText={_noteChanged}
               placeholder={optionalNotePlaceholder()}
               placeholderTextColor="#A39A8F"
+              returnKeyType="done"
               style={styles.input}
+              submitBehavior="blurAndSubmit"
+              testID="reflection-note-input"
               value={snapshot.context.note}
             />
             {failed ? <Text style={styles.error}><fbt desc="Error shown when saving a check-in fails">Your check-in could not be saved.</fbt></Text> : null}
             <View style={styles.actions}>
-              <PressableScale accessibilityRole="button" disabled={saving} onPress={_back} style={styles.secondaryButton}>
+              <PressableScale accessibilityRole="button" disabled={saving} onPress={_back} style={styles.secondaryButton} testID="reflection-back">
                 <Text style={styles.secondaryText}><fbt desc="Button returning from reflection to the emotion star">Back</fbt></Text>
               </PressableScale>
-              <PressableScale accessibilityRole="button" disabled={saving} onPress={_submit} style={styles.primaryButton}>
+              <PressableScale accessibilityRole="button" disabled={saving} onPress={_submit} style={styles.primaryButton} testID="reflection-save">
                 {saving ? <ActivityIndicator color="#FFFFFF" /> : (
                   <Text style={styles.primaryText}>
                     {failed
                       ? <fbt desc="Button retrying a failed check-in save">Try again</fbt>
-                      : <fbt desc="Button saving a completed check-in">Save check-in</fbt>}
+                      : editing
+                        ? <fbt desc="Button saving changes to an existing check-in">Save changes</fbt>
+                        : <fbt desc="Button saving a completed check-in">Save check-in</fbt>}
                   </Text>
                 )}
               </PressableScale>
@@ -90,6 +113,7 @@ export function ReflectionScreen() {
     </View>
   );
 }
+/* oxlint-enable jsx-a11y/no-autofocus */
 
 const styles = StyleSheet.create({
   page: { flex: 1, backgroundColor: palette.paper },
@@ -101,9 +125,11 @@ const styles = StyleSheet.create({
   copy: { fontFamily: type.regular, color: palette.inkMuted, fontSize: 15, lineHeight: 22, marginTop: 10 },
   card: { marginTop: 28, padding: 20, borderRadius: 26, backgroundColor: palette.paperRaised, borderWidth: 1, borderColor: palette.hairline },
   selectionRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 18 },
+  selectionCopy: { flex: 1 },
   dot: { width: 14, height: 14, borderRadius: 7, marginRight: 12 },
   emotion: { fontFamily: type.semibold, color: palette.ink, fontSize: 16 },
   nuance: { fontFamily: type.regular, color: palette.inkMuted, fontSize: 13 },
+  changeSelection: { fontFamily: type.semibold, color: palette.moss, fontSize: 12 },
   input: { minHeight: 150, borderRadius: 18, backgroundColor: '#F0EAE0', padding: 16, fontFamily: type.regular, color: palette.ink, fontSize: 15, lineHeight: 22, textAlignVertical: 'top' },
   error: { fontFamily: type.medium, color: palette.danger, fontSize: 12, marginTop: 10 },
   actions: { flexDirection: 'row', gap: 10, marginTop: 16 },

@@ -1,6 +1,6 @@
 # Youmotion
 
-Build, internal distribution, TestFlight, Google Play, and App Store release instructions are in [BUILD.md](./BUILD.md).
+Build, internal distribution, TestFlight, Google Play, and App Store release instructions are in [BUILD.md](./BUILD.md). Database setup, persisted schema, migration behavior, and native SurrealDB packaging are documented in [DB.md](./DB.md).
 
 Youmotion is a private, local-first Expo app for noticing and recording emotions with a seven-direction German `Gefühlsstern`. Dragging from the center chooses an emotion; distance chooses nuance and intensity. Releasing opens a short reflection, and a confirmed check-in is schema-validated before local persistence.
 
@@ -99,6 +99,8 @@ pnpm typecheck
 pnpm typecheck:compat
 pnpm test
 pnpm test:coverage
+pnpm test:maestro
+pnpm test:maestro:smoke
 pnpm verify
 pnpm test:harness
 pnpm doctor:react
@@ -106,6 +108,8 @@ pnpm doctor:react
 
 `pnpm typecheck` invokes TypeScript 7 directly. `typecheck:compat` checks the compatibility compiler used by editor and lint integrations.
 The pnpm patches for `expo-modules-core` and `expo-modules-jsi` keep Expo SDK 57 buildable with the repository host's Xcode 26.1 Swift compiler. They only replace invalid immutable weak references with mutable weak references and can be removed after moving to Expo's supported Xcode 26.4 or newer toolchain.
+
+The `expo-dev-launcher` patch backports Expo's Android `onUserLeaveHint` fix for the launcher delegate. Remove it after upgrading to an Expo SDK 57 package that includes [expo/expo#47347](https://github.com/expo/expo/pull/47347).
 
 ## Internationalization
 
@@ -164,9 +168,21 @@ The rule suite lives beside the plugin and should be extended whenever a new inv
 - Repository tests execute Effect programs against mocked native storage, including typed decode and storage failures.
 - Navigation tests drive the actual root actor through event paths and assert the projected route.
 - Screen tests render the painterly star and exercise reflection, persistence, history, success, and settings.
+- Maestro tests exercise tab navigation, reflection cancellation, a persisted check-in journey, and language switching through the installed development app.
 - React Native Harness is configured for web, iOS, and Android device-level component testing.
 
 The current Jest coverage gate is enforced globally and must not be lowered.
+
+### Maestro end-to-end tests
+
+Install the [Maestro CLI](https://docs.maestro.dev/getting-started/installing-maestro), boot an iOS simulator or Android emulator, and install the Youmotion development client with `pnpm ios` or `pnpm android`. Keep Metro running in another terminal:
+
+```bash
+pnpm start:maestro
+pnpm test:maestro
+```
+
+The dedicated Metro mode disables the development-only React Native Grab inspection overlay so iOS and Android expose the application accessibility tree to the test runner. Run `pnpm test:maestro:smoke` for the short tab-navigation gate. The flows connect the development client to Metro at `127.0.0.1:8082`; on Android, first run `adb reverse tcp:8082 tcp:8082`. Failure output is written to the ignored `artifacts/maestro` directory.
 
 ## Local Codex skills
 

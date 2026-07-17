@@ -18,12 +18,12 @@ export function SuccessScreen() {
   if (!saved) return null;
 
   return (
-    <View style={styles.page}>
+    <View style={styles.page} testID="success-screen">
       <SafeAreaView style={styles.content}>
         <View style={styles.halo}><Text style={styles.check}>✓</Text></View>
         <Text style={styles.title}><fbt desc="Successful check-in title">You arrived with yourself.</fbt></Text>
         <Text style={styles.copy}>{savedCheckInCopy(saved)}</Text>
-        <PressableScale accessibilityRole="button" onPress={_restart} style={styles.button}>
+        <PressableScale accessibilityRole="button" onPress={_restart} style={styles.button} testID="new-check-in">
           <Text style={styles.buttonText}><fbt desc="Button starting another check-in">New check-in</fbt></Text>
         </PressableScale>
       </SafeAreaView>

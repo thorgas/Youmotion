@@ -1,6 +1,6 @@
 import { EMOTION_IDS } from '@/constants';
 
-import type { EmotionId } from './check-in';
+import type { CheckIn, EmotionId, EmotionSelection } from './check-in';
 
 export type { EmotionSelection } from './check-in';
 
@@ -55,3 +55,18 @@ export const emotions: readonly Emotion[] = [
     nuanceCount: 8,
   },
 ];
+
+export function selectionForCheckIn(checkIn: CheckIn): EmotionSelection {
+  const emotion = emotions.find((candidate) => candidate.id === checkIn.emotionId);
+  if (!emotion) throw new Error('A decoded check-in must reference a known emotion.');
+
+  return {
+    emotionId: checkIn.emotionId,
+    intensity: checkIn.intensity,
+    level: Math.min(
+      checkIn.level ?? Math.floor(checkIn.intensity * emotion.nuanceCount),
+      emotion.nuanceCount - 1,
+    ),
+    color: emotion.color,
+  };
+}

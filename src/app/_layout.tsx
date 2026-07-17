@@ -21,18 +21,18 @@ export default function RootLayout() {
 
   return (
     <KeyboardProvider>
-      <AppLocaleProvider>
-        <DevelopmentRoot>
-          <GestureHandlerRootView style={{ flex: 1 }}>
-            <PressFeedbackProvider>
-              <AppNavigationProvider>
+      <AppNavigationProvider>
+        <AppLocaleProvider>
+          <DevelopmentRoot>
+            <GestureHandlerRootView style={{ flex: 1 }}>
+              <PressFeedbackProvider>
                 <StatusBar style="dark" />
                 <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: '#F4F0E8' } }} />
-              </AppNavigationProvider>
-            </PressFeedbackProvider>
-          </GestureHandlerRootView>
-        </DevelopmentRoot>
-      </AppLocaleProvider>
+              </PressFeedbackProvider>
+            </GestureHandlerRootView>
+          </DevelopmentRoot>
+        </AppLocaleProvider>
+      </AppNavigationProvider>
     </KeyboardProvider>
   );
 }

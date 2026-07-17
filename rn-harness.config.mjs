@@ -2,20 +2,22 @@ import { androidEmulator, androidPlatform } from '@react-native-harness/platform
 import { applePlatform, appleSimulator } from '@react-native-harness/platform-apple';
 import { chrome, webPlatform } from '@react-native-harness/platform-web';
 
+const webPort = process.env.RN_HARNESS_WEB_PORT ?? '8081';
+
 export default {
-  entryPoint: 'expo-router/entry',
+  entryPoint: './entry.tsx',
   appRegistryComponentName: 'main',
   runners: [
-    webPlatform({ name: 'web', browser: chrome('http://localhost:8081/index.html') }),
+    webPlatform({ name: 'web', browser: chrome(`http://localhost:${webPort}/index.html`) }),
     applePlatform({
       name: 'ios',
-      device: appleSimulator('iPhone 16 Pro', '18.0'),
-      bundleId: 'app.youmotion.mobile',
+      device: appleSimulator('iPhone 17 Pro', '26.1'),
+      bundleId: 'com.youmotion.mobile',
     }),
     androidPlatform({
       name: 'android',
       device: androidEmulator('Pixel_9'),
-      bundleId: 'app.youmotion.mobile',
+      bundleId: 'com.youmotion.mobile',
     }),
   ],
   defaultRunner: 'web',
