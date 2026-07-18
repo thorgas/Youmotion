@@ -1,4 +1,5 @@
 import { execFile, spawn } from 'node:child_process';
+import { existsSync } from 'node:fs';
 import { homedir } from 'node:os';
 import { join } from 'node:path';
 import { promisify } from 'node:util';
@@ -10,6 +11,22 @@ const androidHome = process.env.ANDROID_HOME
   ?? join(homedir(), 'Library', 'Android', 'sdk');
 const adb = join(androidHome, 'platform-tools', 'adb');
 const executeFile = promisify(execFile);
+const defaultAndroidAppPath = join(
+  process.cwd(),
+  'android',
+  'app',
+  'build',
+  'outputs',
+  'apk',
+  'debug',
+  'app-debug.apk',
+);
+const harnessAppPath = process.env.HARNESS_APP_PATH
+  ?? (
+    runner === 'android' && existsSync(defaultAndroidAppPath)
+      ? defaultAndroidAppPath
+      : undefined
+  );
 
 if (!runner || !Number.isInteger(port)) {
   throw new Error('An Android Harness runner and Metro port are required.');
@@ -158,6 +175,7 @@ const harness = spawn(
     env: {
       ...process.env,
       RN_HARNESS_METRO_PORT: String(port),
+      ...(harnessAppPath ? { HARNESS_APP_PATH: harnessAppPath } : {}),
     },
     stdio: ['inherit', 'pipe', 'pipe'],
   },

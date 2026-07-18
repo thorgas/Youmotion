@@ -1,4 +1,4 @@
-import { Text as SvgText } from 'react-native-svg';
+import { StyleSheet, Text, View } from 'react-native';
 
 import { EMOTION_LABEL_MODES } from '@/constants';
 import type { EmotionLabelMode } from '@/features/settings/domain/emotion-label-mode';
@@ -22,41 +22,68 @@ export function EmotionAxisLabel({
   y,
 }: EmotionAxisLabelProps) {
   const showsBoth = labelMode === EMOTION_LABEL_MODES.BOTH;
-  const showsEmoji = showsBoth
-    || (labelMode === EMOTION_LABEL_MODES.EMOJI && !isActive);
-  const showsWord = labelMode === EMOTION_LABEL_MODES.TEXT
-    || showsBoth
-    || (labelMode === EMOTION_LABEL_MODES.EMOJI && isActive);
+  const showsWord = labelMode === EMOTION_LABEL_MODES.TEXT || isActive;
 
   return (
-    <>
-      {showsEmoji ? (
-        <SvgText
-          fill={palette.ink}
-          fontSize={22}
+    <View
+      pointerEvents="none"
+      style={[
+        styles.container,
+        {
+          left: x - 52,
+          top: y - 27,
+        },
+      ]}
+      testID={`base-emotion-axis-${emotion.id}`}>
+      {showsBoth || !showsWord ? (
+        <Text
           key={`${emotion.id}-emoji`}
-          testID={`base-emotion-emoji-${emotion.id}`}
-          textAnchor="middle"
-          x={x}
-          y={showsBoth ? y - 9 : y}>
+          style={[styles.emoji, showsBoth && styles.combinedEmoji]}
+          testID={`base-emotion-emoji-${emotion.id}`}>
           {emotionEmoji(emotion.id)}
-        </SvgText>
+        </Text>
       ) : null}
-      {showsWord ? (
-        <SvgText
-          fill={palette.ink}
-          fontFamily={type.medium}
-          fontSize={showsBoth ? textSize.metadata : textSize.emphasis}
+      {showsBoth || showsWord ? (
+        <Text
           key={`${emotion.id}-word`}
-          letterSpacing={0.3}
-          opacity={0.88}
-          testID={`base-emotion-label-${emotion.id}`}
-          textAnchor="middle"
-          x={x}
-          y={showsBoth ? y + 11 : y}>
+          style={[styles.word, showsBoth && styles.combinedWord]}
+          testID={`base-emotion-label-${emotion.id}`}>
           {emotionName(emotion.id)}
-        </SvgText>
+        </Text>
       ) : null}
-    </>
+    </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    position: 'absolute',
+    width: 104,
+    height: 54,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  emoji: {
+    color: palette.ink,
+    fontSize: 22,
+    lineHeight: 27,
+    textAlign: 'center',
+  },
+  combinedEmoji: {
+    height: 27,
+  },
+  word: {
+    color: palette.ink,
+    fontFamily: type.medium,
+    fontSize: textSize.emphasis,
+    letterSpacing: 0.3,
+    lineHeight: 27,
+    opacity: 0.88,
+    textAlign: 'center',
+  },
+  combinedWord: {
+    fontSize: textSize.metadata,
+    height: 20,
+    lineHeight: 18,
+  },
+});

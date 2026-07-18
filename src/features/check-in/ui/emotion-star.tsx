@@ -151,27 +151,26 @@ function EmotionField({ center, labelMode, radius, rippleOffsetX, rippleOffsetY,
   return (
     <>
       <BaseStateRipples offsetX={rippleOffsetX} offsetY={rippleOffsetY} />
-      <Svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
+      <Svg height={size} viewBox={`0 0 ${size} ${size}`} width={size}>
         {selection ? [0.28, 0.5, 0.72, 0.9].map((scale) => (
           <Circle key={scale} cx={center} cy={center} r={radius * scale} fill="none" stroke={palette.hairline} strokeWidth={1} strokeDasharray="2 7" />
         )) : null}
-
-        {emotions.map((emotion, index) => {
-          const angle = emotionAngle(index);
-          const label = _polar({ center, radius: radius * 0.86, angle });
-          const isActive = selection !== null && selection.emotionId === emotion.id;
-          return (
-            <EmotionAxisLabel
-              emotion={emotion}
-              isActive={isActive}
-              key={`${emotion.id}-label`}
-              labelMode={labelMode}
-              x={label.x}
-              y={label.y + 4}
-            />
-          );
-        })}
       </Svg>
+      {emotions.map((emotion, index) => {
+        const angle = emotionAngle(index);
+        const label = _polar({ center, radius: radius * 0.86, angle });
+        const isActive = selection !== null && selection.emotionId === emotion.id;
+        return (
+          <EmotionAxisLabel
+            emotion={emotion}
+            isActive={isActive}
+            key={`${emotion.id}-label`}
+            labelMode={labelMode}
+            x={label.x}
+            y={label.y + 4}
+          />
+        );
+      })}
     </>
   );
 }

@@ -1,5 +1,5 @@
 import { render } from '@testing-library/react-native';
-import Svg from 'react-native-svg';
+import { StyleSheet, View } from 'react-native';
 
 import {
   EMOTION_IDS,
@@ -21,8 +21,8 @@ type LabelCase = {
   title: string;
   mode: EmotionLabelMode;
   isActive: boolean;
-  emojiY: readonly number[] | null;
-  wordY: readonly number[] | null;
+  emojiLineHeight: number | null;
+  wordLineHeight: number | null;
 };
 
 const labelCases = [
@@ -30,56 +30,56 @@ const labelCases = [
     title: 'inactive emoji-only mode',
     mode: EMOTION_LABEL_MODES.EMOJI,
     isActive: false,
-    emojiY: [40],
-    wordY: null,
+    emojiLineHeight: 27,
+    wordLineHeight: null,
   },
   {
     title: 'active emoji-only mode',
     mode: EMOTION_LABEL_MODES.EMOJI,
     isActive: true,
-    emojiY: null,
-    wordY: [40],
+    emojiLineHeight: null,
+    wordLineHeight: 27,
   },
   {
     title: 'inactive text-only mode',
     mode: EMOTION_LABEL_MODES.TEXT,
     isActive: false,
-    emojiY: null,
-    wordY: [40],
+    emojiLineHeight: null,
+    wordLineHeight: 27,
   },
   {
     title: 'active text-only mode',
     mode: EMOTION_LABEL_MODES.TEXT,
     isActive: true,
-    emojiY: null,
-    wordY: [40],
+    emojiLineHeight: null,
+    wordLineHeight: 27,
   },
   {
     title: 'inactive combined mode',
     mode: EMOTION_LABEL_MODES.BOTH,
     isActive: false,
-    emojiY: [31],
-    wordY: [51],
+    emojiLineHeight: 27,
+    wordLineHeight: 18,
   },
   {
     title: 'active combined mode',
     mode: EMOTION_LABEL_MODES.BOTH,
     isActive: true,
-    emojiY: [31],
-    wordY: [51],
+    emojiLineHeight: 27,
+    wordLineHeight: 18,
   },
 ] satisfies readonly LabelCase[];
 
 describe('emotion axis label layout', () => {
   it.each(labelCases)('renders $title without overlapping nodes', async ({
-    emojiY,
+    emojiLineHeight,
     isActive,
     mode,
-    wordY,
+    wordLineHeight,
   }) => {
     const screen = await render(
       <AppLocaleProvider>
-        <Svg height={80} width={240}>
+        <View>
           <EmotionAxisLabel
             emotion={emotion}
             isActive={isActive}
@@ -87,13 +87,28 @@ describe('emotion axis label layout', () => {
             x={120}
             y={40}
           />
-        </Svg>
+        </View>
       </AppLocaleProvider>,
     );
     const emoji = screen.queryByTestId('base-emotion-emoji-freude');
     const word = screen.queryByTestId('base-emotion-label-freude');
+    const axisStyle = StyleSheet.flatten(
+      screen.getByTestId('base-emotion-axis-freude').props['style'],
+    );
+    const emojiStyle = emoji
+      ? StyleSheet.flatten(emoji.props['style'])
+      : null;
+    const wordStyle = word
+      ? StyleSheet.flatten(word.props['style'])
+      : null;
 
-    expect(emoji?.props['y'] ?? null).toEqual(emojiY);
-    expect(word?.props['y'] ?? null).toEqual(wordY);
+    expect(axisStyle).toMatchObject({
+      height: 54,
+      left: 68,
+      top: 13,
+      width: 104,
+    });
+    expect(emojiStyle?.lineHeight ?? null).toBe(emojiLineHeight);
+    expect(wordStyle?.lineHeight ?? null).toBe(wordLineHeight);
   });
 });

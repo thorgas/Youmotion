@@ -126,8 +126,8 @@ describe('check-in screens', () => {
     expect(screen.getByTestId('emotion-readout-prompt')).toHaveStyle({
       alignItems: 'center',
     });
-    expect(screen.getByTestId('base-emotion-emoji-freude').props['children'].props['children']).toBe('😊');
-    expect(screen.getByTestId('base-emotion-emoji-liebe').props['children'].props['children']).toBe('❤️');
+    expect(screen.getByTestId('base-emotion-emoji-freude')).toHaveTextContent('😊');
+    expect(screen.getByTestId('base-emotion-emoji-liebe')).toHaveTextContent('❤️');
     expect(screen.getByText('The farther you move from the center, the more intense the feeling.')).toBeTruthy();
     expect(screen.getByLabelText('Emotion star. Drag outward from the center.')).toBeTruthy();
     expect(screen.getByTestId('base-state-ripples')).toHaveStyle({
@@ -253,8 +253,8 @@ describe('check-in screens', () => {
       bottom: 0,
       left: 0,
     });
-    expect(screen.getByTestId('base-emotion-label-freude').props['children'].props['children']).toBe('Joy');
-    expect(screen.getByTestId('base-emotion-emoji-furcht').props['children'].props['children']).toBe('😨');
+    expect(screen.getByTestId('base-emotion-label-freude')).toHaveTextContent('Joy');
+    expect(screen.getByTestId('base-emotion-emoji-furcht')).toHaveTextContent('😨');
     const grantEvent = _panEvent({ x: 185, y: 40, timestamp: 1 });
     const moveEvent = _panEvent({ x: 240, y: 185, timestamp: 2 });
 
