@@ -14,9 +14,47 @@ import { appSettingsStore } from '../application/app-settings.store';
 
 const _selectSettings = (state: ReturnType<typeof appSettingsStore.getSnapshot>) => state.context;
 
+function AppReleaseInfoCard({
+  appVersion,
+  updateChannel,
+  gitCommit,
+}: {
+  appVersion: string | null;
+  updateChannel: string | null;
+  gitCommit: string | null;
+}) {
+  const shortGitCommit = gitCommit?.slice(0, 7);
+
+  return (
+    <View style={styles.card} testID="app-release-info">
+      <Text style={styles.cardTitle}><fbt desc="App release information title">App information</fbt></Text>
+      <View style={styles.releaseInfo}>
+        <View style={styles.releaseInfoRow}>
+          <Text style={styles.releaseInfoLabel}><fbt desc="App version information label">App</fbt></Text>
+          <Text selectable style={styles.releaseInfoValue}>{appVersion ?? <fbt desc="Unavailable app version value">Not available</fbt>}</Text>
+        </View>
+        <View style={styles.releaseInfoRow}>
+          <Text style={styles.releaseInfoLabel}><fbt desc="EAS Update channel information label">Channel</fbt></Text>
+          <Text selectable style={styles.releaseInfoValue}>{updateChannel ?? <fbt desc="Unavailable EAS Update channel value">Not available</fbt>}</Text>
+        </View>
+        <View style={styles.releaseInfoRow}>
+          <Text style={styles.releaseInfoLabel}><fbt desc="Git commit information label">Git</fbt></Text>
+          <Text selectable style={styles.releaseInfoValue}>{shortGitCommit ?? <fbt desc="Unavailable Git commit value">Not available</fbt>}</Text>
+        </View>
+      </View>
+    </View>
+  );
+}
+
 export function SettingsScreen() {
   const actor = useAppNavigationActor();
-  const { locale, emotionLabelMode } = useSelector(appSettingsStore, _selectSettings);
+  const {
+    locale,
+    emotionLabelMode,
+    appVersion,
+    updateChannel,
+    gitCommit,
+  } = useSelector(appSettingsStore, _selectSettings);
   const _setEnglish = () => actor.send({
     type: SETTINGS_EVENTS.LANGUAGE_CHANGED,
     locale: APP_LOCALES.ENGLISH,
@@ -95,6 +133,11 @@ export function SettingsScreen() {
           <Text style={styles.cardTitle}><fbt desc="About the emotion star setting title">About the emotion star</fbt></Text>
           <Text style={styles.cardCopy}><fbt desc="Explanation of the emotion star source and purpose">The seven basic directions are based on the German therapeutic material “Der Gefühlsstern.” The app supports self-reflection, not diagnosis.</fbt></Text>
         </View>
+        <AppReleaseInfoCard
+          appVersion={appVersion}
+          gitCommit={gitCommit}
+          updateChannel={updateChannel}
+        />
         </ScrollView>
       </SafeAreaView>
     </View>
@@ -118,4 +161,8 @@ const styles = StyleSheet.create({
   labelModeRow: { flexDirection: 'row', gap: 8, marginTop: 16 },
   labelModeButton: { minHeight: 42, flex: 1, alignItems: 'center', justifyContent: 'center', borderRadius: 14, borderWidth: 1, borderColor: palette.hairline, paddingHorizontal: 8 },
   labelModeText: { fontFamily: type.semibold, color: palette.ink, fontSize: 13 },
+  releaseInfo: { marginTop: 12 },
+  releaseInfoRow: { minHeight: 32, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 16 },
+  releaseInfoLabel: { fontFamily: type.regular, color: palette.inkMuted, fontSize: 14 },
+  releaseInfoValue: { flexShrink: 1, fontFamily: type.semibold, color: palette.ink, fontSize: 14, textAlign: 'right' },
 });
