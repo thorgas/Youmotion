@@ -137,7 +137,6 @@ export const APP_TYPE = Object.freeze({
 });
 
 export const CHECK_IN_STORAGE_KEY = 'youmotion.check-ins.v1';
-export const EMOTION_LABEL_MODE_STORAGE_KEY = 'youmotion.emotion-label-mode.v1';
 export const SURREAL_DATABASE_DIRECTORY = 'youmotion-surrealdb';
 export const SURREAL_DATABASE_NAMESPACE = 'youmotion';
 export const SURREAL_DATABASE_NAME = 'local';

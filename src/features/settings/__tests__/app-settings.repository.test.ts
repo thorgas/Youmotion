@@ -1,10 +1,8 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Effect from 'effect/Effect';
 
 import {
   APP_LOCALES,
   EMOTION_LABEL_MODES,
-  EMOTION_LABEL_MODE_STORAGE_KEY,
 } from '@/constants';
 import type { AppSettings } from '../domain/app-settings';
 import {
@@ -40,24 +38,20 @@ jest.mock('@/features/check-in/infrastructure/surrealdb.database', () => ({
 }));
 
 describe('app settings repository', () => {
-  beforeEach(async () => {
+  beforeEach(() => {
     storedSettings = undefined;
     mockQuery.mockClear();
-    await AsyncStorage.clear();
   });
 
-  it('migrates the legacy emotion-label preference into the SurrealDB settings record', async () => {
-    await AsyncStorage.setItem(EMOTION_LABEL_MODE_STORAGE_KEY, EMOTION_LABEL_MODES.BOTH);
-
+  it('initializes a fresh SurrealDB settings record with app defaults', async () => {
     await expect(Effect.runPromise(loadAppSettings)).resolves.toEqual({
       locale: APP_LOCALES.ENGLISH,
-      emotionLabelMode: EMOTION_LABEL_MODES.BOTH,
+      emotionLabelMode: EMOTION_LABEL_MODES.EMOJI,
     });
     expect(storedSettings).toEqual({
       locale: APP_LOCALES.ENGLISH,
-      emotionLabelMode: EMOTION_LABEL_MODES.BOTH,
+      emotionLabelMode: EMOTION_LABEL_MODES.EMOJI,
     });
-    await expect(AsyncStorage.getItem(EMOTION_LABEL_MODE_STORAGE_KEY)).resolves.toBeNull();
   });
 
   it('persists and reloads every app setting from SurrealDB', async () => {

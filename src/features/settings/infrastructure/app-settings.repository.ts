@@ -1,4 +1,3 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Effect from 'effect/Effect';
 import * as Schema from 'effect/Schema';
 import { getLocales } from 'expo-localization';
@@ -8,17 +7,15 @@ import {
   APP_SETTINGS_RECORD_ID,
   APP_SETTINGS_TABLE,
   EMOTION_LABEL_MODES,
-  EMOTION_LABEL_MODE_STORAGE_KEY,
 } from '@/constants';
 import { getDatabase } from '@/features/check-in/infrastructure/surrealdb.database';
 import { appLocaleForLanguageCodes } from '../domain/app-locale';
 import { AppSettingsSchema, type AppSettings } from '../domain/app-settings';
-import { EmotionLabelModeSchema, type EmotionLabelMode } from '../domain/emotion-label-mode';
 
 export class AppSettingsStorageError extends Schema.TaggedError<AppSettingsStorageError>()(
   'AppSettingsStorageError',
   {
-    operation: Schema.Literal('read', 'write', 'migrate'),
+    operation: Schema.Literal('read', 'write'),
     cause: Schema.Defect,
   },
 ) {}
@@ -67,18 +64,6 @@ const selectAppSettings = Effect.tryPromise({
   )),
 );
 
-const loadLegacyEmotionLabelMode = Effect.tryPromise({
-  try: () => AsyncStorage.getItem(EMOTION_LABEL_MODE_STORAGE_KEY),
-  catch: (cause) => AppSettingsStorageError.make({ operation: 'read', cause }),
-}).pipe(
-  Effect.flatMap((stored) => {
-    if (stored === null) return Effect.succeed<EmotionLabelMode>(EMOTION_LABEL_MODES.EMOJI);
-    return Schema.decodeUnknown(EmotionLabelModeSchema)(stored).pipe(
-      Effect.mapError((cause) => AppSettingsDataError.make({ operation: 'decode', cause })),
-    );
-  }),
-);
-
 const upsertAppSettings = Effect.fn('AppSettingsRepository.upsert')((settings: AppSettings) => (
   Schema.encode(AppSettingsSchema)(settings).pipe(
     Effect.mapError((cause) => AppSettingsDataError.make({ operation: 'encode', cause })),
@@ -95,24 +80,15 @@ const upsertAppSettings = Effect.fn('AppSettingsRepository.upsert')((settings: A
   )
 ));
 
-const migrateLegacySettings = loadLegacyEmotionLabelMode.pipe(
-  Effect.map((emotionLabelMode) => ({
-    ...defaultAppSettings(),
-    emotionLabelMode,
-  })),
-  Effect.flatMap((settings) => upsertAppSettings(settings).pipe(
-    Effect.flatMap(() => Effect.tryPromise({
-      try: () => AsyncStorage.removeItem(EMOTION_LABEL_MODE_STORAGE_KEY),
-      catch: (cause) => AppSettingsStorageError.make({ operation: 'migrate', cause }),
-    })),
-    Effect.as(settings),
-  )),
-);
+const initializeAppSettings = Effect.suspend(() => {
+  const settings = defaultAppSettings();
+  return upsertAppSettings(settings).pipe(Effect.as(settings));
+});
 
 export const loadAppSettings = selectAppSettings.pipe(
   Effect.flatMap((settings) => settings[0]
     ? Effect.succeed(settings[0])
-    : migrateLegacySettings),
+    : initializeAppSettings),
   Effect.withSpan('AppSettingsRepository.load'),
 );
 
