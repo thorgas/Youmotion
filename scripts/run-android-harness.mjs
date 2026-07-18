@@ -61,6 +61,42 @@ async function selectDevice() {
   throw new Error(`No connected device matches the ${runner} Harness runner.`);
 }
 
+async function developmentLauncherVisible(deviceId) {
+  const activities = await capture({
+    command: adb,
+    arguments_: [
+      '-s',
+      deviceId,
+      'shell',
+      'dumpsys',
+      'activity',
+      'activities',
+    ],
+  });
+  return activities.includes(
+    'com.youmotion.mobile/expo.modules.devlauncher.launcher.DevLauncherActivity',
+  );
+}
+
+async function launchMostRecentDevelopmentServer(deviceId) {
+  await capture({
+    command: adb,
+    arguments_: [
+      '-s',
+      deviceId,
+      'shell',
+      'am',
+      'start',
+      '-a',
+      'android.intent.action.MAIN',
+      '-c',
+      'android.intent.category.LAUNCHER',
+      '-n',
+      'com.youmotion.mobile/.MainActivity',
+    ],
+  });
+}
+
 async function connectDevelopmentClient() {
   const deviceId = await selectDevice();
   const metroUrl = encodeURIComponent(`http://127.0.0.1:${port}`);
@@ -93,6 +129,17 @@ async function connectDevelopmentClient() {
       'com.youmotion.mobile',
     ],
   });
+  const retry = setTimeout(() => {
+    void developmentLauncherVisible(deviceId)
+      .then((visible) => visible
+        ? launchMostRecentDevelopmentServer(deviceId)
+        : undefined)
+      .catch((cause) => {
+        const message = cause instanceof Error ? cause.message : String(cause);
+        process.stderr.write(`HARNESS Android launcher retry failed: ${message}\n`);
+      });
+  }, 6_000);
+  retry.unref();
 }
 
 const harness = spawn(

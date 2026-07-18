@@ -24,19 +24,48 @@ const emotion = {
 } satisfies Emotion;
 
 async function renderEmotionLabel(mode: EmotionLabelMode) {
-  await render(
+  return render(emotionLabel({ isActive: false, mode }));
+}
+
+function emotionLabel({
+  isActive,
+  mode,
+}: {
+  isActive: boolean;
+  mode: EmotionLabelMode;
+}) {
+  return (
     <AppLocaleProvider>
       <Svg height={80} width={240}>
         <EmotionAxisLabel
           emotion={emotion}
-          isActive={false}
+          isActive={isActive}
           labelMode={mode}
           x={120}
           y={40}
         />
       </Svg>
-    </AppLocaleProvider>,
+    </AppLocaleProvider>
   );
+}
+
+async function expectLabelNodes({
+  emoji,
+  word,
+}: {
+  emoji: boolean;
+  word: boolean;
+}) {
+  if (emoji) {
+    await screen.findByTestId('base-emotion-emoji-freude');
+  } else {
+    expect(screen.queryByTestId('base-emotion-emoji-freude')).toBeNull();
+  }
+  if (word) {
+    await screen.findByTestId('base-emotion-label-freude');
+  } else {
+    expect(screen.queryByTestId('base-emotion-label-freude')).toBeNull();
+  }
 }
 
 describe('emotion label modes on the device runtime', () => {
@@ -59,5 +88,43 @@ describe('emotion label modes on the device runtime', () => {
 
     await screen.findByTestId('base-emotion-emoji-freude');
     await screen.findByTestId('base-emotion-label-freude');
+  });
+
+  test('removes stale native nodes while modes and active state change', async () => {
+    const rendered = await render(emotionLabel({
+      isActive: false,
+      mode: EMOTION_LABEL_MODES.EMOJI,
+    }));
+    await expectLabelNodes({ emoji: true, word: false });
+
+    await rendered.rerender(emotionLabel({
+      isActive: false,
+      mode: EMOTION_LABEL_MODES.TEXT,
+    }));
+    await expectLabelNodes({ emoji: false, word: true });
+
+    await rendered.rerender(emotionLabel({
+      isActive: false,
+      mode: EMOTION_LABEL_MODES.BOTH,
+    }));
+    await expectLabelNodes({ emoji: true, word: true });
+
+    await rendered.rerender(emotionLabel({
+      isActive: false,
+      mode: EMOTION_LABEL_MODES.EMOJI,
+    }));
+    await expectLabelNodes({ emoji: true, word: false });
+
+    await rendered.rerender(emotionLabel({
+      isActive: true,
+      mode: EMOTION_LABEL_MODES.EMOJI,
+    }));
+    await expectLabelNodes({ emoji: false, word: true });
+
+    await rendered.rerender(emotionLabel({
+      isActive: false,
+      mode: EMOTION_LABEL_MODES.EMOJI,
+    }));
+    await expectLabelNodes({ emoji: true, word: false });
   });
 });

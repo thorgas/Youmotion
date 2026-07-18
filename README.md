@@ -210,7 +210,9 @@ The current Jest coverage gate is enforced globally and must not be lowered.
 
 Use `pnpm test:harness:ios` and `pnpm test:harness:android` for the native simulator and emulator gates. Both start Harness on dedicated ports and launch the Expo development client directly into that server. With a Google Pixel 6a connected, `pnpm test:harness:android:pixel` runs the same suite on that physical-device profile. `pnpm test:harness` uses the default web runner and must not be treated as evidence that Hermes, native SVG behavior, or native bindings work.
 
-The emotion-label regression test asserts the actual rendered SVG node set for emoji-only, text-only, and combined modes at both the component and React Native Harness layers. This structural assertion prevents a platform from showing an element whose opacity animation failed to update, which a settings-state-only assertion cannot detect.
+The emotion-label regression suite asserts the actual rendered SVG node set for emoji-only, text-only, and combined modes at both the component and React Native Harness layers. It covers every active/inactive layout, verifies the combined-mode vertical separation, and rerenders the same native component through repeated mode and active-state changes. These structural assertions prevent a platform from retaining an element whose opacity animation or native prop update failed, which a settings-state-only assertion cannot detect.
+
+Run the focused Android regression on an emulator with `pnpm test:harness:android -- emotion-label-modes.harness.tsx`, or replace the script with `pnpm test:harness:android:pixel` for a connected Pixel 6a. This native test should be a release gate for changes to SVG labels, settings propagation, React Native, Reanimated, or `react-native-svg`; the ordinary Jest suite remains the fast gate for every change.
 
 ### Maestro end-to-end tests
 

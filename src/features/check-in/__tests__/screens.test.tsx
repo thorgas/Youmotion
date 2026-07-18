@@ -182,6 +182,19 @@ describe('check-in screens', () => {
       bottom: 0,
       left: 0,
     });
+    expect(screen.queryByTestId('base-emotion-emoji-freude')).toBeNull();
+    expect(screen.getByTestId('base-emotion-label-freude')).toBeTruthy();
+    expect(screen.getAllByTestId(/^base-emotion-emoji-/)).toHaveLength(6);
+    expect(screen.getAllByTestId(/^base-emotion-label-/)).toHaveLength(1);
+
+    await screen.rerender(
+      <AppLocaleProvider>
+        <EmotionStar {...props} selection={null} />
+      </AppLocaleProvider>,
+    );
+
+    expect(screen.getAllByTestId(/^base-emotion-emoji-/)).toHaveLength(7);
+    expect(screen.queryAllByTestId(/^base-emotion-label-/)).toHaveLength(0);
   });
 
   it('coalesces continuous drag positions and publishes the exact released intensity', async () => {
@@ -266,22 +279,28 @@ describe('check-in screens', () => {
       />,
     );
     expect(screen.getByTestId('emotion-star').props['accessibilityValue']).toEqual({ text: EMOTION_LABEL_MODES.EMOJI });
-    expect(screen.getByTestId('base-emotion-emoji-freude')).toBeTruthy();
-    expect(screen.queryByTestId('base-emotion-label-freude')).toBeNull();
+    expect(screen.getAllByTestId(/^base-emotion-emoji-/)).toHaveLength(7);
+    expect(screen.queryAllByTestId(/^base-emotion-label-/)).toHaveLength(0);
 
     await act(() => appSettingsStore.trigger.emotionLabelModeChanged({
       mode: EMOTION_LABEL_MODES.TEXT,
     }));
     expect(screen.getByTestId('emotion-star').props['accessibilityValue']).toEqual({ text: EMOTION_LABEL_MODES.TEXT });
-    expect(screen.queryByTestId('base-emotion-emoji-freude')).toBeNull();
-    expect(screen.getByTestId('base-emotion-label-freude')).toBeTruthy();
+    expect(screen.queryAllByTestId(/^base-emotion-emoji-/)).toHaveLength(0);
+    expect(screen.getAllByTestId(/^base-emotion-label-/)).toHaveLength(7);
 
     await act(() => appSettingsStore.trigger.emotionLabelModeChanged({
       mode: EMOTION_LABEL_MODES.BOTH,
     }));
     expect(screen.getByTestId('emotion-star').props['accessibilityValue']).toEqual({ text: EMOTION_LABEL_MODES.BOTH });
-    expect(screen.getByTestId('base-emotion-emoji-freude')).toBeTruthy();
-    expect(screen.getByTestId('base-emotion-label-freude')).toBeTruthy();
+    expect(screen.getAllByTestId(/^base-emotion-emoji-/)).toHaveLength(7);
+    expect(screen.getAllByTestId(/^base-emotion-label-/)).toHaveLength(7);
+
+    await act(() => appSettingsStore.trigger.emotionLabelModeChanged({
+      mode: EMOTION_LABEL_MODES.EMOJI,
+    }));
+    expect(screen.getAllByTestId(/^base-emotion-emoji-/)).toHaveLength(7);
+    expect(screen.queryAllByTestId(/^base-emotion-label-/)).toHaveLength(0);
   });
 
   it('cancels an interrupted drag instead of releasing its preview', async () => {
