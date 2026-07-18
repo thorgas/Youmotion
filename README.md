@@ -2,7 +2,7 @@
 
 Build, internal distribution, TestFlight, Google Play, and App Store release instructions are in [BUILD.md](./BUILD.md). Database setup, persisted schema, migration behavior, and native SurrealDB packaging are documented in [DB.md](./DB.md).
 
-Youmotion is a private, local-first Expo app for noticing and recording emotions with a seven-direction German `Gefühlsstern`. Dragging from the center chooses an emotion; distance chooses nuance and intensity. Releasing opens a short reflection that is saved before a separate, optional belief-system step. Individual history entries can be edited or permanently deleted after confirmation from the edit screen, the visible History action, or a long press on the History row.
+Youmotion is a private, local-first Expo app for noticing and recording emotions with a seven-direction German `Gefühlsstern`. Dragging from the center chooses an emotion; distance chooses nuance and intensity. Releasing opens a short reflection that is saved before a separate, optional Leidsatz step. Individual history entries can be edited or permanently deleted after confirmation from the edit screen, the visible History action, or a long press on the History row.
 
 This is a self-reflection tool, not a substitute for psychotherapy, medical advice, diagnosis, or emergency support.
 
@@ -42,18 +42,23 @@ oxlint-rules/                tested local architecture plugin
 The main graph contains these navigable states:
 
 ```text
-tabs.today.idle → tabs.today.exploring → reflection → saving → success
-                                                ↘ failure → saving
+tabs.today.idle → tabs.today.exploring → reflection → saving → beliefSystem → attaching → success
+                                                ↘ failure → saving       ↘ catalog
+                                                                          ↘ editor → persisting
 tabs.today ↔ tabs.history ↔ tabs.settings
 ```
 
 Persistence uses `Schema.parseJson` and typed `Schema.TaggedError` failures. There is no application dependency on Zod and no raw JSON parsing.
 
-## Belief-system suggestions
+## Leidsätze and Leitsätze
 
-The app contains 18 stable, locale-independent belief-system IDs derived from the supplied source material. Each belief system can be associated with multiple emotions. The selected emotion provides an initial recommendation order, and repeated attachments to the same emotion promote that belief system in later check-ins. Learning and persistence remain entirely on-device.
+In German, negative core beliefs are presented as `Leidsätze`. The app ships with 22 stable, locale-independent built-in IDs derived from the supplied source material. People can also add their own Leidsatz. A custom Leidsatz receives a stable local ID and joins the same catalog and recommendation system as the built-in entries.
 
-After the reflection has been persisted, the optional belief-system step shows three readable quick suggestions. A neutral, full-width “Browse all core beliefs” button opens the complete catalog; selecting an item returns to the suggestions before the user finishes. No belief system is attached unless the user explicitly selects one. The success screen ends the completed flow with “Done” and returns to Today. Persisted check-ins store only the stable ID; localized wording is resolved when the UI renders.
+Each Leidsatz can be associated with multiple emotions. The selected emotion provides an initial recommendation order, and repeated attachments to the same emotion promote that Leidsatz in later check-ins. New custom entries follow the built-in catalog until their use history promotes them. Learning and persistence remain entirely on-device.
+
+After the reflection has been persisted, the optional Leidsatz step shows three readable quick suggestions. A neutral, full-width catalog button opens all built-in and custom Leidsätze, and the catalog offers an action for adding a personal entry. No Leidsatz is attached unless the user explicitly selects one.
+
+A selected Leidsatz can be reformulated into a compassionate positive `Leitsatz`. The Leitsatz is optional while creating a custom entry and can be added or edited later for either a custom or built-in Leidsatz. When the completed check-in has an attached Leidsatz with a Leitsatz, “Du bist bei dir angekommen” shows that positive statement. Persisted check-ins reference the stable ID; custom Leidsatz text and attached Leitsätze are stored separately in the local database. Built-in display copy remains localized at render time.
 
 ### Belief-system flow
 
@@ -151,7 +156,7 @@ pnpm i18n:all
 
 `i18n:prepare` adds new phrases to the editable German catalog with a `new` status. Translate those entries and remove the status before committing. The compact runtime catalog under `src/translations` is generated during `pnpm install` and intentionally ignored.
 
-Persisted check-ins store stable emotion IDs, intensity, nuance levels, and an optional `beliefSystemId` rather than localized labels. Existing German-label records and records without a belief system remain readable and are projected into the active locale at render time.
+Persisted check-ins store stable emotion IDs, intensity, nuance levels, and an optional `beliefSystemId` rather than localized labels. Existing German-label records and records without a belief system remain readable and are projected into the active locale at render time. User-authored Leidsätze and Leitsätze retain the language in which they were entered and are not passed through the translation catalog.
 
 ## Developer tooling
 
@@ -192,10 +197,10 @@ The rule suite lives beside the plugin and should be extended whenever a new inv
 ## Testing strategy
 
 - Pure tests cover vector-to-emotion selection and intensity thresholds.
-- Repository tests execute Effect programs against mocked native storage, including typed decode, deletion, and storage failures.
-- Navigation tests drive the actual root actor through persistence, belief-system attachment, deletion, and route event paths.
-- Screen tests render the painterly star and exercise reflection, belief-system selection, persistence, history deletion, success, and settings.
-- Harness tests execute belief-system ranking inside the React Native runtime so Node-only JavaScript APIs cannot silently pass the standard Jest suite.
+- Repository tests execute Effect programs against mocked native storage, including typed decode, custom Leidsatz persistence, deletion, and storage failures.
+- Navigation tests drive the actual root actor through persistence, Leidsatz attachment, custom entry creation, Leitsatz persistence, deletion, and route event paths.
+- Screen tests render the painterly star and exercise reflection, built-in and custom Leidsatz selection, Leitsatz display, persistence, history deletion, success, and settings.
+- Harness tests exercise the custom Leidsatz and Leitsatz interaction flow inside the React Native runtime.
 - Maestro tests exercise tab navigation, reflection cancellation, a persisted check-in save-and-delete journey, and language switching through the installed development app.
 - React Native Harness is configured for web, iOS, and Android device-level component testing.
 
@@ -220,4 +225,4 @@ Project-local skills are installed under `.agents/skills`, including Software Ma
 
 ## Source material
 
-The interaction language and emotion vocabulary were derived from the supplied `Youmotion.pdf` and `Gefühlsstern.pdf`. The belief-system catalog was transcribed from the supplied `Leitsätze.pdf` and `Mögliche-Leitsätze.pdf`; near-identical statements were normalized while preserving the 18 distinct beliefs across both documents. The implementation also follows the linked vertical-codebase, self-contained-component, TigerStyle, XState 6 alpha, and custom-linting references.
+The interaction language and emotion vocabulary were derived from the supplied `Youmotion.pdf` and `Gefühlsstern.pdf`. The built-in Leidsatz catalog was transcribed from the supplied `Leitsätze.pdf` and `Mögliche-Leitsätze.pdf`; near-identical statements were normalized into stable source-controlled entries. The implementation also follows the linked vertical-codebase, self-contained-component, TigerStyle, XState 6 alpha, and custom-linting references.

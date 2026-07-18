@@ -1,10 +1,10 @@
 # Database
 
-This document is the source of truth for Youmotion's current database setup, persisted check-in schema, migration behavior, native packaging, and database-related development workflow.
+This document is the source of truth for Youmotion's current database setup, persisted check-in and belief-statement schemas, migration behavior, native packaging, and database-related development workflow.
 
 ## Overview
 
-Youmotion is local-first. Check-ins are stored in an embedded SurrealDB database backed by SurrealKV inside the app's document directory. The app does not currently connect to a remote database, upload check-ins, or configure database credentials.
+Youmotion is local-first. Check-ins, custom Leidsätze, and positive Leitsätze are stored in an embedded SurrealDB database backed by SurrealKV inside the app's document directory. The app does not currently connect to a remote database, upload these records, or configure database credentials.
 
 The persistence path is:
 
@@ -20,8 +20,10 @@ UI event
 The relevant ownership boundaries are:
 
 - `src/features/check-in/domain/check-in.ts`: canonical persisted check-in schema and types.
+- `src/features/check-in/domain/belief-statement.ts`: built-in and custom belief IDs plus persisted Leidsatz/Leitsatz schemas.
 - `src/features/check-in/domain/belief-system.ts`: stable belief-system IDs, emotion mappings, and history-based recommendation ranking.
 - `src/features/check-in/infrastructure/check-in.repository.ts`: queries, persistence, legacy migration, and typed errors.
+- `src/features/check-in/infrastructure/belief-statement.repository.ts`: custom Leidsatz and Leitsatz queries, persistence, and typed errors.
 - `src/features/check-in/infrastructure/surrealdb.database.ts`: filesystem location and shared native connection.
 - `src/features/check-in/application/check-in-history.store.ts`: validated in-memory history projection.
 - `src/navigation/app-navigation.machine.ts`: hydration, save, retry, and edit workflows.
@@ -40,8 +42,11 @@ The database configuration is defined in `src/constants.ts`:
 | Namespace | `youmotion` | SurrealDB namespace |
 | Database | `local` | SurrealDB database within the namespace |
 | Check-in table | `check_in` | Table containing captured moments |
+| Belief-statement table | `belief_statement` | Table containing custom Leidsätze and attached Leitsätze |
 | History read limit | `30` | Maximum records loaded into the current app history |
 | Note limit | `240` | Maximum persisted note length |
+| Belief-statement limit | `240` | Maximum length of each Leidsatz or Leitsatz |
+| Custom ID prefix | `custom-` | Distinguishes user-created Leidsätze from built-in IDs |
 | Legacy key | `youmotion.check-ins.v1` | Previous AsyncStorage location, used only for migration |
 
 `surrealdb.database.ts` creates the directory with Expo FileSystem using `Paths.document`. It accepts only a `file://` URI and converts it into a `surrealkv://` endpoint. The exact absolute path is assigned by iOS or Android and must not be hard-coded.
@@ -62,7 +67,7 @@ Each logical check-in contains:
 | `intensity` | Number from `0` through `1` | Normalized radial intensity |
 | `level` | Optional non-negative integer | Stable nuance bucket |
 | `note` | String of at most 240 characters | Optional reflection text |
-| `beliefSystemId` | Optional value from the stable `BELIEF_SYSTEM_IDS` vocabulary | Attached negative core belief, independent of display language |
+| `beliefSystemId` | Optional built-in ID or branded `custom-…` ID | Attached Leidsatz, independent of its display text |
 
 The SurrealDB record ID is constructed as:
 
@@ -77,18 +82,71 @@ The database decoder accepts `level` as either a JavaScript-safe non-negative in
 The following values are deliberately not persisted:
 
 - Localized emotion or nuance labels
-- Localized belief-system text
+- Localized built-in Leidsatz text
 - Display color and wash color
 - Derived display copy
 - Navigation or transient UI state
 
-Localized labels and colors are derived from stable IDs when rendering. Older records without `level` remain supported; the app derives their level from intensity and clamps it to the emotion's available nuance range. The repository also normalizes integral SurrealDB numbers returned as bigints before domain validation. `beliefSystemId` is optional, so records written before the belief-system feature decode without a data migration. The native SurrealDB client represents a selected-but-absent optional field as `NONE`; the repository schema normalizes that boundary value to an omitted domain property.
+Localized labels and colors are derived from stable IDs when rendering. Custom Leidsatz text is resolved from the separate `belief_statement` table. Older records without `level` remain supported; the app derives their level from intensity and clamps it to the emotion's available nuance range. The repository also normalizes integral SurrealDB numbers returned as bigints before domain validation. `beliefSystemId` is optional, so records written before the belief-system feature decode without a data migration. Existing built-in IDs remain valid after widening the field to also accept branded custom IDs. The native SurrealDB client represents a selected-but-absent optional field as `NONE`; the repository schema normalizes that boundary value to an omitted domain property.
+
+## Belief-statement record schema
+
+`BeliefStatementSchema` in `src/features/check-in/domain/belief-statement.ts` is a tagged union:
+
+| `kind` | Stored fields | Meaning |
+| --- | --- | --- |
+| `custom` | `beliefSystemId`, `harmfulStatement`, optional `guidingStatement` | A user-authored Leidsatz and its optional positive Leitsatz |
+| `built-in` | `beliefSystemId`, `guidingStatement` | A positive Leitsatz attached to source-controlled built-in Leidsatz copy |
+
+Every harmful or guiding statement must contain between 1 and 240 characters after the UI trims surrounding whitespace. Custom IDs use:
+
+```text
+custom-<timestamp>-<nonce>
+```
+
+The ID is created when the custom editor opens and remains stable across persistence retries. The SurrealDB record ID is:
+
+```text
+belief_statement:<belief-system ID>
+```
+
+The stored `statementId` preserves that string identity independently of SurrealDB's intrinsic record ID. Reads project `statementId AS beliefSystemId` before Effect Schema decoding. An upsert replaces the statement for the same ID, which allows a Leitsatz to be added or edited without changing any attached check-in references.
+
+Built-in harmful text is deliberately absent from this table because it remains source-controlled and localized. User-authored Leidsatz and Leitsatz text is persisted verbatim after trimming and is not translated when the application locale changes.
+
+```mermaid
+erDiagram
+    CHECK_IN }o--o| BELIEF_STATEMENT : "beliefSystemId for persisted statement"
+    CHECK_IN }o--o| BUILT_IN_LEIDSATZ : "beliefSystemId for source-controlled text"
+    CHECK_IN {
+        string id
+        string createdAt
+        string emotionId
+        number intensity
+        number level
+        string note
+        string beliefSystemId
+    }
+    BELIEF_STATEMENT {
+        string statementId
+        string kind
+        string harmfulStatement
+        string guidingStatement
+    }
+    BUILT_IN_LEIDSATZ {
+        string beliefSystemId
+        string localizedText
+    }
+```
+
+`beliefSystemId` is optional on `check_in`. Built-in Leitsätze also use `belief_statement` records, so the diagram's built-in catalog supplies the harmful display text while the persisted statement supplies its positive `guidingStatement`.
 
 ### Database schema enforcement
 
-There is currently no SurrealQL `DEFINE TABLE` or `DEFINE FIELD` migration. The `check_in` table is schema-less at the SurrealDB layer. Correctness is enforced at application boundaries with Effect Schema:
+There is currently no SurrealQL `DEFINE TABLE` or `DEFINE FIELD` migration. The `check_in` and `belief_statement` tables are schema-less at the SurrealDB layer. Correctness is enforced at application boundaries with Effect Schema:
 
 - Values are encoded through `CheckInSchema` before an upsert.
+- Belief statements are encoded through `BeliefStatementSchema` before an upsert.
 - Query results are decoded through the repository's database schema.
 - Invalid rows fail loading with `CheckInDataError`; they are not silently accepted.
 - XState machine events and the history store validate the same domain shape.
@@ -124,6 +182,15 @@ LIMIT $limit
 
 The result is decoded before it is sent through `HISTORY_HYDRATED` into `checkInHistoryStore`. A failed query or invalid row produces `HISTORY_HYDRATION_FAILED` instead.
 
+At the same root-machine startup, `loadBeliefStatements` executes:
+
+```sql
+SELECT kind, statementId AS beliefSystemId, harmfulStatement, guidingStatement
+FROM belief_statement
+```
+
+The decoded statements are merged by `beliefSystemId` into root-machine context through `BELIEF_STATEMENTS_HYDRATED`. They supply custom catalog text, Leitsatz previews, and completion-screen content. A query or decode failure produces `BELIEF_STATEMENTS_HYDRATION_FAILED`; it does not invalidate otherwise readable check-in history.
+
 ISO timestamps sort correctly as strings when they use the same UTC representation. The current schema brands `createdAt` as a string but does not itself validate ISO syntax, so any future external importer must validate and normalize timestamps before persistence.
 
 ### Delete
@@ -136,19 +203,21 @@ DELETE $record
 
 The in-memory history entry is removed only after the repository succeeds and emits `DELETED`. Deleting the moment currently open for editing also clears the editing context and returns to History. A failed delete leaves the entry visible and produces `CheckInStorageError` with operation `delete`; the history screen shows a local error message. The app does not currently expose clear-history, export, reset, undo, or data-recovery operations.
 
-### Recommendation data
+### Leidsatz recommendation data
 
-The 18 belief systems are stored as source-controlled IDs rather than database entities. `domain/belief-system.ts` defines a many-to-many default mapping between emotions and belief systems. Every belief system remains available for every emotion; the mapping changes ordering only.
+The 22 built-in Leidsätze are stored as source-controlled IDs rather than database entities. `domain/belief-system.ts` defines a many-to-many default mapping between emotions and built-in IDs. Every built-in and custom Leidsatz remains available for every emotion; the mapping changes ordering only.
 
 For a new or edited check-in, ranking uses:
 
 1. How often each belief system was previously attached to the same base emotion in the loaded local history.
 2. The source-controlled default order for that emotion.
-3. The global catalog order for all remaining belief systems.
+3. The global built-in catalog order followed by custom Leidsätze for all remaining values.
 
-No belief system is attached by default. The reflection is persisted first, without a belief system for new records, and the optional second step then offers the first three ranked values as quick suggestions. A clearly labeled catalog button opens every available belief system. Attaching a selection updates the already-saved check-in; skipping leaves the saved reflection unchanged. Recommendation learning is fully local and currently considers the loaded history projection, which is capped at 30 records.
+No Leidsatz is attached by default. The reflection is persisted first, without a belief-system ID for new records, and the optional second step then offers the first three ranked values as quick suggestions. A clearly labeled catalog button opens every built-in and custom Leidsatz and provides the custom-entry action. Attaching a selection updates the already-saved check-in; skipping leaves the saved reflection unchanged. Recommendation learning is fully local and currently considers the loaded history projection, which is capped at 30 records.
 
 For an existing record, the first save preserves its current belief-system ID while updating the reflection. The optional second step can then retain, replace, or remove that attachment. This prevents the intermediate save from silently discarding an existing belief system.
+
+Creating a custom Leidsatz immediately selects it after its `belief_statement` record is persisted. A Leitsatz may be included in that creation or added later to the selected built-in or custom entry. The success screen resolves the attached ID and shows the positive statement only when that exact Leidsatz has a persisted Leitsatz.
 
 ### Retention
 
@@ -180,8 +249,14 @@ Expected repository failures remain in the Effect error channel:
 - `CheckInDataError`
   - `decode`: invalid legacy JSON or invalid database results
   - `encode`: application data fails the persisted schema
+- `BeliefStatementStorageError`
+  - `read`: native connection or query failure while hydrating Leidsätze and Leitsätze
+  - `write`: native upsert failure while creating or updating a statement
+- `BeliefStatementDataError`
+  - `decode`: invalid `belief_statement` query results
+  - `encode`: a Leidsatz or Leitsatz fails the persisted schema
 
-The root machine maps failures to user-facing state and supports retrying a failed save. Raw native causes are not displayed to the user.
+The root machine maps failures to user-facing state and supports retrying a failed check-in or belief-statement save. Raw native causes are not displayed to the user.
 
 ## Privacy, security, and lifecycle
 
@@ -190,7 +265,7 @@ Current guarantees from the implementation:
 - The configured endpoint is embedded `surrealkv://`, not `ws://` or `wss://`.
 - No remote host, authentication credentials, synchronization, analytics database, or upload path is configured.
 - Database files live in the platform-managed app document directory.
-- Persisted labels are locale-independent, minimizing migration problems when the UI language changes.
+- Persisted source-controlled IDs are locale-independent. User-authored Leidsätze and Leitsätze intentionally retain their entered language.
 
 Current non-guarantees and limitations:
 
@@ -248,9 +323,11 @@ Database coverage is split across:
 
 - `surrealdb.database.test.ts`: directory creation, singleton connection, URI rejection, and retry after failure.
 - `check-in.repository.test.ts`: encode/decode, create, update, delete, legacy migration, integer transport, and tagged failures using a mocked client.
-- `belief-system.test.ts`: catalog completeness, many-to-many defaults, and history-based ranking.
+- `belief-statement.repository.test.ts`: built-in Leitsatz and custom Leidsatz persistence, schema-validated loading, query shape, and tagged failures.
+- `belief-system.test.ts`: catalog completeness, many-to-many defaults, custom entries, and history-based ranking.
 - `belief-system.harness.ts`: recommendation ranking inside the React Native runtime, guarding against JavaScript-engine API mismatches.
-- `app-navigation.machine.test.ts`: hydration, persistence, failure, retry, edit, belief-system attachment, and delete event paths.
+- `belief-statement-flow.harness.tsx`: custom Leidsatz creation, positive Leitsatz formulation, attachment, and completion-screen display.
+- `app-navigation.machine.test.ts`: hydration, persistence, failure, retry, edit, custom creation, Leitsatz updates, belief-system attachment, and delete event paths.
 - `check-in.repository.harness.ts`: real persistence and reload through the native SurrealKV engine, with record cleanup.
 
 Run the standard gates:
@@ -267,8 +344,8 @@ Run `pnpm test:harness:ios` to exercise the React Native runtime and native engi
 
 For every persisted-schema or database-behavior change:
 
-1. Update the domain schema in `domain/check-in.ts`.
-2. Update the database result schema and write payload in `check-in.repository.ts`.
+1. Update the affected domain schema in `domain/check-in.ts` or `domain/belief-statement.ts`.
+2. Update the corresponding database result schema and write payload in the repository.
 3. Decide how existing rows and missing fields decode.
 4. Add an explicit, idempotent migration when old data cannot decode directly.
 5. Preserve stable record IDs unless the change intentionally creates a new entity.
@@ -288,5 +365,6 @@ For every persisted-schema or database-behavior change:
 - Validate timestamp syntax rather than branding any string.
 - Replace timestamp-plus-`Math.random` IDs if cryptographically strong or cross-device identities become necessary.
 - Define and test OS backup policy and data-protection expectations.
+- Add explicit rename and delete semantics for custom Leidsätze and decide how attached check-ins behave when a definition is removed.
 - Decide whether and when the shared connection should close during app lifecycle transitions.
 - Add database-level table and field definitions if storage-level enforcement becomes a requirement.
