@@ -463,6 +463,7 @@ describe('check-in screens', () => {
       <AppLocaleProvider><GuidingBeliefScreen /></AppLocaleProvider>,
     );
     expect(screen.getByText('04 · NEUE RICHTUNG · SCHRITT 3 VON 3')).toBeTruthy();
+    expect(screen.getByText(/Zurück/)).toBeTruthy();
     expect(screen.getByText('Was würde dich stattdessen unterstützen?')).toBeTruthy();
     expect(screen.getByPlaceholderText(
       'Ich darf auch mal nicht funktionieren und werde trotzdem geliebt.',
