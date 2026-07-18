@@ -1,10 +1,10 @@
 import { useSelector } from '@xstate/store-react';
-import { useLocaleContext } from 'fbtee';
 import { PressableScale } from 'pressto';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { formatHistoryDate } from '@/localization/date-copy';
+import { useAppLocale } from '@/localization/app-locale-provider';
 import { CHECK_IN_EVENTS } from '@/constants';
 import { useAppNavigationActor } from '@/navigation/app-navigation.provider';
 import { checkInHistoryStore } from '../application/check-in-history.store';
@@ -62,7 +62,7 @@ function MomentRow({ entry, locale }: { entry: CheckIn; locale: string }) {
 
 export function HistoryScreen() {
   const history = useSelector(checkInHistoryStore, _selectHistory);
-  const { locale } = useLocaleContext();
+  const locale = useAppLocale();
 
   return (
     <View style={styles.page} testID="history-screen">

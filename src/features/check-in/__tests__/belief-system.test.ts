@@ -36,8 +36,8 @@ function checkIn({
 
 describe('core belief recommendations', () => {
   it('keeps all supplied beliefs available exactly once', () => {
-    expect(beliefSystemIds).toHaveLength(18);
-    expect(new Set(beliefSystemIds).size).toBe(18);
+    expect(beliefSystemIds).toHaveLength(22);
+    expect(new Set(beliefSystemIds).size).toBe(22);
   });
 
   it('uses a many-to-many emotion mapping for the initial ranking', () => {

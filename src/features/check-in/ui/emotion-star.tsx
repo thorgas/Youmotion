@@ -23,7 +23,7 @@ import {
   EMOTION_TEXT_REVEAL_DURATION,
   EMOTION_TEXT_REVEAL_STAGGER,
 } from '@/constants';
-import { emotionLabelModeStore } from '@/features/settings/application/emotion-label-mode.store';
+import { appSettingsStore } from '@/features/settings/application/app-settings.store';
 import type { EmotionLabelMode } from '@/features/settings/domain/emotion-label-mode';
 import { emotionAngle, selectionFromPoint } from '../domain/emotion-selection';
 import { emotions, type Emotion, type EmotionSelection } from '../domain/emotion';
@@ -74,7 +74,9 @@ type EmotionAxisLabelProps = {
 };
 
 const AnimatedSvgText = createAnimatedComponent(SvgText);
-const _selectEmotionLabelMode = (state: ReturnType<typeof emotionLabelModeStore.getSnapshot>) => state.context.mode;
+const _selectEmotionLabelMode = (state: ReturnType<typeof appSettingsStore.getSnapshot>) => (
+  state.context.emotionLabelMode
+);
 
 const _polar = ({ center, radius, angle }: { center: number; radius: number; angle: number }) => ({
   x: center + Math.cos(angle) * radius,
@@ -238,7 +240,7 @@ function EmotionField({ center, labelMode, radius, rippleOffsetX, rippleOffsetY,
 }
 
 export function EmotionStar({ selection, disabled, onTouchStart, onSelectionChange, onCancel, onRelease }: EmotionStarProps) {
-  const labelMode = useSelector(emotionLabelModeStore, _selectEmotionLabelMode);
+  const labelMode = useSelector(appSettingsStore, _selectEmotionLabelMode);
   const { width } = useWindowDimensions();
   const size = Math.min(width - 32, 390);
   const center = size / 2;

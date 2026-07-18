@@ -14,7 +14,8 @@
       "supportsTablet": true,
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
-      }
+      },
+      "appleTeamId": "5AYM663WCB"
     },
     "android": {
       "icon": "./assets/images/app-icon-android.png",
@@ -38,8 +39,8 @@
         "expo-splash-screen",
         {
           "backgroundColor": "#F4F0E8",
-          "image": "./assets/images/splash-icon.png",
-          "imageWidth": 76
+          "image": "./assets/images/splash-logo.png",
+          "imageWidth": 156
         }
       ],
       [

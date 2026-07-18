@@ -2,6 +2,7 @@ import { createActor, waitFor, type Actor } from 'xstate';
 
 import {
   APP_ROUTES,
+  APP_LOCALES,
   CHECK_IN_EVENTS,
   CHECK_IN_STATES,
   EMOTION_LABEL_MODES,
@@ -18,11 +19,12 @@ import {
   type EmotionSelection,
 } from '@/features/check-in/domain/check-in';
 import { checkInHistoryStore } from '@/features/check-in/application/check-in-history.store';
-import { emotionLabelModeStore } from '@/features/settings/application/emotion-label-mode.store';
+import { appSettingsStore } from '@/features/settings/application/app-settings.store';
 import {
   failNextSurrealDelete,
   failNextSurrealUpsert,
   mockSurrealDatabase,
+  mockSurrealQuery,
   resetSurrealDatabaseMock,
 } from '@/test-utils/surrealdb.repository.mock';
 import { appNavigationMachine, routeForStateValue } from '../app-navigation.machine';
@@ -75,7 +77,12 @@ describe('app navigation model', () => {
   beforeEach(() => {
     resetSurrealDatabaseMock();
     checkInHistoryStore.trigger.hydrated({ entries: [] });
-    emotionLabelModeStore.trigger.hydrated({ mode: EMOTION_LABEL_MODES.EMOJI });
+    appSettingsStore.trigger.hydrated({
+      settings: {
+        locale: APP_LOCALES.ENGLISH,
+        emotionLabelMode: EMOTION_LABEL_MODES.EMOJI,
+      },
+    });
   });
 
   it('makes tab navigation an explicit state graph', () => {
@@ -97,13 +104,48 @@ describe('app navigation model', () => {
     const actor = createActor(appNavigationMachine).start();
 
     actor.send({ type: SETTINGS_EVENTS.EMOTION_LABEL_MODE_CHANGED, mode: EMOTION_LABEL_MODES.TEXT });
-    expect(emotionLabelModeStore.getSnapshot().context.mode).toBe(EMOTION_LABEL_MODES.TEXT);
+    expect(appSettingsStore.getSnapshot().context.emotionLabelMode).toBe(EMOTION_LABEL_MODES.TEXT);
 
     actor.send({ type: SETTINGS_EVENTS.EMOTION_LABEL_MODE_CHANGED, mode: EMOTION_LABEL_MODES.BOTH });
-    expect(emotionLabelModeStore.getSnapshot().context.mode).toBe(EMOTION_LABEL_MODES.BOTH);
+    expect(appSettingsStore.getSnapshot().context.emotionLabelMode).toBe(EMOTION_LABEL_MODES.BOTH);
 
     actor.send({ type: SETTINGS_EVENTS.EMOTION_LABEL_MODE_CHANGED, mode: EMOTION_LABEL_MODES.EMOJI });
-    expect(emotionLabelModeStore.getSnapshot().context.mode).toBe(EMOTION_LABEL_MODES.EMOJI);
+    expect(appSettingsStore.getSnapshot().context.emotionLabelMode).toBe(EMOTION_LABEL_MODES.EMOJI);
+  });
+
+  it('models and persists both supported languages', () => {
+    const actor = createActor(appNavigationMachine).start();
+
+    actor.send({ type: SETTINGS_EVENTS.LANGUAGE_CHANGED, locale: APP_LOCALES.GERMAN });
+    expect(appSettingsStore.getSnapshot().context.locale).toBe(APP_LOCALES.GERMAN);
+
+    actor.send({ type: SETTINGS_EVENTS.LANGUAGE_CHANGED, locale: APP_LOCALES.ENGLISH });
+    expect(appSettingsStore.getSnapshot().context.locale).toBe(APP_LOCALES.ENGLISH);
+  });
+
+  it('hydrates every app setting from SurrealDB on startup', async () => {
+    mockSurrealQuery.mockImplementation(async (surql) => [{
+      statementIndex: 0,
+      value: surql.startsWith('SELECT locale, emotionLabelMode')
+        ? [{
+            locale: APP_LOCALES.GERMAN,
+            emotionLabelMode: EMOTION_LABEL_MODES.BOTH,
+          }]
+        : [],
+    }]);
+
+    const actor = createActor(appNavigationMachine).start();
+    await waitFor(
+      actor,
+      () => appSettingsStore.getSnapshot().context.locale === APP_LOCALES.GERMAN,
+      { timeout: 1_000 },
+    );
+
+    expect(appSettingsStore.getSnapshot().context).toMatchObject({
+      locale: APP_LOCALES.GERMAN,
+      emotionLabelMode: EMOTION_LABEL_MODES.BOTH,
+      hydrated: true,
+    });
   });
 
   it('reaches reflection only through a valid star interaction', () => {
