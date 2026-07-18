@@ -67,6 +67,15 @@
         "projectId": "7f37690f-c632-408c-a4ab-1b240610bd12"
       }
     },
-    "owner": "youmotion"
+    "owner": "youmotion",
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/7f37690f-c632-408c-a4ab-1b240610bd12",
+      "requestHeaders": {
+        "expo-channel-name": "development"
+      }
+    }
   }
 }

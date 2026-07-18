@@ -57,6 +57,7 @@ minimumReleaseAgeExclude:
   - expo-system-ui@57.0.1
   - expo-web-browser@57.0.1
   - jest-expo@57.0.2
+  - expo-updates@57.0.8
 patchedDependencies:
   expo-dev-launcher@57.0.6: patches/expo-dev-launcher@57.0.6.patch
   expo-modules-core@57.0.5: patches/expo-modules-core@57.0.5.patch
