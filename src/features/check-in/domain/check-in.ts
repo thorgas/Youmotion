@@ -1,7 +1,7 @@
 import * as Schema from 'effect/Schema';
 
 import { EMOTION_IDS, MAX_NOTE_LENGTH } from '@/constants';
-import { BeliefSystemId } from './belief-system';
+import { BeliefSystemId } from './belief-statement';
 
 export const EmotionId = Schema.Literal(
   EMOTION_IDS.JOY,

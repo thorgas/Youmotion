@@ -9,9 +9,13 @@ import {
   type CheckIn,
 } from '../domain/check-in';
 import {
+  CustomBeliefSystemId,
+  type BeliefStatement,
+  type BeliefSystemId,
+} from '../domain/belief-statement';
+import {
   beliefSystemIds,
   recommendedBeliefSystemIds,
-  type BeliefSystemId,
 } from '../domain/belief-system';
 
 function checkIn({
@@ -73,5 +77,31 @@ describe('core belief recommendations', () => {
       emotionId: EMOTION_IDS.ANGER,
       history,
     })[0]).toBe(BELIEF_SYSTEM_IDS.MUST_STAY_IN_CONTROL);
+  });
+
+  it('adds personal beliefs to the catalog and promotes them after use', () => {
+    const beliefSystemId = CustomBeliefSystemId.make('custom-rest-is-safe');
+    const statements = [{
+      kind: 'custom',
+      beliefSystemId,
+      harmfulStatement: 'I must earn every pause.',
+      guidingStatement: 'Rest is part of a full life.',
+    }] satisfies readonly BeliefStatement[];
+    const history = [
+      checkIn({
+        id: 'custom-joy',
+        emotionId: EMOTION_IDS.JOY,
+        beliefSystemId,
+      }),
+    ];
+
+    const recommendations = recommendedBeliefSystemIds({
+      emotionId: EMOTION_IDS.JOY,
+      history,
+      statements,
+    });
+
+    expect(recommendations).toHaveLength(beliefSystemIds.length + 1);
+    expect(recommendations[0]).toBe(beliefSystemId);
   });
 });

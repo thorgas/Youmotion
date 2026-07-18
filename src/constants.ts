@@ -45,6 +45,16 @@ export const CHECK_IN_EVENTS = Object.freeze({
   BELIEF_SYSTEM_BACK_REQUESTED: literal('beliefSystem.backRequested'),
   BELIEF_SYSTEM_CATALOG_REQUESTED: literal('beliefSystem.catalogRequested'),
   BELIEF_SYSTEM_CATALOG_CLOSED: literal('beliefSystem.catalogClosed'),
+  CUSTOM_BELIEF_SYSTEM_REQUESTED: literal('beliefSystem.customRequested'),
+  GUIDING_BELIEF_SYSTEM_REQUESTED: literal('beliefSystem.guidingRequested'),
+  BELIEF_SYSTEM_EDITOR_CANCELLED: literal('beliefSystem.editorCancelled'),
+  BELIEF_SYSTEM_DRAFT_CHANGED: literal('beliefSystem.draftChanged'),
+  GUIDING_BELIEF_SYSTEM_DRAFT_CHANGED: literal('beliefSystem.guidingDraftChanged'),
+  BELIEF_SYSTEM_EDITOR_CONFIRMED: literal('beliefSystem.editorConfirmed'),
+  BELIEF_STATEMENTS_HYDRATED: literal('beliefSystem.statementsHydrated'),
+  BELIEF_STATEMENTS_HYDRATION_FAILED: literal('beliefSystem.statementsHydrationFailed'),
+  BELIEF_STATEMENT_PERSISTED: literal('beliefSystem.statementPersisted'),
+  BELIEF_STATEMENT_PERSISTENCE_FAILED: literal('beliefSystem.statementPersistenceFailed'),
   CONFIRMED: literal('checkIn.confirmed'),
   PERSISTED: literal('checkIn.persisted'),
   FAILED: literal('checkIn.failed'),
@@ -67,6 +77,9 @@ export const CHECK_IN_STATES = Object.freeze({
   SAVING: literal('saving'),
   BELIEF_SYSTEM: literal('beliefSystem'),
   BELIEF_SYSTEM_CATALOG: literal('beliefSystemCatalog'),
+  BELIEF_SYSTEM_EDITOR: literal('beliefSystemEditor'),
+  PERSISTING_BELIEF_STATEMENT: literal('persistingBeliefStatement'),
+  BELIEF_STATEMENT_FAILURE: literal('beliefStatementFailure'),
   ATTACHING_BELIEF_SYSTEM: literal('attachingBeliefSystem'),
   BELIEF_SYSTEM_FAILURE: literal('beliefSystemFailure'),
   SUCCESS: literal('success'),
@@ -143,12 +156,16 @@ export const SURREAL_DATABASE_NAME = 'local';
 export const SURREAL_DATABASE_ENDPOINT_PREFIX = 'surrealkv://';
 export const FILE_URI_PREFIX = 'file://';
 export const CHECK_IN_TABLE = 'check_in';
+export const BELIEF_STATEMENT_TABLE = 'belief_statement';
 export const APP_SETTINGS_TABLE = 'app_settings';
 export const APP_SETTINGS_RECORD_ID = 'current';
 export const MAX_CHECK_IN_HISTORY = 30;
 export const MAX_NOTE_LENGTH = 240;
+export const MAX_BELIEF_STATEMENT_LENGTH = 240;
+export const CUSTOM_BELIEF_SYSTEM_ID_PREFIX = 'custom-';
 export const CHECK_IN_FAILURE_MESSAGE = 'Your check-in could not be saved.';
 export const BELIEF_SYSTEM_FAILURE_MESSAGE = 'Your core belief could not be attached.';
+export const BELIEF_STATEMENT_FAILURE_MESSAGE = 'Your belief could not be saved.';
 export const CHECK_IN_DELETE_FAILURE_MESSAGE = 'Your check-in could not be deleted.';
 export const SETTINGS_FAILURE_MESSAGE = 'Your preference could not be saved.';
 export const EMOTION_AXIS_START_ANGLE = -Math.PI / 4;

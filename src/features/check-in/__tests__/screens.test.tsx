@@ -329,12 +329,88 @@ describe('check-in screens', () => {
     await waitFor(() => expect(
       mockActor.getSnapshot().matches(CHECK_IN_STATES.BELIEF_SYSTEM),
     ).toBe(true));
+    await fireEvent.press(screen.getByTestId('guiding-belief-edit'));
+    await waitFor(() => expect(
+      mockActor.getSnapshot().matches(CHECK_IN_STATES.BELIEF_SYSTEM_EDITOR),
+    ).toBe(true));
+    await fireEvent.changeText(
+      screen.getByTestId('guiding-belief-draft'),
+      'I may pause and I am still loved.',
+    );
+    await fireEvent.press(screen.getByTestId('belief-system-editor-save'));
+    await waitFor(() => expect(
+      mockActor.getSnapshot().matches(CHECK_IN_STATES.BELIEF_SYSTEM),
+    ).toBe(true));
+    expect(await screen.findByText('I may pause and I am still loved.')).toBeTruthy();
     await fireEvent.press(screen.getByText('Attach and finish'));
 
     await waitFor(() => expect(mockActor.getSnapshot().matches(CHECK_IN_STATES.SUCCESS)).toBe(true));
     expect(mockActor.getSnapshot().context.saved?.beliefSystemId).toBe(
       BELIEF_SYSTEM_IDS.ALWAYS_FUNCTIONING,
     );
+    const success = await _renderLocalized(<SuccessScreen />);
+    expect(success.getByTestId('success-guiding-belief')).toBeTruthy();
+    expect(success.getByText('Your guiding belief')).toBeTruthy();
+    expect(success.getByText('I may pause and I am still loved.')).toBeTruthy();
+  });
+
+  it('creates and reuses a personal core belief from the catalog', async () => {
+    await act(_reachReflection);
+    await act(() => mockActor.send({ type: CHECK_IN_EVENTS.CONFIRMED }));
+    await waitFor(() => expect(
+      mockActor.getSnapshot().matches(CHECK_IN_STATES.BELIEF_SYSTEM),
+    ).toBe(true));
+    const screen = await _renderLocalized(<ReflectionScreen />);
+
+    await fireEvent.press(screen.getByTestId('belief-system-browse'));
+    await fireEvent.press(screen.getByTestId('create-custom-belief'));
+    await waitFor(() => expect(
+      mockActor.getSnapshot().matches(CHECK_IN_STATES.BELIEF_SYSTEM_EDITOR),
+    ).toBe(true));
+    await fireEvent.changeText(
+      screen.getByTestId('belief-system-draft'),
+      'I must earn every pause.',
+    );
+    await fireEvent.changeText(
+      screen.getByTestId('guiding-belief-draft'),
+      'Rest is part of a full life.',
+    );
+    await fireEvent.press(screen.getByTestId('belief-system-editor-save'));
+
+    await waitFor(() => expect(
+      mockActor.getSnapshot().matches(CHECK_IN_STATES.BELIEF_SYSTEM),
+    ).toBe(true));
+    expect(await screen.findByText('I must earn every pause.')).toBeTruthy();
+    expect(screen.getByText('Rest is part of a full life.')).toBeTruthy();
+    await fireEvent.press(screen.getByText('Attach and finish'));
+    await waitFor(() => expect(
+      mockActor.getSnapshot().matches(CHECK_IN_STATES.SUCCESS),
+    ).toBe(true));
+
+    const success = await _renderLocalized(<SuccessScreen />);
+    expect(success.getByText('Rest is part of a full life.')).toBeTruthy();
+  });
+
+  it('calls harmful beliefs Leidsätze and positive beliefs Leitsätze in German', async () => {
+    await act(() => appSettingsStore.trigger.languageChanged({
+      locale: APP_LOCALES.GERMAN,
+    }));
+    await act(_reachReflection);
+    await act(() => mockActor.send({ type: CHECK_IN_EVENTS.CONFIRMED }));
+    await waitFor(() => expect(
+      mockActor.getSnapshot().matches(CHECK_IN_STATES.BELIEF_SYSTEM),
+    ).toBe(true));
+    const screen = await _renderLocalized(<ReflectionScreen />);
+
+    expect(screen.getByText('Passt ein Leidsatz zu diesem Moment?')).toBeTruthy();
+    await fireEvent.press(screen.getByText('Alle Leidsätze ansehen'));
+    expect(await screen.findByText('LEIDSÄTZE')).toBeTruthy();
+    await fireEvent.press(screen.getByText('Eigenen Leidsatz hinzufügen'));
+    expect(await screen.findByText('Füge deinen eigenen Leidsatz hinzu.')).toBeTruthy();
+    expect(screen.getByText('Leitsatz · optional')).toBeTruthy();
+    expect(screen.getByPlaceholderText(
+      'Ich darf auch mal nicht funktionieren und werde trotzdem geliebt.',
+    )).toBeTruthy();
   });
 
   it('renders success, history, and settings destinations', async () => {

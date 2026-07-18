@@ -226,6 +226,96 @@ describe('app navigation model', () => {
     expect(snapshot.context.saved?.beliefSystemId).toBe(BELIEF_SYSTEM_IDS.ALWAYS_FUNCTIONING);
   });
 
+  it('persists a custom core belief and guiding belief through retryable model states', async () => {
+    const actor = createActor(appNavigationMachine).start();
+    actor.send({ type: CHECK_IN_EVENTS.TOUCH_STARTED });
+    actor.send({ type: CHECK_IN_EVENTS.SELECTION_CHANGED, selection });
+    actor.send({ type: CHECK_IN_EVENTS.SELECTION_RELEASED });
+    actor.send({ type: CHECK_IN_EVENTS.CONFIRMED });
+    await waitFor(
+      actor,
+      (candidate) => candidate.matches(CHECK_IN_STATES.BELIEF_SYSTEM),
+      { timeout: 1_000 },
+    );
+
+    actor.send({ type: CHECK_IN_EVENTS.BELIEF_SYSTEM_CATALOG_REQUESTED });
+    actor.send({ type: CHECK_IN_EVENTS.CUSTOM_BELIEF_SYSTEM_REQUESTED });
+    expect(actor.getSnapshot().matches(CHECK_IN_STATES.BELIEF_SYSTEM_EDITOR)).toBe(true);
+    expect(routeForStateValue(actor.getSnapshot().value)).toBe(APP_ROUTES.REFLECTION);
+    actor.send({
+      type: CHECK_IN_EVENTS.BELIEF_SYSTEM_DRAFT_CHANGED,
+      statement: 'I must always function.',
+    });
+    actor.send({
+      type: CHECK_IN_EVENTS.GUIDING_BELIEF_SYSTEM_DRAFT_CHANGED,
+      statement: 'I may pause and I am still loved.',
+    });
+    failNextSurrealUpsert(new Error('belief storage unavailable'));
+    actor.send({ type: CHECK_IN_EVENTS.BELIEF_SYSTEM_EDITOR_CONFIRMED });
+
+    await waitFor(
+      actor,
+      (candidate) => candidate.matches(CHECK_IN_STATES.BELIEF_STATEMENT_FAILURE),
+      { timeout: 1_000 },
+    );
+    actor.send({ type: CHECK_IN_EVENTS.RETRIED });
+    const persisted = await waitFor(
+      actor,
+      (candidate) => candidate.matches(CHECK_IN_STATES.BELIEF_SYSTEM),
+      { timeout: 1_000 },
+    );
+    const selectedId = persisted.context.beliefSystemId;
+    expect(selectedId).toEqual(expect.stringMatching(/^custom-/));
+    expect(persisted.context.beliefStatements).toContainEqual({
+      kind: 'custom',
+      beliefSystemId: selectedId,
+      harmfulStatement: 'I must always function.',
+      guidingStatement: 'I may pause and I am still loved.',
+    });
+
+    actor.send({ type: CHECK_IN_EVENTS.CONFIRMED });
+    const completed = await waitFor(
+      actor,
+      (candidate) => candidate.matches(CHECK_IN_STATES.SUCCESS),
+      { timeout: 1_000 },
+    );
+    expect(completed.context.saved?.beliefSystemId).toBe(selectedId);
+  });
+
+  it('adds a guiding belief to a built-in core belief', async () => {
+    const actor = createActor(appNavigationMachine).start();
+    actor.send({ type: CHECK_IN_EVENTS.TOUCH_STARTED });
+    actor.send({ type: CHECK_IN_EVENTS.SELECTION_CHANGED, selection });
+    actor.send({ type: CHECK_IN_EVENTS.SELECTION_RELEASED });
+    actor.send({ type: CHECK_IN_EVENTS.CONFIRMED });
+    await waitFor(
+      actor,
+      (candidate) => candidate.matches(CHECK_IN_STATES.BELIEF_SYSTEM),
+      { timeout: 1_000 },
+    );
+    actor.send({
+      type: CHECK_IN_EVENTS.BELIEF_SYSTEM_CHANGED,
+      beliefSystemId: BELIEF_SYSTEM_IDS.ALWAYS_FUNCTIONING,
+    });
+    actor.send({ type: CHECK_IN_EVENTS.GUIDING_BELIEF_SYSTEM_REQUESTED });
+    actor.send({
+      type: CHECK_IN_EVENTS.GUIDING_BELIEF_SYSTEM_DRAFT_CHANGED,
+      statement: 'I may pause and I am still loved.',
+    });
+    actor.send({ type: CHECK_IN_EVENTS.BELIEF_SYSTEM_EDITOR_CONFIRMED });
+
+    const persisted = await waitFor(
+      actor,
+      (candidate) => candidate.matches(CHECK_IN_STATES.BELIEF_SYSTEM),
+      { timeout: 1_000 },
+    );
+    expect(persisted.context.beliefStatements).toContainEqual({
+      kind: 'built-in',
+      beliefSystemId: BELIEF_SYSTEM_IDS.ALWAYS_FUNCTIONING,
+      guidingStatement: 'I may pause and I am still loved.',
+    });
+  });
+
   it('deletes a persisted check-in through the root actor', async () => {
     const actor = await startAfterInitialHistoryHydration();
     actor.send({ type: CHECK_IN_EVENTS.TOUCH_STARTED });

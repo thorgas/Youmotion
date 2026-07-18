@@ -17,7 +17,7 @@ import {
   type CheckIn,
   type EmotionSelection,
 } from '../domain/check-in';
-import { BeliefSystemId } from '../domain/belief-system';
+import { BeliefSystemId } from '../domain/belief-statement';
 import { getDatabase } from './surrealdb.database';
 
 export class CheckInStorageError extends Schema.TaggedError<CheckInStorageError>()(
@@ -64,19 +64,9 @@ const SurrealIntensity = Schema.Union(
   ),
 );
 
-const surrealNone = { kind: 'none' } satisfies { readonly kind: 'none' };
-
-const SurrealOptionalBeliefSystemId = Schema.transform(
-  Schema.Union(
-    BeliefSystemId,
-    Schema.Struct({ kind: Schema.Literal('none') }),
-  ),
-  Schema.UndefinedOr(BeliefSystemId),
-  {
-    strict: true,
-    decode: (value) => typeof value === 'string' ? value : undefined,
-    encode: (value) => value === undefined ? surrealNone : value,
-  },
+const SurrealOptionalBeliefSystemId = Schema.Union(
+  BeliefSystemId,
+  Schema.Struct({ kind: Schema.Literal('none') }),
 );
 
 const CheckInDatabaseSchema = Schema.Struct({
@@ -90,6 +80,16 @@ const CheckInDatabaseSchema = Schema.Struct({
 });
 
 const CheckInDatabaseListSchema = Schema.Array(CheckInDatabaseSchema);
+
+function checkInFromDatabase(
+  entry: typeof CheckInDatabaseSchema.Type,
+): CheckIn {
+  const { beliefSystemId, ...checkIn } = entry;
+  if (beliefSystemId === undefined || typeof beliefSystemId !== 'string') {
+    return checkIn;
+  }
+  return { ...checkIn, beliefSystemId };
+}
 
 const readLegacy = Effect.tryPromise({
   try: () => AsyncStorage.getItem(CHECK_IN_STORAGE_KEY),
@@ -117,6 +117,7 @@ const selectRecentCheckIns = Effect.tryPromise({
 }).pipe(
   Effect.flatMap((statements) => Schema.decodeUnknown(CheckInDatabaseListSchema)(statements[0]?.value ?? []).pipe(
     Effect.mapError((cause) => CheckInDataError.make({ operation: 'decode', cause })),
+    Effect.map((entries) => entries.map(checkInFromDatabase)),
   )),
 );
 

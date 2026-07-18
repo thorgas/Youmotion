@@ -1,3 +1,4 @@
+import { useSelector as useActorSelector } from '@xstate/react';
 import { useSelector } from '@xstate/store-react';
 import { PressableScale } from 'pressto';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
@@ -20,9 +21,13 @@ import {
 import { palette, type } from './theme';
 
 const _selectHistory = (state: ReturnType<typeof checkInHistoryStore.getSnapshot>) => state.context;
+const _selectBeliefStatements = (
+  snapshot: ReturnType<ReturnType<typeof useAppNavigationActor>['getSnapshot']>,
+) => snapshot.context.beliefStatements;
 
 function MomentRow({ entry, locale }: { entry: CheckIn; locale: string }) {
   const actor = useAppNavigationActor();
+  const beliefStatements = useActorSelector(actor, _selectBeliefStatements);
   const _edit = () => actor.send({ type: CHECK_IN_EVENTS.EDIT_REQUESTED, entry });
   const _delete = () => actor.send({ type: CHECK_IN_EVENTS.DELETE_REQUESTED, id: entry.id });
   const _confirmDelete = () => confirmCheckInDeletion(_delete);
@@ -43,7 +48,12 @@ function MomentRow({ entry, locale }: { entry: CheckIn; locale: string }) {
           <Text style={styles.date}>{formatHistoryDate({ date: new Date(entry.createdAt), locale })}</Text>
           {entry.note ? <Text style={styles.note}>{entry.note}</Text> : null}
           {entry.beliefSystemId ? (
-            <Text style={styles.beliefSystem}>{beliefSystemText(entry.beliefSystemId)}</Text>
+            <Text style={styles.beliefSystem}>
+              {beliefSystemText({
+                id: entry.beliefSystemId,
+                statements: beliefStatements,
+              })}
+            </Text>
           ) : null}
         </View>
       </PressableScale>

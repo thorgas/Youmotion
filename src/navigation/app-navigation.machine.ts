@@ -10,6 +10,7 @@ import {
 import {
   APP_ROUTES,
   BELIEF_SYSTEM_FAILURE_MESSAGE,
+  BELIEF_STATEMENT_FAILURE_MESSAGE,
   CHECK_IN_EVENTS,
   CHECK_IN_DELETE_FAILURE_MESSAGE,
   CHECK_IN_FAILURE_MESSAGE,
@@ -27,12 +28,26 @@ import {
   EmotionSelectionSchema,
 } from '@/features/check-in/domain/check-in';
 import { selectionForCheckIn } from '@/features/check-in/domain/emotion';
-import { BeliefSystemId } from '@/features/check-in/domain/belief-system';
+import {
+  BeliefStatementListSchema,
+  BeliefStatementSchema,
+  BeliefSystemId,
+  CustomBeliefSystemId,
+  beliefStatementForId,
+  createCustomBeliefSystemId,
+  isCustomBeliefSystemId,
+  recordBeliefStatement,
+  type BeliefStatement,
+} from '@/features/check-in/domain/belief-statement';
 import {
   deleteCheckIn,
   loadCheckIns,
   persistCheckIn,
 } from '@/features/check-in/infrastructure/check-in.repository';
+import {
+  loadBeliefStatements,
+  persistBeliefStatement,
+} from '@/features/check-in/infrastructure/belief-statement.repository';
 import { checkInHistoryStore } from '@/features/check-in/application/check-in-history.store';
 import { appSettingsStore } from '@/features/settings/application/app-settings.store';
 import { AppLocaleSchema } from '@/features/settings/domain/app-locale';
@@ -47,12 +62,59 @@ const AppContextSchema = Schema.Struct({
   selection: Schema.NullOr(EmotionSelectionSchema),
   note: Schema.String,
   beliefSystemId: Schema.NullOr(BeliefSystemId),
+  beliefStatements: BeliefStatementListSchema,
+  beliefStatementDraft: Schema.String,
+  beliefStatementDraftId: Schema.NullOr(CustomBeliefSystemId),
+  guidingBeliefStatementDraft: Schema.String,
+  beliefStatementEditorMode: Schema.NullOr(Schema.Literal('custom', 'guiding')),
   saved: Schema.NullOr(CheckInSchema),
   editing: Schema.NullOr(CheckInSchema),
   error: Schema.NullOr(Schema.String),
 });
 
 const EmptyEventSchema = Schema.standardSchemaV1(Schema.Struct({}));
+
+function beliefStatementFromDraft({
+  beliefStatementDraft,
+  beliefStatementDraftId,
+  beliefStatementEditorMode,
+  beliefStatements,
+  beliefSystemId,
+  guidingBeliefStatementDraft,
+}: {
+  beliefStatementDraft: string;
+  beliefStatementDraftId: typeof CustomBeliefSystemId.Type | null;
+  beliefStatementEditorMode: 'custom' | 'guiding' | null;
+  beliefStatements: readonly BeliefStatement[];
+  beliefSystemId: BeliefSystemId | null;
+  guidingBeliefStatementDraft: string;
+}): BeliefStatement | null {
+  const guidingStatement = guidingBeliefStatementDraft.trim();
+  if (beliefStatementEditorMode === 'custom') {
+    const harmfulStatement = beliefStatementDraft.trim();
+    if (!harmfulStatement || !beliefStatementDraftId) return null;
+    if (!guidingStatement) {
+      return {
+        kind: 'custom',
+        beliefSystemId: beliefStatementDraftId,
+        harmfulStatement,
+      };
+    }
+    return {
+      kind: 'custom',
+      beliefSystemId: beliefStatementDraftId,
+      harmfulStatement,
+      guidingStatement,
+    };
+  }
+  if (!beliefSystemId || !guidingStatement) return null;
+  if (!isCustomBeliefSystemId(beliefSystemId)) {
+    return { kind: 'built-in', beliefSystemId, guidingStatement };
+  }
+  const existing = beliefStatementForId({ beliefSystemId, statements: beliefStatements });
+  if (existing?.kind !== 'custom') return null;
+  return { ...existing, guidingStatement };
+}
 
 export const appNavigationMachine = setup({
   states: {
@@ -72,6 +134,9 @@ export const appNavigationMachine = setup({
     [CHECK_IN_STATES.SAVING]: {},
     [CHECK_IN_STATES.BELIEF_SYSTEM]: {},
     [CHECK_IN_STATES.BELIEF_SYSTEM_CATALOG]: {},
+    [CHECK_IN_STATES.BELIEF_SYSTEM_EDITOR]: {},
+    [CHECK_IN_STATES.PERSISTING_BELIEF_STATEMENT]: {},
+    [CHECK_IN_STATES.BELIEF_STATEMENT_FAILURE]: {},
     [CHECK_IN_STATES.ATTACHING_BELIEF_SYSTEM]: {},
     [CHECK_IN_STATES.BELIEF_SYSTEM_FAILURE]: {},
     [CHECK_IN_STATES.SUCCESS]: {},
@@ -96,6 +161,28 @@ export const appNavigationMachine = setup({
       [CHECK_IN_EVENTS.BELIEF_SYSTEM_BACK_REQUESTED]: EmptyEventSchema,
       [CHECK_IN_EVENTS.BELIEF_SYSTEM_CATALOG_REQUESTED]: EmptyEventSchema,
       [CHECK_IN_EVENTS.BELIEF_SYSTEM_CATALOG_CLOSED]: EmptyEventSchema,
+      [CHECK_IN_EVENTS.CUSTOM_BELIEF_SYSTEM_REQUESTED]: EmptyEventSchema,
+      [CHECK_IN_EVENTS.GUIDING_BELIEF_SYSTEM_REQUESTED]: EmptyEventSchema,
+      [CHECK_IN_EVENTS.BELIEF_SYSTEM_EDITOR_CANCELLED]: EmptyEventSchema,
+      [CHECK_IN_EVENTS.BELIEF_SYSTEM_DRAFT_CHANGED]: Schema.standardSchemaV1(
+        Schema.Struct({ statement: Schema.String }),
+      ),
+      [CHECK_IN_EVENTS.GUIDING_BELIEF_SYSTEM_DRAFT_CHANGED]: Schema.standardSchemaV1(
+        Schema.Struct({ statement: Schema.String }),
+      ),
+      [CHECK_IN_EVENTS.BELIEF_SYSTEM_EDITOR_CONFIRMED]: EmptyEventSchema,
+      [CHECK_IN_EVENTS.BELIEF_STATEMENTS_HYDRATED]: Schema.standardSchemaV1(
+        Schema.Struct({ statements: BeliefStatementListSchema }),
+      ),
+      [CHECK_IN_EVENTS.BELIEF_STATEMENTS_HYDRATION_FAILED]: Schema.standardSchemaV1(
+        Schema.Struct({ message: Schema.String }),
+      ),
+      [CHECK_IN_EVENTS.BELIEF_STATEMENT_PERSISTED]: Schema.standardSchemaV1(
+        Schema.Struct({ statement: BeliefStatementSchema }),
+      ),
+      [CHECK_IN_EVENTS.BELIEF_STATEMENT_PERSISTENCE_FAILED]: Schema.standardSchemaV1(
+        Schema.Struct({ message: Schema.String }),
+      ),
       [CHECK_IN_EVENTS.CONFIRMED]: EmptyEventSchema,
       [CHECK_IN_EVENTS.PERSISTED]: Schema.standardSchemaV1(Schema.Struct({ saved: CheckInSchema })),
       [CHECK_IN_EVENTS.FAILED]: Schema.standardSchemaV1(Schema.Struct({ message: Schema.String })),
@@ -143,6 +230,11 @@ export const appNavigationMachine = setup({
     selection: null,
     note: '',
     beliefSystemId: null,
+    beliefStatements: [],
+    beliefStatementDraft: '',
+    beliefStatementDraftId: null,
+    guidingBeliefStatementDraft: '',
+    beliefStatementEditorMode: null,
     saved: null,
     editing: null,
     error: null,
@@ -163,6 +255,16 @@ export const appNavigationMachine = setup({
           message: SETTINGS_FAILURE_MESSAGE,
         }),
       );
+      void Effect.runPromise(loadBeliefStatements).then(
+        (statements) => self.send({
+          type: CHECK_IN_EVENTS.BELIEF_STATEMENTS_HYDRATED,
+          statements,
+        }),
+        () => self.send({
+          type: CHECK_IN_EVENTS.BELIEF_STATEMENTS_HYDRATION_FAILED,
+          message: BELIEF_STATEMENT_FAILURE_MESSAGE,
+        }),
+      );
     });
   },
   on: {
@@ -171,6 +273,20 @@ export const appNavigationMachine = setup({
     },
     [CHECK_IN_EVENTS.HISTORY_HYDRATION_FAILED]: ({ event }, enq) => {
       enq(() => checkInHistoryStore.trigger.hydrationFailed({ message: event.message }));
+    },
+    [CHECK_IN_EVENTS.BELIEF_STATEMENTS_HYDRATED]: {
+      context: ({ context, event }) => ({
+        beliefStatements: event.statements.reduce(
+          (statements, statement) => recordBeliefStatement({
+            statement,
+            statements,
+          }),
+          context.beliefStatements,
+        ),
+      }),
+    },
+    [CHECK_IN_EVENTS.BELIEF_STATEMENTS_HYDRATION_FAILED]: {
+      context: ({ event }) => ({ error: event.message }),
     },
     [CHECK_IN_EVENTS.DELETE_REQUESTED]: ({ event, self }, enq) => {
       enq(() => {
@@ -399,6 +515,23 @@ export const appNavigationMachine = setup({
         [CHECK_IN_EVENTS.BELIEF_SYSTEM_CATALOG_REQUESTED]: {
           target: CHECK_IN_STATES.BELIEF_SYSTEM_CATALOG,
         },
+        [CHECK_IN_EVENTS.GUIDING_BELIEF_SYSTEM_REQUESTED]: ({ context }) => {
+          if (!context.beliefSystemId) return undefined;
+          const statement = beliefStatementForId({
+            beliefSystemId: context.beliefSystemId,
+            statements: context.beliefStatements,
+          });
+          return {
+            target: CHECK_IN_STATES.BELIEF_SYSTEM_EDITOR,
+            context: {
+              beliefStatementEditorMode: 'guiding',
+              beliefStatementDraft: '',
+              beliefStatementDraftId: null,
+              guidingBeliefStatementDraft: statement?.guidingStatement ?? '',
+              error: null,
+            },
+          };
+        },
         [CHECK_IN_EVENTS.CONFIRMED]: ({ context }) => {
           if (!context.saved) return undefined;
           if ((context.saved.beliefSystemId ?? null) !== context.beliefSystemId) {
@@ -429,6 +562,116 @@ export const appNavigationMachine = setup({
         },
         [CHECK_IN_EVENTS.BELIEF_SYSTEM_CATALOG_CLOSED]: {
           target: CHECK_IN_STATES.BELIEF_SYSTEM,
+        },
+        [CHECK_IN_EVENTS.CUSTOM_BELIEF_SYSTEM_REQUESTED]: () => ({
+          target: CHECK_IN_STATES.BELIEF_SYSTEM_EDITOR,
+          context: {
+            beliefSystemId: null,
+            beliefStatementEditorMode: 'custom',
+            beliefStatementDraft: '',
+            beliefStatementDraftId: createCustomBeliefSystemId({
+              timestamp: Date.now(),
+              nonce: Math.random().toString(16).slice(2),
+            }),
+            guidingBeliefStatementDraft: '',
+            error: null,
+          },
+        }),
+      },
+    },
+    [CHECK_IN_STATES.BELIEF_SYSTEM_EDITOR]: {
+      on: {
+        [CHECK_IN_EVENTS.BELIEF_SYSTEM_DRAFT_CHANGED]: {
+          context: ({ event }) => ({ beliefStatementDraft: event.statement }),
+        },
+        [CHECK_IN_EVENTS.GUIDING_BELIEF_SYSTEM_DRAFT_CHANGED]: {
+          context: ({ event }) => ({ guidingBeliefStatementDraft: event.statement }),
+        },
+        [CHECK_IN_EVENTS.BELIEF_SYSTEM_EDITOR_CANCELLED]: {
+          target: CHECK_IN_STATES.BELIEF_SYSTEM,
+          context: {
+            beliefStatementEditorMode: null,
+            beliefStatementDraft: '',
+            beliefStatementDraftId: null,
+            guidingBeliefStatementDraft: '',
+            error: null,
+          },
+        },
+        [CHECK_IN_EVENTS.BELIEF_SYSTEM_EDITOR_CONFIRMED]: ({ context }) => {
+          const harmfulStatementReady = (
+            context.beliefStatementEditorMode === 'custom'
+            && context.beliefStatementDraft.trim().length > 0
+          );
+          const guidingStatementReady = (
+            context.beliefStatementEditorMode === 'guiding'
+            && context.beliefSystemId !== null
+            && context.guidingBeliefStatementDraft.trim().length > 0
+          );
+          return harmfulStatementReady || guidingStatementReady
+            ? { target: CHECK_IN_STATES.PERSISTING_BELIEF_STATEMENT }
+            : undefined;
+        },
+      },
+    },
+    [CHECK_IN_STATES.PERSISTING_BELIEF_STATEMENT]: {
+      entry: ({ context, self }, enq) => {
+        enq(() => {
+          const statement = beliefStatementFromDraft(context);
+          if (!statement) {
+            self.send({
+              type: CHECK_IN_EVENTS.BELIEF_STATEMENT_PERSISTENCE_FAILED,
+              message: BELIEF_STATEMENT_FAILURE_MESSAGE,
+            });
+            return;
+          }
+          void Effect.runPromise(persistBeliefStatement(statement)).then(
+            (persisted) => self.send({
+              type: CHECK_IN_EVENTS.BELIEF_STATEMENT_PERSISTED,
+              statement: persisted,
+            }),
+            () => self.send({
+              type: CHECK_IN_EVENTS.BELIEF_STATEMENT_PERSISTENCE_FAILED,
+              message: BELIEF_STATEMENT_FAILURE_MESSAGE,
+            }),
+          );
+        });
+      },
+      on: {
+        [CHECK_IN_EVENTS.BELIEF_STATEMENT_PERSISTED]: ({ context, event }) => ({
+          target: CHECK_IN_STATES.BELIEF_SYSTEM,
+          context: {
+            beliefSystemId: event.statement.beliefSystemId,
+            beliefStatements: recordBeliefStatement({
+              statement: event.statement,
+              statements: context.beliefStatements,
+            }),
+            beliefStatementEditorMode: null,
+            beliefStatementDraft: '',
+            beliefStatementDraftId: null,
+            guidingBeliefStatementDraft: '',
+            error: null,
+          },
+        }),
+        [CHECK_IN_EVENTS.BELIEF_STATEMENT_PERSISTENCE_FAILED]: ({ event }) => ({
+          target: CHECK_IN_STATES.BELIEF_STATEMENT_FAILURE,
+          context: { error: event.message },
+        }),
+      },
+    },
+    [CHECK_IN_STATES.BELIEF_STATEMENT_FAILURE]: {
+      on: {
+        [CHECK_IN_EVENTS.RETRIED]: {
+          target: CHECK_IN_STATES.PERSISTING_BELIEF_STATEMENT,
+        },
+        [CHECK_IN_EVENTS.BELIEF_SYSTEM_EDITOR_CANCELLED]: {
+          target: CHECK_IN_STATES.BELIEF_SYSTEM,
+          context: {
+            beliefStatementEditorMode: null,
+            beliefStatementDraft: '',
+            beliefStatementDraftId: null,
+            guidingBeliefStatementDraft: '',
+            error: null,
+          },
         },
       },
     },
@@ -512,17 +755,24 @@ export const appNavigationMachine = setup({
   },
 });
 
+const reflectionRouteStates: readonly StateValue[] = [
+  NAVIGATION_STATES.REFLECTION,
+  CHECK_IN_STATES.SAVING,
+  CHECK_IN_STATES.BELIEF_SYSTEM,
+  CHECK_IN_STATES.BELIEF_SYSTEM_CATALOG,
+  CHECK_IN_STATES.BELIEF_SYSTEM_EDITOR,
+  CHECK_IN_STATES.PERSISTING_BELIEF_STATEMENT,
+  CHECK_IN_STATES.BELIEF_STATEMENT_FAILURE,
+  CHECK_IN_STATES.ATTACHING_BELIEF_SYSTEM,
+  CHECK_IN_STATES.BELIEF_SYSTEM_FAILURE,
+  CHECK_IN_STATES.FAILURE,
+];
+
 export function routeForStateValue(value: StateValue) {
   if (matchesState(CHECK_IN_STATES.SUCCESS, value)) return APP_ROUTES.SUCCESS;
-  if (
-    matchesState(NAVIGATION_STATES.REFLECTION, value)
-    || matchesState(CHECK_IN_STATES.SAVING, value)
-    || matchesState(CHECK_IN_STATES.BELIEF_SYSTEM, value)
-    || matchesState(CHECK_IN_STATES.BELIEF_SYSTEM_CATALOG, value)
-    || matchesState(CHECK_IN_STATES.ATTACHING_BELIEF_SYSTEM, value)
-    || matchesState(CHECK_IN_STATES.BELIEF_SYSTEM_FAILURE, value)
-    || matchesState(CHECK_IN_STATES.FAILURE, value)
-  ) return APP_ROUTES.REFLECTION;
+  if (reflectionRouteStates.some((state) => matchesState(state, value))) {
+    return APP_ROUTES.REFLECTION;
+  }
   if (matchesState({ [NAVIGATION_STATES.TABS]: NAVIGATION_STATES.HISTORY }, value)) return APP_ROUTES.HISTORY;
   if (matchesState({ [NAVIGATION_STATES.TABS]: NAVIGATION_STATES.SETTINGS }, value)) return APP_ROUTES.SETTINGS;
   return APP_ROUTES.TODAY;

@@ -314,7 +314,7 @@
       "tokens": [],
       "translations": [
         {
-          "translation": "Glaubenssatz",
+          "translation": "Leidsatz",
           "variations": {}
         }
       ],
@@ -325,7 +325,7 @@
       "tokens": [],
       "translations": [
         {
-          "translation": "Keinen Glaubenssatz anhängen",
+          "translation": "Keinen Leidsatz anhängen",
           "variations": {}
         }
       ],
@@ -336,7 +336,7 @@
       "tokens": [],
       "translations": [
         {
-          "translation": "Optionaler Glaubenssatz",
+          "translation": "Optionaler Leidsatz",
           "variations": {}
         }
       ],
@@ -1612,7 +1612,7 @@
       "tokens": [],
       "translations": [
         {
-          "translation": "03 · GLAUBENSSATZ · SCHRITT 2 VON 2",
+          "translation": "03 · LEIDSATZ · SCHRITT 2 VON 2",
           "variations": {}
         }
       ],
@@ -1623,7 +1623,7 @@
       "tokens": [],
       "translations": [
         {
-          "translation": "Passt ein Glaubenssatz zu diesem Moment?",
+          "translation": "Passt ein Leidsatz zu diesem Moment?",
           "variations": {}
         }
       ],
@@ -1656,7 +1656,7 @@
       "tokens": [],
       "translations": [
         {
-          "translation": "Alle Glaubenssätze ansehen",
+          "translation": "Alle Leidsätze ansehen",
           "variations": {}
         }
       ],
@@ -1678,7 +1678,7 @@
       "tokens": [],
       "translations": [
         {
-          "translation": "Deine Reflexion ist gespeichert, aber der Glaubenssatz konnte nicht angehängt werden.",
+          "translation": "Deine Reflexion ist gespeichert, aber der Leidsatz konnte nicht angehängt werden.",
           "variations": {}
         }
       ],
@@ -1722,7 +1722,7 @@
       "tokens": [],
       "translations": [
         {
-          "translation": "Ohne Glaubenssatz abschließen",
+          "translation": "Ohne Leidsatz abschließen",
           "variations": {}
         }
       ],
@@ -1744,7 +1744,7 @@
       "tokens": [],
       "translations": [
         {
-          "translation": "GLAUBENSSÄTZE",
+          "translation": "LEIDSÄTZE",
           "variations": {}
         }
       ],
@@ -1877,6 +1877,294 @@
       "translations": [
         {
           "translation": "Wütend zu sein lässt dich dumm aussehen.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "LbBilKBdkznQ1OYlunSdmg==": {
+      "description": "Accessibility label for the personal core belief input",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Dein eigener Leidsatz",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "pmtLf0hs6froojMFP2CCmw==": {
+      "description": "Placeholder example for a personal core belief",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Ich muss immer funktionieren.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "DY3r551HS/7frSWG696ZuQ==": {
+      "description": "Accessibility label for the positive guiding belief input",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Positiver Leitsatz",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "MV8rl991B4U/C7nphVGPEg==": {
+      "description": "Placeholder example for a compassionate positive guiding belief",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Ich darf auch mal nicht funktionieren und werde trotzdem geliebt.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "cxZC8lBwjJVLLoiQsia/YQ==": {
+      "description": "Button editing a positive guiding belief",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Leitsatz bearbeiten",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "u/yqHWVEmHr9lzTMAtieWg==": {
+      "description": "Button turning a harmful core belief into a positive guiding belief",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Leitsatz formulieren",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "APjOPHBFR5QM7jI4xmd1jg==": {
+      "description": "Description below the button for formulating a positive guiding belief",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Gib diesem Leidsatz eine mitfühlende Richtung.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "Fjv9N5uWkKB6nJNpsNONJA==": {
+      "description": "Button for adding a personal core belief",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Eigenen Leidsatz hinzufügen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "mbY65qetTKoNqh/XZgJdEQ==": {
+      "description": "Description below the button for adding a personal core belief",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Formuliere ihn in deinen eigenen Worten.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "iCoIdaj7So1EJbpkgRUezg==": {
+      "description": "Label above the personal core belief editor",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "DEIN LEIDSATZ",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "LpLrxfc/NLYxOxeKEmY9eQ==": {
+      "description": "Label above the positive guiding belief editor",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "LEITSATZ",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "VahgRy9VLiXETa/f2P5kKQ==": {
+      "description": "Title for adding a personal core belief",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Füge deinen eigenen Leidsatz hinzu.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "FbZyWANVQrGKDK6hXW8hFA==": {
+      "description": "Title for turning a harmful core belief into a positive guiding belief",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Gib diesem Leidsatz eine neue Richtung.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "723AN9anyWrrvKYQPCax7w==": {
+      "description": "Instructions for adding a personal harmful and optional positive guiding belief",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Benenne den Satz, der Leid verursacht. Du kannst jetzt auch einen positiven Leitsatz formulieren.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "LCFfeTUC5v9j65rtkC4M4w==": {
+      "description": "Instructions for formulating a positive guiding belief",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Schreibe einen mitfühlenden Satz, mit dem du leben möchtest.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "d9mxdNUtlU9DM4nRy1ZkyA==": {
+      "description": "Label for a personal harmful core belief",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Leidsatz",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "WX93Yso+7GVW4SuBU5+fLg==": {
+      "description": "Label above the harmful belief being reformulated",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Leidsatz",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "LU4SfXRLxNUC55PS+zxbVg==": {
+      "description": "Label for an optional positive guiding belief",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Leitsatz · optional",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "yKufdHy9cP8slCvrpIQW1w==": {
+      "description": "Label for a positive guiding belief",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Leitsatz",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "mjQh3q0YJv8n5tySOgnf+Q==": {
+      "description": "Error shown when a personal or guiding belief cannot be saved",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Dein Satz konnte nicht gespeichert werden.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "xnBRIwdGjPRx8cssEZk/jg==": {
+      "description": "Button cancelling personal or guiding belief editing",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Abbrechen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "lmUKUJphx/yjNrUU/rVtnQ==": {
+      "description": "Button retrying belief persistence",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Erneut versuchen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "ayP7xiJ0WaR+AQaPBjBx7Q==": {
+      "description": "Button saving a personal or guiding belief",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Satz speichern",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "Ydxv891jcCYG13l8NhvXNQ==": {
+      "description": "Label above the positive guiding belief on the completed check-in screen",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Dein Leitsatz",
           "variations": {}
         }
       ],

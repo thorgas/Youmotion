@@ -2,7 +2,11 @@ import { fbs } from 'fbtee';
 
 import { BELIEF_SYSTEM_IDS } from '@/constants';
 
-import type { BeliefSystemId } from '../domain/belief-system';
+import {
+  beliefStatementForId,
+  type BeliefStatement,
+  type BeliefSystemId,
+} from '../domain/belief-statement';
 
 type Copy = () => string;
 
@@ -99,8 +103,33 @@ const copyById = new Map<BeliefSystemId, Copy>([
 
 const _fallback = () => String(fbs('Core belief', 'Fallback label for a core belief'));
 
-export function beliefSystemText(id: BeliefSystemId) {
+export function beliefSystemText(
+  {
+    id,
+    statements = [],
+  }: {
+    id: BeliefSystemId;
+    statements?: readonly BeliefStatement[];
+  },
+) {
+  const statement = beliefStatementForId({ beliefSystemId: id, statements });
+  if (statement?.kind === 'custom') return statement.harmfulStatement;
   return copyById.get(id)?.() ?? _fallback();
+}
+
+export function guidingBeliefSystemText(
+  {
+    id,
+    statements,
+  }: {
+    id: BeliefSystemId;
+    statements: readonly BeliefStatement[];
+  },
+) {
+  return beliefStatementForId({
+    beliefSystemId: id,
+    statements,
+  })?.guidingStatement;
 }
 
 export const noBeliefSystemText = () => String(fbs(
@@ -111,4 +140,24 @@ export const noBeliefSystemText = () => String(fbs(
 export const beliefSystemPickerAccessibilityLabel = () => String(fbs(
   'Optional core belief',
   'Accessibility label for the core belief picker',
+));
+
+export const customBeliefAccessibilityLabel = () => String(fbs(
+  'Your own core belief',
+  'Accessibility label for the personal core belief input',
+));
+
+export const customBeliefPlaceholder = () => String(fbs(
+  'I always have to function.',
+  'Placeholder example for a personal core belief',
+));
+
+export const guidingBeliefAccessibilityLabel = () => String(fbs(
+  'Positive guiding belief',
+  'Accessibility label for the positive guiding belief input',
+));
+
+export const guidingBeliefPlaceholder = () => String(fbs(
+  'I may not function sometimes and I am still loved.',
+  'Placeholder example for a compassionate positive guiding belief',
 ));

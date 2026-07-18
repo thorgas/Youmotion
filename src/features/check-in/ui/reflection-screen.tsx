@@ -15,6 +15,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import {
   CHECK_IN_EVENTS,
   CHECK_IN_STATES,
+  MAX_BELIEF_STATEMENT_LENGTH,
   NAVIGATION_STATES,
   REFLECTION_KEYBOARD_BOTTOM_OFFSET,
 } from '@/constants';
@@ -26,12 +27,21 @@ import {
   optionalNotePlaceholder,
 } from './emotion-copy';
 import { checkInHistoryStore } from '../application/check-in-history.store';
+import type { CheckIn, EmotionSelection } from '../domain/check-in';
 import {
   recommendedBeliefSystemIds,
-  type BeliefSystemId,
 } from '../domain/belief-system';
+import type {
+  BeliefStatement,
+  BeliefSystemId,
+} from '../domain/belief-statement';
 import {
   beliefSystemText,
+  customBeliefAccessibilityLabel,
+  customBeliefPlaceholder,
+  guidingBeliefAccessibilityLabel,
+  guidingBeliefPlaceholder,
+  guidingBeliefSystemText,
   noBeliefSystemText,
 } from './belief-system-copy';
 import {
@@ -48,14 +58,33 @@ const _selectHistory = (
   state: ReturnType<typeof checkInHistoryStore.getSnapshot>,
 ) => state.context.entries;
 
+function recommendationsForSelection({
+  history,
+  selection,
+  statements,
+}: {
+  history: readonly CheckIn[];
+  selection: EmotionSelection | null;
+  statements: readonly BeliefStatement[];
+}) {
+  if (!selection) return [];
+  return recommendedBeliefSystemIds({
+    emotionId: selection.emotionId,
+    history,
+    statements,
+  });
+}
+
 function BeliefSystemOption({
   disabled,
   id,
   selected,
+  statements,
 }: {
   disabled: boolean;
   id: BeliefSystemId | null;
   selected: boolean;
+  statements: readonly BeliefStatement[];
 }) {
   const actor = useAppNavigationActor();
   const _select = () => actor.send({
@@ -77,7 +106,7 @@ function BeliefSystemOption({
         {selected ? <View style={styles.radioDot} /> : null}
       </View>
       <Text style={styles.suggestionText}>
-        {id ? beliefSystemText(id) : noBeliefSystemText()}
+        {id ? beliefSystemText({ id, statements }) : noBeliefSystemText()}
       </Text>
     </PressableScale>
   );
@@ -87,10 +116,12 @@ function BeliefSystemSuggestion({
   disabled,
   id,
   selected,
+  statements,
 }: {
   disabled: boolean;
   id: BeliefSystemId;
   selected: boolean;
+  statements: readonly BeliefStatement[];
 }) {
   const actor = useAppNavigationActor();
   const _toggle = () => actor.send({
@@ -110,7 +141,7 @@ function BeliefSystemSuggestion({
       <View style={[styles.radio, selected ? styles.radioSelected : null]}>
         {selected ? <View style={styles.radioDot} /> : null}
       </View>
-      <Text style={styles.suggestionText}>{beliefSystemText(id)}</Text>
+      <Text style={styles.suggestionText}>{beliefSystemText({ id, statements })}</Text>
     </PressableScale>
   );
 }
@@ -286,18 +317,27 @@ function BeliefSystemStep() {
   const history = useStoreSelector(checkInHistoryStore, _selectHistory);
   const selection = snapshot.context.selection;
   const selectedId = snapshot.context.beliefSystemId;
-  const recommendations = selection
-    ? recommendedBeliefSystemIds({ emotionId: selection.emotionId, history })
-    : [];
+  const statements = snapshot.context.beliefStatements;
+  const recommendations = recommendationsForSelection({
+    history,
+    selection,
+    statements,
+  });
   const initialSuggestions = recommendations.slice(0, 3);
   const quickSuggestions = selectedId && !initialSuggestions.includes(selectedId)
     ? [selectedId, ...initialSuggestions.slice(0, 2)]
     : initialSuggestions;
   const attaching = snapshot.matches(CHECK_IN_STATES.ATTACHING_BELIEF_SYSTEM);
   const failed = snapshot.matches(CHECK_IN_STATES.BELIEF_SYSTEM_FAILURE);
+  const guidingStatement = selectedId
+    ? guidingBeliefSystemText({ id: selectedId, statements })
+    : undefined;
 
   const _back = () => actor.send({ type: CHECK_IN_EVENTS.BELIEF_SYSTEM_BACK_REQUESTED });
   const _browse = () => actor.send({ type: CHECK_IN_EVENTS.BELIEF_SYSTEM_CATALOG_REQUESTED });
+  const _guide = () => actor.send({
+    type: CHECK_IN_EVENTS.GUIDING_BELIEF_SYSTEM_REQUESTED,
+  });
   const _finish = () => actor.send({
     type: failed ? CHECK_IN_EVENTS.RETRIED : CHECK_IN_EVENTS.CONFIRMED,
   });
@@ -352,9 +392,37 @@ function BeliefSystemStep() {
                   id={id}
                   key={id}
                   selected={selectedId === id}
+                  statements={statements}
                 />
               ))}
             </View>
+            {selectedId ? (
+              <PressableScale
+                accessibilityRole="button"
+                disabled={attaching}
+                onPress={_guide}
+                style={styles.guidingButton}
+                testID="guiding-belief-edit"
+              >
+                <View style={styles.browseCopy}>
+                  <Text style={styles.browseTitle}>
+                    {guidingStatement
+                      ? <fbt desc="Button editing a positive guiding belief">Edit guiding belief</fbt>
+                      : <fbt desc="Button turning a harmful core belief into a positive guiding belief">Formulate a guiding belief</fbt>}
+                  </Text>
+                  {guidingStatement ? (
+                    <Text style={styles.guidingPreview}>{guidingStatement}</Text>
+                  ) : (
+                    <Text style={styles.browseHelp}>
+                      <fbt desc="Description below the button for formulating a positive guiding belief">
+                        Give this belief a compassionate direction.
+                      </fbt>
+                    </Text>
+                  )}
+                </View>
+                <Text style={styles.chevron}>›</Text>
+              </PressableScale>
+            ) : null}
             <PressableScale
               accessibilityRole="button"
               disabled={attaching}
@@ -425,10 +493,16 @@ function BeliefSystemCatalogStep() {
   const snapshot = useSelector(actor, _selectSnapshot);
   const history = useStoreSelector(checkInHistoryStore, _selectHistory);
   const selection = snapshot.context.selection;
-  const recommendations = selection
-    ? recommendedBeliefSystemIds({ emotionId: selection.emotionId, history })
-    : [];
+  const statements = snapshot.context.beliefStatements;
+  const recommendations = recommendationsForSelection({
+    history,
+    selection,
+    statements,
+  });
   const _close = () => actor.send({ type: CHECK_IN_EVENTS.BELIEF_SYSTEM_CATALOG_CLOSED });
+  const _create = () => actor.send({
+    type: CHECK_IN_EVENTS.CUSTOM_BELIEF_SYSTEM_REQUESTED,
+  });
 
   if (!selection) return null;
 
@@ -462,11 +536,30 @@ function BeliefSystemCatalogStep() {
               </fbt>
             </Text>
           </View>
+          <PressableScale
+            accessibilityRole="button"
+            onPress={_create}
+            style={styles.createBeliefButton}
+            testID="create-custom-belief"
+          >
+            <View style={styles.browseCopy}>
+              <Text style={styles.createBeliefTitle}>
+                <fbt desc="Button for adding a personal core belief">Add your own core belief</fbt>
+              </Text>
+              <Text style={styles.browseHelp}>
+                <fbt desc="Description below the button for adding a personal core belief">
+                  Write it in your own words.
+                </fbt>
+              </Text>
+            </View>
+            <Text style={styles.chevron}>+</Text>
+          </PressableScale>
           <View accessibilityRole="radiogroup" style={styles.catalogList}>
             <BeliefSystemOption
               disabled={false}
               id={null}
               selected={snapshot.context.beliefSystemId === null}
+              statements={statements}
             />
             {recommendations.map((id) => (
               <BeliefSystemOption
@@ -474,10 +567,202 @@ function BeliefSystemCatalogStep() {
                 id={id}
                 key={id}
                 selected={snapshot.context.beliefSystemId === id}
+                statements={statements}
               />
             ))}
           </View>
         </ScrollView>
+      </SafeAreaView>
+    </View>
+  );
+}
+
+function BeliefEditorHeader({ custom }: { custom: boolean }) {
+  return (
+    <View style={styles.catalogHeader}>
+      <Text style={styles.eyebrow}>
+        {custom
+          ? <fbt desc="Label above the personal core belief editor">YOUR CORE BELIEF</fbt>
+          : <fbt desc="Label above the positive guiding belief editor">GUIDING BELIEF</fbt>}
+      </Text>
+      <Text style={styles.title}>
+        {custom
+          ? <fbt desc="Title for adding a personal core belief">Add your own core belief.</fbt>
+          : <fbt desc="Title for turning a harmful core belief into a positive guiding belief">Give this belief a new direction.</fbt>}
+      </Text>
+      <Text style={styles.copy}>
+        {custom
+          ? <fbt desc="Instructions for adding a personal harmful and optional positive guiding belief">
+              Name the belief that causes suffering. You can also formulate a positive guiding belief now.
+            </fbt>
+          : <fbt desc="Instructions for formulating a positive guiding belief">
+              Write a compassionate sentence that you want to live with.
+            </fbt>}
+      </Text>
+    </View>
+  );
+}
+
+function BeliefEditorFields({
+  beliefStatementDraft,
+  custom,
+  guidingBeliefStatementDraft,
+  onBeliefChanged,
+  onGuidingChanged,
+  saving,
+  selectedText,
+}: {
+  beliefStatementDraft: string;
+  custom: boolean;
+  guidingBeliefStatementDraft: string;
+  onBeliefChanged: (statement: string) => void;
+  onGuidingChanged: (statement: string) => void;
+  saving: boolean;
+  selectedText: string;
+}) {
+  return (
+    <>
+      {custom ? (
+        <View style={styles.editorField}>
+          <Text style={styles.editorLabel}>
+            <fbt desc="Label for a personal harmful core belief">Core belief</fbt>
+          </Text>
+          <TextInput
+            accessibilityLabel={customBeliefAccessibilityLabel()}
+            editable={!saving}
+            maxLength={MAX_BELIEF_STATEMENT_LENGTH}
+            multiline
+            onChangeText={onBeliefChanged}
+            placeholder={customBeliefPlaceholder()}
+            placeholderTextColor="#A39A8F"
+            style={styles.beliefInput}
+            testID="belief-system-draft"
+            value={beliefStatementDraft}
+          />
+        </View>
+      ) : (
+        <View style={styles.sourceBelief}>
+          <Text style={styles.editorLabel}>
+            <fbt desc="Label above the harmful belief being reformulated">Core belief</fbt>
+          </Text>
+          <Text style={styles.sourceBeliefText}>{selectedText}</Text>
+        </View>
+      )}
+      <View style={styles.editorField}>
+        <Text style={styles.editorLabel}>
+          {custom
+            ? <fbt desc="Label for an optional positive guiding belief">Guiding belief · optional</fbt>
+            : <fbt desc="Label for a positive guiding belief">Guiding belief</fbt>}
+        </Text>
+        <TextInput
+          accessibilityLabel={guidingBeliefAccessibilityLabel()}
+          editable={!saving}
+          maxLength={MAX_BELIEF_STATEMENT_LENGTH}
+          multiline
+          onChangeText={onGuidingChanged}
+          placeholder={guidingBeliefPlaceholder()}
+          placeholderTextColor="#A39A8F"
+          style={styles.beliefInput}
+          testID="guiding-belief-draft"
+          value={guidingBeliefStatementDraft}
+        />
+      </View>
+    </>
+  );
+}
+
+function BeliefSystemEditorStep() {
+  const actor = useAppNavigationActor();
+  const snapshot = useSelector(actor, _selectSnapshot);
+  const mode = snapshot.context.beliefStatementEditorMode;
+  const selectedId = snapshot.context.beliefSystemId;
+  const statements = snapshot.context.beliefStatements;
+  const saving = snapshot.matches(CHECK_IN_STATES.PERSISTING_BELIEF_STATEMENT);
+  const failed = snapshot.matches(CHECK_IN_STATES.BELIEF_STATEMENT_FAILURE);
+  const custom = mode === 'custom';
+  const harmfulReady = snapshot.context.beliefStatementDraft.trim().length > 0;
+  const guidingReady = snapshot.context.guidingBeliefStatementDraft.trim().length > 0;
+  const canSave = custom ? harmfulReady : guidingReady;
+  const selectedText = selectedId
+    ? beliefSystemText({ id: selectedId, statements })
+    : '';
+
+  const _beliefChanged = (statement: string) => actor.send({
+    type: CHECK_IN_EVENTS.BELIEF_SYSTEM_DRAFT_CHANGED,
+    statement,
+  });
+  const _guidingChanged = (statement: string) => actor.send({
+    type: CHECK_IN_EVENTS.GUIDING_BELIEF_SYSTEM_DRAFT_CHANGED,
+    statement,
+  });
+  const _cancel = () => actor.send({
+    type: CHECK_IN_EVENTS.BELIEF_SYSTEM_EDITOR_CANCELLED,
+  });
+  const _save = () => actor.send({
+    type: failed ? CHECK_IN_EVENTS.RETRIED : CHECK_IN_EVENTS.BELIEF_SYSTEM_EDITOR_CONFIRMED,
+  });
+
+  if (!mode) return null;
+
+  return (
+    <View style={styles.page} testID="belief-system-editor">
+      <SafeAreaView style={styles.safeArea}>
+        <KeyboardAwareScrollView
+          bottomOffset={REFLECTION_KEYBOARD_BOTTOM_OFFSET}
+          contentContainerStyle={styles.content}
+          keyboardDismissMode="interactive"
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
+        >
+          <BeliefEditorHeader custom={custom} />
+          <View style={styles.card}>
+            <BeliefEditorFields
+              beliefStatementDraft={snapshot.context.beliefStatementDraft}
+              custom={custom}
+              guidingBeliefStatementDraft={snapshot.context.guidingBeliefStatementDraft}
+              onBeliefChanged={_beliefChanged}
+              onGuidingChanged={_guidingChanged}
+              saving={saving}
+              selectedText={selectedText}
+            />
+            {failed ? (
+              <Text style={styles.error}>
+                <fbt desc="Error shown when a personal or guiding belief cannot be saved">
+                  Your belief could not be saved.
+                </fbt>
+              </Text>
+            ) : null}
+            <View style={styles.actions}>
+              <PressableScale
+                accessibilityRole="button"
+                disabled={saving}
+                onPress={_cancel}
+                style={styles.secondaryButton}
+                testID="belief-system-editor-cancel"
+              >
+                <Text style={styles.secondaryText}>
+                  <fbt desc="Button cancelling personal or guiding belief editing">Cancel</fbt>
+                </Text>
+              </PressableScale>
+              <PressableScale
+                accessibilityRole="button"
+                accessibilityState={{ disabled: saving || !canSave }}
+                disabled={saving || !canSave}
+                onPress={_save}
+                style={styles.primaryButton}
+                testID="belief-system-editor-save"
+              >
+                {saving ? <ActivityIndicator color="#FFFFFF" /> : (
+                  <Text style={styles.primaryText}>
+                    {failed
+                      ? <fbt desc="Button retrying belief persistence">Try again</fbt>
+                      : <fbt desc="Button saving a personal or guiding belief">Save belief</fbt>}
+                  </Text>
+                )}
+              </PressableScale>
+            </View>
+          </View>
+        </KeyboardAwareScrollView>
       </SafeAreaView>
     </View>
   );
@@ -490,6 +775,13 @@ export function ReflectionScreen() {
   if (snapshot.matches(NAVIGATION_STATES.TABS)) return null;
   if (snapshot.matches(CHECK_IN_STATES.BELIEF_SYSTEM_CATALOG)) {
     return <BeliefSystemCatalogStep />;
+  }
+  if (
+    snapshot.matches(CHECK_IN_STATES.BELIEF_SYSTEM_EDITOR)
+    || snapshot.matches(CHECK_IN_STATES.PERSISTING_BELIEF_STATEMENT)
+    || snapshot.matches(CHECK_IN_STATES.BELIEF_STATEMENT_FAILURE)
+  ) {
+    return <BeliefSystemEditorStep />;
   }
   if (
     snapshot.matches(CHECK_IN_STATES.BELIEF_SYSTEM)
@@ -620,9 +912,43 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     paddingVertical: 10,
   },
+  guidingButton: {
+    minHeight: 58,
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 14,
+    borderRadius: 16,
+    borderCurve: 'continuous',
+    borderWidth: 1,
+    borderColor: palette.moss,
+    backgroundColor: '#EDF0EB',
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+  },
+  createBeliefButton: {
+    minHeight: 64,
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 22,
+    borderRadius: 18,
+    borderCurve: 'continuous',
+    borderWidth: 1,
+    borderColor: palette.moss,
+    backgroundColor: '#EDF0EB',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+  },
   browseCopy: { flex: 1 },
   browseTitle: { fontFamily: type.semibold, color: palette.ink, fontSize: 14 },
+  createBeliefTitle: { fontFamily: type.semibold, color: palette.moss, fontSize: 15 },
   browseHelp: { fontFamily: type.regular, color: palette.inkMuted, fontSize: 12, marginTop: 2 },
+  guidingPreview: {
+    fontFamily: type.regular,
+    color: palette.moss,
+    fontSize: 13,
+    lineHeight: 19,
+    marginTop: 4,
+  },
   chevron: { fontFamily: type.regular, color: palette.inkMuted, fontSize: 28, lineHeight: 30 },
   catalogBack: {
     alignSelf: 'flex-start',
@@ -631,6 +957,39 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   catalogList: { gap: 8, paddingTop: 24 },
+  editorField: { gap: 8, paddingBottom: 18 },
+  editorLabel: {
+    fontFamily: type.semibold,
+    color: palette.inkMuted,
+    fontSize: 11,
+    letterSpacing: 0.8,
+  },
+  beliefInput: {
+    minHeight: 112,
+    borderRadius: 18,
+    borderCurve: 'continuous',
+    backgroundColor: '#F0EAE0',
+    padding: 16,
+    fontFamily: type.regular,
+    color: palette.ink,
+    fontSize: 15,
+    lineHeight: 22,
+    textAlignVertical: 'top',
+  },
+  sourceBelief: {
+    gap: 8,
+    marginBottom: 18,
+    padding: 16,
+    borderRadius: 18,
+    borderCurve: 'continuous',
+    backgroundColor: '#F0EAE0',
+  },
+  sourceBeliefText: {
+    fontFamily: type.medium,
+    color: palette.ink,
+    fontSize: 15,
+    lineHeight: 22,
+  },
   error: { fontFamily: type.medium, color: palette.danger, fontSize: 12, marginTop: 10 },
   deleteSection: {
     marginTop: 18,
