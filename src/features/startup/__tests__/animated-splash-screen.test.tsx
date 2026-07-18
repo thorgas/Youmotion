@@ -2,9 +2,8 @@ import { act, fireEvent, render } from '@testing-library/react-native';
 import { Text } from 'react-native';
 
 import {
-  SPLASH_LOGO_HOLD_DURATION,
-  SPLASH_LOGO_REVEAL_DURATION,
   SPLASH_OVERLAY_FADE_DURATION,
+  SPLASH_OVERLAY_VISIBLE_DURATION,
 } from '@/constants';
 import { AnimatedSplashScreen } from '../ui/animated-splash-screen';
 
@@ -40,9 +39,7 @@ describe('animated splash screen', () => {
     await fireEvent(screen.getByTestId('animated-splash-root'), 'layout');
     await act(() => {
       jest.advanceTimersByTime(
-        SPLASH_LOGO_REVEAL_DURATION
-        + SPLASH_LOGO_HOLD_DURATION
-        + SPLASH_OVERLAY_FADE_DURATION,
+        SPLASH_OVERLAY_VISIBLE_DURATION + SPLASH_OVERLAY_FADE_DURATION,
       );
     });
 
