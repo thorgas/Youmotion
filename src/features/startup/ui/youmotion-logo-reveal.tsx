@@ -67,7 +67,7 @@ export function YoumotionLogoReveal({
       if (reduceMotion) return 1;
       return withTiming(1, {
         duration: SPLASH_LOGO_REVEAL_DURATION,
-        easing: Easing.bezier(0.3, 0, 0.2, 1),
+        easing: Easing.bezier(0.45, 0, 0.55, 1),
         reduceMotion: ReduceMotion.System,
       });
     },

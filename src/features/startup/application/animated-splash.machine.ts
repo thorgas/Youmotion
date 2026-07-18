@@ -3,9 +3,8 @@ import { setup } from 'xstate';
 
 import {
   SPLASH_EVENTS,
-  SPLASH_LOGO_HOLD_DURATION,
-  SPLASH_LOGO_REVEAL_DURATION,
   SPLASH_OVERLAY_FADE_DURATION,
+  SPLASH_OVERLAY_VISIBLE_DURATION,
   SPLASH_STATES,
 } from '@/constants';
 import {
@@ -82,7 +81,7 @@ export const animatedSplashMachine = setup({
     },
     [SPLASH_STATES.REVEALING]: {
       after: {
-        [SPLASH_LOGO_REVEAL_DURATION + SPLASH_LOGO_HOLD_DURATION]: {
+        [SPLASH_OVERLAY_VISIBLE_DURATION]: {
           target: SPLASH_STATES.FADING,
         },
       },

@@ -3,9 +3,9 @@ import { createActor } from 'xstate';
 
 import {
   SPLASH_EVENTS,
-  SPLASH_LOGO_HOLD_DURATION,
   SPLASH_LOGO_REVEAL_DURATION,
   SPLASH_OVERLAY_FADE_DURATION,
+  SPLASH_OVERLAY_VISIBLE_DURATION,
   SPLASH_STATES,
 } from '@/constants';
 import { animatedSplashMachine } from '../application/animated-splash.machine';
@@ -35,9 +35,8 @@ describe('animated splash model', () => {
     expect(SplashScreen.hide).toHaveBeenCalledTimes(1);
     expect(actor.getSnapshot().matches(SPLASH_STATES.REVEALING)).toBe(true);
 
-    jest.advanceTimersByTime(
-      SPLASH_LOGO_REVEAL_DURATION + SPLASH_LOGO_HOLD_DURATION,
-    );
+    expect(SPLASH_OVERLAY_VISIBLE_DURATION).toBeLessThan(SPLASH_LOGO_REVEAL_DURATION);
+    jest.advanceTimersByTime(SPLASH_OVERLAY_VISIBLE_DURATION);
     expect(actor.getSnapshot().matches(SPLASH_STATES.FADING)).toBe(true);
 
     jest.advanceTimersByTime(SPLASH_OVERLAY_FADE_DURATION);
