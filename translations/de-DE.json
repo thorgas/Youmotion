@@ -34,6 +34,83 @@
       ],
       "types": []
     },
+    "1+IK8bIvo8qB1B6bmamwEg==": {
+      "description": "App release information title",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "App-Informationen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "P5GdnTgANhI/B4dYbOujRQ==": {
+      "description": "App version information label",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "App",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "GJWanAG3903qlYQ/kd0EcQ==": {
+      "description": "Unavailable app version value",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Nicht verfügbar",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "01x5+m1Vhvtg8wKv8VmcEA==": {
+      "description": "EAS Update channel information label",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Kanal",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "L8hHidEByOfyKhesu1T0yQ==": {
+      "description": "Unavailable EAS Update channel value",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Nicht verfügbar",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "VNQNlXtbLCH2mgl6ZzA5iQ==": {
+      "description": "Git commit information label",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Git",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "ranPnf5oWBvYy5fYWu7B4g==": {
+      "description": "Unavailable Git commit value",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Nicht verfügbar",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
     "iLQJz1sNjAOCUZM2Ylbeog==": {
       "description": "Negative core belief about always functioning",
       "tokens": [],

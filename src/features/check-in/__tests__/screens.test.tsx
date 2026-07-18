@@ -36,6 +36,20 @@ jest.mock('@/navigation/app-navigation.provider', () => ({
   useAppNavigationActor: () => mockActor,
 }));
 
+jest.mock('expo-constants', () => ({
+  __esModule: true,
+  default: {
+    expoConfig: {
+      extra: { gitCommit: 'f4610f7c58dcae3d2f552e2c6651c2a9a62884e9' },
+      version: '1.0.0',
+    },
+  },
+}));
+
+jest.mock('expo-updates', () => ({
+  channel: 'development',
+}));
+
 jest.mock('../infrastructure/surrealdb.database', () => ({
   getDatabase: jest.fn(() => Promise.resolve(mockSurrealDatabase)),
 }));
@@ -339,8 +353,16 @@ describe('check-in screens', () => {
 
     const settings = await _renderLocalized(<SettingsScreen />);
     expect(settings.getByText('Private by design')).toBeTruthy();
+    expect(settings.getByText('App information')).toBeTruthy();
+    expect(settings.getByText('App')).toBeTruthy();
+    expect(settings.getByText('Channel')).toBeTruthy();
+    expect(settings.getByText('Git')).toBeTruthy();
+    expect(settings.getByText('1.0.0')).toBeTruthy();
+    expect(settings.getByText('development')).toBeTruthy();
+    expect(settings.getByText('f4610f7')).toBeTruthy();
     await fireEvent.press(settings.getByText('German'));
     await waitFor(() => expect(settings.getByText('Von Anfang an privat')).toBeTruthy());
+    expect(settings.getByText('App-Informationen')).toBeTruthy();
     await fireEvent.press(settings.getByText('Englisch'));
     await waitFor(() => expect(settings.getByText('Private by design')).toBeTruthy());
   });
