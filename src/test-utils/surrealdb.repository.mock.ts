@@ -1,3 +1,8 @@
+import {
+  APP_LOCALES,
+  EMOTION_LABEL_MODES,
+} from '@/constants';
+
 type QueryResult = readonly [{
   statementIndex: number;
   value: unknown;
@@ -16,6 +21,15 @@ async function defaultQuery(surql: string): Promise<QueryResult> {
     const cause = nextDeleteFailure;
     nextDeleteFailure = undefined;
     throw cause;
+  }
+  if (surql.startsWith('SELECT locale, emotionLabelMode')) {
+    return [{
+      statementIndex: 0,
+      value: [{
+        locale: APP_LOCALES.ENGLISH,
+        emotionLabelMode: EMOTION_LABEL_MODES.EMOJI,
+      }],
+    }];
   }
   return [{ statementIndex: 0, value: surql.startsWith('SELECT') ? [] : null }];
 }

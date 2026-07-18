@@ -21,7 +21,12 @@ jest.mock('expo-haptics', () => ({
 }));
 
 jest.mock('expo-localization', () => ({
-  getLocales: jest.fn(() => [{ languageTag: 'en-US' }]),
+  getLocales: jest.fn(() => [{ languageCode: 'en', languageTag: 'en-US' }]),
+}));
+
+jest.mock('expo-splash-screen', () => ({
+  hide: jest.fn(),
+  preventAutoHideAsync: jest.fn(() => Promise.resolve(true)),
 }));
 
 jest.mock('react-native-reanimated', () => {
@@ -32,7 +37,9 @@ jest.mock('react-native-reanimated', () => {
     default: { Text, View, createAnimatedComponent: (component) => component },
     createAnimatedComponent: (component) => component,
     Easing: { bezier: jest.fn(() => (value) => value) },
+    Extrapolation: { CLAMP: 'clamp' },
     interpolate: jest.fn((_value, _input, output) => output[0]),
+    ReduceMotion: { Always: 'always', Never: 'never', System: 'system' },
     useAnimatedProps: jest.fn((props) => props()),
     useAnimatedStyle: jest.fn((style) => style()),
     useDerivedValue: jest.fn((derive) => ({ value: derive() })),

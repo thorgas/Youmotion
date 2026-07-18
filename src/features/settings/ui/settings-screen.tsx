@@ -1,7 +1,5 @@
-import { useLocaleContext } from 'fbtee';
 import { useSelector } from '@xstate/store-react';
 import { PressableScale } from 'pressto';
-import { startTransition } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -12,16 +10,21 @@ import {
 } from '@/constants';
 import { palette, type } from '@/features/check-in/ui/theme';
 import { useAppNavigationActor } from '@/navigation/app-navigation.provider';
-import { emotionLabelModeStore } from '../application/emotion-label-mode.store';
+import { appSettingsStore } from '../application/app-settings.store';
 
-const _selectEmotionLabelMode = (state: ReturnType<typeof emotionLabelModeStore.getSnapshot>) => state.context.mode;
+const _selectSettings = (state: ReturnType<typeof appSettingsStore.getSnapshot>) => state.context;
 
 export function SettingsScreen() {
   const actor = useAppNavigationActor();
-  const { locale, localeChangeIsPending, setLocale } = useLocaleContext();
-  const emotionLabelMode = useSelector(emotionLabelModeStore, _selectEmotionLabelMode);
-  const _setEnglish = () => startTransition(() => setLocale(APP_LOCALES.ENGLISH));
-  const _setGerman = () => startTransition(() => setLocale(APP_LOCALES.GERMAN));
+  const { locale, emotionLabelMode } = useSelector(appSettingsStore, _selectSettings);
+  const _setEnglish = () => actor.send({
+    type: SETTINGS_EVENTS.LANGUAGE_CHANGED,
+    locale: APP_LOCALES.ENGLISH,
+  });
+  const _setGerman = () => actor.send({
+    type: SETTINGS_EVENTS.LANGUAGE_CHANGED,
+    locale: APP_LOCALES.GERMAN,
+  });
   const _showEmoji = () => actor.send({ type: SETTINGS_EVENTS.EMOTION_LABEL_MODE_CHANGED, mode: EMOTION_LABEL_MODES.EMOJI });
   const _showText = () => actor.send({ type: SETTINGS_EVENTS.EMOTION_LABEL_MODE_CHANGED, mode: EMOTION_LABEL_MODES.TEXT });
   const _showBoth = () => actor.send({ type: SETTINGS_EVENTS.EMOTION_LABEL_MODE_CHANGED, mode: EMOTION_LABEL_MODES.BOTH });
@@ -39,7 +42,6 @@ export function SettingsScreen() {
             <PressableScale
               accessibilityRole="button"
               accessibilityState={{ selected: locale === APP_LOCALES.ENGLISH }}
-              disabled={localeChangeIsPending}
               onPress={_setEnglish}
               style={[styles.languageButton, locale === APP_LOCALES.ENGLISH && styles.languageButtonSelected]}
               testID="language-english">
@@ -48,7 +50,6 @@ export function SettingsScreen() {
             <PressableScale
               accessibilityRole="button"
               accessibilityState={{ selected: locale === APP_LOCALES.GERMAN }}
-              disabled={localeChangeIsPending}
               onPress={_setGerman}
               style={[styles.languageButton, locale === APP_LOCALES.GERMAN && styles.languageButtonSelected]}
               testID="language-german">

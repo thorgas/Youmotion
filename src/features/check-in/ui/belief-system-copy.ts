@@ -79,6 +79,22 @@ const copyById = new Map<BeliefSystemId, Copy>([
     'I must never say no.',
     'Negative core belief about never saying no',
   ))],
+  [BELIEF_SYSTEM_IDS.LOVE_REQUIRES_SUCCESS, () => String(fbs(
+    'I am only loved when I am successful.',
+    'Negative core belief about success being required for love',
+  ))],
+  [BELIEF_SYSTEM_IDS.LOVE_MAKES_VULNERABLE, () => String(fbs(
+    'Love makes you weak or vulnerable.',
+    'Negative core belief about love causing weakness or vulnerability',
+  ))],
+  [BELIEF_SYSTEM_IDS.LOVE_REQUIRES_HELPING, () => String(fbs(
+    "If I don't help, I won't be loved.",
+    'Negative core belief about helping being required for love',
+  ))],
+  [BELIEF_SYSTEM_IDS.ANGER_LOOKS_STUPID, () => String(fbs(
+    'Being angry makes you look stupid.',
+    'Negative core belief about anger looking stupid',
+  ))],
 ]);
 
 const _fallback = () => String(fbs('Core belief', 'Fallback label for a core belief'));

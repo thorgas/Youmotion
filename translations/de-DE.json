@@ -1760,6 +1760,50 @@
         }
       ],
       "types": []
+    },
+    "YfHyq2SvxrWeODQQ1/eTQA==": {
+      "description": "Negative core belief about success being required for love",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Nur wenn ich erfolgreich bin werde ich geliebt.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "T6+PT06i9+8yRdl2pLu3EA==": {
+      "description": "Negative core belief about love causing weakness or vulnerability",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Liebe macht dich schwach/verletzlich.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "SNb9/QK88/BbhXA+OS3S4g==": {
+      "description": "Negative core belief about helping being required for love",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Wenn ich nicht helfe, werde ich nicht geliebt.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "/IqLBZUvRfmU9JfAvUYj7g==": {
+      "description": "Negative core belief about anger looking stupid",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Wütend zu sein lässt dich dumm aussehen.",
+          "variations": {}
+        }
+      ],
+      "types": []
     }
   }
 }

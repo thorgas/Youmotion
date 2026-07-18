@@ -4,6 +4,7 @@ import { Alert, StyleSheet } from 'react-native';
 import { createActor, type Actor } from 'xstate';
 
 import {
+  APP_LOCALES,
   CHECK_IN_EVENTS,
   CHECK_IN_STATES,
   EMOTION_LABEL_MODES,
@@ -27,7 +28,7 @@ import { HistoryScreen } from '../ui/history-screen';
 import { ReflectionScreen } from '../ui/reflection-screen';
 import { SuccessScreen } from '../ui/success-screen';
 import { SettingsScreen } from '@/features/settings/ui/settings-screen';
-import { emotionLabelModeStore } from '@/features/settings/application/emotion-label-mode.store';
+import { appSettingsStore } from '@/features/settings/application/app-settings.store';
 
 let mockActor: Actor<typeof appNavigationMachine>;
 
@@ -84,7 +85,12 @@ describe('check-in screens', () => {
   beforeEach(() => {
     resetSurrealDatabaseMock();
     checkInHistoryStore.trigger.hydrated({ entries: [] });
-    emotionLabelModeStore.trigger.hydrated({ mode: EMOTION_LABEL_MODES.EMOJI });
+    appSettingsStore.trigger.hydrated({
+      settings: {
+        locale: APP_LOCALES.ENGLISH,
+        emotionLabelMode: EMOTION_LABEL_MODES.EMOJI,
+      },
+    });
     mockActor = createActor(appNavigationMachine).start();
   });
 
@@ -246,10 +252,14 @@ describe('check-in screens', () => {
     );
     expect(screen.getByTestId('emotion-star').props['accessibilityValue']).toEqual({ text: EMOTION_LABEL_MODES.EMOJI });
 
-    await act(() => emotionLabelModeStore.trigger.changed({ mode: EMOTION_LABEL_MODES.TEXT }));
+    await act(() => appSettingsStore.trigger.emotionLabelModeChanged({
+      mode: EMOTION_LABEL_MODES.TEXT,
+    }));
     expect(screen.getByTestId('emotion-star').props['accessibilityValue']).toEqual({ text: EMOTION_LABEL_MODES.TEXT });
 
-    await act(() => emotionLabelModeStore.trigger.changed({ mode: EMOTION_LABEL_MODES.BOTH }));
+    await act(() => appSettingsStore.trigger.emotionLabelModeChanged({
+      mode: EMOTION_LABEL_MODES.BOTH,
+    }));
     expect(screen.getByTestId('emotion-star').props['accessibilityValue']).toEqual({ text: EMOTION_LABEL_MODES.BOTH });
   });
 

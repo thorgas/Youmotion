@@ -29,6 +29,10 @@ export const BELIEF_SYSTEM_IDS = Object.freeze({
   MUST_STAY_IN_CONTROL: literal('must-stay-in-control'),
   MUST_NOT_BE_CENTER: literal('must-not-be-center'),
   MUST_NOT_SAY_NO: literal('must-not-say-no'),
+  LOVE_REQUIRES_SUCCESS: literal('love-requires-success'),
+  LOVE_MAKES_VULNERABLE: literal('love-makes-vulnerable'),
+  LOVE_REQUIRES_HELPING: literal('love-requires-helping'),
+  ANGER_LOOKS_STUPID: literal('anger-looks-stupid'),
 });
 
 export const CHECK_IN_EVENTS = Object.freeze({
@@ -76,10 +80,11 @@ export const NAVIGATION_EVENTS = Object.freeze({
 });
 
 export const SETTINGS_EVENTS = Object.freeze({
+  LANGUAGE_CHANGED: literal('settings.languageChanged'),
   EMOTION_LABEL_MODE_CHANGED: literal('settings.emotionLabelModeChanged'),
-  EMOTION_LABEL_MODE_HYDRATED: literal('settings.emotionLabelModeHydrated'),
-  EMOTION_LABEL_MODE_HYDRATION_FAILED: literal('settings.emotionLabelModeHydrationFailed'),
-  EMOTION_LABEL_MODE_PERSISTENCE_FAILED: literal('settings.emotionLabelModePersistenceFailed'),
+  APP_SETTINGS_HYDRATED: literal('settings.appSettingsHydrated'),
+  APP_SETTINGS_HYDRATION_FAILED: literal('settings.appSettingsHydrationFailed'),
+  APP_SETTINGS_PERSISTENCE_FAILED: literal('settings.appSettingsPersistenceFailed'),
 });
 
 export const EMOTION_LABEL_MODES = Object.freeze({
@@ -94,6 +99,22 @@ export const NAVIGATION_STATES = Object.freeze({
   HISTORY: literal('history'),
   SETTINGS: literal('settings'),
   REFLECTION: literal('reflection'),
+});
+
+export const SPLASH_EVENTS = Object.freeze({
+  LAYOUT_READY: literal('splash.layoutReady'),
+  LOGO_READY: literal('splash.logoReady'),
+  REDUCED_MOTION_LAYOUT_READY: literal('splash.reducedMotionLayoutReady'),
+});
+
+export const SPLASH_STATES = Object.freeze({
+  WAITING_FOR_LAYOUT: literal('waitingForLayout'),
+  WAITING_FOR_LOGO: literal('waitingForLogo'),
+  WAITING_FOR_REDUCED_MOTION_LOGO: literal('waitingForReducedMotionLogo'),
+  WAITING_FOR_LAYOUT_AFTER_LOGO: literal('waitingForLayoutAfterLogo'),
+  REVEALING: literal('revealing'),
+  FADING: literal('fading'),
+  COMPLETE: literal('complete'),
 });
 
 export const APP_ROUTES = Object.freeze({
@@ -123,6 +144,8 @@ export const SURREAL_DATABASE_NAME = 'local';
 export const SURREAL_DATABASE_ENDPOINT_PREFIX = 'surrealkv://';
 export const FILE_URI_PREFIX = 'file://';
 export const CHECK_IN_TABLE = 'check_in';
+export const APP_SETTINGS_TABLE = 'app_settings';
+export const APP_SETTINGS_RECORD_ID = 'current';
 export const MAX_CHECK_IN_HISTORY = 30;
 export const MAX_NOTE_LENGTH = 240;
 export const CHECK_IN_FAILURE_MESSAGE = 'Your check-in could not be saved.';
@@ -137,3 +160,8 @@ export const REFLECTION_KEYBOARD_BOTTOM_OFFSET = 82;
 export const EMOTION_TEXT_REVEAL_DURATION = 620;
 export const EMOTION_TEXT_REVEAL_STAGGER = 150;
 export const EMOTION_LABEL_TRANSITION_DURATION = 180;
+export const SPLASH_BACKGROUND_COLOR = '#F4F0E8';
+export const SPLASH_LOGO_SIZE = 156;
+export const SPLASH_LOGO_REVEAL_DURATION = 620;
+export const SPLASH_LOGO_HOLD_DURATION = 220;
+export const SPLASH_OVERLAY_FADE_DURATION = 180;

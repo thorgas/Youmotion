@@ -34,12 +34,14 @@ import {
   persistCheckIn,
 } from '@/features/check-in/infrastructure/check-in.repository';
 import { checkInHistoryStore } from '@/features/check-in/application/check-in-history.store';
-import { emotionLabelModeStore } from '@/features/settings/application/emotion-label-mode.store';
+import { appSettingsStore } from '@/features/settings/application/app-settings.store';
+import { AppLocaleSchema } from '@/features/settings/domain/app-locale';
+import { AppSettingsSchema } from '@/features/settings/domain/app-settings';
 import { EmotionLabelModeSchema } from '@/features/settings/domain/emotion-label-mode';
 import {
-  loadEmotionLabelMode,
-  persistEmotionLabelMode,
-} from '@/features/settings/infrastructure/emotion-label-mode.repository';
+  loadAppSettings,
+  persistAppSettings,
+} from '@/features/settings/infrastructure/app-settings.repository';
 
 const AppContextSchema = Schema.Struct({
   selection: Schema.NullOr(EmotionSelectionSchema),
@@ -120,13 +122,16 @@ export const appNavigationMachine = setup({
       [SETTINGS_EVENTS.EMOTION_LABEL_MODE_CHANGED]: Schema.standardSchemaV1(
         Schema.Struct({ mode: EmotionLabelModeSchema }),
       ),
-      [SETTINGS_EVENTS.EMOTION_LABEL_MODE_HYDRATED]: Schema.standardSchemaV1(
-        Schema.Struct({ mode: EmotionLabelModeSchema }),
+      [SETTINGS_EVENTS.LANGUAGE_CHANGED]: Schema.standardSchemaV1(
+        Schema.Struct({ locale: AppLocaleSchema }),
       ),
-      [SETTINGS_EVENTS.EMOTION_LABEL_MODE_HYDRATION_FAILED]: Schema.standardSchemaV1(
+      [SETTINGS_EVENTS.APP_SETTINGS_HYDRATED]: Schema.standardSchemaV1(
+        Schema.Struct({ settings: AppSettingsSchema }),
+      ),
+      [SETTINGS_EVENTS.APP_SETTINGS_HYDRATION_FAILED]: Schema.standardSchemaV1(
         Schema.Struct({ message: Schema.String }),
       ),
-      [SETTINGS_EVENTS.EMOTION_LABEL_MODE_PERSISTENCE_FAILED]: Schema.standardSchemaV1(
+      [SETTINGS_EVENTS.APP_SETTINGS_PERSISTENCE_FAILED]: Schema.standardSchemaV1(
         Schema.Struct({ message: Schema.String }),
       ),
     },
@@ -151,10 +156,10 @@ export const appNavigationMachine = setup({
           message: CHECK_IN_FAILURE_MESSAGE,
         }),
       );
-      void Effect.runPromise(loadEmotionLabelMode).then(
-        (mode) => self.send({ type: SETTINGS_EVENTS.EMOTION_LABEL_MODE_HYDRATED, mode }),
+      void Effect.runPromise(loadAppSettings).then(
+        (settings) => self.send({ type: SETTINGS_EVENTS.APP_SETTINGS_HYDRATED, settings }),
         () => self.send({
-          type: SETTINGS_EVENTS.EMOTION_LABEL_MODE_HYDRATION_FAILED,
+          type: SETTINGS_EVENTS.APP_SETTINGS_HYDRATION_FAILED,
           message: SETTINGS_FAILURE_MESSAGE,
         }),
       );
@@ -197,22 +202,39 @@ export const appNavigationMachine = setup({
       enq(() => checkInHistoryStore.trigger.deletionFailed({ message: event.message }));
     },
     [SETTINGS_EVENTS.EMOTION_LABEL_MODE_CHANGED]: ({ event, self }, enq) => {
-      enq(() => emotionLabelModeStore.trigger.changed({ mode: event.mode }));
       enq(() => {
-        void Effect.runPromise(persistEmotionLabelMode(event.mode)).catch(() => self.send({
-          type: SETTINGS_EVENTS.EMOTION_LABEL_MODE_PERSISTENCE_FAILED,
+        appSettingsStore.trigger.emotionLabelModeChanged({ mode: event.mode });
+        const { locale } = appSettingsStore.getSnapshot().context;
+        void Effect.runPromise(persistAppSettings({
+          locale,
+          emotionLabelMode: event.mode,
+        })).catch(() => self.send({
+          type: SETTINGS_EVENTS.APP_SETTINGS_PERSISTENCE_FAILED,
           message: SETTINGS_FAILURE_MESSAGE,
         }));
       });
     },
-    [SETTINGS_EVENTS.EMOTION_LABEL_MODE_HYDRATED]: ({ event }, enq) => {
-      enq(() => emotionLabelModeStore.trigger.hydrated({ mode: event.mode }));
+    [SETTINGS_EVENTS.LANGUAGE_CHANGED]: ({ event, self }, enq) => {
+      enq(() => {
+        appSettingsStore.trigger.languageChanged({ locale: event.locale });
+        const { emotionLabelMode } = appSettingsStore.getSnapshot().context;
+        void Effect.runPromise(persistAppSettings({
+          locale: event.locale,
+          emotionLabelMode,
+        })).catch(() => self.send({
+          type: SETTINGS_EVENTS.APP_SETTINGS_PERSISTENCE_FAILED,
+          message: SETTINGS_FAILURE_MESSAGE,
+        }));
+      });
     },
-    [SETTINGS_EVENTS.EMOTION_LABEL_MODE_HYDRATION_FAILED]: ({ event }, enq) => {
-      enq(() => emotionLabelModeStore.trigger.hydrationFailed({ message: event.message }));
+    [SETTINGS_EVENTS.APP_SETTINGS_HYDRATED]: ({ event }, enq) => {
+      enq(() => appSettingsStore.trigger.hydrated({ settings: event.settings }));
     },
-    [SETTINGS_EVENTS.EMOTION_LABEL_MODE_PERSISTENCE_FAILED]: ({ event }, enq) => {
-      enq(() => emotionLabelModeStore.trigger.persistenceFailed({ message: event.message }));
+    [SETTINGS_EVENTS.APP_SETTINGS_HYDRATION_FAILED]: ({ event }, enq) => {
+      enq(() => appSettingsStore.trigger.hydrationFailed({ message: event.message }));
+    },
+    [SETTINGS_EVENTS.APP_SETTINGS_PERSISTENCE_FAILED]: ({ event }, enq) => {
+      enq(() => appSettingsStore.trigger.persistenceFailed({ message: event.message }));
     },
   },
   states: {

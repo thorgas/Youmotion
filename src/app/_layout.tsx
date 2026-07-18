@@ -6,7 +6,9 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { KeyboardProvider } from 'react-native-keyboard-controller';
 
 import { PressFeedbackProvider } from '@/components/ui/press-feedback-provider';
+import { SPLASH_BACKGROUND_COLOR } from '@/constants';
 import { DevelopmentRoot } from '@/development/development-root';
+import { AnimatedSplashScreen } from '@/features/startup/ui/animated-splash-screen';
 import { AppLocaleProvider } from '@/localization/app-locale-provider';
 import { AppNavigationProvider } from '@/navigation/app-navigation.provider';
 
@@ -20,19 +22,21 @@ export default function RootLayout() {
   if (!fontsLoaded && !fontError) return null;
 
   return (
-    <KeyboardProvider>
-      <AppNavigationProvider>
-        <AppLocaleProvider>
-          <DevelopmentRoot>
-            <GestureHandlerRootView style={{ flex: 1 }}>
-              <PressFeedbackProvider>
-                <StatusBar style="dark" />
-                <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: '#F4F0E8' } }} />
-              </PressFeedbackProvider>
-            </GestureHandlerRootView>
-          </DevelopmentRoot>
-        </AppLocaleProvider>
-      </AppNavigationProvider>
-    </KeyboardProvider>
+    <AnimatedSplashScreen>
+      <KeyboardProvider>
+        <AppNavigationProvider>
+          <AppLocaleProvider>
+            <DevelopmentRoot>
+              <GestureHandlerRootView style={{ flex: 1 }}>
+                <PressFeedbackProvider>
+                  <StatusBar style="dark" />
+                  <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: SPLASH_BACKGROUND_COLOR } }} />
+                </PressFeedbackProvider>
+              </GestureHandlerRootView>
+            </DevelopmentRoot>
+          </AppLocaleProvider>
+        </AppNavigationProvider>
+      </KeyboardProvider>
+    </AnimatedSplashScreen>
   );
 }
