@@ -19,7 +19,8 @@ UI event
 
 The relevant ownership boundaries are:
 
-- `src/features/check-in/domain/check-in.ts`: canonical application schemas and types.
+- `src/features/check-in/domain/check-in.ts`: canonical persisted check-in schema and types.
+- `src/features/check-in/domain/belief-system.ts`: stable belief-system IDs, emotion mappings, and history-based recommendation ranking.
 - `src/features/check-in/infrastructure/check-in.repository.ts`: queries, persistence, legacy migration, and typed errors.
 - `src/features/check-in/infrastructure/surrealdb.database.ts`: filesystem location and shared native connection.
 - `src/features/check-in/application/check-in-history.store.ts`: validated in-memory history projection.
@@ -57,10 +58,11 @@ Each logical check-in contains:
 | --- | --- | --- |
 | `id` | Branded string | Stable application identity |
 | `createdAt` | Branded string | Creation timestamp; newly created values use ISO 8601 UTC |
-| `emotionId` | `freude`, `liebe`, `scham`, `ekel`, `trauer`, `wut`, or `angst` | Locale-independent base emotion |
+| `emotionId` | `freude`, `liebe`, `scham`, `ekel`, `trauer`, `wut`, or `furcht` | Locale-independent base emotion |
 | `intensity` | Number from `0` through `1` | Normalized radial intensity |
 | `level` | Optional non-negative integer | Stable nuance bucket |
 | `note` | String of at most 240 characters | Optional reflection text |
+| `beliefSystemId` | Optional value from the stable `BELIEF_SYSTEM_IDS` vocabulary | Attached negative core belief, independent of display language |
 
 The SurrealDB record ID is constructed as:
 
@@ -75,11 +77,12 @@ The database decoder accepts `level` as either a JavaScript-safe non-negative in
 The following values are deliberately not persisted:
 
 - Localized emotion or nuance labels
+- Localized belief-system text
 - Display color and wash color
 - Derived display copy
 - Navigation or transient UI state
 
-Localized labels and colors are derived from stable emotion IDs when rendering. Older records without `level` remain supported; the app derives their level from intensity and clamps it to the emotion's available nuance range.
+Localized labels and colors are derived from stable IDs when rendering. Older records without `level` remain supported; the app derives their level from intensity and clamps it to the emotion's available nuance range. The repository also normalizes integral SurrealDB numbers returned as bigints before domain validation. `beliefSystemId` is optional, so records written before the belief-system feature decode without a data migration. The native SurrealDB client represents a selected-but-absent optional field as `NONE`; the repository schema normalizes that boundary value to an omitted domain property.
 
 ### Database schema enforcement
 
@@ -106,14 +109,14 @@ The record ID and content are passed as query parameters. The table name is a so
 
 ### Update
 
-Editing uses the same upsert operation with the existing record. It preserves `id` and `createdAt` while replacing emotion, intensity, level, and note. Therefore an edit updates one captured moment instead of inserting a duplicate.
+Editing uses the same upsert operation with the existing record. It preserves `id` and `createdAt` while replacing emotion, intensity, level, note, and the optional `beliefSystemId`. Therefore an edit updates one captured moment instead of inserting a duplicate.
 
 ### Read and hydrate
 
 At root-machine startup, `loadCheckIns` executes the equivalent of:
 
 ```sql
-SELECT checkInId AS id, createdAt, emotionId, intensity, level, note
+SELECT checkInId AS id, createdAt, emotionId, intensity, level, note, beliefSystemId
 FROM check_in
 ORDER BY createdAt DESC
 LIMIT $limit
@@ -123,9 +126,31 @@ The result is decoded before it is sent through `HISTORY_HYDRATED` into `checkIn
 
 ISO timestamps sort correctly as strings when they use the same UTC representation. The current schema brands `createdAt` as a string but does not itself validate ISO syntax, so any future external importer must validate and normalize timestamps before persistence.
 
-### Delete and retention
+### Delete
 
-The production repository does not currently expose delete, clear-history, export, or reset operations. The `DELETE $record` query appears only in the native Harness test cleanup.
+The edit screen exposes a full-width destructive “Delete moment” action. In History, the same confirmation is available from the visible trailing delete action and by long-pressing the moment row. All three entry points send `DELETE_REQUESTED` to the root actor only after destructive confirmation. `deleteCheckIn` then removes the exact record with:
+
+```sql
+DELETE $record
+```
+
+The in-memory history entry is removed only after the repository succeeds and emits `DELETED`. Deleting the moment currently open for editing also clears the editing context and returns to History. A failed delete leaves the entry visible and produces `CheckInStorageError` with operation `delete`; the history screen shows a local error message. The app does not currently expose clear-history, export, reset, undo, or data-recovery operations.
+
+### Recommendation data
+
+The 18 belief systems are stored as source-controlled IDs rather than database entities. `domain/belief-system.ts` defines a many-to-many default mapping between emotions and belief systems. Every belief system remains available for every emotion; the mapping changes ordering only.
+
+For a new or edited check-in, ranking uses:
+
+1. How often each belief system was previously attached to the same base emotion in the loaded local history.
+2. The source-controlled default order for that emotion.
+3. The global catalog order for all remaining belief systems.
+
+No belief system is attached by default. The reflection is persisted first, without a belief system for new records, and the optional second step then offers the first three ranked values as quick suggestions. A clearly labeled catalog button opens every available belief system. Attaching a selection updates the already-saved check-in; skipping leaves the saved reflection unchanged. Recommendation learning is fully local and currently considers the loaded history projection, which is capped at 30 records.
+
+For an existing record, the first save preserves its current belief-system ID while updating the reflection. The optional second step can then retain, replace, or remove that attachment. This prevents the intermediate save from silently discarding an existing belief system.
+
+### Retention
 
 `MAX_CHECK_IN_HISTORY = 30` limits the read query and in-memory history. It does **not** delete older rows from SurrealDB. If physical retention must also be capped, add an explicit, tested pruning operation rather than assuming the history limit performs cleanup.
 
@@ -150,6 +175,7 @@ Expected repository failures remain in the Effect error channel:
 - `CheckInStorageError`
   - `read`: native connection or query failure while loading
   - `write`: native upsert failure
+  - `delete`: native per-record deletion failure
   - `migrate`: failure removing migrated AsyncStorage data
 - `CheckInDataError`
   - `decode`: invalid legacy JSON or invalid database results
@@ -171,7 +197,7 @@ Current non-guarantees and limitations:
 - The app does not add application-level database encryption or manage an encryption key.
 - Platform sandboxing and device storage protection are relied upon; their effective behavior depends on OS and device configuration.
 - Backup inclusion/exclusion is not explicitly configured or tested in this repository.
-- There is no user-facing export, delete-all, per-record delete, or data recovery flow.
+- There is no user-facing export, delete-all, undo, or data recovery flow.
 - Uninstall, restore, and OS backup behavior is platform-managed and should be tested before making stronger product claims.
 
 Any change to the statement that data stays exclusively on the device requires a security and product review of every new transport, backup, telemetry, and remote-storage path.
@@ -221,8 +247,10 @@ Use `pnpm start:tunnel` when a physical device cannot reach Metro over the local
 Database coverage is split across:
 
 - `surrealdb.database.test.ts`: directory creation, singleton connection, URI rejection, and retry after failure.
-- `check-in.repository.test.ts`: encode/decode, create, update, legacy migration, integer transport, and tagged failures using a mocked client.
-- `app-navigation.machine.test.ts`: hydration, persistence, failure, retry, and edit event paths.
+- `check-in.repository.test.ts`: encode/decode, create, update, delete, legacy migration, integer transport, and tagged failures using a mocked client.
+- `belief-system.test.ts`: catalog completeness, many-to-many defaults, and history-based ranking.
+- `belief-system.harness.ts`: recommendation ranking inside the React Native runtime, guarding against JavaScript-engine API mismatches.
+- `app-navigation.machine.test.ts`: hydration, persistence, failure, retry, edit, belief-system attachment, and delete event paths.
 - `check-in.repository.harness.ts`: real persistence and reload through the native SurrealKV engine, with record cleanup.
 
 Run the standard gates:
@@ -233,7 +261,7 @@ pnpm test:coverage
 pnpm verify:surrealdb-vendor
 ```
 
-Run `pnpm test:harness` against an iOS or Android Harness runner to exercise the native engine. A plain web environment cannot validate the native SurrealDB binding.
+Run `pnpm test:harness:ios` to exercise the React Native runtime and native engine on the configured iOS simulator. The script reserves port 8083 and passes it to the Expo development client at launch, so an existing Metro server does not make Harness wait at the development-server chooser. A plain web environment cannot validate Hermes or the native SurrealDB binding.
 
 ## Schema-change checklist
 
@@ -256,7 +284,7 @@ For every persisted-schema or database-behavior change:
 
 - Introduce a durable schema-version record and ordered migration system.
 - Decide whether the 30-entry product limit should also prune physical rows.
-- Add explicit delete/export/reset semantics and corresponding privacy copy.
+- Add delete-all, export, undo, and reset semantics with corresponding privacy copy.
 - Validate timestamp syntax rather than branding any string.
 - Replace timestamp-plus-`Math.random` IDs if cryptographically strong or cross-device identities become necessary.
 - Define and test OS backup policy and data-protection expectations.

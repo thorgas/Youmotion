@@ -13,7 +13,7 @@ const _selectSaved = (snapshot: ReturnType<ReturnType<typeof useAppNavigationAct
 export function SuccessScreen() {
   const actor = useAppNavigationActor();
   const saved = useSelector(actor, _selectSaved);
-  const _restart = () => actor.send({ type: CHECK_IN_EVENTS.RESTARTED });
+  const _finish = () => actor.send({ type: CHECK_IN_EVENTS.RESTARTED });
 
   if (!saved) return null;
 
@@ -23,8 +23,8 @@ export function SuccessScreen() {
         <View style={styles.halo}><Text style={styles.check}>✓</Text></View>
         <Text style={styles.title}><fbt desc="Successful check-in title">You arrived with yourself.</fbt></Text>
         <Text style={styles.copy}>{savedCheckInCopy(saved)}</Text>
-        <PressableScale accessibilityRole="button" onPress={_restart} style={styles.button} testID="new-check-in">
-          <Text style={styles.buttonText}><fbt desc="Button starting another check-in">New check-in</fbt></Text>
+        <PressableScale accessibilityRole="button" onPress={_finish} style={styles.button} testID="check-in-done">
+          <Text style={styles.buttonText}><fbt desc="Button finishing the completed check-in flow">Done</fbt></Text>
         </PressableScale>
       </SafeAreaView>
     </View>

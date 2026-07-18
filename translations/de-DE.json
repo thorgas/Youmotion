@@ -1,6 +1,281 @@
 {
   "fb-locale": "de-DE",
   "translations": {
+    "R0lvfChJ/UgnfwIU39Jbow==": {
+      "description": "Button cancelling check-in deletion",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Abbrechen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "M/iDs57prtdpszhZ7gMAFA==": {
+      "description": "Button deleting a check-in",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Löschen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "jUgL8xX76Ham/o8olnAawA==": {
+      "description": "Error shown when check-in history cannot be updated",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Dein Verlauf konnte nicht aktualisiert werden.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "iLQJz1sNjAOCUZM2Ylbeog==": {
+      "description": "Negative core belief about always functioning",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Ich muss immer funktionieren.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "TGYuCMLwuC7Yh90iGGUn4Q==": {
+      "description": "Negative core belief about making no mistakes",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Ich darf keine Fehler machen.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "QfpI5D8xMpu8QtFiN81qNg==": {
+      "description": "Negative core belief about total responsibility",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Ich bin für alles verantwortlich.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "CVaT/YqS4SNIBdvEQvdvTQ==": {
+      "description": "Negative core belief about doing everything alone",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Ich muss alles alleine schaffen.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "UwQQnMi/XcNY9pMbcaPvxQ==": {
+      "description": "Negative core belief about perfection",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Ich muss alles perfekt schaffen.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "kkl5RApZxBMuxlDJK7HsOQ==": {
+      "description": "Negative core belief about always being there for others",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Ich muss immer für alle anderen da sein.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "kjM6oDDy3JKYGF40LKXlPg==": {
+      "description": "Negative core belief about expecting perfection",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Ich bin perfekt und erwarte es auch von anderen.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "lTmR6m2qFy9uVXmuknDYLg==": {
+      "description": "Negative core belief about changing oneself to be loved",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Um geliebt zu werden, muss ich so sein, wie die anderen mich wollen.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "SGD2Sq0+GFXgFyk09fhhVA==": {
+      "description": "Negative core belief about always being considerate",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Ich muss Rücksicht nehmen.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "m7/Ir2soWICOVCO9wfCHqQ==": {
+      "description": "Negative core belief about adapting oneself",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Ich muss mich anpassen.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "bOZ6a6cirKB21/qcPIu7NQ==": {
+      "description": "Negative core belief about being loved by everyone",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Ich will von allen geliebt werden.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "uBk7u+JJHi+dSaEftkeQDA==": {
+      "description": "Negative core belief about being a burden",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Ich darf/kann mich keinem zumuten.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "VjQQJ7gihQigd56HKDa+uQ==": {
+      "description": "Negative core belief about being inferior to others",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Ich bin hässlicher/dümmer … etc. als andere.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "TwoqxjtT3G+gDFQjom6WTg==": {
+      "description": "Negative core belief about others being better",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Andere sind immer besser als ich.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "p1CzaXWuhU7aL2repFpM7g==": {
+      "description": "Negative core belief about suppressing anger",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Ich darf nicht wütend sein.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "swlEh+rwLSj8tVurOxMYog==": {
+      "description": "Negative core belief about never losing control",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Ich darf nie außer Kontrolle geraten.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "Pxp2FB4VnKUCS1MHfJhhPQ==": {
+      "description": "Negative core belief about avoiding attention",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Ich darf nicht im Mittelpunkt stehen.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "KUb0NEgjNaTmosVuPUfRtg==": {
+      "description": "Negative core belief about never saying no",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Ich darf niemals Nein sagen.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "MvNljnTp2nOMBcGP9HsckA==": {
+      "description": "Fallback label for a core belief",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Glaubenssatz",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "Njo7txKPEm1Ox+ApugqJOw==": {
+      "description": "Picker option for attaching no core belief",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Keinen Glaubenssatz anhängen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "iCV0A3g/GNOWZTS5fUvb6A==": {
+      "description": "Accessibility label for the core belief picker",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Optionaler Glaubenssatz",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "/Ti2VtBiXvsq4uUy5U/+Mg==": {
+      "description": "Explanation of personalized core belief suggestions",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Vorschläge passen zu diesem Gefühl und zu dem, was du zuvor angehängt hast.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
     "ESeO7pm9a7u44l0AyiRypg==": {
       "description": "Settings screen eyebrow heading",
       "tokens": [],
@@ -804,17 +1079,6 @@
       ],
       "types": []
     },
-    "cwUthFJdCgV42WV4iwhplg==": {
-      "description": "Second step label for reflecting on a feeling",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "02 · REFLEKTIEREN",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
     "yqdNa50IDs9gbGrotVnfdA==": {
       "description": "Reflection screen question",
       "tokens": [],
@@ -848,23 +1112,12 @@
       ],
       "types": []
     },
-    "pypybnNuf9ZI+2YU7DYp/Q==": {
+    "M9t029NbBFb5qi78nNyN+g==": {
       "description": "Placeholder for the optional reflection note",
       "tokens": [],
       "translations": [
         {
-          "translation": "Ein Gedanke, ein Körpergefühl, eine Situation …",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "O0gcdguTvxq6lDAC8l6YUw==": {
-      "description": "Error shown when saving a check-in fails",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "Dein Check-in konnte nicht gespeichert werden.",
+          "translation": "Was ist passiert? Ein Gedanke, ein Körpergefühl, eine Situation …",
           "variations": {}
         }
       ],
@@ -876,28 +1129,6 @@
       "translations": [
         {
           "translation": "Zurück",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "CPeZaDUtYCGVib3PdWuQ9g==": {
-      "description": "Button retrying a failed check-in save",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "Erneut versuchen",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "+9IJjzAR1upCMMO1/zCMKw==": {
-      "description": "Button saving a completed check-in",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "Check-in speichern",
           "variations": {}
         }
       ],
@@ -920,17 +1151,6 @@
       "translations": [
         {
           "translation": "Dein Check-in „{emotionName} · {emotionNuance}“ ist nur auf diesem Gerät gespeichert.",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "GiSLY9y/j8Ai+2BOdxJfkg==": {
-      "description": "Button starting another check-in",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "Neuer Check-in",
           "variations": {}
         }
       ],
@@ -1145,34 +1365,12 @@
       ],
       "types": []
     },
-    "v77XkAy4rXjsqwiytOiFIQ==": {
-      "description": "Label for editing an existing check-in",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "MOMENT BEARBEITEN",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
     "qAax2x7Q2nMs2SjmaDn6BQ==": {
       "description": "Title for editing an existing check-in",
       "tokens": [],
       "translations": [
         {
           "translation": "Bearbeite diesen Moment.",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "ph8mrzVzHC2xOKG7jojHkA==": {
-      "description": "Button saving changes to an existing check-in",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "Änderungen speichern",
           "variations": {}
         }
       ],
@@ -1272,6 +1470,292 @@
       "translations": [
         {
           "translation": "Beides",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "j5ksl0Si9oF0z8IDR01jzg==": {
+      "description": "Label for editing an existing check-in",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "MOMENT BEARBEITEN · SCHRITT 1 VON 2",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "S5x1aui2D7o6xWd8KBhcpg==": {
+      "description": "Second step label for reflecting on a feeling",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "02 · REFLEXION · SCHRITT 1 VON 2",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "PqBLVS/ZeoCc2Mc4fD3Pog==": {
+      "description": "Error shown when saving a reflection fails",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Deine Reflexion konnte nicht gespeichert werden.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "Gr2DP1SaQkyLHnoKEedaOw==": {
+      "description": "Button retrying a failed reflection save",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Erneut versuchen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "ECb+06AlNayP598Y7LLu3g==": {
+      "description": "Button saving reflection before optional core belief step",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Reflexion speichern",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "2PIlVYvR4LTgVhNUAMyodQ==": {
+      "description": "Optional core belief step label",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "03 · GLAUBENSSATZ · SCHRITT 2 VON 2",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "6Fm5iEggTrTmG2hKDIpAqg==": {
+      "description": "Question shown after a reflection is saved",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Passt ein Glaubenssatz zu diesem Moment?",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "3lum3q9U3hU6okcmbqcnmg==": {
+      "description": "Explanation that the reflection was saved before core belief selection",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Deine Reflexion ist bereits gespeichert. Füge nur einen hinzu, wenn es sich hilfreich anfühlt.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "qfYTAuAdG0Oxw1b0hGm/tw==": {
+      "description": "Confirmation that the reflection text is persisted",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Reflexion gespeichert",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "RtS/f+IsTf6CcRAuJa3vsg==": {
+      "description": "Button opening the complete core belief catalog",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Alle Glaubenssätze ansehen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "QfwSqwbCVVDksX6u6FSIEA==": {
+      "description": "Description below the button opening all core beliefs",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Vollständige Liste öffnen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "3PNO254zdVAAeWbB+aicRQ==": {
+      "description": "Error shown when optional core belief attachment fails",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Deine Reflexion ist gespeichert, aber der Glaubenssatz konnte nicht angehängt werden.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "bReq3yQtzxzWUN9EqNSdQw==": {
+      "description": "Button returning to the saved reflection text",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Zurück",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "m/LFspeVdH7M/U9sq+ec+A==": {
+      "description": "Button retrying core belief attachment",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Erneut versuchen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "oUxFmuE24O6lUH1fr0nrXg==": {
+      "description": "Button attaching the selected core belief",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Anhängen und abschließen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "Bd0TAa6mFO8LRNqyBRVv+A==": {
+      "description": "Button finishing without a core belief",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Ohne Glaubenssatz abschließen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "7rNBYqKFC/7U8QkWu4LskQ==": {
+      "description": "Button returning from the core belief catalog",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Zurück",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "ZysYdQOTXo63HMijh+hVYQ==": {
+      "description": "Label above the complete core belief catalog",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "GLAUBENSSÄTZE",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "fq67u9l4dDzgklWIpccz8w==": {
+      "description": "Title for the complete core belief catalog",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Wähle, was sich vertraut anfühlt.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "P8hZkvM+mLmH5ExsxtMZbg==": {
+      "description": "Instructions for selecting from the complete core belief catalog",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Wenn du eine Option auswählst, kehrst du zu den Vorschlägen zurück. Du kannst sie vor dem Abschluss noch ändern.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "UdNHu5uZnQZHr4IClz/Rzg==": {
+      "description": "Title confirming check-in deletion",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Diesen Moment löschen?",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "JSVoAtCa3GEKMzCiNinoyA==": {
+      "description": "Explanation in check-in deletion confirmation",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Dieser Moment wird dauerhaft von diesem Gerät gelöscht.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "lU+ubFdyMezp15zQ4KvRZA==": {
+      "description": "Visible button for permanently deleting a captured moment",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Moment löschen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "W169CyKYN0eq48fl7N4VYg==": {
+      "description": "Accessibility label for permanently deleting a captured moment",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Moment löschen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "Y/TG5aTgIxUB8/I8sL0n7A==": {
+      "description": "Accessibility hint for a history moment with long-press deletion",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Öffnet diesen Moment. Lange drücken, um ihn zu löschen.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "lvkp7gv0sh85lQT8w1ZtIQ==": {
+      "description": "Button finishing the completed check-in flow",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Fertig",
           "variations": {}
         }
       ],

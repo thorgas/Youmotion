@@ -1,6 +1,6 @@
 import { act, fireEvent, render, waitFor, within } from '@testing-library/react-native';
 import type { ReactElement } from 'react';
-import { StyleSheet } from 'react-native';
+import { Alert, StyleSheet } from 'react-native';
 import { createActor, type Actor } from 'xstate';
 
 import {
@@ -8,6 +8,7 @@ import {
   CHECK_IN_STATES,
   EMOTION_LABEL_MODES,
   EMOTION_IDS,
+  BELIEF_SYSTEM_IDS,
   NAVIGATION_EVENTS,
   NAVIGATION_STATES,
 } from '@/constants';
@@ -49,6 +50,16 @@ const _reachReflection = () => {
   mockActor.send({ type: CHECK_IN_EVENTS.TOUCH_STARTED });
   mockActor.send({ type: CHECK_IN_EVENTS.SELECTION_CHANGED, selection });
   mockActor.send({ type: CHECK_IN_EVENTS.SELECTION_RELEASED });
+};
+
+const _finishWithoutBeliefSystem = async () => {
+  await waitFor(() => expect(
+    mockActor.getSnapshot().matches(CHECK_IN_STATES.BELIEF_SYSTEM),
+  ).toBe(true));
+  await act(() => mockActor.send({ type: CHECK_IN_EVENTS.CONFIRMED }));
+  await waitFor(() => expect(
+    mockActor.getSnapshot().matches(CHECK_IN_STATES.SUCCESS),
+  ).toBe(true));
 };
 
 const _renderLocalized = (element: ReactElement) => render(<AppLocaleProvider>{element}</AppLocaleProvider>);
@@ -261,7 +272,7 @@ describe('check-in screens', () => {
     expect(onRelease).not.toHaveBeenCalled();
   });
 
-  it('lets the reflection screen edit and submit a note', async () => {
+  it('saves a reflection before offering the optional core belief step', async () => {
     await act(_reachReflection);
     const screen = await _renderLocalized(<ReflectionScreen />);
     expect(screen.getByLabelText('Optional note about the feeling').props['autoFocus']).toBe(true);
@@ -271,21 +282,47 @@ describe('check-in screens', () => {
       keyboardDismissMode: 'interactive',
       keyboardShouldPersistTaps: 'handled',
     });
+    expect(screen.queryByText('Does a core belief fit this moment?')).toBeNull();
     await fireEvent.changeText(screen.getByLabelText('Optional note about the feeling'), 'Ein heller Moment.');
-    await fireEvent.press(screen.getByText('Save check-in'));
+    await fireEvent.press(screen.getByText('Save reflection'));
+
+    await waitFor(() => expect(
+      mockActor.getSnapshot().matches(CHECK_IN_STATES.BELIEF_SYSTEM),
+    ).toBe(true));
+    expect(mockActor.getSnapshot().context.saved?.note).toBe('Ein heller Moment.');
+    expect(mockActor.getSnapshot().context.saved?.beliefSystemId).toBeUndefined();
+    expect(await screen.findByText('Your reflection is already saved. Add one only if it feels useful.')).toBeTruthy();
+    expect(screen.getByTestId('belief-system-browse').props['accessibilityRole']).toBe('button');
+
+    await fireEvent.press(screen.getByTestId('belief-system-browse'));
+    await waitFor(() => expect(
+      mockActor.getSnapshot().matches(CHECK_IN_STATES.BELIEF_SYSTEM_CATALOG),
+    ).toBe(true));
+    expect(await screen.findByText('Choose what feels familiar.')).toBeTruthy();
+    await fireEvent.press(screen.getByTestId(
+      `belief-system-option-${BELIEF_SYSTEM_IDS.ALWAYS_FUNCTIONING}`,
+    ));
+    await waitFor(() => expect(
+      mockActor.getSnapshot().matches(CHECK_IN_STATES.BELIEF_SYSTEM),
+    ).toBe(true));
+    await fireEvent.press(screen.getByText('Attach and finish'));
 
     await waitFor(() => expect(mockActor.getSnapshot().matches(CHECK_IN_STATES.SUCCESS)).toBe(true));
-    expect(mockActor.getSnapshot().context.saved?.note).toBe('Ein heller Moment.');
+    expect(mockActor.getSnapshot().context.saved?.beliefSystemId).toBe(
+      BELIEF_SYSTEM_IDS.ALWAYS_FUNCTIONING,
+    );
   });
 
   it('renders success, history, and settings destinations', async () => {
     await act(_reachReflection);
     await act(() => mockActor.send({ type: CHECK_IN_EVENTS.CONFIRMED }));
-    await waitFor(() => expect(mockActor.getSnapshot().matches(CHECK_IN_STATES.SUCCESS)).toBe(true));
+    await _finishWithoutBeliefSystem();
     expect(mockActor.getSnapshot().context.saved).not.toBeNull();
 
     const success = await _renderLocalized(<SuccessScreen />);
     expect(success.getByText('You arrived with yourself.')).toBeTruthy();
+    expect(success.getByText('Done')).toBeTruthy();
+    expect(success.queryByText('New check-in')).toBeNull();
 
     const history = await _renderLocalized(<HistoryScreen />);
     expect(history.getByText(/Joy · Cheerfulness/)).toBeTruthy();
@@ -302,7 +339,7 @@ describe('check-in screens', () => {
     await act(_reachReflection);
     await act(() => mockActor.send({ type: CHECK_IN_EVENTS.NOTE_CHANGED, note: 'Before' }));
     await act(() => mockActor.send({ type: CHECK_IN_EVENTS.CONFIRMED }));
-    await waitFor(() => expect(mockActor.getSnapshot().matches(CHECK_IN_STATES.SUCCESS)).toBe(true));
+    await _finishWithoutBeliefSystem();
     await act(() => mockActor.send({ type: CHECK_IN_EVENTS.RESTARTED }));
     await act(() => mockActor.send({ type: NAVIGATION_EVENTS.HISTORY_OPENED }));
 
@@ -314,13 +351,61 @@ describe('check-in screens', () => {
     const reflection = await _renderLocalized(<ReflectionScreen />);
     expect(reflection.getByText('Edit this moment.')).toBeTruthy();
     expect(reflection.getByText('Change feeling')).toBeTruthy();
+    expect(reflection.getByTestId('delete-edited-moment')).toBeTruthy();
     expect(reflection.getByDisplayValue('Before').props['autoFocus']).toBe(true);
+  });
+
+  it('confirms and deletes a captured moment by long-pressing its history row', async () => {
+    const alert = jest.spyOn(Alert, 'alert');
+    await act(_reachReflection);
+    await act(() => mockActor.send({ type: CHECK_IN_EVENTS.CONFIRMED }));
+    await _finishWithoutBeliefSystem();
+    const saved = mockActor.getSnapshot().context.saved;
+    if (!saved) throw new Error('Successful persistence must expose the saved check-in.');
+    await act(() => mockActor.send({ type: CHECK_IN_EVENTS.RESTARTED }));
+    await act(() => mockActor.send({ type: NAVIGATION_EVENTS.HISTORY_OPENED }));
+
+    const history = await _renderLocalized(<HistoryScreen />);
+    await fireEvent(history.getByTestId(`history-moment-${saved.id}`), 'longPress');
+    const buttons = alert.mock.calls[alert.mock.calls.length - 1]?.[2];
+    const destructive = buttons?.find((button) => button.style === 'destructive');
+    await act(() => destructive?.onPress?.());
+
+    await waitFor(() => expect(
+      checkInHistoryStore.getSnapshot().context.entries,
+    ).toHaveLength(0));
+  });
+
+  it('deletes the current moment from its edit screen and returns to history', async () => {
+    const alert = jest.spyOn(Alert, 'alert');
+    await act(_reachReflection);
+    await act(() => mockActor.send({ type: CHECK_IN_EVENTS.NOTE_CHANGED, note: 'Remove me' }));
+    await act(() => mockActor.send({ type: CHECK_IN_EVENTS.CONFIRMED }));
+    await _finishWithoutBeliefSystem();
+    const saved = mockActor.getSnapshot().context.saved;
+    if (!saved) throw new Error('Successful persistence must expose the saved check-in.');
+    await act(() => mockActor.send({ type: CHECK_IN_EVENTS.RESTARTED }));
+    await act(() => mockActor.send({ type: NAVIGATION_EVENTS.HISTORY_OPENED }));
+    await act(() => mockActor.send({ type: CHECK_IN_EVENTS.EDIT_REQUESTED, entry: saved }));
+
+    const reflection = await _renderLocalized(<ReflectionScreen />);
+    await fireEvent.press(reflection.getByTestId('delete-edited-moment'));
+    const buttons = alert.mock.calls[alert.mock.calls.length - 1]?.[2];
+    const destructive = buttons?.find((button) => button.style === 'destructive');
+    await act(() => destructive?.onPress?.());
+
+    await waitFor(() => expect(
+      mockActor.getSnapshot().matches({
+        [NAVIGATION_STATES.TABS]: NAVIGATION_STATES.HISTORY,
+      }),
+    ).toBe(true));
+    expect(checkInHistoryStore.getSnapshot().context.entries).toHaveLength(0);
   });
 
   it('opens the latest captured moment for editing from Today', async () => {
     await act(_reachReflection);
     await act(() => mockActor.send({ type: CHECK_IN_EVENTS.CONFIRMED }));
-    await waitFor(() => expect(mockActor.getSnapshot().matches(CHECK_IN_STATES.SUCCESS)).toBe(true));
+    await _finishWithoutBeliefSystem();
     await act(() => mockActor.send({ type: CHECK_IN_EVENTS.RESTARTED }));
 
     const today = await _renderLocalized(<CheckInScreen />);

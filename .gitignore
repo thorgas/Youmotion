@@ -12,6 +12,9 @@ web-build/
 coverage/
 .reassure/
 /artifacts/maestro/
+/artifacts/screenshots/
+/.maestro/debug/
+/.maestro/tests/
 expo-env.d.ts
 
 # fbtee

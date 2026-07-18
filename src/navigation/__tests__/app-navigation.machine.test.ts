@@ -1,4 +1,4 @@
-import { createActor, waitFor } from 'xstate';
+import { createActor, waitFor, type Actor } from 'xstate';
 
 import {
   APP_ROUTES,
@@ -6,14 +6,21 @@ import {
   CHECK_IN_STATES,
   EMOTION_LABEL_MODES,
   EMOTION_IDS,
+  BELIEF_SYSTEM_IDS,
   NAVIGATION_EVENTS,
   NAVIGATION_STATES,
   SETTINGS_EVENTS,
 } from '@/constants';
-import type { EmotionSelection } from '@/features/check-in/domain/check-in';
+import {
+  CheckInId,
+  CheckInTimestamp,
+  type CheckIn,
+  type EmotionSelection,
+} from '@/features/check-in/domain/check-in';
 import { checkInHistoryStore } from '@/features/check-in/application/check-in-history.store';
 import { emotionLabelModeStore } from '@/features/settings/application/emotion-label-mode.store';
 import {
+  failNextSurrealDelete,
   failNextSurrealUpsert,
   mockSurrealDatabase,
   resetSurrealDatabaseMock,
@@ -30,6 +37,39 @@ const selection = {
   level: 2,
   color: '#E7AD32',
 } satisfies EmotionSelection;
+
+const hydrationSentinel = {
+  id: CheckInId.make('hydration-sentinel'),
+  createdAt: CheckInTimestamp.make('2026-07-18T00:00:00.000Z'),
+  emotionId: EMOTION_IDS.JOY,
+  intensity: 0.5,
+  note: '',
+} satisfies CheckIn;
+
+async function startAfterInitialHistoryHydration() {
+  checkInHistoryStore.trigger.hydrated({ entries: [hydrationSentinel] });
+  const actor = createActor(appNavigationMachine).start();
+  await waitFor(
+    actor,
+    () => checkInHistoryStore.getSnapshot().context.entries.length === 0,
+    { timeout: 1_000 },
+  );
+  return actor;
+}
+
+async function finishWithoutBeliefSystem(actor: Actor<typeof appNavigationMachine>) {
+  await waitFor(
+    actor,
+    (candidate) => candidate.matches(CHECK_IN_STATES.BELIEF_SYSTEM),
+    { timeout: 1_000 },
+  );
+  actor.send({ type: CHECK_IN_EVENTS.CONFIRMED });
+  return waitFor(
+    actor,
+    (candidate) => candidate.matches(CHECK_IN_STATES.SUCCESS),
+    { timeout: 1_000 },
+  );
+}
 
 describe('app navigation model', () => {
   beforeEach(() => {
@@ -105,11 +145,32 @@ describe('app navigation model', () => {
     expect(routeForStateValue(actor.getSnapshot().value)).toBe(APP_ROUTES.TODAY);
   });
 
-  it('persists through the saving state and reaches success', async () => {
+  it('saves the reflection before offering and attaching a core belief', async () => {
     const actor = createActor(appNavigationMachine).start();
     actor.send({ type: CHECK_IN_EVENTS.TOUCH_STARTED });
     actor.send({ type: CHECK_IN_EVENTS.SELECTION_CHANGED, selection });
     actor.send({ type: CHECK_IN_EVENTS.SELECTION_RELEASED });
+    actor.send({ type: CHECK_IN_EVENTS.NOTE_CHANGED, note: 'A bright moment' });
+    actor.send({ type: CHECK_IN_EVENTS.CONFIRMED });
+
+    const savedReflection = await waitFor(
+      actor,
+      (candidate) => candidate.matches(CHECK_IN_STATES.BELIEF_SYSTEM),
+      { timeout: 1_000 },
+    );
+    expect(savedReflection.context.saved).toMatchObject({
+      note: 'A bright moment',
+    });
+    expect(savedReflection.context.saved?.beliefSystemId).toBeUndefined();
+    expect(routeForStateValue(savedReflection.value)).toBe(APP_ROUTES.REFLECTION);
+
+    actor.send({ type: CHECK_IN_EVENTS.BELIEF_SYSTEM_CATALOG_REQUESTED });
+    expect(actor.getSnapshot().matches(CHECK_IN_STATES.BELIEF_SYSTEM_CATALOG)).toBe(true);
+    actor.send({
+      type: CHECK_IN_EVENTS.BELIEF_SYSTEM_CHANGED,
+      beliefSystemId: BELIEF_SYSTEM_IDS.ALWAYS_FUNCTIONING,
+    });
+    expect(actor.getSnapshot().matches(CHECK_IN_STATES.BELIEF_SYSTEM)).toBe(true);
     actor.send({ type: CHECK_IN_EVENTS.CONFIRMED });
 
     const snapshot = await waitFor(
@@ -120,6 +181,53 @@ describe('app navigation model', () => {
 
     expect(routeForStateValue(snapshot.value)).toBe(APP_ROUTES.SUCCESS);
     expect(snapshot.context.saved?.emotionId).toBe(EMOTION_IDS.JOY);
+    expect(snapshot.context.saved?.beliefSystemId).toBe(BELIEF_SYSTEM_IDS.ALWAYS_FUNCTIONING);
+  });
+
+  it('deletes a persisted check-in through the root actor', async () => {
+    const actor = await startAfterInitialHistoryHydration();
+    actor.send({ type: CHECK_IN_EVENTS.TOUCH_STARTED });
+    actor.send({ type: CHECK_IN_EVENTS.SELECTION_CHANGED, selection });
+    actor.send({ type: CHECK_IN_EVENTS.SELECTION_RELEASED });
+    actor.send({ type: CHECK_IN_EVENTS.CONFIRMED });
+
+    const created = await finishWithoutBeliefSystem(actor);
+    const saved = created.context.saved;
+    if (!saved) throw new Error('Successful persistence must expose the saved check-in.');
+
+    checkInHistoryStore.trigger.hydrated({ entries: [saved] });
+    actor.send({ type: CHECK_IN_EVENTS.DELETE_REQUESTED, id: saved.id });
+    await waitFor(
+      actor,
+      () => checkInHistoryStore.getSnapshot().context.entries.length === 0,
+      { timeout: 1_000 },
+    );
+
+    expect(checkInHistoryStore.getSnapshot().context.entries).toEqual([]);
+  });
+
+  it('keeps a check-in visible when deletion fails', async () => {
+    const actor = await startAfterInitialHistoryHydration();
+    actor.send({ type: CHECK_IN_EVENTS.TOUCH_STARTED });
+    actor.send({ type: CHECK_IN_EVENTS.SELECTION_CHANGED, selection });
+    actor.send({ type: CHECK_IN_EVENTS.SELECTION_RELEASED });
+    actor.send({ type: CHECK_IN_EVENTS.CONFIRMED });
+
+    const created = await finishWithoutBeliefSystem(actor);
+    const saved = created.context.saved;
+    if (!saved) throw new Error('Successful persistence must expose the saved check-in.');
+
+    checkInHistoryStore.trigger.hydrated({ entries: [saved] });
+    failNextSurrealDelete(new Error('delete unavailable'));
+    actor.send({ type: CHECK_IN_EVENTS.DELETE_REQUESTED, id: saved.id });
+    await waitFor(
+      actor,
+      () => checkInHistoryStore.getSnapshot().context.error !== null,
+      { timeout: 1_000 },
+    );
+
+    expect(checkInHistoryStore.getSnapshot().context.entries).toContainEqual(saved);
+    expect(checkInHistoryStore.getSnapshot().context.error).not.toBeNull();
   });
 
   it('models a storage failure and successful retry', async () => {
@@ -132,13 +240,48 @@ describe('app navigation model', () => {
 
     await waitFor(actor, (candidate) => candidate.matches(CHECK_IN_STATES.FAILURE), { timeout: 1_000 });
     actor.send({ type: CHECK_IN_EVENTS.RETRIED });
-    const snapshot = await waitFor(
+    const snapshot = await finishWithoutBeliefSystem(actor);
+
+    expect(snapshot.context.error).toBeNull();
+  });
+
+  it('keeps the saved reflection when core belief attachment needs a retry', async () => {
+    const actor = createActor(appNavigationMachine).start();
+    actor.send({ type: CHECK_IN_EVENTS.TOUCH_STARTED });
+    actor.send({ type: CHECK_IN_EVENTS.SELECTION_CHANGED, selection });
+    actor.send({ type: CHECK_IN_EVENTS.SELECTION_RELEASED });
+    actor.send({ type: CHECK_IN_EVENTS.NOTE_CHANGED, note: 'Already safe' });
+    actor.send({ type: CHECK_IN_EVENTS.CONFIRMED });
+    const reflection = await waitFor(
+      actor,
+      (candidate) => candidate.matches(CHECK_IN_STATES.BELIEF_SYSTEM),
+      { timeout: 1_000 },
+    );
+    const reflectionId = reflection.context.saved?.id;
+
+    actor.send({
+      type: CHECK_IN_EVENTS.BELIEF_SYSTEM_CHANGED,
+      beliefSystemId: BELIEF_SYSTEM_IDS.ALWAYS_FUNCTIONING,
+    });
+    failNextSurrealUpsert(new Error('attachment unavailable'));
+    actor.send({ type: CHECK_IN_EVENTS.CONFIRMED });
+    const failure = await waitFor(
+      actor,
+      (candidate) => candidate.matches(CHECK_IN_STATES.BELIEF_SYSTEM_FAILURE),
+      { timeout: 1_000 },
+    );
+    expect(failure.context.saved).toMatchObject({ id: reflectionId, note: 'Already safe' });
+
+    actor.send({ type: CHECK_IN_EVENTS.RETRIED });
+    const completed = await waitFor(
       actor,
       (candidate) => candidate.matches(CHECK_IN_STATES.SUCCESS),
       { timeout: 1_000 },
     );
-
-    expect(snapshot.context.error).toBeNull();
+    expect(completed.context.saved).toMatchObject({
+      id: reflectionId,
+      beliefSystemId: BELIEF_SYSTEM_IDS.ALWAYS_FUNCTIONING,
+    });
   });
 
   it('loads, changes, and updates an existing moment without duplicating it', async () => {
@@ -149,11 +292,7 @@ describe('app navigation model', () => {
     actor.send({ type: CHECK_IN_EVENTS.NOTE_CHANGED, note: 'Before' });
     actor.send({ type: CHECK_IN_EVENTS.CONFIRMED });
 
-    const created = await waitFor(
-      actor,
-      (candidate) => candidate.matches(CHECK_IN_STATES.SUCCESS),
-      { timeout: 1_000 },
-    );
+    const created = await finishWithoutBeliefSystem(actor);
     const saved = created.context.saved;
     if (!saved) throw new Error('Successful persistence must expose the saved check-in.');
 
@@ -172,6 +311,12 @@ describe('app navigation model', () => {
     });
     actor.send({ type: CHECK_IN_EVENTS.SELECTION_RELEASED });
     actor.send({ type: CHECK_IN_EVENTS.NOTE_CHANGED, note: 'After' });
+    actor.send({ type: CHECK_IN_EVENTS.CONFIRMED });
+    await waitFor(
+      actor,
+      (candidate) => candidate.matches(CHECK_IN_STATES.BELIEF_SYSTEM),
+      { timeout: 1_000 },
+    );
     actor.send({ type: CHECK_IN_EVENTS.CONFIRMED });
 
     await waitFor(

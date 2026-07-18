@@ -30,6 +30,7 @@ describe('SurrealDB check-in repository', () => {
     saved = await Effect.runPromise(persistCheckIn({
       selection,
       note: 'Native SurrealKV harness check',
+      beliefSystemId: null,
       existing: null,
     }));
 
