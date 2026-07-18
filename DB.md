@@ -110,14 +110,14 @@ The ID is created when the custom editor opens and remains stable across persist
 belief_statement:<belief-system ID>
 ```
 
-The stored `statementId` preserves that string identity independently of SurrealDB's intrinsic record ID. Reads project `statementId AS beliefSystemId` before Effect Schema decoding. An upsert replaces the statement for the same ID, which allows a Leitsatz to be added or edited without changing any attached check-in references.
+The stored `statementId` preserves that string identity independently of SurrealDB's intrinsic record ID. Reads project `statementId AS beliefSystemId` before Effect Schema decoding. An upsert replaces the statement for the same ID, which allows a custom Leidsatz or Leitsatz to be edited without changing any attached check-in references. Clearing a built-in Leitsatz deletes its `belief_statement` row; clearing a custom Leitsatz upserts the custom row without `guidingStatement`, because its harmful statement still owns that record.
 
 Built-in harmful text is deliberately absent from this table because it remains source-controlled and localized. User-authored Leidsatz and Leitsatz text is persisted verbatim after trimming and is not translated when the application locale changes.
 
 ```mermaid
 erDiagram
     CHECK_IN }o--o| BELIEF_STATEMENT : "beliefSystemId for persisted statement"
-    CHECK_IN }o--o| BUILT_IN_LEIDSATZ : "beliefSystemId for source-controlled text"
+    CHECK_IN }o--o| BUILT_IN_BELIEF_CATALOG : "beliefSystemId for source-controlled text"
     CHECK_IN {
         string id
         string createdAt
@@ -133,7 +133,7 @@ erDiagram
         string harmfulStatement
         string guidingStatement
     }
-    BUILT_IN_LEIDSATZ {
+    BUILT_IN_BELIEF_CATALOG {
         string beliefSystemId
         string localizedText
     }
@@ -213,11 +213,11 @@ For a new or edited check-in, ranking uses:
 2. The source-controlled default order for that emotion.
 3. The global built-in catalog order followed by custom Leidsätze for all remaining values.
 
-No Leidsatz is attached by default. The reflection is persisted first, without a belief-system ID for new records, and the optional second step then offers the first three ranked values as quick suggestions. A clearly labeled catalog button opens every built-in and custom Leidsatz and provides the custom-entry action. Attaching a selection updates the already-saved check-in; skipping leaves the saved reflection unchanged. Recommendation learning is fully local and currently considers the loaded history projection, which is capped at 30 records.
+No Leidsatz is attached by default. The reflection is persisted first, without a belief-system ID for new records, and the optional second step then offers the first three ranked values as quick suggestions. A clearly labeled catalog button opens every built-in and custom Leidsatz and provides the custom-entry action. Attaching a selection updates the already-saved check-in; skipping leaves the saved reflection unchanged. An attached selection opens the dedicated `/guiding-belief` route, which preloads any existing custom harmful text and positive guiding statement. Recommendation learning is fully local and currently considers the loaded history projection, which is capped at 30 records.
 
-For an existing record, the first save preserves its current belief-system ID while updating the reflection. The optional second step can then retain, replace, or remove that attachment. This prevents the intermediate save from silently discarding an existing belief system.
+For an existing record, the first save preserves its current belief-system ID while updating the emotion ID, intensity, nuance level, and note. The optional second step can then retain, replace, or remove that attachment. If a belief remains attached, the dedicated third step can edit custom harmful wording and add, replace, or remove its guiding statement. Every check-in update preserves the original record ID and `createdAt`, so editing does not duplicate the history entry. Custom belief text is shared by stable `beliefSystemId`; changing it updates its display everywhere that ID is referenced.
 
-Creating a custom Leidsatz immediately selects it after its `belief_statement` record is persisted. A Leitsatz may be included in that creation or added later to the selected built-in or custom entry. The success screen resolves the attached ID and shows the positive statement only when that exact Leidsatz has a persisted Leitsatz.
+Creating a custom Leidsatz immediately selects it after its harmful statement is persisted. Its Leitsatz is formulated on the same dedicated third step used by built-in entries. The success screen resolves the attached ID and shows the positive statement only when that exact Leidsatz has a persisted Leitsatz.
 
 ### Retention
 
@@ -323,11 +323,11 @@ Database coverage is split across:
 
 - `surrealdb.database.test.ts`: directory creation, singleton connection, URI rejection, and retry after failure.
 - `check-in.repository.test.ts`: encode/decode, create, update, delete, legacy migration, integer transport, and tagged failures using a mocked client.
-- `belief-statement.repository.test.ts`: built-in Leitsatz and custom Leidsatz persistence, schema-validated loading, query shape, and tagged failures.
+- `belief-statement.repository.test.ts`: built-in Leitsatz and custom Leidsatz persistence, Leitsatz removal, schema-validated loading, query shape, and tagged failures.
 - `belief-system.test.ts`: catalog completeness, many-to-many defaults, custom entries, and history-based ranking.
 - `belief-system.harness.ts`: recommendation ranking inside the React Native runtime, guarding against JavaScript-engine API mismatches.
-- `belief-statement-flow.harness.tsx`: custom Leidsatz creation, positive Leitsatz formulation, attachment, and completion-screen display.
-- `app-navigation.machine.test.ts`: hydration, persistence, failure, retry, edit, custom creation, Leitsatz updates, belief-system attachment, and delete event paths.
+- `belief-statement-flow.harness.tsx`: custom Leidsatz creation, dedicated guiding-belief state, positive Leitsatz persistence, attachment, and completion under the native runtime.
+- `app-navigation.machine.test.ts`: hydration, persistence, failure, retry, complete saved-moment editing, custom creation, Leitsatz updates and removal, belief-system attachment, and delete event paths.
 - `check-in.repository.harness.ts`: real persistence and reload through the native SurrealKV engine, with record cleanup.
 
 Run the standard gates:
@@ -338,7 +338,7 @@ pnpm test:coverage
 pnpm verify:surrealdb-vendor
 ```
 
-Run `pnpm test:harness:ios` to exercise the React Native runtime and native engine on the configured iOS simulator. The script reserves port 8083 and passes it to the Expo development client at launch, so an existing Metro server does not make Harness wait at the development-server chooser. A plain web environment cannot validate Hermes or the native SurrealDB binding.
+Run `pnpm test:harness:ios` or `pnpm test:harness:android` to exercise the React Native runtime and native engine on the configured simulator or emulator. The scripts reserve dedicated Metro ports so an existing development server does not intercept Harness. A connected Google Pixel 6a can run the same suite through `pnpm test:harness:android:pixel`. A plain web environment cannot validate Hermes, Android SVG rendering, or the native SurrealDB binding.
 
 ## Schema-change checklist
 
@@ -365,6 +365,6 @@ For every persisted-schema or database-behavior change:
 - Validate timestamp syntax rather than branding any string.
 - Replace timestamp-plus-`Math.random` IDs if cryptographically strong or cross-device identities become necessary.
 - Define and test OS backup policy and data-protection expectations.
-- Add explicit rename and delete semantics for custom Leidsätze and decide how attached check-ins behave when a definition is removed.
+- Add explicit deletion semantics for custom Leidsätze and decide how attached check-ins behave when a definition is removed.
 - Decide whether and when the shared connection should close during app lifecycle transitions.
 - Add database-level table and field definitions if storage-level enforcement becomes a requirement.

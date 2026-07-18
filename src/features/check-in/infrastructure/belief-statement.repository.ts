@@ -7,6 +7,7 @@ import { BELIEF_STATEMENT_TABLE } from '@/constants';
 import {
   BeliefStatementListSchema,
   BeliefStatementSchema,
+  type BeliefSystemId,
   type BeliefStatement,
 } from '../domain/belief-statement';
 import { getDatabase } from './surrealdb.database';
@@ -14,7 +15,7 @@ import { getDatabase } from './surrealdb.database';
 export class BeliefStatementStorageError extends Schema.TaggedError<BeliefStatementStorageError>()(
   'BeliefStatementStorageError',
   {
-    operation: Schema.Literal('read', 'write'),
+    operation: Schema.Literal('read', 'write', 'delete'),
     cause: Schema.Defect,
   },
 ) {}
@@ -78,4 +79,26 @@ export const persistBeliefStatement = Effect.fn(
     })),
     Effect.as(statement),
   )
+));
+
+export const deleteBeliefStatement = Effect.fn(
+  'BeliefStatementRepository.delete',
+)((beliefSystemId: BeliefSystemId) => (
+  Effect.tryPromise({
+    try: async () => {
+      const database = await getDatabase();
+      await database.query(
+        'DELETE $record',
+        {
+          record: new SurrealRecordId(
+            `${BELIEF_STATEMENT_TABLE}:${beliefSystemId}`,
+          ),
+        },
+      );
+    },
+    catch: (cause) => BeliefStatementStorageError.make({
+      operation: 'delete',
+      cause,
+    }),
+  })
 ));

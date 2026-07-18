@@ -42,8 +42,8 @@ oxlint-rules/                tested local architecture plugin
 The main graph contains these navigable states:
 
 ```text
-tabs.today.idle → tabs.today.exploring → reflection → saving → beliefSystem → attaching → success
-                                                ↘ failure → saving       ↘ catalog
+tabs.today.idle → tabs.today.exploring → reflection → saving → beliefSystem → attaching → guidingBelief → persistingGuidingBelief → success
+                                                ↘ failure → saving       ↘ catalog          ↘ failure → retry
                                                                           ↘ editor → persisting
 tabs.today ↔ tabs.history ↔ tabs.settings
 ```
@@ -58,7 +58,9 @@ Each Leidsatz can be associated with multiple emotions. The selected emotion pro
 
 After the reflection has been persisted, the optional Leidsatz step shows three readable quick suggestions. A neutral, full-width catalog button opens all built-in and custom Leidsätze, and the catalog offers an action for adding a personal entry. No Leidsatz is attached unless the user explicitly selects one.
 
-A selected Leidsatz can be reformulated into a compassionate positive `Leitsatz`. The Leitsatz is optional while creating a custom entry and can be added or edited later for either a custom or built-in Leidsatz. When the completed check-in has an attached Leidsatz with a Leitsatz, “Du bist bei dir angekommen” shows that positive statement. Persisted check-ins reference the stable ID; custom Leidsatz text and attached Leitsätze are stored separately in the local database. Built-in display copy remains localized at render time.
+A selected Leidsatz continues to the dedicated `/guiding-belief` page. Its short reflection prompts are adapted from the supplied `Leitsätze-Verändern.pdf`: consider what the old rule once protected, where it restricts life now, and what a small change would look like tomorrow. The page then helps reformulate the Leidsatz into a compassionate positive `Leitsatz` while avoiding absolute language and keeping the result memorable.
+
+The Leitsatz remains optional. An existing Leitsatz is prefilled and can be changed or removed; a custom Leidsatz's original wording can also be edited on this page. Editing a saved moment reopens emotion, intensity, nuance, note, attached Leidsatz, custom wording, and Leitsatz values without creating a second history entry. When the completed check-in has an attached Leidsatz with a Leitsatz, “Du bist bei dir angekommen” shows that positive statement. Persisted check-ins reference the stable ID; custom Leidsatz text and attached Leitsätze are stored separately in the local database. Built-in display copy remains localized at render time.
 
 ### Belief-system flow
 
@@ -198,15 +200,17 @@ The rule suite lives beside the plugin and should be extended whenever a new inv
 
 - Pure tests cover vector-to-emotion selection and intensity thresholds.
 - Repository tests execute Effect programs against mocked native storage, including typed decode, custom Leidsatz persistence, deletion, and storage failures.
-- Navigation tests drive the actual root actor through persistence, Leidsatz attachment, custom entry creation, Leitsatz persistence, deletion, and route event paths.
-- Screen tests render the painterly star and exercise reflection, built-in and custom Leidsatz selection, Leitsatz display, persistence, history deletion, success, and settings.
-- Harness tests exercise the custom Leidsatz and Leitsatz interaction flow inside the React Native runtime.
+- Navigation tests drive the actual root actor through persistence, Leidsatz attachment, custom entry creation, dedicated guiding-belief navigation, complete saved-moment editing, Leitsatz persistence and removal, deletion, and route event paths.
+- Screen tests render the painterly star and exercise reflection, built-in and custom Leidsatz selection, the dedicated guiding-belief page, Leitsatz display, persistence, history deletion, success, and settings.
+- Harness tests exercise custom Leidsatz persistence through the separate guiding-belief state and verify emotion-label SVG nodes on the native React Native runtime.
 - Maestro tests exercise tab navigation, reflection cancellation, a persisted check-in save-and-delete journey, and language switching through the installed development app.
 - React Native Harness is configured for web, iOS, and Android device-level component testing.
 
 The current Jest coverage gate is enforced globally and must not be lowered.
 
-Use `pnpm test:harness:ios` for the native iOS gate. It starts Harness on its dedicated port and launches the Expo development client directly into that server. `pnpm test:harness` uses the default web runner and must not be treated as evidence that Hermes or native bindings work.
+Use `pnpm test:harness:ios` and `pnpm test:harness:android` for the native simulator and emulator gates. Both start Harness on dedicated ports and launch the Expo development client directly into that server. With a Google Pixel 6a connected, `pnpm test:harness:android:pixel` runs the same suite on that physical-device profile. `pnpm test:harness` uses the default web runner and must not be treated as evidence that Hermes, native SVG behavior, or native bindings work.
+
+The emotion-label regression test asserts the actual rendered SVG node set for emoji-only, text-only, and combined modes at both the component and React Native Harness layers. This structural assertion prevents a platform from showing an element whose opacity animation failed to update, which a settings-state-only assertion cannot detect.
 
 ### Maestro end-to-end tests
 
@@ -225,4 +229,4 @@ Project-local skills are installed under `.agents/skills`, including Software Ma
 
 ## Source material
 
-The interaction language and emotion vocabulary were derived from the supplied `Youmotion.pdf` and `Gefühlsstern.pdf`. The built-in Leidsatz catalog was transcribed from the supplied `Leitsätze.pdf` and `Mögliche-Leitsätze.pdf`; near-identical statements were normalized into stable source-controlled entries. The implementation also follows the linked vertical-codebase, self-contained-component, TigerStyle, XState 6 alpha, and custom-linting references.
+The interaction language and emotion vocabulary were derived from the supplied `Youmotion.pdf` and `Gefühlsstern.pdf`. The built-in Leidsatz catalog was transcribed from the supplied `Leitsätze.pdf` and `Mögliche-Leitsätze.pdf`; near-identical statements were normalized into stable source-controlled entries. The dedicated reformulation prompts were adapted from the supplied `Leitsätze-Verändern.pdf`. The implementation also follows the linked vertical-codebase, self-contained-component, TigerStyle, XState 6 alpha, and custom-linting references.

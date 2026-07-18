@@ -2,12 +2,9 @@ import { useCallback, useMemo } from 'react';
 import { useSelector } from '@xstate/store-react';
 import { PanResponder, StyleSheet, Text, useWindowDimensions, View, type StyleProp, type TextStyle } from 'react-native';
 import Animated, {
-  createAnimatedComponent,
   Easing,
   interpolate,
-  useAnimatedProps,
   useAnimatedStyle,
-  useDerivedValue,
   useFrameCallback,
   useReducedMotion,
   useSharedValue,
@@ -15,20 +12,19 @@ import Animated, {
   withDelay,
   withTiming,
 } from 'react-native-reanimated';
-import Svg, { Circle, Text as SvgText } from 'react-native-svg';
+import Svg, { Circle } from 'react-native-svg';
 
 import {
-  EMOTION_LABEL_TRANSITION_DURATION,
-  EMOTION_LABEL_MODES,
   EMOTION_TEXT_REVEAL_DURATION,
   EMOTION_TEXT_REVEAL_STAGGER,
 } from '@/constants';
 import { appSettingsStore } from '@/features/settings/application/app-settings.store';
 import type { EmotionLabelMode } from '@/features/settings/domain/emotion-label-mode';
 import { emotionAngle, selectionFromPoint } from '../domain/emotion-selection';
-import { emotions, type Emotion, type EmotionSelection } from '../domain/emotion';
+import { emotions, type EmotionSelection } from '../domain/emotion';
 import { BaseStateRipples } from './base-state-ripples';
-import { emotionEmoji, emotionName, emotionNuance, emotionStarAccessibility } from './emotion-copy';
+import { EmotionAxisLabel } from './emotion-axis-label';
+import { emotionName, emotionNuance, emotionStarAccessibility } from './emotion-copy';
 import { palette, textSize, type } from './theme';
 
 type EmotionStarProps = {
@@ -65,15 +61,6 @@ type RevealedCharacterProps = {
   style: StyleProp<TextStyle>;
 };
 
-type EmotionAxisLabelProps = {
-  emotion: Emotion;
-  isActive: boolean;
-  labelMode: EmotionLabelMode;
-  x: number;
-  y: number;
-};
-
-const AnimatedSvgText = createAnimatedComponent(SvgText);
 const _selectEmotionLabelMode = (state: ReturnType<typeof appSettingsStore.getSnapshot>) => (
   state.context.emotionLabelMode
 );
@@ -157,56 +144,6 @@ function EmotionReadout({ selection }: { selection: EmotionSelection }) {
         text={emotionName(selection.emotionId)}
       />
     </View>
-  );
-}
-
-function EmotionAxisLabel({ emotion, isActive, labelMode, x, y }: EmotionAxisLabelProps) {
-  const reduceMotion = useReducedMotion();
-  const animatesToWord = labelMode === EMOTION_LABEL_MODES.EMOJI;
-  const showsEmoji = labelMode !== EMOTION_LABEL_MODES.TEXT;
-  const showsWord = labelMode !== EMOTION_LABEL_MODES.EMOJI;
-  const showsBoth = labelMode === EMOTION_LABEL_MODES.BOTH;
-  const progress = useDerivedValue(
-    () => reduceMotion ? Number(isActive && animatesToWord) : withTiming(Number(isActive && animatesToWord), {
-      duration: EMOTION_LABEL_TRANSITION_DURATION,
-      easing: Easing.bezier(0.3, 0, 0.2, 1),
-    }),
-    [animatesToWord, isActive, reduceMotion],
-  );
-  const emojiAnimatedProps = useAnimatedProps(() => ({
-    opacity: showsEmoji ? interpolate(progress.value, [0, 1], [1, 0]) : 0,
-    y: showsBoth ? y - 9 : interpolate(progress.value, [0, 1], [y, y - 3]),
-  }));
-  const wordAnimatedProps = useAnimatedProps(() => ({
-    opacity: showsWord ? 0.88 : interpolate(progress.value, [0, 1], [0, 0.88]),
-    y: showsBoth ? y + 11 : interpolate(progress.value, [0, 1], [y + 3, y]),
-  }));
-
-  return (
-    <>
-      <AnimatedSvgText
-        animatedProps={emojiAnimatedProps}
-        fill={palette.ink}
-        fontSize={22}
-        key={`${emotion.id}-emoji`}
-        testID={`base-emotion-emoji-${emotion.id}`}
-        textAnchor="middle"
-        x={x}>
-        {emotionEmoji(emotion.id)}
-      </AnimatedSvgText>
-      <AnimatedSvgText
-        animatedProps={wordAnimatedProps}
-        fill={palette.ink}
-        fontFamily={type.medium}
-        fontSize={showsBoth ? textSize.metadata : textSize.emphasis}
-        key={`${emotion.id}-word`}
-        letterSpacing={0.3}
-        testID={`base-emotion-label-${emotion.id}`}
-        textAnchor="middle"
-        x={x}>
-        {emotionName(emotion.id)}
-      </AnimatedSvgText>
-    </>
   );
 }
 

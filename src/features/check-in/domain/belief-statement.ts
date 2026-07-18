@@ -102,9 +102,11 @@ export function beliefStatementForId({
 export function customBeliefSystemIds(
   statements: readonly BeliefStatement[],
 ): readonly CustomBeliefSystemId[] {
-  return statements
-    .filter((statement) => statement.kind === 'custom')
-    .map((statement) => statement.beliefSystemId);
+  const ids: CustomBeliefSystemId[] = [];
+  for (const statement of statements) {
+    if (statement.kind === 'custom') ids.push(statement.beliefSystemId);
+  }
+  return ids;
 }
 
 export function recordBeliefStatement({
@@ -121,4 +123,14 @@ export function recordBeliefStatement({
   return statements.map((candidate) => (
     candidate.beliefSystemId === statement.beliefSystemId ? statement : candidate
   ));
+}
+
+export function removeBeliefStatement({
+  beliefSystemId,
+  statements,
+}: {
+  beliefSystemId: BeliefSystemId;
+  statements: readonly BeliefStatement[];
+}) {
+  return statements.filter((statement) => statement.beliefSystemId !== beliefSystemId);
 }

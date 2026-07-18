@@ -2,13 +2,9 @@ import {
   afterEach,
   describe,
   expect,
-  mock,
-  render,
-  resetModules,
   test,
   waitUntil,
 } from 'react-native-harness';
-import { screen, userEvent } from '@react-native-harness/ui';
 import { SurrealRecordId } from 'react-native-surrealdb';
 import { createActor, type Actor } from 'xstate';
 
@@ -19,7 +15,6 @@ import {
   CHECK_IN_TABLE,
   EMOTION_IDS,
 } from '@/constants';
-import { AppLocaleProvider } from '@/localization/app-locale-provider';
 import { appNavigationMachine } from '@/navigation/app-navigation.machine';
 import type { BeliefSystemId } from '../domain/belief-statement';
 import type {
@@ -31,10 +26,23 @@ import { getDatabase } from '../infrastructure/surrealdb.database';
 let actor: Actor<typeof appNavigationMachine> | undefined;
 let createdBeliefSystemId: BeliefSystemId | undefined;
 let createdCheckInId: CheckInId | undefined;
+const waitOptions = { timeout: 5_000 };
 
 function currentActor() {
-  if (!actor) throw new Error('The navigation actor must be started before rendering.');
+  if (!actor) throw new Error('The navigation actor must be started before use.');
   return actor;
+}
+
+async function waitForState(state: string) {
+  try {
+    await waitUntil(
+      () => currentActor().getSnapshot().matches(state),
+      waitOptions,
+    );
+  } catch (cause) {
+    const current = JSON.stringify(currentActor().getSnapshot().value);
+    throw new Error(`Expected ${state}, received ${current}.`, { cause });
+  }
 }
 
 afterEach(async () => {
@@ -55,16 +63,10 @@ afterEach(async () => {
   actor = undefined;
   createdBeliefSystemId = undefined;
   createdCheckInId = undefined;
-  resetModules();
 });
 
 describe('personal belief flow on the device runtime', () => {
-  test('creates a core belief and shows its guiding belief after check-in', async () => {
-    mock('@/navigation/app-navigation.provider', () => ({
-      useAppNavigationActor: currentActor,
-    }));
-    const { ReflectionScreen } = await import('../ui/reflection-screen');
-    const { SuccessScreen } = await import('../ui/success-screen');
+  test('persists a custom core belief through the dedicated guiding step', async () => {
     const selection = {
       emotionId: EMOTION_IDS.JOY,
       intensity: 0.5,
@@ -76,41 +78,40 @@ describe('personal belief flow on the device runtime', () => {
     currentActor().send({ type: CHECK_IN_EVENTS.SELECTION_CHANGED, selection });
     currentActor().send({ type: CHECK_IN_EVENTS.SELECTION_RELEASED });
     currentActor().send({ type: CHECK_IN_EVENTS.CONFIRMED });
-    await waitUntil(
-      () => currentActor().getSnapshot().matches(CHECK_IN_STATES.BELIEF_SYSTEM),
-    );
+    await waitForState(CHECK_IN_STATES.BELIEF_SYSTEM);
 
-    const rendered = await render(
-      <AppLocaleProvider><ReflectionScreen /></AppLocaleProvider>,
-    );
-    await userEvent.press(await screen.findByTestId('belief-system-browse'));
-    await userEvent.press(await screen.findByTestId('create-custom-belief'));
-    await userEvent.type(
-      await screen.findByTestId('belief-system-draft'),
-      'I must earn every pause.',
-    );
-    await userEvent.type(
-      await screen.findByTestId('guiding-belief-draft'),
-      'Rest is part of a full life.',
-    );
-    await userEvent.press(await screen.findByTestId('belief-system-editor-save'));
-    await waitUntil(
-      () => currentActor().getSnapshot().matches(CHECK_IN_STATES.BELIEF_SYSTEM),
-    );
+    currentActor().send({ type: CHECK_IN_EVENTS.BELIEF_SYSTEM_CATALOG_REQUESTED });
+    await waitForState(CHECK_IN_STATES.BELIEF_SYSTEM_CATALOG);
+    currentActor().send({ type: CHECK_IN_EVENTS.CUSTOM_BELIEF_SYSTEM_REQUESTED });
+    await waitForState(CHECK_IN_STATES.BELIEF_SYSTEM_EDITOR);
+    currentActor().send({
+      type: CHECK_IN_EVENTS.BELIEF_SYSTEM_DRAFT_CHANGED,
+      statement: 'I must earn every pause.',
+    });
+    currentActor().send({ type: CHECK_IN_EVENTS.BELIEF_SYSTEM_EDITOR_CONFIRMED });
+    await waitForState(CHECK_IN_STATES.BELIEF_SYSTEM);
     createdBeliefSystemId = currentActor().getSnapshot().context.beliefSystemId
       ?? undefined;
+    if (!createdBeliefSystemId) {
+      throw new Error('Custom belief persistence must select its stable ID.');
+    }
 
-    await userEvent.press(await screen.findByTestId('belief-system-finish'));
-    await waitUntil(
-      () => currentActor().getSnapshot().matches(CHECK_IN_STATES.SUCCESS),
-    );
-    createdCheckInId = currentActor().getSnapshot().context.saved?.id;
-    await rendered.rerender(
-      <AppLocaleProvider><SuccessScreen /></AppLocaleProvider>,
-    );
+    currentActor().send({ type: CHECK_IN_EVENTS.CONFIRMED });
+    await waitForState(CHECK_IN_STATES.GUIDING_BELIEF);
+    currentActor().send({
+      type: CHECK_IN_EVENTS.GUIDING_BELIEF_SYSTEM_DRAFT_CHANGED,
+      statement: 'Rest is part of a full life.',
+    });
+    currentActor().send({ type: CHECK_IN_EVENTS.GUIDING_BELIEF_CONFIRMED });
+    await waitForState(CHECK_IN_STATES.SUCCESS);
 
-    expect(await screen.findByTestId('success-guiding-belief')).toHaveTextContent(
-      'Rest is part of a full life.',
-    );
+    const snapshot = currentActor().getSnapshot();
+    createdCheckInId = snapshot.context.saved?.id;
+    expect(snapshot.context.beliefStatements).toContainEqual({
+      kind: 'custom',
+      beliefSystemId: createdBeliefSystemId,
+      harmfulStatement: 'I must earn every pause.',
+      guidingStatement: 'Rest is part of a full life.',
+    });
   });
 });

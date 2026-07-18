@@ -215,6 +215,13 @@ describe('app navigation model', () => {
     expect(actor.getSnapshot().matches(CHECK_IN_STATES.BELIEF_SYSTEM)).toBe(true);
     actor.send({ type: CHECK_IN_EVENTS.CONFIRMED });
 
+    const guiding = await waitFor(
+      actor,
+      (candidate) => candidate.matches(CHECK_IN_STATES.GUIDING_BELIEF),
+      { timeout: 1_000 },
+    );
+    expect(routeForStateValue(guiding.value)).toBe(APP_ROUTES.GUIDING_BELIEF);
+    actor.send({ type: CHECK_IN_EVENTS.GUIDING_BELIEF_SKIPPED });
     const snapshot = await waitFor(
       actor,
       (candidate) => candidate.matches(CHECK_IN_STATES.SUCCESS),
@@ -246,10 +253,6 @@ describe('app navigation model', () => {
       type: CHECK_IN_EVENTS.BELIEF_SYSTEM_DRAFT_CHANGED,
       statement: 'I must always function.',
     });
-    actor.send({
-      type: CHECK_IN_EVENTS.GUIDING_BELIEF_SYSTEM_DRAFT_CHANGED,
-      statement: 'I may pause and I am still loved.',
-    });
     failNextSurrealUpsert(new Error('belief storage unavailable'));
     actor.send({ type: CHECK_IN_EVENTS.BELIEF_SYSTEM_EDITOR_CONFIRMED });
 
@@ -270,16 +273,31 @@ describe('app navigation model', () => {
       kind: 'custom',
       beliefSystemId: selectedId,
       harmfulStatement: 'I must always function.',
-      guidingStatement: 'I may pause and I am still loved.',
     });
 
     actor.send({ type: CHECK_IN_EVENTS.CONFIRMED });
+    await waitFor(
+      actor,
+      (candidate) => candidate.matches(CHECK_IN_STATES.GUIDING_BELIEF),
+      { timeout: 1_000 },
+    );
+    actor.send({
+      type: CHECK_IN_EVENTS.GUIDING_BELIEF_SYSTEM_DRAFT_CHANGED,
+      statement: 'I may pause and I am still loved.',
+    });
+    actor.send({ type: CHECK_IN_EVENTS.GUIDING_BELIEF_CONFIRMED });
     const completed = await waitFor(
       actor,
       (candidate) => candidate.matches(CHECK_IN_STATES.SUCCESS),
       { timeout: 1_000 },
     );
     expect(completed.context.saved?.beliefSystemId).toBe(selectedId);
+    expect(completed.context.beliefStatements).toContainEqual({
+      kind: 'custom',
+      beliefSystemId: selectedId,
+      harmfulStatement: 'I must always function.',
+      guidingStatement: 'I may pause and I am still loved.',
+    });
   });
 
   it('adds a guiding belief to a built-in core belief', async () => {
@@ -297,16 +315,22 @@ describe('app navigation model', () => {
       type: CHECK_IN_EVENTS.BELIEF_SYSTEM_CHANGED,
       beliefSystemId: BELIEF_SYSTEM_IDS.ALWAYS_FUNCTIONING,
     });
-    actor.send({ type: CHECK_IN_EVENTS.GUIDING_BELIEF_SYSTEM_REQUESTED });
+    actor.send({ type: CHECK_IN_EVENTS.CONFIRMED });
+    const guiding = await waitFor(
+      actor,
+      (candidate) => candidate.matches(CHECK_IN_STATES.GUIDING_BELIEF),
+      { timeout: 1_000 },
+    );
+    expect(routeForStateValue(guiding.value)).toBe(APP_ROUTES.GUIDING_BELIEF);
     actor.send({
       type: CHECK_IN_EVENTS.GUIDING_BELIEF_SYSTEM_DRAFT_CHANGED,
       statement: 'I may pause and I am still loved.',
     });
-    actor.send({ type: CHECK_IN_EVENTS.BELIEF_SYSTEM_EDITOR_CONFIRMED });
+    actor.send({ type: CHECK_IN_EVENTS.GUIDING_BELIEF_CONFIRMED });
 
     const persisted = await waitFor(
       actor,
-      (candidate) => candidate.matches(CHECK_IN_STATES.BELIEF_SYSTEM),
+      (candidate) => candidate.matches(CHECK_IN_STATES.SUCCESS),
       { timeout: 1_000 },
     );
     expect(persisted.context.beliefStatements).toContainEqual({
@@ -405,18 +429,24 @@ describe('app navigation model', () => {
     expect(failure.context.saved).toMatchObject({ id: reflectionId, note: 'Already safe' });
 
     actor.send({ type: CHECK_IN_EVENTS.RETRIED });
-    const completed = await waitFor(
+    const guiding = await waitFor(
+      actor,
+      (candidate) => candidate.matches(CHECK_IN_STATES.GUIDING_BELIEF),
+      { timeout: 1_000 },
+    );
+    expect(guiding.context.saved).toMatchObject({
+      id: reflectionId,
+      beliefSystemId: BELIEF_SYSTEM_IDS.ALWAYS_FUNCTIONING,
+    });
+    actor.send({ type: CHECK_IN_EVENTS.GUIDING_BELIEF_SKIPPED });
+    await waitFor(
       actor,
       (candidate) => candidate.matches(CHECK_IN_STATES.SUCCESS),
       { timeout: 1_000 },
     );
-    expect(completed.context.saved).toMatchObject({
-      id: reflectionId,
-      beliefSystemId: BELIEF_SYSTEM_IDS.ALWAYS_FUNCTIONING,
-    });
   });
 
-  it('loads, changes, and updates an existing moment without duplicating it', async () => {
+  it('loads and updates every editable value without duplicating the moment', async () => {
     const actor = createActor(appNavigationMachine).start();
     actor.send({ type: CHECK_IN_EVENTS.TOUCH_STARTED });
     actor.send({ type: CHECK_IN_EVENTS.SELECTION_CHANGED, selection });
@@ -424,7 +454,31 @@ describe('app navigation model', () => {
     actor.send({ type: CHECK_IN_EVENTS.NOTE_CHANGED, note: 'Before' });
     actor.send({ type: CHECK_IN_EVENTS.CONFIRMED });
 
-    const created = await finishWithoutBeliefSystem(actor);
+    await waitFor(
+      actor,
+      (candidate) => candidate.matches(CHECK_IN_STATES.BELIEF_SYSTEM),
+      { timeout: 1_000 },
+    );
+    actor.send({
+      type: CHECK_IN_EVENTS.BELIEF_SYSTEM_CHANGED,
+      beliefSystemId: BELIEF_SYSTEM_IDS.ALWAYS_FUNCTIONING,
+    });
+    actor.send({ type: CHECK_IN_EVENTS.CONFIRMED });
+    await waitFor(
+      actor,
+      (candidate) => candidate.matches(CHECK_IN_STATES.GUIDING_BELIEF),
+      { timeout: 1_000 },
+    );
+    actor.send({
+      type: CHECK_IN_EVENTS.GUIDING_BELIEF_SYSTEM_DRAFT_CHANGED,
+      statement: 'I must keep going.',
+    });
+    actor.send({ type: CHECK_IN_EVENTS.GUIDING_BELIEF_CONFIRMED });
+    const created = await waitFor(
+      actor,
+      (candidate) => candidate.matches(CHECK_IN_STATES.SUCCESS),
+      { timeout: 1_000 },
+    );
     const saved = created.context.saved;
     if (!saved) throw new Error('Successful persistence must expose the saved check-in.');
 
@@ -449,7 +503,21 @@ describe('app navigation model', () => {
       (candidate) => candidate.matches(CHECK_IN_STATES.BELIEF_SYSTEM),
       { timeout: 1_000 },
     );
+    actor.send({
+      type: CHECK_IN_EVENTS.BELIEF_SYSTEM_CHANGED,
+      beliefSystemId: BELIEF_SYSTEM_IDS.NO_MISTAKES,
+    });
     actor.send({ type: CHECK_IN_EVENTS.CONFIRMED });
+    await waitFor(
+      actor,
+      (candidate) => candidate.matches(CHECK_IN_STATES.GUIDING_BELIEF),
+      { timeout: 1_000 },
+    );
+    actor.send({
+      type: CHECK_IN_EVENTS.GUIDING_BELIEF_SYSTEM_DRAFT_CHANGED,
+      statement: 'Mistakes help me learn.',
+    });
+    actor.send({ type: CHECK_IN_EVENTS.GUIDING_BELIEF_CONFIRMED });
 
     await waitFor(
       actor,
@@ -464,6 +532,55 @@ describe('app navigation model', () => {
       intensity: 0.8,
       level: 4,
       note: 'After',
+      beliefSystemId: BELIEF_SYSTEM_IDS.NO_MISTAKES,
     });
+    expect(actor.getSnapshot().context.beliefStatements).toContainEqual({
+      kind: 'built-in',
+      beliefSystemId: BELIEF_SYSTEM_IDS.NO_MISTAKES,
+      guidingStatement: 'Mistakes help me learn.',
+    });
+
+    const updated = entries[0];
+    if (!updated) throw new Error('The edited check-in must remain in history.');
+    actor.send({ type: CHECK_IN_EVENTS.EDIT_REQUESTED, entry: updated });
+    actor.send({ type: CHECK_IN_EVENTS.CONFIRMED });
+    await waitFor(
+      actor,
+      (candidate) => candidate.matches(CHECK_IN_STATES.BELIEF_SYSTEM),
+      { timeout: 1_000 },
+    );
+    actor.send({ type: CHECK_IN_EVENTS.CONFIRMED });
+    await waitFor(
+      actor,
+      (candidate) => candidate.matches(CHECK_IN_STATES.GUIDING_BELIEF),
+      { timeout: 1_000 },
+    );
+    actor.send({
+      type: CHECK_IN_EVENTS.GUIDING_BELIEF_SYSTEM_DRAFT_CHANGED,
+      statement: '',
+    });
+    actor.send({ type: CHECK_IN_EVENTS.GUIDING_BELIEF_CONFIRMED });
+    await waitFor(
+      actor,
+      (candidate) => candidate.matches({
+        [NAVIGATION_STATES.TABS]: NAVIGATION_STATES.HISTORY,
+      }),
+      { timeout: 1_000 },
+    );
+
+    expect(actor.getSnapshot().context.beliefStatements).not.toContainEqual(
+      expect.objectContaining({
+        beliefSystemId: BELIEF_SYSTEM_IDS.NO_MISTAKES,
+      }),
+    );
+    expect(mockSurrealQuery).toHaveBeenCalledWith(
+      'DELETE $record',
+      expect.objectContaining({
+        record: expect.objectContaining({
+          kind: 'record',
+          value: expect.stringContaining(BELIEF_SYSTEM_IDS.NO_MISTAKES),
+        }),
+      }),
+    );
   });
 });

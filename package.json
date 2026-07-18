@@ -152,6 +152,8 @@
     "test:maestro": "maestro test .maestro",
     "test:maestro:smoke": "maestro test .maestro --include-tags=smoke",
     "test:harness": "harness --config jest.harness.config.mjs --no-watchman",
+    "test:harness:android": "node scripts/run-android-harness.mjs android 8084",
+    "test:harness:android:pixel": "node scripts/run-android-harness.mjs android-pixel-6a 8084",
     "test:harness:ios": "RN_HARNESS_METRO_PORT=8083 harness --config jest.harness.config.mjs --no-watchman --harnessRunner ios",
     "verify": "pnpm lint && pnpm typecheck && pnpm test",
     "verify:surrealdb-vendor": "node scripts/verify-vendored-surrealdb.mjs"

@@ -26,6 +26,7 @@ import { selectionFromPoint } from '../domain/emotion-selection';
 import { EmotionStar } from '../ui/emotion-star';
 import { HistoryScreen } from '../ui/history-screen';
 import { ReflectionScreen } from '../ui/reflection-screen';
+import { GuidingBeliefScreen } from '../ui/guiding-belief-screen';
 import { SuccessScreen } from '../ui/success-screen';
 import { SettingsScreen } from '@/features/settings/ui/settings-screen';
 import { appSettingsStore } from '@/features/settings/application/app-settings.store';
@@ -265,16 +266,22 @@ describe('check-in screens', () => {
       />,
     );
     expect(screen.getByTestId('emotion-star').props['accessibilityValue']).toEqual({ text: EMOTION_LABEL_MODES.EMOJI });
+    expect(screen.getByTestId('base-emotion-emoji-freude')).toBeTruthy();
+    expect(screen.queryByTestId('base-emotion-label-freude')).toBeNull();
 
     await act(() => appSettingsStore.trigger.emotionLabelModeChanged({
       mode: EMOTION_LABEL_MODES.TEXT,
     }));
     expect(screen.getByTestId('emotion-star').props['accessibilityValue']).toEqual({ text: EMOTION_LABEL_MODES.TEXT });
+    expect(screen.queryByTestId('base-emotion-emoji-freude')).toBeNull();
+    expect(screen.getByTestId('base-emotion-label-freude')).toBeTruthy();
 
     await act(() => appSettingsStore.trigger.emotionLabelModeChanged({
       mode: EMOTION_LABEL_MODES.BOTH,
     }));
     expect(screen.getByTestId('emotion-star').props['accessibilityValue']).toEqual({ text: EMOTION_LABEL_MODES.BOTH });
+    expect(screen.getByTestId('base-emotion-emoji-freude')).toBeTruthy();
+    expect(screen.getByTestId('base-emotion-label-freude')).toBeTruthy();
   });
 
   it('cancels an interrupted drag instead of releasing its preview', async () => {
@@ -329,20 +336,23 @@ describe('check-in screens', () => {
     await waitFor(() => expect(
       mockActor.getSnapshot().matches(CHECK_IN_STATES.BELIEF_SYSTEM),
     ).toBe(true));
-    await fireEvent.press(screen.getByTestId('guiding-belief-edit'));
+    await fireEvent.press(screen.getByTestId('belief-system-finish'));
     await waitFor(() => expect(
-      mockActor.getSnapshot().matches(CHECK_IN_STATES.BELIEF_SYSTEM_EDITOR),
+      mockActor.getSnapshot().matches(CHECK_IN_STATES.GUIDING_BELIEF),
     ).toBe(true));
+    await screen.rerender(
+      <AppLocaleProvider><GuidingBeliefScreen /></AppLocaleProvider>,
+    );
+    expect(screen.getByText('What would support you instead?')).toBeTruthy();
+    expect(screen.getByText(/What did this rule once help you gain or protect/)).toBeTruthy();
+    expect(screen.getByTestId('guiding-source-belief')).toHaveTextContent(
+      'I always have to function.',
+    );
     await fireEvent.changeText(
       screen.getByTestId('guiding-belief-draft'),
       'I may pause and I am still loved.',
     );
-    await fireEvent.press(screen.getByTestId('belief-system-editor-save'));
-    await waitFor(() => expect(
-      mockActor.getSnapshot().matches(CHECK_IN_STATES.BELIEF_SYSTEM),
-    ).toBe(true));
-    expect(await screen.findByText('I may pause and I am still loved.')).toBeTruthy();
-    await fireEvent.press(screen.getByText('Attach and finish'));
+    await fireEvent.press(screen.getByTestId('guiding-belief-save'));
 
     await waitFor(() => expect(mockActor.getSnapshot().matches(CHECK_IN_STATES.SUCCESS)).toBe(true));
     expect(mockActor.getSnapshot().context.saved?.beliefSystemId).toBe(
@@ -371,18 +381,29 @@ describe('check-in screens', () => {
       screen.getByTestId('belief-system-draft'),
       'I must earn every pause.',
     );
-    await fireEvent.changeText(
-      screen.getByTestId('guiding-belief-draft'),
-      'Rest is part of a full life.',
-    );
     await fireEvent.press(screen.getByTestId('belief-system-editor-save'));
 
     await waitFor(() => expect(
       mockActor.getSnapshot().matches(CHECK_IN_STATES.BELIEF_SYSTEM),
     ).toBe(true));
     expect(await screen.findByText('I must earn every pause.')).toBeTruthy();
-    expect(screen.getByText('Rest is part of a full life.')).toBeTruthy();
-    await fireEvent.press(screen.getByText('Attach and finish'));
+    await fireEvent.press(screen.getByText('Attach and continue'));
+    await waitFor(() => expect(
+      mockActor.getSnapshot().matches(CHECK_IN_STATES.GUIDING_BELIEF),
+    ).toBe(true));
+    await screen.rerender(
+      <AppLocaleProvider><GuidingBeliefScreen /></AppLocaleProvider>,
+    );
+    expect(screen.getByDisplayValue('I must earn every pause.')).toBeTruthy();
+    await fireEvent.changeText(
+      screen.getByTestId('guiding-source-belief-draft'),
+      'I must always earn every pause.',
+    );
+    await fireEvent.changeText(
+      screen.getByTestId('guiding-belief-draft'),
+      'Rest is part of a full life.',
+    );
+    await fireEvent.press(screen.getByTestId('guiding-belief-save'));
     await waitFor(() => expect(
       mockActor.getSnapshot().matches(CHECK_IN_STATES.SUCCESS),
     ).toBe(true));
@@ -391,7 +412,7 @@ describe('check-in screens', () => {
     expect(success.getByText('Rest is part of a full life.')).toBeTruthy();
   });
 
-  it('calls harmful beliefs Leidsätze and positive beliefs Leitsätze in German', async () => {
+  it('uses distinct harmful and guiding belief terms in the German locale', async () => {
     await act(() => appSettingsStore.trigger.languageChanged({
       locale: APP_LOCALES.GERMAN,
     }));
@@ -407,7 +428,23 @@ describe('check-in screens', () => {
     expect(await screen.findByText('LEIDSÄTZE')).toBeTruthy();
     await fireEvent.press(screen.getByText('Eigenen Leidsatz hinzufügen'));
     expect(await screen.findByText('Füge deinen eigenen Leidsatz hinzu.')).toBeTruthy();
-    expect(screen.getByText('Leitsatz · optional')).toBeTruthy();
+    await fireEvent.changeText(
+      screen.getByTestId('belief-system-draft'),
+      'Ich muss immer funktionieren.',
+    );
+    await fireEvent.press(screen.getByTestId('belief-system-editor-save'));
+    await waitFor(() => expect(
+      mockActor.getSnapshot().matches(CHECK_IN_STATES.BELIEF_SYSTEM),
+    ).toBe(true));
+    await fireEvent.press(screen.getByTestId('belief-system-finish'));
+    await waitFor(() => expect(
+      mockActor.getSnapshot().matches(CHECK_IN_STATES.GUIDING_BELIEF),
+    ).toBe(true));
+    await screen.rerender(
+      <AppLocaleProvider><GuidingBeliefScreen /></AppLocaleProvider>,
+    );
+    expect(screen.getByText('04 · NEUE RICHTUNG · SCHRITT 3 VON 3')).toBeTruthy();
+    expect(screen.getByText('Was würde dich stattdessen unterstützen?')).toBeTruthy();
     expect(screen.getByPlaceholderText(
       'Ich darf auch mal nicht funktionieren und werde trotzdem geliebt.',
     )).toBeTruthy();

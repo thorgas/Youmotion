@@ -6,10 +6,12 @@ import {
   type BeliefStatement,
 } from '../domain/belief-statement';
 import {
+  deleteBeliefStatement,
   loadBeliefStatements,
   persistBeliefStatement,
 } from '../infrastructure/belief-statement.repository';
 import {
+  failNextSurrealDelete,
   failNextSurrealUpsert,
   mockSurrealDatabase,
   mockSurrealQuery,
@@ -76,6 +78,22 @@ describe('Effect belief statement repository', () => {
     await expect(Effect.runPromise(loadBeliefStatements)).resolves.toEqual([stored]);
   });
 
+  it('deletes a guiding statement by its stable belief ID', async () => {
+    await Effect.runPromise(
+      deleteBeliefStatement(BELIEF_SYSTEM_IDS.ALWAYS_FUNCTIONING),
+    );
+
+    expect(mockSurrealQuery).toHaveBeenCalledWith(
+      'DELETE $record',
+      expect.objectContaining({
+        record: expect.objectContaining({
+          kind: 'record',
+          value: expect.stringContaining(BELIEF_SYSTEM_IDS.ALWAYS_FUNCTIONING),
+        }),
+      }),
+    );
+  });
+
   it('surfaces invalid data and write failures as tagged errors', async () => {
     mockSurrealQuery.mockResolvedValueOnce([{
       statementIndex: 0,
@@ -97,6 +115,16 @@ describe('Effect belief statement repository', () => {
     ).resolves.toMatchObject({
       _tag: 'BeliefStatementStorageError',
       operation: 'write',
+    });
+
+    failNextSurrealDelete(new Error('storage unavailable'));
+    await expect(
+      Effect.runPromise(Effect.flip(
+        deleteBeliefStatement(BELIEF_SYSTEM_IDS.ALWAYS_FUNCTIONING),
+      )),
+    ).resolves.toMatchObject({
+      _tag: 'BeliefStatementStorageError',
+      operation: 'delete',
     });
   });
 });

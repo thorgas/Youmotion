@@ -39,9 +39,6 @@ import {
   beliefSystemText,
   customBeliefAccessibilityLabel,
   customBeliefPlaceholder,
-  guidingBeliefAccessibilityLabel,
-  guidingBeliefPlaceholder,
-  guidingBeliefSystemText,
   noBeliefSystemText,
 } from './belief-system-copy';
 import {
@@ -205,8 +202,8 @@ function ReflectionNoteStep() {
           <View style={styles.header}>
             <Text style={styles.eyebrow}>
               {editing
-                ? <fbt desc="Label for editing an existing check-in">EDIT MOMENT · STEP 1 OF 2</fbt>
-                : <fbt desc="Second step label for reflecting on a feeling">02 · REFLECT · STEP 1 OF 2</fbt>}
+                ? <fbt desc="Label for editing an existing check-in">EDIT MOMENT · STEP 1 OF 3</fbt>
+                : <fbt desc="Second step label for reflecting on a feeling">02 · REFLECT · STEP 1 OF 3</fbt>}
             </Text>
             <Text style={styles.title}>
               {editing
@@ -329,15 +326,9 @@ function BeliefSystemStep() {
     : initialSuggestions;
   const attaching = snapshot.matches(CHECK_IN_STATES.ATTACHING_BELIEF_SYSTEM);
   const failed = snapshot.matches(CHECK_IN_STATES.BELIEF_SYSTEM_FAILURE);
-  const guidingStatement = selectedId
-    ? guidingBeliefSystemText({ id: selectedId, statements })
-    : undefined;
 
   const _back = () => actor.send({ type: CHECK_IN_EVENTS.BELIEF_SYSTEM_BACK_REQUESTED });
   const _browse = () => actor.send({ type: CHECK_IN_EVENTS.BELIEF_SYSTEM_CATALOG_REQUESTED });
-  const _guide = () => actor.send({
-    type: CHECK_IN_EVENTS.GUIDING_BELIEF_SYSTEM_REQUESTED,
-  });
   const _finish = () => actor.send({
     type: failed ? CHECK_IN_EVENTS.RETRIED : CHECK_IN_EVENTS.CONFIRMED,
   });
@@ -355,7 +346,7 @@ function BeliefSystemStep() {
         >
           <View style={styles.header}>
             <Text style={styles.eyebrow}>
-              <fbt desc="Optional core belief step label">03 · CORE BELIEF · STEP 2 OF 2</fbt>
+              <fbt desc="Optional core belief step label">03 · CORE BELIEF · STEP 2 OF 3</fbt>
             </Text>
             <Text style={styles.title}>
               <fbt desc="Question shown after a reflection is saved">
@@ -396,33 +387,6 @@ function BeliefSystemStep() {
                 />
               ))}
             </View>
-            {selectedId ? (
-              <PressableScale
-                accessibilityRole="button"
-                disabled={attaching}
-                onPress={_guide}
-                style={styles.guidingButton}
-                testID="guiding-belief-edit"
-              >
-                <View style={styles.browseCopy}>
-                  <Text style={styles.browseTitle}>
-                    {guidingStatement
-                      ? <fbt desc="Button editing a positive guiding belief">Edit guiding belief</fbt>
-                      : <fbt desc="Button turning a harmful core belief into a positive guiding belief">Formulate a guiding belief</fbt>}
-                  </Text>
-                  {guidingStatement ? (
-                    <Text style={styles.guidingPreview}>{guidingStatement}</Text>
-                  ) : (
-                    <Text style={styles.browseHelp}>
-                      <fbt desc="Description below the button for formulating a positive guiding belief">
-                        Give this belief a compassionate direction.
-                      </fbt>
-                    </Text>
-                  )}
-                </View>
-                <Text style={styles.chevron}>›</Text>
-              </PressableScale>
-            ) : null}
             <PressableScale
               accessibilityRole="button"
               disabled={attaching}
@@ -475,7 +439,7 @@ function BeliefSystemStep() {
                     {failed
                       ? <fbt desc="Button retrying core belief attachment">Try again</fbt>
                       : selectedId
-                        ? <fbt desc="Button attaching the selected core belief">Attach and finish</fbt>
+                        ? <fbt desc="Button attaching the selected core belief and continuing">Attach and continue</fbt>
                         : <fbt desc="Button finishing without a core belief">Finish without one</fbt>}
                   </Text>
                 )}
@@ -577,27 +541,19 @@ function BeliefSystemCatalogStep() {
   );
 }
 
-function BeliefEditorHeader({ custom }: { custom: boolean }) {
+function BeliefEditorHeader() {
   return (
     <View style={styles.catalogHeader}>
       <Text style={styles.eyebrow}>
-        {custom
-          ? <fbt desc="Label above the personal core belief editor">YOUR CORE BELIEF</fbt>
-          : <fbt desc="Label above the positive guiding belief editor">GUIDING BELIEF</fbt>}
+        <fbt desc="Label above the personal core belief editor">YOUR CORE BELIEF</fbt>
       </Text>
       <Text style={styles.title}>
-        {custom
-          ? <fbt desc="Title for adding a personal core belief">Add your own core belief.</fbt>
-          : <fbt desc="Title for turning a harmful core belief into a positive guiding belief">Give this belief a new direction.</fbt>}
+        <fbt desc="Title for adding a personal core belief">Add your own core belief.</fbt>
       </Text>
       <Text style={styles.copy}>
-        {custom
-          ? <fbt desc="Instructions for adding a personal harmful and optional positive guiding belief">
-              Name the belief that causes suffering. You can also formulate a positive guiding belief now.
-            </fbt>
-          : <fbt desc="Instructions for formulating a positive guiding belief">
-              Write a compassionate sentence that you want to live with.
-            </fbt>}
+        <fbt desc="Instructions for adding a personal harmful belief">
+          Name the belief that causes suffering. You can give it a new direction after attaching it.
+        </fbt>
       </Text>
     </View>
   );
@@ -605,94 +561,43 @@ function BeliefEditorHeader({ custom }: { custom: boolean }) {
 
 function BeliefEditorFields({
   beliefStatementDraft,
-  custom,
-  guidingBeliefStatementDraft,
   onBeliefChanged,
-  onGuidingChanged,
   saving,
-  selectedText,
 }: {
   beliefStatementDraft: string;
-  custom: boolean;
-  guidingBeliefStatementDraft: string;
   onBeliefChanged: (statement: string) => void;
-  onGuidingChanged: (statement: string) => void;
   saving: boolean;
-  selectedText: string;
 }) {
   return (
-    <>
-      {custom ? (
-        <View style={styles.editorField}>
-          <Text style={styles.editorLabel}>
-            <fbt desc="Label for a personal harmful core belief">Core belief</fbt>
-          </Text>
-          <TextInput
-            accessibilityLabel={customBeliefAccessibilityLabel()}
-            editable={!saving}
-            maxLength={MAX_BELIEF_STATEMENT_LENGTH}
-            multiline
-            onChangeText={onBeliefChanged}
-            placeholder={customBeliefPlaceholder()}
-            placeholderTextColor="#A39A8F"
-            style={styles.beliefInput}
-            testID="belief-system-draft"
-            value={beliefStatementDraft}
-          />
-        </View>
-      ) : (
-        <View style={styles.sourceBelief}>
-          <Text style={styles.editorLabel}>
-            <fbt desc="Label above the harmful belief being reformulated">Core belief</fbt>
-          </Text>
-          <Text style={styles.sourceBeliefText}>{selectedText}</Text>
-        </View>
-      )}
-      <View style={styles.editorField}>
-        <Text style={styles.editorLabel}>
-          {custom
-            ? <fbt desc="Label for an optional positive guiding belief">Guiding belief · optional</fbt>
-            : <fbt desc="Label for a positive guiding belief">Guiding belief</fbt>}
-        </Text>
-        <TextInput
-          accessibilityLabel={guidingBeliefAccessibilityLabel()}
-          editable={!saving}
-          maxLength={MAX_BELIEF_STATEMENT_LENGTH}
-          multiline
-          onChangeText={onGuidingChanged}
-          placeholder={guidingBeliefPlaceholder()}
-          placeholderTextColor="#A39A8F"
-          style={styles.beliefInput}
-          testID="guiding-belief-draft"
-          value={guidingBeliefStatementDraft}
-        />
-      </View>
-    </>
+    <View style={styles.editorField}>
+      <Text style={styles.editorLabel}>
+        <fbt desc="Label for a personal harmful core belief">Core belief</fbt>
+      </Text>
+      <TextInput
+        accessibilityLabel={customBeliefAccessibilityLabel()}
+        editable={!saving}
+        maxLength={MAX_BELIEF_STATEMENT_LENGTH}
+        multiline
+        onChangeText={onBeliefChanged}
+        placeholder={customBeliefPlaceholder()}
+        placeholderTextColor="#A39A8F"
+        style={styles.beliefInput}
+        testID="belief-system-draft"
+        value={beliefStatementDraft}
+      />
+    </View>
   );
 }
 
 function BeliefSystemEditorStep() {
   const actor = useAppNavigationActor();
   const snapshot = useSelector(actor, _selectSnapshot);
-  const mode = snapshot.context.beliefStatementEditorMode;
-  const selectedId = snapshot.context.beliefSystemId;
-  const statements = snapshot.context.beliefStatements;
   const saving = snapshot.matches(CHECK_IN_STATES.PERSISTING_BELIEF_STATEMENT);
   const failed = snapshot.matches(CHECK_IN_STATES.BELIEF_STATEMENT_FAILURE);
-  const custom = mode === 'custom';
   const harmfulReady = snapshot.context.beliefStatementDraft.trim().length > 0;
-  const guidingReady = snapshot.context.guidingBeliefStatementDraft.trim().length > 0;
-  const canSave = custom ? harmfulReady : guidingReady;
-  const selectedText = selectedId
-    ? beliefSystemText({ id: selectedId, statements })
-    : '';
 
   const _beliefChanged = (statement: string) => actor.send({
     type: CHECK_IN_EVENTS.BELIEF_SYSTEM_DRAFT_CHANGED,
-    statement,
-  });
-  const _guidingChanged = (statement: string) => actor.send({
-    type: CHECK_IN_EVENTS.GUIDING_BELIEF_SYSTEM_DRAFT_CHANGED,
     statement,
   });
   const _cancel = () => actor.send({
@@ -701,8 +606,6 @@ function BeliefSystemEditorStep() {
   const _save = () => actor.send({
     type: failed ? CHECK_IN_EVENTS.RETRIED : CHECK_IN_EVENTS.BELIEF_SYSTEM_EDITOR_CONFIRMED,
   });
-
-  if (!mode) return null;
 
   return (
     <View style={styles.page} testID="belief-system-editor">
@@ -714,16 +617,12 @@ function BeliefSystemEditorStep() {
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
         >
-          <BeliefEditorHeader custom={custom} />
+          <BeliefEditorHeader />
           <View style={styles.card}>
             <BeliefEditorFields
               beliefStatementDraft={snapshot.context.beliefStatementDraft}
-              custom={custom}
-              guidingBeliefStatementDraft={snapshot.context.guidingBeliefStatementDraft}
               onBeliefChanged={_beliefChanged}
-              onGuidingChanged={_guidingChanged}
               saving={saving}
-              selectedText={selectedText}
             />
             {failed ? (
               <Text style={styles.error}>
@@ -746,8 +645,8 @@ function BeliefSystemEditorStep() {
               </PressableScale>
               <PressableScale
                 accessibilityRole="button"
-                accessibilityState={{ disabled: saving || !canSave }}
-                disabled={saving || !canSave}
+                accessibilityState={{ disabled: saving || !harmfulReady }}
+                disabled={saving || !harmfulReady}
                 onPress={_save}
                 style={styles.primaryButton}
                 testID="belief-system-editor-save"

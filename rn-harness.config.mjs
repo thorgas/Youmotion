@@ -1,4 +1,8 @@
-import { androidEmulator, androidPlatform } from '@react-native-harness/platform-android';
+import {
+  androidEmulator,
+  androidPlatform,
+  physicalAndroidDevice,
+} from '@react-native-harness/platform-android';
 import { applePlatform, appleSimulator } from '@react-native-harness/platform-apple';
 import { chrome, webPlatform } from '@react-native-harness/platform-web';
 
@@ -22,6 +26,11 @@ export default {
     androidPlatform({
       name: 'android',
       device: androidEmulator('Pixel_9'),
+      bundleId: 'com.youmotion.mobile',
+    }),
+    androidPlatform({
+      name: 'android-pixel-6a',
+      device: physicalAndroidDevice('Google', 'Pixel 6a'),
       bundleId: 'com.youmotion.mobile',
     }),
   ],

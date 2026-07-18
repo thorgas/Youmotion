@@ -37,6 +37,7 @@ import {
   createCustomBeliefSystemId,
   isCustomBeliefSystemId,
   recordBeliefStatement,
+  removeBeliefStatement,
   type BeliefStatement,
 } from '@/features/check-in/domain/belief-statement';
 import {
@@ -45,6 +46,7 @@ import {
   persistCheckIn,
 } from '@/features/check-in/infrastructure/check-in.repository';
 import {
+  deleteBeliefStatement,
   loadBeliefStatements,
   persistBeliefStatement,
 } from '@/features/check-in/infrastructure/belief-statement.repository';
@@ -66,7 +68,6 @@ const AppContextSchema = Schema.Struct({
   beliefStatementDraft: Schema.String,
   beliefStatementDraftId: Schema.NullOr(CustomBeliefSystemId),
   guidingBeliefStatementDraft: Schema.String,
-  beliefStatementEditorMode: Schema.NullOr(Schema.Literal('custom', 'guiding')),
   saved: Schema.NullOr(CheckInSchema),
   editing: Schema.NullOr(CheckInSchema),
   error: Schema.NullOr(Schema.String),
@@ -74,46 +75,68 @@ const AppContextSchema = Schema.Struct({
 
 const EmptyEventSchema = Schema.standardSchemaV1(Schema.Struct({}));
 
-function beliefStatementFromDraft({
+function customBeliefStatementFromDraft({
   beliefStatementDraft,
   beliefStatementDraftId,
-  beliefStatementEditorMode,
+}: {
+  beliefStatementDraft: string;
+  beliefStatementDraftId: typeof CustomBeliefSystemId.Type | null;
+}): BeliefStatement | null {
+  const harmfulStatement = beliefStatementDraft.trim();
+  if (!harmfulStatement || !beliefStatementDraftId) return null;
+  return {
+    kind: 'custom',
+    beliefSystemId: beliefStatementDraftId,
+    harmfulStatement,
+  };
+}
+
+function guidingBeliefStatementFromDraft({
+  beliefStatementDraft,
   beliefStatements,
   beliefSystemId,
   guidingBeliefStatementDraft,
 }: {
   beliefStatementDraft: string;
-  beliefStatementDraftId: typeof CustomBeliefSystemId.Type | null;
-  beliefStatementEditorMode: 'custom' | 'guiding' | null;
   beliefStatements: readonly BeliefStatement[];
   beliefSystemId: BeliefSystemId | null;
   guidingBeliefStatementDraft: string;
 }): BeliefStatement | null {
+  if (!beliefSystemId) return null;
   const guidingStatement = guidingBeliefStatementDraft.trim();
-  if (beliefStatementEditorMode === 'custom') {
-    const harmfulStatement = beliefStatementDraft.trim();
-    if (!harmfulStatement || !beliefStatementDraftId) return null;
-    if (!guidingStatement) {
-      return {
-        kind: 'custom',
-        beliefSystemId: beliefStatementDraftId,
-        harmfulStatement,
-      };
-    }
-    return {
-      kind: 'custom',
-      beliefSystemId: beliefStatementDraftId,
-      harmfulStatement,
-      guidingStatement,
-    };
-  }
-  if (!beliefSystemId || !guidingStatement) return null;
   if (!isCustomBeliefSystemId(beliefSystemId)) {
-    return { kind: 'built-in', beliefSystemId, guidingStatement };
+    return guidingStatement
+      ? { kind: 'built-in', beliefSystemId, guidingStatement }
+      : null;
   }
   const existing = beliefStatementForId({ beliefSystemId, statements: beliefStatements });
   if (existing?.kind !== 'custom') return null;
-  return { ...existing, guidingStatement };
+  const harmfulStatement = beliefStatementDraft.trim();
+  if (!harmfulStatement) return null;
+  return guidingStatement
+    ? { ...existing, harmfulStatement, guidingStatement }
+    : { kind: 'custom', beliefSystemId, harmfulStatement };
+}
+
+function guidingBeliefDrafts({
+  beliefStatements,
+  beliefSystemId,
+}: {
+  beliefStatements: readonly BeliefStatement[];
+  beliefSystemId: BeliefSystemId;
+}) {
+  const statement = beliefStatementForId({
+    beliefSystemId,
+    statements: beliefStatements,
+  });
+  return {
+    beliefStatementDraft: statement?.kind === 'custom'
+      ? statement.harmfulStatement
+      : '',
+    beliefStatementDraftId: null,
+    guidingBeliefStatementDraft: statement?.guidingStatement ?? '',
+    error: null,
+  };
 }
 
 export const appNavigationMachine = setup({
@@ -139,6 +162,9 @@ export const appNavigationMachine = setup({
     [CHECK_IN_STATES.BELIEF_STATEMENT_FAILURE]: {},
     [CHECK_IN_STATES.ATTACHING_BELIEF_SYSTEM]: {},
     [CHECK_IN_STATES.BELIEF_SYSTEM_FAILURE]: {},
+    [CHECK_IN_STATES.GUIDING_BELIEF]: {},
+    [CHECK_IN_STATES.PERSISTING_GUIDING_BELIEF]: {},
+    [CHECK_IN_STATES.GUIDING_BELIEF_FAILURE]: {},
     [CHECK_IN_STATES.SUCCESS]: {},
     [CHECK_IN_STATES.FAILURE]: {},
   },
@@ -162,7 +188,6 @@ export const appNavigationMachine = setup({
       [CHECK_IN_EVENTS.BELIEF_SYSTEM_CATALOG_REQUESTED]: EmptyEventSchema,
       [CHECK_IN_EVENTS.BELIEF_SYSTEM_CATALOG_CLOSED]: EmptyEventSchema,
       [CHECK_IN_EVENTS.CUSTOM_BELIEF_SYSTEM_REQUESTED]: EmptyEventSchema,
-      [CHECK_IN_EVENTS.GUIDING_BELIEF_SYSTEM_REQUESTED]: EmptyEventSchema,
       [CHECK_IN_EVENTS.BELIEF_SYSTEM_EDITOR_CANCELLED]: EmptyEventSchema,
       [CHECK_IN_EVENTS.BELIEF_SYSTEM_DRAFT_CHANGED]: Schema.standardSchemaV1(
         Schema.Struct({ statement: Schema.String }),
@@ -171,6 +196,9 @@ export const appNavigationMachine = setup({
         Schema.Struct({ statement: Schema.String }),
       ),
       [CHECK_IN_EVENTS.BELIEF_SYSTEM_EDITOR_CONFIRMED]: EmptyEventSchema,
+      [CHECK_IN_EVENTS.GUIDING_BELIEF_BACK_REQUESTED]: EmptyEventSchema,
+      [CHECK_IN_EVENTS.GUIDING_BELIEF_SKIPPED]: EmptyEventSchema,
+      [CHECK_IN_EVENTS.GUIDING_BELIEF_CONFIRMED]: EmptyEventSchema,
       [CHECK_IN_EVENTS.BELIEF_STATEMENTS_HYDRATED]: Schema.standardSchemaV1(
         Schema.Struct({ statements: BeliefStatementListSchema }),
       ),
@@ -179,6 +207,9 @@ export const appNavigationMachine = setup({
       ),
       [CHECK_IN_EVENTS.BELIEF_STATEMENT_PERSISTED]: Schema.standardSchemaV1(
         Schema.Struct({ statement: BeliefStatementSchema }),
+      ),
+      [CHECK_IN_EVENTS.BELIEF_STATEMENT_REMOVED]: Schema.standardSchemaV1(
+        Schema.Struct({ beliefSystemId: BeliefSystemId }),
       ),
       [CHECK_IN_EVENTS.BELIEF_STATEMENT_PERSISTENCE_FAILED]: Schema.standardSchemaV1(
         Schema.Struct({ message: Schema.String }),
@@ -234,7 +265,6 @@ export const appNavigationMachine = setup({
     beliefStatementDraft: '',
     beliefStatementDraftId: null,
     guidingBeliefStatementDraft: '',
-    beliefStatementEditorMode: null,
     saved: null,
     editing: null,
     error: null,
@@ -515,27 +545,19 @@ export const appNavigationMachine = setup({
         [CHECK_IN_EVENTS.BELIEF_SYSTEM_CATALOG_REQUESTED]: {
           target: CHECK_IN_STATES.BELIEF_SYSTEM_CATALOG,
         },
-        [CHECK_IN_EVENTS.GUIDING_BELIEF_SYSTEM_REQUESTED]: ({ context }) => {
-          if (!context.beliefSystemId) return undefined;
-          const statement = beliefStatementForId({
-            beliefSystemId: context.beliefSystemId,
-            statements: context.beliefStatements,
-          });
-          return {
-            target: CHECK_IN_STATES.BELIEF_SYSTEM_EDITOR,
-            context: {
-              beliefStatementEditorMode: 'guiding',
-              beliefStatementDraft: '',
-              beliefStatementDraftId: null,
-              guidingBeliefStatementDraft: statement?.guidingStatement ?? '',
-              error: null,
-            },
-          };
-        },
         [CHECK_IN_EVENTS.CONFIRMED]: ({ context }) => {
           if (!context.saved) return undefined;
           if ((context.saved.beliefSystemId ?? null) !== context.beliefSystemId) {
             return { target: CHECK_IN_STATES.ATTACHING_BELIEF_SYSTEM };
+          }
+          if (context.beliefSystemId) {
+            return {
+              target: CHECK_IN_STATES.GUIDING_BELIEF,
+              context: guidingBeliefDrafts({
+                beliefSystemId: context.beliefSystemId,
+                beliefStatements: context.beliefStatements,
+              }),
+            };
           }
           if (context.editing) {
             return {
@@ -567,7 +589,6 @@ export const appNavigationMachine = setup({
           target: CHECK_IN_STATES.BELIEF_SYSTEM_EDITOR,
           context: {
             beliefSystemId: null,
-            beliefStatementEditorMode: 'custom',
             beliefStatementDraft: '',
             beliefStatementDraftId: createCustomBeliefSystemId({
               timestamp: Date.now(),
@@ -584,13 +605,9 @@ export const appNavigationMachine = setup({
         [CHECK_IN_EVENTS.BELIEF_SYSTEM_DRAFT_CHANGED]: {
           context: ({ event }) => ({ beliefStatementDraft: event.statement }),
         },
-        [CHECK_IN_EVENTS.GUIDING_BELIEF_SYSTEM_DRAFT_CHANGED]: {
-          context: ({ event }) => ({ guidingBeliefStatementDraft: event.statement }),
-        },
         [CHECK_IN_EVENTS.BELIEF_SYSTEM_EDITOR_CANCELLED]: {
           target: CHECK_IN_STATES.BELIEF_SYSTEM,
           context: {
-            beliefStatementEditorMode: null,
             beliefStatementDraft: '',
             beliefStatementDraftId: null,
             guidingBeliefStatementDraft: '',
@@ -598,16 +615,7 @@ export const appNavigationMachine = setup({
           },
         },
         [CHECK_IN_EVENTS.BELIEF_SYSTEM_EDITOR_CONFIRMED]: ({ context }) => {
-          const harmfulStatementReady = (
-            context.beliefStatementEditorMode === 'custom'
-            && context.beliefStatementDraft.trim().length > 0
-          );
-          const guidingStatementReady = (
-            context.beliefStatementEditorMode === 'guiding'
-            && context.beliefSystemId !== null
-            && context.guidingBeliefStatementDraft.trim().length > 0
-          );
-          return harmfulStatementReady || guidingStatementReady
+          return context.beliefStatementDraft.trim().length > 0
             ? { target: CHECK_IN_STATES.PERSISTING_BELIEF_STATEMENT }
             : undefined;
         },
@@ -616,7 +624,7 @@ export const appNavigationMachine = setup({
     [CHECK_IN_STATES.PERSISTING_BELIEF_STATEMENT]: {
       entry: ({ context, self }, enq) => {
         enq(() => {
-          const statement = beliefStatementFromDraft(context);
+          const statement = customBeliefStatementFromDraft(context);
           if (!statement) {
             self.send({
               type: CHECK_IN_EVENTS.BELIEF_STATEMENT_PERSISTENCE_FAILED,
@@ -645,7 +653,6 @@ export const appNavigationMachine = setup({
               statement: event.statement,
               statements: context.beliefStatements,
             }),
-            beliefStatementEditorMode: null,
             beliefStatementDraft: '',
             beliefStatementDraftId: null,
             guidingBeliefStatementDraft: '',
@@ -666,7 +673,6 @@ export const appNavigationMachine = setup({
         [CHECK_IN_EVENTS.BELIEF_SYSTEM_EDITOR_CANCELLED]: {
           target: CHECK_IN_STATES.BELIEF_SYSTEM,
           context: {
-            beliefStatementEditorMode: null,
             beliefStatementDraft: '',
             beliefStatementDraftId: null,
             guidingBeliefStatementDraft: '',
@@ -699,6 +705,19 @@ export const appNavigationMachine = setup({
       on: {
         [CHECK_IN_EVENTS.PERSISTED]: ({ context, event }, enq) => {
           enq(() => checkInHistoryStore.trigger.recorded({ entry: event.saved }));
+          if (event.saved.beliefSystemId) {
+            return {
+              target: CHECK_IN_STATES.GUIDING_BELIEF,
+              context: {
+                ...context,
+                ...guidingBeliefDrafts({
+                  beliefSystemId: event.saved.beliefSystemId,
+                  beliefStatements: context.beliefStatements,
+                }),
+                saved: event.saved,
+              },
+            };
+          }
           if (context.editing) {
             return {
               target: `#appNavigation.${NAVIGATION_STATES.TABS}.${NAVIGATION_STATES.HISTORY}`,
@@ -728,6 +747,204 @@ export const appNavigationMachine = setup({
         [CHECK_IN_EVENTS.RETRIED]: { target: CHECK_IN_STATES.ATTACHING_BELIEF_SYSTEM },
         [CHECK_IN_EVENTS.BELIEF_SYSTEM_BACK_REQUESTED]: {
           target: CHECK_IN_STATES.BELIEF_SYSTEM,
+        },
+      },
+    },
+    [CHECK_IN_STATES.GUIDING_BELIEF]: {
+      on: {
+        [CHECK_IN_EVENTS.BELIEF_SYSTEM_DRAFT_CHANGED]: {
+          context: ({ event }) => ({ beliefStatementDraft: event.statement }),
+        },
+        [CHECK_IN_EVENTS.GUIDING_BELIEF_SYSTEM_DRAFT_CHANGED]: {
+          context: ({ event }) => ({ guidingBeliefStatementDraft: event.statement }),
+        },
+        [CHECK_IN_EVENTS.GUIDING_BELIEF_BACK_REQUESTED]: {
+          target: CHECK_IN_STATES.BELIEF_SYSTEM,
+          context: {
+            beliefStatementDraft: '',
+            beliefStatementDraftId: null,
+            guidingBeliefStatementDraft: '',
+            error: null,
+          },
+        },
+        [CHECK_IN_EVENTS.GUIDING_BELIEF_SKIPPED]: ({ context }) => {
+          if (context.editing) {
+            return {
+              target: `#appNavigation.${NAVIGATION_STATES.TABS}.${NAVIGATION_STATES.HISTORY}`,
+              context: {
+                selection: null,
+                note: '',
+                beliefSystemId: null,
+                beliefStatementDraft: '',
+                beliefStatementDraftId: null,
+                guidingBeliefStatementDraft: '',
+                saved: null,
+                editing: null,
+                error: null,
+              },
+            };
+          }
+          return {
+            target: CHECK_IN_STATES.SUCCESS,
+            context: {
+              beliefStatementDraft: '',
+              beliefStatementDraftId: null,
+              guidingBeliefStatementDraft: '',
+              error: null,
+            },
+          };
+        },
+        [CHECK_IN_EVENTS.GUIDING_BELIEF_CONFIRMED]: ({ context }) => {
+          if (!context.beliefSystemId) return undefined;
+          const existing = beliefStatementForId({
+            beliefSystemId: context.beliefSystemId,
+            statements: context.beliefStatements,
+          });
+          const guidingStatement = context.guidingBeliefStatementDraft.trim();
+          const customReady = isCustomBeliefSystemId(context.beliefSystemId)
+            && context.beliefStatementDraft.trim().length > 0;
+          const builtInReady = !isCustomBeliefSystemId(context.beliefSystemId)
+            && (guidingStatement.length > 0 || existing?.guidingStatement !== undefined);
+          return customReady || builtInReady
+            ? { target: CHECK_IN_STATES.PERSISTING_GUIDING_BELIEF }
+            : undefined;
+        },
+      },
+    },
+    [CHECK_IN_STATES.PERSISTING_GUIDING_BELIEF]: {
+      entry: ({ context, self }, enq) => {
+        enq(() => {
+          if (!context.beliefSystemId) {
+            self.send({
+              type: CHECK_IN_EVENTS.BELIEF_STATEMENT_PERSISTENCE_FAILED,
+              message: BELIEF_STATEMENT_FAILURE_MESSAGE,
+            });
+            return;
+          }
+          const beliefSystemId = context.beliefSystemId;
+          const statement = guidingBeliefStatementFromDraft(context);
+          const existing = beliefStatementForId({
+            beliefSystemId,
+            statements: context.beliefStatements,
+          });
+          if (statement) {
+            void Effect.runPromise(persistBeliefStatement(statement)).then(
+              (persisted) => self.send({
+                type: CHECK_IN_EVENTS.BELIEF_STATEMENT_PERSISTED,
+                statement: persisted,
+              }),
+              () => self.send({
+                type: CHECK_IN_EVENTS.BELIEF_STATEMENT_PERSISTENCE_FAILED,
+                message: BELIEF_STATEMENT_FAILURE_MESSAGE,
+              }),
+            );
+            return;
+          }
+          if (existing?.kind === 'built-in') {
+            void Effect.runPromise(deleteBeliefStatement(beliefSystemId)).then(
+              () => self.send({
+                type: CHECK_IN_EVENTS.BELIEF_STATEMENT_REMOVED,
+                beliefSystemId,
+              }),
+              () => self.send({
+                type: CHECK_IN_EVENTS.BELIEF_STATEMENT_PERSISTENCE_FAILED,
+                message: BELIEF_STATEMENT_FAILURE_MESSAGE,
+              }),
+            );
+            return;
+          }
+          self.send({
+            type: CHECK_IN_EVENTS.BELIEF_STATEMENT_PERSISTENCE_FAILED,
+            message: BELIEF_STATEMENT_FAILURE_MESSAGE,
+          });
+        });
+      },
+      on: {
+        [CHECK_IN_EVENTS.BELIEF_STATEMENT_PERSISTED]: ({ context, event }) => {
+          const beliefStatements = recordBeliefStatement({
+            statement: event.statement,
+            statements: context.beliefStatements,
+          });
+          if (context.editing) {
+            return {
+              target: `#appNavigation.${NAVIGATION_STATES.TABS}.${NAVIGATION_STATES.HISTORY}`,
+              context: {
+                beliefStatements,
+                selection: null,
+                note: '',
+                beliefSystemId: null,
+                beliefStatementDraft: '',
+                beliefStatementDraftId: null,
+                guidingBeliefStatementDraft: '',
+                saved: null,
+                editing: null,
+                error: null,
+              },
+            };
+          }
+          return {
+            target: CHECK_IN_STATES.SUCCESS,
+            context: {
+              beliefStatements,
+              beliefStatementDraft: '',
+              beliefStatementDraftId: null,
+              guidingBeliefStatementDraft: '',
+              error: null,
+            },
+          };
+        },
+        [CHECK_IN_EVENTS.BELIEF_STATEMENT_REMOVED]: ({ context, event }) => {
+          const beliefStatements = removeBeliefStatement({
+            beliefSystemId: event.beliefSystemId,
+            statements: context.beliefStatements,
+          });
+          if (context.editing) {
+            return {
+              target: `#appNavigation.${NAVIGATION_STATES.TABS}.${NAVIGATION_STATES.HISTORY}`,
+              context: {
+                beliefStatements,
+                selection: null,
+                note: '',
+                beliefSystemId: null,
+                beliefStatementDraft: '',
+                beliefStatementDraftId: null,
+                guidingBeliefStatementDraft: '',
+                saved: null,
+                editing: null,
+                error: null,
+              },
+            };
+          }
+          return {
+            target: CHECK_IN_STATES.SUCCESS,
+            context: {
+              beliefStatements,
+              beliefStatementDraft: '',
+              beliefStatementDraftId: null,
+              guidingBeliefStatementDraft: '',
+              error: null,
+            },
+          };
+        },
+        [CHECK_IN_EVENTS.BELIEF_STATEMENT_PERSISTENCE_FAILED]: ({ context, event }) => ({
+          target: CHECK_IN_STATES.GUIDING_BELIEF_FAILURE,
+          context: { ...context, error: event.message },
+        }),
+      },
+    },
+    [CHECK_IN_STATES.GUIDING_BELIEF_FAILURE]: {
+      on: {
+        [CHECK_IN_EVENTS.RETRIED]: {
+          target: CHECK_IN_STATES.PERSISTING_GUIDING_BELIEF,
+        },
+        [CHECK_IN_EVENTS.GUIDING_BELIEF_BACK_REQUESTED]: {
+          target: CHECK_IN_STATES.BELIEF_SYSTEM,
+          context: {
+            beliefStatementDraft: '',
+            beliefStatementDraftId: null,
+            guidingBeliefStatementDraft: '',
+            error: null,
+          },
         },
       },
     },
@@ -770,6 +987,13 @@ const reflectionRouteStates: readonly StateValue[] = [
 
 export function routeForStateValue(value: StateValue) {
   if (matchesState(CHECK_IN_STATES.SUCCESS, value)) return APP_ROUTES.SUCCESS;
+  if (
+    matchesState(CHECK_IN_STATES.GUIDING_BELIEF, value)
+    || matchesState(CHECK_IN_STATES.PERSISTING_GUIDING_BELIEF, value)
+    || matchesState(CHECK_IN_STATES.GUIDING_BELIEF_FAILURE, value)
+  ) {
+    return APP_ROUTES.GUIDING_BELIEF;
+  }
   if (reflectionRouteStates.some((state) => matchesState(state, value))) {
     return APP_ROUTES.REFLECTION;
   }
