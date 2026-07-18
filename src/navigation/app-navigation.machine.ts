@@ -9,7 +9,9 @@ import {
 
 import {
   APP_ROUTES,
+  BELIEF_SYSTEM_FAILURE_MESSAGE,
   CHECK_IN_EVENTS,
+  CHECK_IN_DELETE_FAILURE_MESSAGE,
   CHECK_IN_FAILURE_MESSAGE,
   CHECK_IN_STATES,
   MAX_NOTE_LENGTH,
@@ -20,11 +22,17 @@ import {
 } from '@/constants';
 import {
   CheckInSchema,
+  CheckInId,
   CheckInListSchema,
   EmotionSelectionSchema,
 } from '@/features/check-in/domain/check-in';
 import { selectionForCheckIn } from '@/features/check-in/domain/emotion';
-import { loadCheckIns, persistCheckIn } from '@/features/check-in/infrastructure/check-in.repository';
+import { BeliefSystemId } from '@/features/check-in/domain/belief-system';
+import {
+  deleteCheckIn,
+  loadCheckIns,
+  persistCheckIn,
+} from '@/features/check-in/infrastructure/check-in.repository';
 import { checkInHistoryStore } from '@/features/check-in/application/check-in-history.store';
 import { emotionLabelModeStore } from '@/features/settings/application/emotion-label-mode.store';
 import { EmotionLabelModeSchema } from '@/features/settings/domain/emotion-label-mode';
@@ -36,6 +44,7 @@ import {
 const AppContextSchema = Schema.Struct({
   selection: Schema.NullOr(EmotionSelectionSchema),
   note: Schema.String,
+  beliefSystemId: Schema.NullOr(BeliefSystemId),
   saved: Schema.NullOr(CheckInSchema),
   editing: Schema.NullOr(CheckInSchema),
   error: Schema.NullOr(Schema.String),
@@ -59,6 +68,10 @@ export const appNavigationMachine = setup({
     },
     [NAVIGATION_STATES.REFLECTION]: {},
     [CHECK_IN_STATES.SAVING]: {},
+    [CHECK_IN_STATES.BELIEF_SYSTEM]: {},
+    [CHECK_IN_STATES.BELIEF_SYSTEM_CATALOG]: {},
+    [CHECK_IN_STATES.ATTACHING_BELIEF_SYSTEM]: {},
+    [CHECK_IN_STATES.BELIEF_SYSTEM_FAILURE]: {},
     [CHECK_IN_STATES.SUCCESS]: {},
     [CHECK_IN_STATES.FAILURE]: {},
   },
@@ -75,6 +88,12 @@ export const appNavigationMachine = setup({
       [CHECK_IN_EVENTS.SELECTION_CANCELLED]: EmptyEventSchema,
       [CHECK_IN_EVENTS.SELECTION_RELEASED]: EmptyEventSchema,
       [CHECK_IN_EVENTS.NOTE_CHANGED]: Schema.standardSchemaV1(Schema.Struct({ note: Schema.String })),
+      [CHECK_IN_EVENTS.BELIEF_SYSTEM_CHANGED]: Schema.standardSchemaV1(
+        Schema.Struct({ beliefSystemId: Schema.NullOr(BeliefSystemId) }),
+      ),
+      [CHECK_IN_EVENTS.BELIEF_SYSTEM_BACK_REQUESTED]: EmptyEventSchema,
+      [CHECK_IN_EVENTS.BELIEF_SYSTEM_CATALOG_REQUESTED]: EmptyEventSchema,
+      [CHECK_IN_EVENTS.BELIEF_SYSTEM_CATALOG_CLOSED]: EmptyEventSchema,
       [CHECK_IN_EVENTS.CONFIRMED]: EmptyEventSchema,
       [CHECK_IN_EVENTS.PERSISTED]: Schema.standardSchemaV1(Schema.Struct({ saved: CheckInSchema })),
       [CHECK_IN_EVENTS.FAILED]: Schema.standardSchemaV1(Schema.Struct({ message: Schema.String })),
@@ -88,6 +107,13 @@ export const appNavigationMachine = setup({
         Schema.Struct({ entry: CheckInSchema }),
       ),
       [CHECK_IN_EVENTS.EDIT_SELECTION_REQUESTED]: EmptyEventSchema,
+      [CHECK_IN_EVENTS.DELETE_REQUESTED]: Schema.standardSchemaV1(
+        Schema.Struct({ id: CheckInId }),
+      ),
+      [CHECK_IN_EVENTS.DELETED]: Schema.standardSchemaV1(Schema.Struct({ id: CheckInId })),
+      [CHECK_IN_EVENTS.DELETE_FAILED]: Schema.standardSchemaV1(
+        Schema.Struct({ message: Schema.String }),
+      ),
       [CHECK_IN_EVENTS.RETRIED]: EmptyEventSchema,
       [CHECK_IN_EVENTS.RESTARTED]: EmptyEventSchema,
       [CHECK_IN_EVENTS.REFLECTION_CANCELLED]: EmptyEventSchema,
@@ -108,7 +134,14 @@ export const appNavigationMachine = setup({
 }).createMachine({
   id: 'appNavigation',
   initial: NAVIGATION_STATES.TABS,
-  context: { selection: null, note: '', saved: null, editing: null, error: null },
+  context: {
+    selection: null,
+    note: '',
+    beliefSystemId: null,
+    saved: null,
+    editing: null,
+    error: null,
+  },
   entry: ({ self }, enq) => {
     enq(() => {
       void Effect.runPromise(loadCheckIns).then(
@@ -133,6 +166,35 @@ export const appNavigationMachine = setup({
     },
     [CHECK_IN_EVENTS.HISTORY_HYDRATION_FAILED]: ({ event }, enq) => {
       enq(() => checkInHistoryStore.trigger.hydrationFailed({ message: event.message }));
+    },
+    [CHECK_IN_EVENTS.DELETE_REQUESTED]: ({ event, self }, enq) => {
+      enq(() => {
+        void Effect.runPromise(deleteCheckIn(event.id)).then(
+          () => self.send({ type: CHECK_IN_EVENTS.DELETED, id: event.id }),
+          () => self.send({
+            type: CHECK_IN_EVENTS.DELETE_FAILED,
+            message: CHECK_IN_DELETE_FAILURE_MESSAGE,
+          }),
+        );
+      });
+    },
+    [CHECK_IN_EVENTS.DELETED]: ({ context, event }, enq) => {
+      enq(() => checkInHistoryStore.trigger.deleted({ id: event.id }));
+      if (context.editing?.id !== event.id) return undefined;
+      return {
+        target: `#appNavigation.${NAVIGATION_STATES.TABS}.${NAVIGATION_STATES.HISTORY}`,
+        context: {
+          selection: null,
+          note: '',
+          beliefSystemId: null,
+          saved: null,
+          editing: null,
+          error: null,
+        },
+      };
+    },
+    [CHECK_IN_EVENTS.DELETE_FAILED]: ({ event }, enq) => {
+      enq(() => checkInHistoryStore.trigger.deletionFailed({ message: event.message }));
     },
     [SETTINGS_EVENTS.EMOTION_LABEL_MODE_CHANGED]: ({ event, self }, enq) => {
       enq(() => emotionLabelModeStore.trigger.changed({ mode: event.mode }));
@@ -159,21 +221,43 @@ export const appNavigationMachine = setup({
       on: {
         [NAVIGATION_EVENTS.TODAY_OPENED]: {
           target: `.${NAVIGATION_STATES.TODAY}`,
-          context: { selection: null, note: '', saved: null, editing: null, error: null },
+          context: {
+            selection: null,
+            note: '',
+            beliefSystemId: null,
+            saved: null,
+            editing: null,
+            error: null,
+          },
         },
         [NAVIGATION_EVENTS.HISTORY_OPENED]: {
           target: `.${NAVIGATION_STATES.HISTORY}`,
-          context: { selection: null, note: '', saved: null, editing: null, error: null },
+          context: {
+            selection: null,
+            note: '',
+            beliefSystemId: null,
+            saved: null,
+            editing: null,
+            error: null,
+          },
         },
         [NAVIGATION_EVENTS.SETTINGS_OPENED]: {
           target: `.${NAVIGATION_STATES.SETTINGS}`,
-          context: { selection: null, note: '', saved: null, editing: null, error: null },
+          context: {
+            selection: null,
+            note: '',
+            beliefSystemId: null,
+            saved: null,
+            editing: null,
+            error: null,
+          },
         },
         [CHECK_IN_EVENTS.EDIT_REQUESTED]: ({ event }) => ({
           target: `#appNavigation.${NAVIGATION_STATES.REFLECTION}`,
           context: {
             selection: selectionForCheckIn(event.entry),
             note: event.entry.note,
+            beliefSystemId: event.entry.beliefSystemId ?? null,
             saved: null,
             editing: event.entry,
             error: null,
@@ -234,7 +318,14 @@ export const appNavigationMachine = setup({
           target: context.editing
             ? `#appNavigation.${NAVIGATION_STATES.TABS}.${NAVIGATION_STATES.HISTORY}`
             : `#appNavigation.${NAVIGATION_STATES.TABS}.${NAVIGATION_STATES.TODAY}.${CHECK_IN_STATES.IDLE}`,
-          context: { selection: null, note: '', saved: null, editing: null, error: null },
+          context: {
+            selection: null,
+            note: '',
+            beliefSystemId: null,
+            saved: null,
+            editing: null,
+            error: null,
+          },
         }),
         [CHECK_IN_EVENTS.CONFIRMED]: ({ context }) => (
           context.selection ? { target: CHECK_IN_STATES.SAVING } : undefined
@@ -251,7 +342,10 @@ export const appNavigationMachine = setup({
           void Effect.runPromise(persistCheckIn({
             selection: context.selection,
             note: context.note,
-            existing: context.editing,
+            beliefSystemId: context.saved
+              ? context.saved.beliefSystemId ?? null
+              : context.editing?.beliefSystemId ?? null,
+            existing: context.saved ?? context.editing,
           })).then(
             (saved) => self.send({ type: CHECK_IN_EVENTS.PERSISTED, saved }),
             () => self.send({ type: CHECK_IN_EVENTS.FAILED, message: CHECK_IN_FAILURE_MESSAGE }),
@@ -261,14 +355,8 @@ export const appNavigationMachine = setup({
       on: {
         [CHECK_IN_EVENTS.PERSISTED]: ({ context, event }, enq) => {
           enq(() => checkInHistoryStore.trigger.recorded({ entry: event.saved }));
-          if (context.editing) {
-            return {
-              target: `#appNavigation.${NAVIGATION_STATES.TABS}.${NAVIGATION_STATES.HISTORY}`,
-              context: { selection: null, note: '', saved: null, editing: null, error: null },
-            };
-          }
           return {
-            target: CHECK_IN_STATES.SUCCESS,
+            target: CHECK_IN_STATES.BELIEF_SYSTEM,
             context: { ...context, saved: event.saved, error: null },
           };
         },
@@ -278,11 +366,118 @@ export const appNavigationMachine = setup({
         }),
       },
     },
+    [CHECK_IN_STATES.BELIEF_SYSTEM]: {
+      on: {
+        [CHECK_IN_EVENTS.BELIEF_SYSTEM_CHANGED]: {
+          context: ({ event }) => ({ beliefSystemId: event.beliefSystemId }),
+        },
+        [CHECK_IN_EVENTS.BELIEF_SYSTEM_BACK_REQUESTED]: {
+          target: NAVIGATION_STATES.REFLECTION,
+        },
+        [CHECK_IN_EVENTS.BELIEF_SYSTEM_CATALOG_REQUESTED]: {
+          target: CHECK_IN_STATES.BELIEF_SYSTEM_CATALOG,
+        },
+        [CHECK_IN_EVENTS.CONFIRMED]: ({ context }) => {
+          if (!context.saved) return undefined;
+          if ((context.saved.beliefSystemId ?? null) !== context.beliefSystemId) {
+            return { target: CHECK_IN_STATES.ATTACHING_BELIEF_SYSTEM };
+          }
+          if (context.editing) {
+            return {
+              target: `#appNavigation.${NAVIGATION_STATES.TABS}.${NAVIGATION_STATES.HISTORY}`,
+              context: {
+                selection: null,
+                note: '',
+                beliefSystemId: null,
+                saved: null,
+                editing: null,
+                error: null,
+              },
+            };
+          }
+          return { target: CHECK_IN_STATES.SUCCESS };
+        },
+      },
+    },
+    [CHECK_IN_STATES.BELIEF_SYSTEM_CATALOG]: {
+      on: {
+        [CHECK_IN_EVENTS.BELIEF_SYSTEM_CHANGED]: {
+          target: CHECK_IN_STATES.BELIEF_SYSTEM,
+          context: ({ event }) => ({ beliefSystemId: event.beliefSystemId }),
+        },
+        [CHECK_IN_EVENTS.BELIEF_SYSTEM_CATALOG_CLOSED]: {
+          target: CHECK_IN_STATES.BELIEF_SYSTEM,
+        },
+      },
+    },
+    [CHECK_IN_STATES.ATTACHING_BELIEF_SYSTEM]: {
+      entry: ({ context, self }, enq) => {
+        enq(() => {
+          if (!context.selection || !context.saved) {
+            self.send({ type: CHECK_IN_EVENTS.FAILED, message: BELIEF_SYSTEM_FAILURE_MESSAGE });
+            return;
+          }
+          void Effect.runPromise(persistCheckIn({
+            selection: context.selection,
+            note: context.note,
+            beliefSystemId: context.beliefSystemId,
+            existing: context.saved,
+          })).then(
+            (saved) => self.send({ type: CHECK_IN_EVENTS.PERSISTED, saved }),
+            () => self.send({
+              type: CHECK_IN_EVENTS.FAILED,
+              message: BELIEF_SYSTEM_FAILURE_MESSAGE,
+            }),
+          );
+        });
+      },
+      on: {
+        [CHECK_IN_EVENTS.PERSISTED]: ({ context, event }, enq) => {
+          enq(() => checkInHistoryStore.trigger.recorded({ entry: event.saved }));
+          if (context.editing) {
+            return {
+              target: `#appNavigation.${NAVIGATION_STATES.TABS}.${NAVIGATION_STATES.HISTORY}`,
+              context: {
+                selection: null,
+                note: '',
+                beliefSystemId: null,
+                saved: null,
+                editing: null,
+                error: null,
+              },
+            };
+          }
+          return {
+            target: CHECK_IN_STATES.SUCCESS,
+            context: { ...context, saved: event.saved, error: null },
+          };
+        },
+        [CHECK_IN_EVENTS.FAILED]: ({ context, event }) => ({
+          target: CHECK_IN_STATES.BELIEF_SYSTEM_FAILURE,
+          context: { ...context, error: event.message },
+        }),
+      },
+    },
+    [CHECK_IN_STATES.BELIEF_SYSTEM_FAILURE]: {
+      on: {
+        [CHECK_IN_EVENTS.RETRIED]: { target: CHECK_IN_STATES.ATTACHING_BELIEF_SYSTEM },
+        [CHECK_IN_EVENTS.BELIEF_SYSTEM_BACK_REQUESTED]: {
+          target: CHECK_IN_STATES.BELIEF_SYSTEM,
+        },
+      },
+    },
     [CHECK_IN_STATES.SUCCESS]: {
       on: {
         [CHECK_IN_EVENTS.RESTARTED]: {
           target: `#appNavigation.${NAVIGATION_STATES.TABS}.${NAVIGATION_STATES.TODAY}.${CHECK_IN_STATES.IDLE}`,
-          context: { selection: null, note: '', saved: null, editing: null, error: null },
+          context: {
+            selection: null,
+            note: '',
+            beliefSystemId: null,
+            saved: null,
+            editing: null,
+            error: null,
+          },
         },
       },
     },
@@ -300,6 +495,10 @@ export function routeForStateValue(value: StateValue) {
   if (
     matchesState(NAVIGATION_STATES.REFLECTION, value)
     || matchesState(CHECK_IN_STATES.SAVING, value)
+    || matchesState(CHECK_IN_STATES.BELIEF_SYSTEM, value)
+    || matchesState(CHECK_IN_STATES.BELIEF_SYSTEM_CATALOG, value)
+    || matchesState(CHECK_IN_STATES.ATTACHING_BELIEF_SYSTEM, value)
+    || matchesState(CHECK_IN_STATES.BELIEF_SYSTEM_FAILURE, value)
     || matchesState(CHECK_IN_STATES.FAILURE, value)
   ) return APP_ROUTES.REFLECTION;
   if (matchesState({ [NAVIGATION_STATES.TABS]: NAVIGATION_STATES.HISTORY }, value)) return APP_ROUTES.HISTORY;

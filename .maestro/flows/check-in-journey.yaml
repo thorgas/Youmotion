@@ -1,9 +1,12 @@
 appId: com.youmotion.mobile
-name: Save a check-in and find it in history
+name: Save, find, and delete a check-in
 tags:
   - check-in
   - persistence
+  - deletion
 ---
+- evalScript: ${output.checkInNote = "MaestroTestEntry" + new Date().getTime()}
+- evalScript: ${output.checkInNotePattern = ".*" + output.checkInNote + ".*"}
 - runFlow: ../helpers/open-app.yaml
 - tapOn:
     id: tab-today
@@ -17,18 +20,47 @@ tags:
     timeout: 10000
 - tapOn:
     id: reflection-note-input
-- inputText: MaestroTestEntry
+- inputText: ${output.checkInNote}
 - pressKey: Enter
+- scrollUntilVisible:
+    element:
+      id: reflection-save
+    direction: DOWN
+    timeout: 10000
+    speed: 40
 - tapOn:
     id: reflection-save
+- extendedWaitUntil:
+    visible:
+      id: belief-system-step
+    timeout: 10000
+- tapOn:
+    id: belief-system-browse
+- extendedWaitUntil:
+    visible:
+      id: belief-system-catalog
+    timeout: 10000
+- tapOn:
+    id: belief-system-option-always-functioning
+- extendedWaitUntil:
+    visible:
+      id: belief-system-finish
+    timeout: 10000
+- tapOn:
+    id: belief-system-finish
 - extendedWaitUntil:
     visible:
       id: success-screen
     timeout: 10000
 - tapOn:
-    id: new-check-in
+    id: check-in-done
 - tapOn:
     id: tab-history
 - extendedWaitUntil:
-    visible: '.*MaestroTestEntry.*'
+    visible: ${output.checkInNotePattern}
     timeout: 10000
+- longPressOn:
+    id: 'history-moment-.*'
+    index: 0
+- tapOn: Delete
+- assertNotVisible: ${output.checkInNotePattern}

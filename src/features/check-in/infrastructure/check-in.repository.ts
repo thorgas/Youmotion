@@ -17,12 +17,13 @@ import {
   type CheckIn,
   type EmotionSelection,
 } from '../domain/check-in';
+import { BeliefSystemId } from '../domain/belief-system';
 import { getDatabase } from './surrealdb.database';
 
 export class CheckInStorageError extends Schema.TaggedError<CheckInStorageError>()(
   'CheckInStorageError',
   {
-    operation: Schema.Literal('read', 'write', 'migrate'),
+    operation: Schema.Literal('read', 'write', 'delete', 'migrate'),
     cause: Schema.Defect,
   },
 ) {}
@@ -50,13 +51,42 @@ const SurrealNonNegativeInteger = Schema.Union(
   ),
 );
 
+const SurrealIntensity = Schema.Union(
+  CheckInSchema.fields.intensity,
+  Schema.transform(
+    Schema.BigIntFromSelf.pipe(Schema.betweenBigInt(0n, 1n)),
+    CheckInSchema.fields.intensity,
+    {
+      strict: true,
+      decode: (value) => Number(value),
+      encode: (value) => BigInt(value),
+    },
+  ),
+);
+
+const surrealNone = { kind: 'none' } satisfies { readonly kind: 'none' };
+
+const SurrealOptionalBeliefSystemId = Schema.transform(
+  Schema.Union(
+    BeliefSystemId,
+    Schema.Struct({ kind: Schema.Literal('none') }),
+  ),
+  Schema.UndefinedOr(BeliefSystemId),
+  {
+    strict: true,
+    decode: (value) => typeof value === 'string' ? value : undefined,
+    encode: (value) => value === undefined ? surrealNone : value,
+  },
+);
+
 const CheckInDatabaseSchema = Schema.Struct({
   id: CheckInId,
   createdAt: CheckInTimestamp,
   emotionId: CheckInSchema.fields.emotionId,
-  intensity: CheckInSchema.fields.intensity,
+  intensity: SurrealIntensity,
   level: Schema.optional(SurrealNonNegativeInteger),
   note: CheckInSchema.fields.note,
+  beliefSystemId: Schema.optional(SurrealOptionalBeliefSystemId),
 });
 
 const CheckInDatabaseListSchema = Schema.Array(CheckInDatabaseSchema);
@@ -79,7 +109,7 @@ const selectRecentCheckIns = Effect.tryPromise({
   try: async () => {
     const database = await getDatabase();
     return database.query<unknown>(
-      `SELECT checkInId AS id, createdAt, emotionId, intensity, level, note FROM ${CHECK_IN_TABLE} ORDER BY createdAt DESC LIMIT $limit`,
+      `SELECT checkInId AS id, createdAt, emotionId, intensity, level, note, beliefSystemId FROM ${CHECK_IN_TABLE} ORDER BY createdAt DESC LIMIT $limit`,
       { limit: MAX_CHECK_IN_HISTORY },
     );
   },
@@ -129,16 +159,19 @@ export const loadCheckIns = selectRecentCheckIns.pipe(
 export const persistCheckIn = Effect.fn('CheckInRepository.persist')(({
   selection,
   note,
+  beliefSystemId,
   existing,
 }: {
   selection: EmotionSelection;
   note: string;
+  beliefSystemId: CheckIn['beliefSystemId'] | null;
   existing: CheckIn | null;
 }) => {
   const identity = existing ?? {
     id: CheckInId.make(`${Date.now()}-${Math.random().toString(16).slice(2)}`),
     createdAt: CheckInTimestamp.make(new Date().toISOString()),
   };
+  const beliefSystem = beliefSystemId === null ? {} : { beliefSystemId };
   const checkIn: CheckIn = {
     id: identity.id,
     createdAt: identity.createdAt,
@@ -146,6 +179,20 @@ export const persistCheckIn = Effect.fn('CheckInRepository.persist')(({
     intensity: selection.intensity,
     level: selection.level,
     note: note.trim(),
+    ...beliefSystem,
   };
   return upsertCheckIn(checkIn).pipe(Effect.as(checkIn));
 });
+
+export const deleteCheckIn = Effect.fn('CheckInRepository.delete')((id: CheckInId) => (
+  Effect.tryPromise({
+    try: async () => {
+      const database = await getDatabase();
+      await database.query(
+        'DELETE $record',
+        { record: new SurrealRecordId(`${CHECK_IN_TABLE}:${id}`) },
+      );
+    },
+    catch: (cause) => CheckInStorageError.make({ operation: 'delete', cause }),
+  })
+));

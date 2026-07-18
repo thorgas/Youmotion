@@ -4,11 +4,17 @@ type QueryResult = readonly [{
 }];
 
 let nextUpsertFailure: unknown;
+let nextDeleteFailure: unknown;
 
 async function defaultQuery(surql: string): Promise<QueryResult> {
   if (surql.startsWith('UPSERT') && nextUpsertFailure !== undefined) {
     const cause = nextUpsertFailure;
     nextUpsertFailure = undefined;
+    throw cause;
+  }
+  if (surql.startsWith('DELETE') && nextDeleteFailure !== undefined) {
+    const cause = nextDeleteFailure;
+    nextDeleteFailure = undefined;
     throw cause;
   }
   return [{ statementIndex: 0, value: surql.startsWith('SELECT') ? [] : null }];
@@ -19,10 +25,15 @@ export const mockSurrealDatabase = { query: mockSurrealQuery };
 
 export function resetSurrealDatabaseMock() {
   nextUpsertFailure = undefined;
+  nextDeleteFailure = undefined;
   mockSurrealQuery.mockReset();
   mockSurrealQuery.mockImplementation(defaultQuery);
 }
 
 export function failNextSurrealUpsert(cause: unknown) {
   nextUpsertFailure = cause;
+}
+
+export function failNextSurrealDelete(cause: unknown) {
+  nextDeleteFailure = cause;
 }
