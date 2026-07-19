@@ -116,7 +116,7 @@ export function GuidingBeliefScreen() {
           contentInsetAdjustmentBehavior="automatic"
           keyboardDismissMode="interactive"
           keyboardShouldPersistTaps="handled"
-          showsVerticalScrollIndicator={false}
+          showsVerticalScrollIndicator
           style={styles.scroll}
           testID="guiding-belief-scroll"
         >
@@ -140,11 +140,6 @@ export function GuidingBeliefScreen() {
             <Text style={styles.copy}>
               <fbt desc="Explanation that harmful beliefs may once have helped but can become restrictive">
                 An inner rule may once have helped you feel safe, capable, or accepted.
-              </fbt>
-            </Text>
-            <Text style={styles.copy}>
-              <fbt desc="Invitation to formulate a helpful positive guiding belief">
-                You can give it a new direction: a sentence that leaves room for your needs and the person you want to be.
               </fbt>
             </Text>
           </View>

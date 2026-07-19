@@ -539,6 +539,10 @@ describe('check-in screens', () => {
       'Eine innere Regel hat dir vielleicht einmal geholfen, dich sicher, kompetent oder angenommen zu fühlen.',
     )).toBeTruthy();
     expect(screen.queryByText(/Spüre nach/)).toBeNull();
+    expect(screen.queryByText(/Du kannst ihr eine neue Richtung geben/)).toBeNull();
+    expect(screen.getByTestId('guiding-belief-scroll').props).toMatchObject({
+      showsVerticalScrollIndicator: true,
+    });
     expect(screen.getByText('Dein neuer Leitsatz')).toBeTruthy();
     expect(screen.getByText(
       'Schreibe hier deinen neuen Leitsatz auf, z. B.:',
