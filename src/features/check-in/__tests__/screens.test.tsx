@@ -535,6 +535,14 @@ describe('check-in screens', () => {
     expect(progress.getAllByText('Optional')).toHaveLength(2);
     expect(screen.getByText(/Zurück/)).toBeTruthy();
     expect(screen.getByText('Was würde dich stattdessen unterstützen?')).toBeTruthy();
+    expect(screen.getByText(
+      'Eine innere Regel hat dir vielleicht einmal geholfen, dich sicher, kompetent oder angenommen zu fühlen.',
+    )).toBeTruthy();
+    expect(screen.queryByText(/Spüre nach/)).toBeNull();
+    expect(screen.getByText('Dein neuer Leitsatz')).toBeTruthy();
+    expect(screen.getByText(
+      'Schreibe hier deinen neuen Leitsatz auf, z. B.:',
+    )).toBeTruthy();
     expect(screen.getByPlaceholderText(
       'Ich darf auch mal nicht funktionieren und werde trotzdem geliebt.',
     )).toBeTruthy();

@@ -139,7 +139,7 @@ export function GuidingBeliefScreen() {
             </Text>
             <Text style={styles.copy}>
               <fbt desc="Explanation that harmful beliefs may once have helped but can become restrictive">
-                An inner rule may once have helped you feel safe, capable, or accepted. Notice what it protected—and where it now limits you.
+                An inner rule may once have helped you feel safe, capable, or accepted.
               </fbt>
             </Text>
             <Text style={styles.copy}>
@@ -199,7 +199,14 @@ export function GuidingBeliefScreen() {
           </View>
           <View style={styles.card}>
             <Text style={styles.sectionLabel}>
-              <fbt desc="Label above the positive guiding belief input">Your guiding belief</fbt>
+              <fbt desc="Label above the new positive guiding belief input">
+                Your new guiding belief
+              </fbt>
+            </Text>
+            <Text style={styles.inputHelp}>
+              <fbt desc="Instruction above the new positive guiding belief input">
+                Write down your new guiding belief here, for example:
+              </fbt>
             </Text>
             <TextInput
               accessibilityLabel={guidingBeliefAccessibilityLabel()}
@@ -348,6 +355,12 @@ const styles = StyleSheet.create({
     lineHeight: 25,
     padding: 16,
     textAlignVertical: 'top',
+  },
+  inputHelp: {
+    color: palette.inkMuted,
+    fontFamily: type.regular,
+    fontSize: 14,
+    lineHeight: 20,
   },
   reflectionCard: {
     borderRadius: 24,
