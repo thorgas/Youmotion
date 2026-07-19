@@ -68,7 +68,7 @@ export default function RootLayout() {
 
   return (
     <AnimatedSplashScreen>
-      <KeyboardProvider>
+      <KeyboardProvider preload={false}>
         <AppNavigationProvider>
           <AppLocaleProvider>
             <DevelopmentRoot>
