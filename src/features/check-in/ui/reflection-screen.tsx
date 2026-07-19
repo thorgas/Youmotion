@@ -192,18 +192,19 @@ function ReflectionNoteStep() {
   return (
     <View style={styles.page} testID="reflection-screen">
       <SafeAreaView style={styles.safeArea}>
+        <CheckInProgressHeader
+          activeStep={1}
+          context={editing ? 'editing' : 'reflection'}
+        />
         <KeyboardAwareScrollView
           bottomOffset={REFLECTION_KEYBOARD_BOTTOM_OFFSET}
-          contentContainerStyle={styles.content}
+          contentContainerStyle={[styles.content, styles.flowContent]}
           keyboardDismissMode="interactive"
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
+          style={styles.scroll}
           testID="reflection-keyboard-scroll"
         >
-          <CheckInProgressHeader
-            activeStep={1}
-            context={editing ? 'editing' : 'reflection'}
-          />
           <View>
             <Text style={styles.title}>
               {editing
@@ -343,16 +344,17 @@ function BeliefSystemStep() {
   return (
     <View style={styles.page} testID="reflection-screen">
       <SafeAreaView style={styles.safeArea}>
+        <CheckInProgressHeader
+          activeStep={2}
+          context="core-belief"
+        />
         <ScrollView
-          contentContainerStyle={styles.content}
+          contentContainerStyle={[styles.content, styles.flowContent]}
           contentInsetAdjustmentBehavior="automatic"
           showsVerticalScrollIndicator={false}
+          style={styles.scroll}
           testID="belief-system-step"
         >
-          <CheckInProgressHeader
-            activeStep={2}
-            context="core-belief"
-          />
           <View>
             <Text style={styles.title}>
               <fbt desc="Question shown after a reflection is saved">
@@ -701,6 +703,7 @@ export function ReflectionScreen() {
 const styles = StyleSheet.create({
   page: { flex: 1, backgroundColor: palette.paper },
   safeArea: { flex: 1 },
+  scroll: { flex: 1 },
   content: {
     flexGrow: 1,
     width: '100%',
@@ -709,6 +712,7 @@ const styles = StyleSheet.create({
     padding: 22,
     paddingBottom: 32,
   },
+  flowContent: { paddingTop: 8 },
   catalogHeader: { marginTop: 8 },
   eyebrow: {
     fontFamily: type.semibold,

@@ -106,19 +106,20 @@ export function GuidingBeliefScreen() {
   return (
     <View style={styles.page} testID="guiding-belief-screen">
       <SafeAreaView style={styles.safeArea}>
+        <CheckInProgressHeader
+          activeStep={3}
+          context="guiding-belief"
+        />
         <KeyboardAwareScrollView
           bottomOffset={REFLECTION_KEYBOARD_BOTTOM_OFFSET}
-          contentContainerStyle={styles.content}
+          contentContainerStyle={[styles.content, styles.flowContent]}
           contentInsetAdjustmentBehavior="automatic"
           keyboardDismissMode="interactive"
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
+          style={styles.scroll}
           testID="guiding-belief-scroll"
         >
-          <CheckInProgressHeader
-            activeStep={3}
-            context="guiding-belief"
-          />
           <View style={styles.header}>
             <PressableScale
               accessibilityRole="button"
@@ -288,6 +289,7 @@ export function GuidingBeliefScreen() {
 const styles = StyleSheet.create({
   page: { flex: 1, backgroundColor: palette.paper },
   safeArea: { flex: 1 },
+  scroll: { flex: 1 },
   content: {
     flexGrow: 1,
     width: '100%',
@@ -297,6 +299,7 @@ const styles = StyleSheet.create({
     paddingBottom: 36,
     gap: 16,
   },
+  flowContent: { paddingTop: 16 },
   backButton: { minHeight: 44, alignSelf: 'flex-start', justifyContent: 'center' },
   backText: { fontFamily: type.semibold, color: palette.ink, fontSize: 14 },
   header: { gap: 10 },

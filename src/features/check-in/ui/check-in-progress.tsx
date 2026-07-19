@@ -168,7 +168,12 @@ export function CheckInProgress({ activeStep }: { activeStep: ProgressStep }) {
 
 const styles = StyleSheet.create({
   header: {
+    alignSelf: 'center',
+    backgroundColor: palette.paper,
     marginTop: 24,
+    maxWidth: 520,
+    paddingHorizontal: 22,
+    width: '100%',
   },
   eyebrow: {
     color: palette.inkMuted,

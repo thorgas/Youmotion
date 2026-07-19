@@ -346,6 +346,9 @@ describe('check-in screens', () => {
       keyboardDismissMode: 'interactive',
       keyboardShouldPersistTaps: 'handled',
     });
+    expect(within(screen.getByTestId('reflection-keyboard-scroll')).queryByTestId(
+      'check-in-progress-header',
+    )).toBeNull();
     expect(screen.queryByText('Does a core belief fit this moment?')).toBeNull();
     await fireEvent.changeText(screen.getByLabelText('Optional note about the feeling'), 'Ein heller Moment.');
     await fireEvent.press(screen.getByText('Save and continue'));
@@ -361,6 +364,9 @@ describe('check-in screens', () => {
     const beliefProgressHeader = screen.getByTestId('check-in-progress-header');
     expect(beliefProgressHeader.props['style']).toEqual(progressHeaderStyle);
     expect(beliefProgressHeader.parent?.children.indexOf(beliefProgressHeader)).toBe(0);
+    expect(within(screen.getByTestId('belief-system-step')).queryByTestId(
+      'check-in-progress-header',
+    )).toBeNull();
     expect(screen.getByTestId('check-in-progress').props['accessibilityValue']).toMatchObject({
       now: 2,
     });
@@ -391,6 +397,9 @@ describe('check-in screens', () => {
     const guidingProgressHeader = screen.getByTestId('check-in-progress-header');
     expect(guidingProgressHeader.props['style']).toEqual(progressHeaderStyle);
     expect(guidingProgressHeader.parent?.children.indexOf(guidingProgressHeader)).toBe(0);
+    expect(within(screen.getByTestId('guiding-belief-scroll')).queryByTestId(
+      'check-in-progress-header',
+    )).toBeNull();
     expect(screen.getByTestId('check-in-progress').props['accessibilityValue']).toMatchObject({
       now: 3,
     });
