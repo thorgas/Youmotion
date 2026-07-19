@@ -46,6 +46,7 @@ import {
   deleteMomentAccessibilityLabel,
   deleteMomentText,
 } from './check-in-deletion';
+import { CheckInProgress } from './check-in-progress';
 import { palette, type } from './theme';
 
 const _selectSnapshot = (
@@ -202,8 +203,8 @@ function ReflectionNoteStep() {
           <View style={styles.header}>
             <Text style={styles.eyebrow}>
               {editing
-                ? <fbt desc="Label for editing an existing check-in">EDIT MOMENT · STEP 1 OF 3</fbt>
-                : <fbt desc="Second step label for reflecting on a feeling">02 · REFLECT · STEP 1 OF 3</fbt>}
+                ? <fbt desc="Label for editing an existing check-in">EDIT MOMENT</fbt>
+                : <fbt desc="Second step label for reflecting on a feeling">02 · REFLECT</fbt>}
             </Text>
             <Text style={styles.title}>
               {editing
@@ -215,6 +216,12 @@ function ReflectionNoteStep() {
                 You do not have to explain anything. A few words can help hold onto the moment.
               </fbt>
             </Text>
+            <Text style={styles.continuationHint}>
+              <fbt desc="Explanation of the optional values available after saving a reflection">
+                Next, you can add or change this moment's core belief and guiding belief. Both steps are optional.
+              </fbt>
+            </Text>
+            <CheckInProgress activeStep={1} />
           </View>
           <View style={styles.card}>
             <PressableScale
@@ -281,7 +288,7 @@ function ReflectionNoteStep() {
                   <Text style={styles.primaryText}>
                     {failed
                       ? <fbt desc="Button retrying a failed reflection save">Try again</fbt>
-                      : <fbt desc="Button saving reflection before optional core belief step">Save reflection</fbt>}
+                      : <fbt desc="Button saving reflection and continuing to optional values">Save and continue</fbt>}
                   </Text>
                 )}
               </PressableScale>
@@ -346,8 +353,9 @@ function BeliefSystemStep() {
         >
           <View style={styles.header}>
             <Text style={styles.eyebrow}>
-              <fbt desc="Optional core belief step label">03 · CORE BELIEF · STEP 2 OF 3</fbt>
+              <fbt desc="Optional core belief step label">03 · CORE BELIEF</fbt>
             </Text>
+            <CheckInProgress activeStep={2} />
             <Text style={styles.title}>
               <fbt desc="Question shown after a reflection is saved">
                 Does a core belief fit this moment?
@@ -718,6 +726,13 @@ const styles = StyleSheet.create({
     fontSize: 15,
     lineHeight: 22,
     marginTop: 10,
+  },
+  continuationHint: {
+    fontFamily: type.medium,
+    color: palette.moss,
+    fontSize: 13,
+    lineHeight: 19,
+    marginTop: 12,
   },
   card: {
     marginTop: 28,

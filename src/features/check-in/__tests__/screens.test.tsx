@@ -325,6 +325,17 @@ describe('check-in screens', () => {
   it('saves a reflection before offering the optional core belief step', async () => {
     await act(_reachReflection);
     const screen = await _renderLocalized(<ReflectionScreen />);
+    expect(screen.getByTestId('check-in-progress-step-1-active')).toBeTruthy();
+    expect(screen.getByTestId('check-in-progress-step-2-upcoming')).toBeTruthy();
+    expect(screen.getByTestId('check-in-progress-step-3-upcoming')).toBeTruthy();
+    expect(screen.getByTestId('check-in-progress').props).toMatchObject({
+      accessibilityRole: 'progressbar',
+      accessibilityValue: { min: 1, max: 3, now: 1 },
+    });
+    expect(within(screen.getByTestId('check-in-progress')).getAllByText('Optional')).toHaveLength(2);
+    expect(screen.getByText(
+      "Next, you can add or change this moment's core belief and guiding belief. Both steps are optional.",
+    )).toBeTruthy();
     expect(screen.getByLabelText('Optional note about the feeling').props['autoFocus']).toBe(true);
     expect(screen.getByText('Cheerfulness')).toBeTruthy();
     expect(screen.queryByText(/50%/)).toBeNull();
@@ -334,7 +345,7 @@ describe('check-in screens', () => {
     });
     expect(screen.queryByText('Does a core belief fit this moment?')).toBeNull();
     await fireEvent.changeText(screen.getByLabelText('Optional note about the feeling'), 'Ein heller Moment.');
-    await fireEvent.press(screen.getByText('Save reflection'));
+    await fireEvent.press(screen.getByText('Save and continue'));
 
     await waitFor(() => expect(
       mockActor.getSnapshot().matches(CHECK_IN_STATES.BELIEF_SYSTEM),
@@ -342,6 +353,11 @@ describe('check-in screens', () => {
     expect(mockActor.getSnapshot().context.saved?.note).toBe('Ein heller Moment.');
     expect(mockActor.getSnapshot().context.saved?.beliefSystemId).toBeUndefined();
     expect(await screen.findByText('Your reflection is already saved. Add one only if it feels useful.')).toBeTruthy();
+    expect(screen.getByTestId('check-in-progress-step-1-complete')).toBeTruthy();
+    expect(screen.getByTestId('check-in-progress-step-2-active')).toBeTruthy();
+    expect(screen.getByTestId('check-in-progress').props['accessibilityValue']).toMatchObject({
+      now: 2,
+    });
     expect(screen.getByTestId('belief-system-browse').props['accessibilityRole']).toBe('button');
 
     await fireEvent.press(screen.getByTestId('belief-system-browse'));
@@ -363,6 +379,12 @@ describe('check-in screens', () => {
       <AppLocaleProvider><GuidingBeliefScreen /></AppLocaleProvider>,
     );
     expect(screen.getByText('What would support you instead?')).toBeTruthy();
+    expect(screen.getByTestId('check-in-progress-step-1-complete')).toBeTruthy();
+    expect(screen.getByTestId('check-in-progress-step-2-complete')).toBeTruthy();
+    expect(screen.getByTestId('check-in-progress-step-3-active')).toBeTruthy();
+    expect(screen.getByTestId('check-in-progress').props['accessibilityValue']).toMatchObject({
+      now: 3,
+    });
     expect(screen.getByText(/What did this rule once help you gain or protect/)).toBeTruthy();
     expect(screen.getByTestId('guiding-source-belief')).toHaveTextContent(
       'I always have to function.',
@@ -487,7 +509,12 @@ describe('check-in screens', () => {
     await screen.rerender(
       <AppLocaleProvider><GuidingBeliefScreen /></AppLocaleProvider>,
     );
-    expect(screen.getByText('04 · NEUE RICHTUNG · SCHRITT 3 VON 3')).toBeTruthy();
+    expect(screen.getByText('04 · NEUE RICHTUNG')).toBeTruthy();
+    const progress = within(screen.getByTestId('check-in-progress'));
+    expect(progress.getByText('Moment')).toBeTruthy();
+    expect(progress.getByText('Leidsatz')).toBeTruthy();
+    expect(progress.getByText('Leitsatz')).toBeTruthy();
+    expect(progress.getAllByText('Optional')).toHaveLength(2);
     expect(screen.getByText(/Zurück/)).toBeTruthy();
     expect(screen.getByText('Was würde dich stattdessen unterstützen?')).toBeTruthy();
     expect(screen.getByPlaceholderText(
@@ -557,6 +584,10 @@ describe('check-in screens', () => {
     expect(mockActor.getSnapshot().matches(NAVIGATION_STATES.REFLECTION)).toBe(true);
     const reflection = await _renderLocalized(<ReflectionScreen />);
     expect(reflection.getByText('Edit this moment.')).toBeTruthy();
+    expect(reflection.getByText(
+      "Next, you can add or change this moment's core belief and guiding belief. Both steps are optional.",
+    )).toBeTruthy();
+    expect(reflection.getByText('Save and continue')).toBeTruthy();
     expect(reflection.getByText('Change feeling')).toBeTruthy();
     expect(reflection.getByTestId('delete-edited-moment')).toBeTruthy();
     expect(reflection.getByDisplayValue('Before').props['autoFocus']).toBe(true);

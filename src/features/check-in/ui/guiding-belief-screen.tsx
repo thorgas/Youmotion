@@ -27,6 +27,7 @@ import {
   guidingBeliefAccessibilityLabel,
   guidingBeliefPlaceholder,
 } from './belief-system-copy';
+import { CheckInProgress } from './check-in-progress';
 import { palette, type } from './theme';
 
 type NavigationSnapshot = ReturnType<
@@ -128,9 +129,10 @@ export function GuidingBeliefScreen() {
           <View style={styles.header}>
             <Text style={styles.eyebrow}>
               <fbt desc="Dedicated positive guiding belief step label">
-                04 · NEW DIRECTION · STEP 3 OF 3
+                04 · NEW DIRECTION
               </fbt>
             </Text>
+            <CheckInProgress activeStep={3} />
             <Text style={styles.title}>
               <fbt desc="Title for the dedicated positive guiding belief page">
                 What would support you instead?

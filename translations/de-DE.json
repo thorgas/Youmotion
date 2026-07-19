@@ -1574,17 +1574,6 @@
       ],
       "types": []
     },
-    "ECb+06AlNayP598Y7LLu3g==": {
-      "description": "Button saving reflection before optional core belief step",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "Reflexion speichern",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
     "6Fm5iEggTrTmG2hKDIpAqg==": {
       "description": "Question shown after a reflection is saved",
       "tokens": [],
@@ -2003,17 +1992,6 @@
       ],
       "types": []
     },
-    "70PhGATxJVGnZcQiD1iLBw==": {
-      "description": "Dedicated positive guiding belief step label",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "04 · NEUE RICHTUNG · SCHRITT 3 VON 3",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
     "MHVp2VAo2i2YQtgX34yXBg==": {
       "description": "Title for the dedicated positive guiding belief page",
       "tokens": [],
@@ -2201,39 +2179,6 @@
       ],
       "types": []
     },
-    "i4uWWU8CDnrnQuaI5nK0HQ==": {
-      "description": "Label for editing an existing check-in",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "MOMENT BEARBEITEN · SCHRITT 1 VON 3",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "yC3Ty7HfIUEuNhWujuPxHw==": {
-      "description": "Second step label for reflecting on a feeling",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "02 · REFLEKTIEREN · SCHRITT 1 VON 3",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "h/sf+fdkHiOCVmn+AwX2eQ==": {
-      "description": "Optional core belief step label",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "03 · LEIDSATZ · SCHRITT 2 VON 3",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
     "Tae5iZKOi8WUeLnuz230qw==": {
       "description": "Button attaching the selected core belief and continuing",
       "tokens": [],
@@ -2273,6 +2218,116 @@
       "translations": [
         {
           "translation": "Dein Leitsatz",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "wPFrKot+8fGc7NQa4aSqeg==": {
+      "description": "Label below an optional check-in progress step",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Optional",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "2V+mujw4ZLItB1lrDaVyWA==": {
+      "description": "Moment step in check-in progress",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Moment",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "CEJMoNtpzKm7+WaPhyGgoQ==": {
+      "description": "Harmful core belief step in check-in progress",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Leidsatz",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "62egImaxgKU0ca0LNKQ73Q==": {
+      "description": "Positive guiding belief step in check-in progress",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Leitsatz",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "0F9q2jZ3kHxTGwWB39UBeg==": {
+      "description": "Dedicated positive guiding belief step label",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "04 · NEUE RICHTUNG",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "v77XkAy4rXjsqwiytOiFIQ==": {
+      "description": "Label for editing an existing check-in",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "MOMENT BEARBEITEN",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "cwUthFJdCgV42WV4iwhplg==": {
+      "description": "Second step label for reflecting on a feeling",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "02 · REFLEKTIEREN",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "+uDTq5kRWGkxxTSuod6JJQ==": {
+      "description": "Explanation of the optional values available after saving a reflection",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Danach kannst du Leidsatz und Leitsatz dieses Moments ergänzen oder ändern. Beide Schritte sind optional.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "j0ph5m3mWUCGDM2D50m9zg==": {
+      "description": "Button saving reflection and continuing to optional values",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Speichern & weiter",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "rauWej/jBwd+RU+rrtuwGw==": {
+      "description": "Optional core belief step label",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "03 · LEIDSATZ",
           "variations": {}
         }
       ],
