@@ -80,6 +80,7 @@ const AppContextSchema = Schema.Struct({
   saved: Schema.NullOr(CheckInSchema),
   editing: Schema.NullOr(CheckInSchema),
   error: Schema.NullOr(Schema.String),
+  guidingHelpVisible: Schema.Boolean,
 });
 
 const EmptyEventSchema = Schema.standardSchemaV1(Schema.Struct({}));
@@ -144,6 +145,7 @@ function guidingBeliefDrafts({
       : '',
     beliefStatementDraftId: null,
     guidingBeliefStatementDraft: statement?.guidingStatement ?? '',
+    guidingHelpVisible: false,
     error: null,
   };
 }
@@ -242,6 +244,7 @@ export const appNavigationMachine = setup({
       [CHECK_IN_EVENTS.GUIDING_BELIEF_SYSTEM_DRAFT_CHANGED]: Schema.standardSchemaV1(
         Schema.Struct({ statement: Schema.String }),
       ),
+      [CHECK_IN_EVENTS.GUIDING_BELIEF_HELP_TOGGLED]: EmptyEventSchema,
       [CHECK_IN_EVENTS.BELIEF_SYSTEM_EDITOR_CONFIRMED]: EmptyEventSchema,
       [CHECK_IN_EVENTS.GUIDING_BELIEF_BACK_REQUESTED]: EmptyEventSchema,
       [CHECK_IN_EVENTS.GUIDING_BELIEF_SKIPPED]: EmptyEventSchema,
@@ -346,6 +349,7 @@ export const appNavigationMachine = setup({
     saved: null,
     editing: null,
     error: null,
+    guidingHelpVisible: false,
   },
   entry: ({ self }, enq) => {
     enq(() => {
@@ -1030,12 +1034,18 @@ export const appNavigationMachine = setup({
         [CHECK_IN_EVENTS.GUIDING_BELIEF_SYSTEM_DRAFT_CHANGED]: {
           context: ({ event }) => ({ guidingBeliefStatementDraft: event.statement }),
         },
+        [CHECK_IN_EVENTS.GUIDING_BELIEF_HELP_TOGGLED]: {
+          context: ({ context }) => ({
+            guidingHelpVisible: !context.guidingHelpVisible,
+          }),
+        },
         [CHECK_IN_EVENTS.GUIDING_BELIEF_BACK_REQUESTED]: {
           target: CHECK_IN_STATES.BELIEF_SYSTEM,
           context: {
             beliefStatementDraft: '',
             beliefStatementDraftId: null,
             guidingBeliefStatementDraft: '',
+            guidingHelpVisible: false,
             error: null,
           },
         },
@@ -1050,6 +1060,7 @@ export const appNavigationMachine = setup({
                 beliefStatementDraft: '',
                 beliefStatementDraftId: null,
                 guidingBeliefStatementDraft: '',
+                guidingHelpVisible: false,
                 saved: null,
                 editing: null,
                 error: null,
@@ -1062,6 +1073,7 @@ export const appNavigationMachine = setup({
               beliefStatementDraft: '',
               beliefStatementDraftId: null,
               guidingBeliefStatementDraft: '',
+              guidingHelpVisible: false,
               error: null,
             },
           };
@@ -1148,6 +1160,7 @@ export const appNavigationMachine = setup({
                 beliefStatementDraft: '',
                 beliefStatementDraftId: null,
                 guidingBeliefStatementDraft: '',
+                guidingHelpVisible: false,
                 saved: null,
                 editing: null,
                 error: null,
@@ -1161,6 +1174,7 @@ export const appNavigationMachine = setup({
               beliefStatementDraft: '',
               beliefStatementDraftId: null,
               guidingBeliefStatementDraft: '',
+              guidingHelpVisible: false,
               error: null,
             },
           };
@@ -1181,6 +1195,7 @@ export const appNavigationMachine = setup({
                 beliefStatementDraft: '',
                 beliefStatementDraftId: null,
                 guidingBeliefStatementDraft: '',
+                guidingHelpVisible: false,
                 saved: null,
                 editing: null,
                 error: null,
@@ -1194,6 +1209,7 @@ export const appNavigationMachine = setup({
               beliefStatementDraft: '',
               beliefStatementDraftId: null,
               guidingBeliefStatementDraft: '',
+              guidingHelpVisible: false,
               error: null,
             },
           };
@@ -1215,6 +1231,7 @@ export const appNavigationMachine = setup({
             beliefStatementDraft: '',
             beliefStatementDraftId: null,
             guidingBeliefStatementDraft: '',
+            guidingHelpVisible: false,
             error: null,
           },
         },

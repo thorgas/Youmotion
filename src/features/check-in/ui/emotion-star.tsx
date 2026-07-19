@@ -1,23 +1,9 @@
 import { useCallback, useMemo } from 'react';
 import { useSelector } from '@xstate/store-react';
 import { PanResponder, StyleSheet, Text, useWindowDimensions, View, type StyleProp, type TextStyle } from 'react-native';
-import Animated, {
-  Easing,
-  interpolate,
-  useAnimatedStyle,
-  useFrameCallback,
-  useReducedMotion,
-  useSharedValue,
-  type SharedValue,
-  withDelay,
-  withTiming,
-} from 'react-native-reanimated';
+import { useSharedValue, type SharedValue } from 'react-native-reanimated';
 import Svg, { Circle } from 'react-native-svg';
 
-import {
-  EMOTION_TEXT_REVEAL_DURATION,
-  EMOTION_TEXT_REVEAL_STAGGER,
-} from '@/constants';
 import { appSettingsStore } from '@/features/settings/application/app-settings.store';
 import type { EmotionLabelMode } from '@/features/settings/domain/emotion-label-mode';
 import { emotionAngle, selectionFromPoint } from '../domain/emotion-selection';
@@ -46,19 +32,10 @@ type EmotionFieldProps = {
   labelMode: EmotionLabelMode;
 };
 
-type RevealedTextProps = {
-  delay: number;
+type ReadoutTextProps = {
   style: StyleProp<TextStyle>;
   testID: string;
   text: string;
-};
-
-type RevealedCharacterProps = {
-  character: string;
-  index: number;
-  length: number;
-  progress: Readonly<Pick<SharedValue<number>, 'value'>>;
-  style: StyleProp<TextStyle>;
 };
 
 const _selectEmotionLabelMode = (state: ReturnType<typeof appSettingsStore.getSnapshot>) => (
@@ -70,75 +47,23 @@ const _polar = ({ center, radius, angle }: { center: number; radius: number; ang
   y: center + Math.sin(angle) * radius,
 });
 
-function RevealedCharacter({ character, index, length, progress, style }: RevealedCharacterProps) {
-  const animatedStyle = useAnimatedStyle(() => {
-    const staggerRange = 0.64;
-    const start = length <= 1 ? 0 : (index / (length - 1)) * staggerRange;
-    const characterProgress = interpolate(
-      progress.value,
-      [start, Math.min(start + 0.36, 1)],
-      [0, 1],
-      'clamp',
-    );
-
-    return {
-      opacity: interpolate(characterProgress, [0, 0.72, 1], [0, 0.92, 1]),
-      transform: [
-        { translateX: interpolate(characterProgress, [0, 0.72, 1], [-9, 1.5, 0]) },
-        { scale: interpolate(characterProgress, [0, 0.72, 1], [0.96, 1.015, 1]) },
-      ],
-    };
-  }, [index, length, progress]);
-
-  return <Animated.Text accessible={false} style={[style, animatedStyle]}>{character}</Animated.Text>;
-}
-
-function RevealedText({ delay, style, testID, text }: RevealedTextProps) {
-  const reduceMotion = useReducedMotion();
-  const characters = Array.from(text);
-  const progress = useSharedValue(reduceMotion ? 1 : 0);
-  const hasStarted = useSharedValue(reduceMotion);
-  const _startReveal = () => {
-    'worklet';
-    if (hasStarted.value) return;
-    hasStarted.value = true;
-    progress.value = withDelay(delay, withTiming(1, {
-      duration: EMOTION_TEXT_REVEAL_DURATION,
-      easing: Easing.bezier(0.3, 0, 0.2, 1),
-    }));
-  };
-
-  useFrameCallback(_startReveal, true);
-
+function ReadoutText({ style, testID, text }: ReadoutTextProps) {
   return (
     <View accessibilityLabel={text} accessible style={styles.revealLine} testID={testID}>
-      {characters.map((character, index) => (
-        <RevealedCharacter
-          key={text.slice(0, index + 1)}
-          character={character}
-          index={index}
-          length={characters.length}
-          progress={progress}
-          style={style}
-        />
-      ))}
+      <Text accessible={false} style={style}>{text}</Text>
     </View>
   );
 }
 
 function EmotionReadout({ selection }: { selection: EmotionSelection }) {
-  const revealKey = `${selection.emotionId}-${selection.level}`;
-
   return (
-    <View key={revealKey} style={styles.selectedReadout} testID="emotion-readout-selection">
-      <RevealedText
-        delay={0}
+    <View style={styles.selectedReadout} testID="emotion-readout-selection">
+      <ReadoutText
         style={[styles.readoutEmotion, styles.readoutEmotionSelected]}
         testID="emotion-nuance-reveal"
         text={emotionNuance(selection)}
       />
-      <RevealedText
-        delay={EMOTION_TEXT_REVEAL_STAGGER}
+      <ReadoutText
         style={styles.readoutNuance}
         testID="emotion-name-reveal"
         text={emotionName(selection.emotionId)}

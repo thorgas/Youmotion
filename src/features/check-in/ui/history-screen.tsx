@@ -10,6 +10,7 @@ import { CHECK_IN_EVENTS } from '@/constants';
 import { useAppNavigationActor } from '@/navigation/app-navigation.provider';
 import { checkInHistoryStore } from '../application/check-in-history.store';
 import type { CheckIn } from '../domain/check-in';
+import { selectionForCheckIn } from '../domain/emotion';
 import type { BeliefStatement } from '../domain/belief-statement';
 import { emotionSummary } from './emotion-copy';
 import {
@@ -99,13 +100,19 @@ function MomentRow({ entry, locale }: { entry: CheckIn; locale: string }) {
         style={styles.rowMain}
         testID={`history-moment-${entry.id}`}
       >
-        <View style={styles.dot} />
+        <View
+          style={[
+            styles.dot,
+            { backgroundColor: selectionForCheckIn(entry).color },
+          ]}
+        />
         <View style={styles.rowCopy}>
           <Text style={styles.emotion}>{emotionSummary(entry)}</Text>
           <Text style={styles.date}>{formatHistoryDate({ date: new Date(entry.createdAt), locale })}</Text>
           {entry.note ? <Text style={styles.note}>{entry.note}</Text> : null}
           <HistoryBelief entry={entry} statements={beliefStatements} />
         </View>
+        <Text accessibilityElementsHidden style={styles.disclosure}>›</Text>
       </PressableScale>
     </View>
   );
@@ -152,8 +159,9 @@ const styles = StyleSheet.create({
   error: { fontFamily: type.medium, color: palette.danger, fontSize: 12, lineHeight: 18, paddingBottom: 12 },
   row: { flexDirection: 'row', alignItems: 'center', borderTopWidth: 1, borderColor: palette.hairline },
   rowMain: { flex: 1, flexDirection: 'row', alignItems: 'flex-start', paddingVertical: 17, paddingRight: 10 },
-  dot: { width: 10, height: 10, borderRadius: 5, backgroundColor: '#8D8278', marginTop: 5, marginRight: 12 },
+  dot: { width: 10, height: 10, borderRadius: 5, marginTop: 5, marginRight: 12 },
   rowCopy: { flex: 1 },
+  disclosure: { fontFamily: type.regular, color: palette.inkMuted, fontSize: 24, lineHeight: 24 },
   emotion: { fontFamily: type.semibold, color: palette.ink, fontSize: 15 },
   date: { fontFamily: type.regular, color: palette.inkMuted, fontSize: 12, marginTop: 2 },
   note: { fontFamily: type.regular, color: palette.ink, fontSize: 13, lineHeight: 19, marginTop: 8 },

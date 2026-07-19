@@ -250,7 +250,7 @@ function ReflectionNoteStep() {
               multiline
               onChangeText={_noteChanged}
               placeholder={optionalNotePlaceholder()}
-              placeholderTextColor="#A39A8F"
+              placeholderTextColor={palette.inkMuted}
               returnKeyType="done"
               style={styles.input}
               submitBehavior="blurAndSubmit"
@@ -588,7 +588,7 @@ function BeliefEditorFields({
         multiline
         onChangeText={onBeliefChanged}
         placeholder={customBeliefPlaceholder()}
-        placeholderTextColor="#A39A8F"
+        placeholderTextColor={palette.inkMuted}
         style={styles.beliefInput}
         testID="belief-system-draft"
         value={beliefStatementDraft}

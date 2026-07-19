@@ -410,6 +410,10 @@ describe('check-in screens', () => {
     expect(screen.getByTestId('check-in-progress').props['accessibilityValue']).toMatchObject({
       now: 3,
     });
+    expect(screen.queryByTestId('guiding-belief-help')).toBeNull();
+    expect(screen.queryByText(/What did this rule once help you gain or protect/)).toBeNull();
+    await fireEvent.press(screen.getByTestId('guiding-belief-help-toggle'));
+    expect(screen.getByTestId('guiding-belief-help')).toBeTruthy();
     expect(screen.getByText(/What did this rule once help you gain or protect/)).toBeTruthy();
     expect(screen.getByTestId('guiding-source-belief')).toHaveTextContent(
       'I always have to function.',
@@ -445,7 +449,7 @@ describe('check-in screens', () => {
     expect(history.getByText('Released core belief')).toBeTruthy();
     expect(history.getByText('Your guiding belief')).toBeTruthy();
     expect(history.getByTestId(`history-released-belief-${saved.id}`)).toHaveStyle({
-      color: '#9A8F87',
+      color: '#6F6760',
       fontSize: 12,
       textDecorationLine: 'line-through',
     });

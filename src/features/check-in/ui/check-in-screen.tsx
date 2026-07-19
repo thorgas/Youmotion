@@ -8,6 +8,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { CHECK_IN_EVENTS } from '@/constants';
 import { useAppNavigationActor } from '@/navigation/app-navigation.provider';
 import type { EmotionSelection } from '../domain/check-in';
+import { selectionForCheckIn } from '../domain/emotion';
 import { checkInHistoryStore } from '../application/check-in-history.store';
 import { EmotionStar } from './emotion-star';
 import { emotionSummary } from './emotion-copy';
@@ -100,10 +101,16 @@ export function CheckInScreen() {
             <View style={styles.recent}>
               <Text style={styles.sectionTitle}><fbt desc="Heading for the most recent check-in">Latest check-in</fbt></Text>
               <PressableScale accessibilityRole="button" onPress={_editLatest} style={styles.recentCard}>
-                <View style={styles.recentDot} />
+                <View
+                  style={[
+                    styles.recentDot,
+                    { backgroundColor: selectionForCheckIn(latest).color },
+                  ]}
+                />
                 <View style={styles.recentCopy}>
                   <Text style={styles.recentEmotion}>{emotionSummary(latest)}</Text>
                 </View>
+                <Text accessibilityElementsHidden style={styles.disclosure}>›</Text>
               </PressableScale>
             </View>
           ) : null}
@@ -128,8 +135,9 @@ const styles = StyleSheet.create({
   recent: { marginTop: 28 },
   sectionTitle: { fontFamily: type.medium, color: palette.ink, fontSize: 20, marginBottom: 10 },
   recentCard: { flexDirection: 'row', alignItems: 'center', borderTopWidth: 1, borderBottomWidth: 1, borderColor: palette.hairline, paddingVertical: 14 },
-  recentDot: { width: 10, height: 10, borderRadius: 5, marginRight: 12, backgroundColor: '#8D8278' },
+  recentDot: { width: 10, height: 10, borderRadius: 5, marginRight: 12 },
   recentCopy: { flex: 1 },
   recentEmotion: { fontFamily: type.medium, color: palette.ink, fontSize: 14 },
-  disclaimer: { fontFamily: type.regular, color: palette.inkMuted, fontSize: 11, lineHeight: 16, marginTop: 24, textAlign: 'center', paddingHorizontal: 32, opacity: 0.58 },
+  disclosure: { fontFamily: type.regular, color: palette.inkMuted, fontSize: 24, lineHeight: 24 },
+  disclaimer: { fontFamily: type.regular, color: palette.inkMuted, fontSize: 11, lineHeight: 16, marginTop: 24, textAlign: 'center', paddingHorizontal: 32 },
 });

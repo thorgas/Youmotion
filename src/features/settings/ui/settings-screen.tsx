@@ -1,5 +1,6 @@
 import { useSelector as useActorSelector } from '@xstate/react';
 import { useSelector } from '@xstate/store-react';
+import { fbs } from 'fbtee';
 import { PressableScale } from 'pressto';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -32,8 +33,8 @@ function AppReleaseInfoCard({
   const shortGitCommit = gitCommit?.slice(0, 7);
 
   return (
-    <View style={styles.card} testID="app-release-info">
-      <Text style={styles.cardTitle}><fbt desc="App release information title">App information</fbt></Text>
+    <View style={styles.releaseFooter} testID="app-release-info">
+      <Text style={styles.sectionHeading}><fbt desc="App release information title">App information</fbt></Text>
       <View style={styles.releaseInfo}>
         <View style={styles.releaseInfoRow}>
           <Text style={styles.releaseInfoLabel}><fbt desc="App version information label">App</fbt></Text>
@@ -49,6 +50,36 @@ function AppReleaseInfoCard({
         </View>
       </View>
     </View>
+  );
+}
+
+function SettingsActionRow({
+  count,
+  description,
+  onPress,
+  testID,
+  title,
+}: {
+  count?: number;
+  description: string;
+  onPress: () => void;
+  testID: string;
+  title: string;
+}) {
+  return (
+    <PressableScale
+      accessibilityRole="button"
+      onPress={onPress}
+      style={styles.actionRow}
+      testID={testID}
+    >
+      <View style={styles.actionCopy}>
+        <Text style={styles.actionTitle}>{title}</Text>
+        <Text style={styles.actionDescription}>{description}</Text>
+      </View>
+      {count === undefined ? null : <Text style={styles.actionCount}>{count}</Text>}
+      <Text accessibilityElementsHidden style={styles.actionChevron}>›</Text>
+    </PressableScale>
   );
 }
 
@@ -81,8 +112,12 @@ export function SettingsScreen() {
       <SafeAreaView edges={['top']} style={styles.safeArea}>
         <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         <Text style={styles.eyebrow}><fbt desc="Settings screen eyebrow heading">SETTINGS</fbt></Text>
-        <Text style={styles.title}><fbt desc="Settings screen title">A protected space.</fbt></Text>
-        <View style={styles.card}>
+        <Text style={styles.title}><fbt desc="Settings screen title">Your space.</fbt></Text>
+        <Text style={styles.sectionHeading}>
+          <fbt desc="Heading grouping app preferences in settings">PREFERENCES</fbt>
+        </Text>
+        <View style={styles.preferencesCard}>
+          <View style={styles.preferenceGroup}>
           <Text style={styles.cardTitle}><fbt desc="Language setting title">Language</fbt></Text>
           <Text style={styles.cardCopy}><fbt desc="Language setting explanation">Choose the language used throughout Youmotion.</fbt></Text>
           <View style={styles.languageRow}>
@@ -103,8 +138,9 @@ export function SettingsScreen() {
               <Text style={[styles.languageText, locale === APP_LOCALES.GERMAN && styles.languageTextSelected]}><fbt desc="German language option">German</fbt></Text>
             </PressableScale>
           </View>
-        </View>
-        <View style={styles.card}>
+          </View>
+          <View style={styles.preferenceDivider} />
+          <View style={styles.preferenceGroup}>
           <Text style={styles.cardTitle}><fbt desc="Emotion star label display setting title">Emotion labels</fbt></Text>
           <Text style={styles.cardCopy}><fbt desc="Explanation of the emotion star label display setting">Choose what appears around the emotion star before you touch it.</fbt></Text>
           <View style={styles.labelModeRow}>
@@ -133,37 +169,39 @@ export function SettingsScreen() {
               <Text style={[styles.labelModeText, emotionLabelMode === EMOTION_LABEL_MODES.BOTH && styles.languageTextSelected]}><fbt desc="Emoji and text emotion label display option">Both</fbt></Text>
             </PressableScale>
           </View>
+          </View>
         </View>
-        <View style={styles.card}>
-          <Text style={styles.cardTitle}>
-            <fbt desc="Personal core-belief management setting title">Your core beliefs</fbt>
-          </Text>
-          <Text style={styles.cardCopy}>
-            <fbt desc="Personal core-belief management setting explanation">
-              Edit or remove the core beliefs you wrote yourself.
-            </fbt>
-          </Text>
-          <PressableScale
-            accessibilityRole="button"
+        <Text style={styles.sectionHeading}>
+          <fbt desc="Heading grouping personalization links in settings">PERSONALIZE</fbt>
+        </Text>
+        <View style={styles.actionGroup}>
+          <SettingsActionRow
+            count={personalBeliefCount}
+            description={String(fbs(
+              'Edit or remove the core beliefs you wrote yourself.',
+              'Personal core-belief management setting explanation',
+            ))}
             onPress={_openBeliefLibrary}
-            style={styles.manageBeliefsButton}
             testID="open-belief-library"
-          >
-            <Text style={styles.manageBeliefsText}>
-              <fbt desc="Button opening personal core-belief management">
-                Manage personal core beliefs
-              </fbt>
-            </Text>
-            <Text style={styles.manageBeliefsCount}>{personalBeliefCount}</Text>
-          </PressableScale>
+            title={String(fbs(
+              'Manage personal core beliefs',
+              'Button opening personal core-belief management',
+            ))}
+          />
         </View>
-        <View style={styles.card}>
-          <Text style={styles.cardTitle}><fbt desc="Local privacy setting title">Private by design</fbt></Text>
-          <Text style={styles.cardCopy}><fbt desc="Local privacy explanation">Your check-ins are currently stored exclusively on this device.</fbt></Text>
-        </View>
-        <View style={styles.card}>
-          <Text style={styles.cardTitle}><fbt desc="About the emotion star setting title">About the emotion star</fbt></Text>
-          <Text style={styles.cardCopy}><fbt desc="Explanation of the emotion star source and purpose">The seven basic directions are based on the German therapeutic material “Der Gefühlsstern.” The app supports self-reflection, not diagnosis.</fbt></Text>
+        <Text style={styles.sectionHeading}>
+          <fbt desc="Heading grouping data and product information in settings">YOUR DATA</fbt>
+        </Text>
+        <View style={styles.infoGroup}>
+          <View style={styles.infoRow}>
+            <Text style={styles.infoTitle}><fbt desc="Local privacy setting title">Private by design</fbt></Text>
+            <Text style={styles.infoCopy}><fbt desc="Local privacy explanation">Your check-ins are currently stored exclusively on this device.</fbt></Text>
+          </View>
+          <View style={styles.actionDivider} />
+          <View style={styles.infoRow}>
+            <Text style={styles.infoTitle}><fbt desc="About the emotion star setting title">About the emotion star</fbt></Text>
+            <Text style={styles.infoCopy}><fbt desc="Explanation of the emotion star source and purpose">The seven basic directions are based on the German therapeutic material “Der Gefühlsstern.” The app supports self-reflection, not diagnosis.</fbt></Text>
+          </View>
         </View>
         <AppReleaseInfoCard
           appVersion={appVersion}
@@ -181,9 +219,28 @@ const styles = StyleSheet.create({
   safeArea: { flex: 1 },
   content: { width: '100%', maxWidth: 520, alignSelf: 'center', padding: 22, paddingBottom: 40 },
   eyebrow: { fontFamily: type.semibold, color: palette.inkMuted, fontSize: 11, letterSpacing: 1.4, marginTop: 18 },
-  title: { fontFamily: type.semibold, color: palette.ink, fontSize: 34, marginTop: 8, marginBottom: 26 },
-  card: { backgroundColor: palette.paperRaised, borderRadius: 24, borderWidth: 1, borderColor: palette.hairline, padding: 20, marginBottom: 14 },
-  cardTitle: { fontFamily: type.medium, color: palette.ink, fontSize: 20 },
+  title: { fontFamily: type.semibold, color: palette.ink, fontSize: 36, marginTop: 8, marginBottom: 30 },
+  sectionHeading: {
+    fontFamily: type.semibold,
+    color: palette.inkMuted,
+    fontSize: 10,
+    letterSpacing: 1.3,
+    marginBottom: 10,
+    marginTop: 8,
+    textTransform: 'uppercase',
+  },
+  preferencesCard: {
+    backgroundColor: palette.paperRaised,
+    borderRadius: 24,
+    borderCurve: 'continuous',
+    borderWidth: 1,
+    borderColor: palette.hairline,
+    marginBottom: 26,
+    overflow: 'hidden',
+  },
+  preferenceGroup: { padding: 18 },
+  preferenceDivider: { height: 1, backgroundColor: palette.hairline, marginHorizontal: 18 },
+  cardTitle: { fontFamily: type.medium, color: palette.ink, fontSize: 18 },
   cardCopy: { fontFamily: type.regular, color: palette.inkMuted, fontSize: 14, lineHeight: 21, marginTop: 7 },
   languageRow: { flexDirection: 'row', gap: 10, marginTop: 16 },
   languageButton: { minHeight: 42, flex: 1, alignItems: 'center', justifyContent: 'center', borderRadius: 14, borderWidth: 1, borderColor: palette.hairline },
@@ -193,29 +250,63 @@ const styles = StyleSheet.create({
   labelModeRow: { flexDirection: 'row', gap: 8, marginTop: 16 },
   labelModeButton: { minHeight: 42, flex: 1, alignItems: 'center', justifyContent: 'center', borderRadius: 14, borderWidth: 1, borderColor: palette.hairline, paddingHorizontal: 8 },
   labelModeText: { fontFamily: type.semibold, color: palette.ink, fontSize: 13 },
-  manageBeliefsButton: {
-    minHeight: 48,
+  actionGroup: {
+    borderTopWidth: 1,
+    borderBottomWidth: 1,
+    borderColor: palette.hairline,
+    marginBottom: 26,
+  },
+  actionRow: {
+    minHeight: 76,
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
     gap: 12,
-    borderRadius: 16,
-    backgroundColor: palette.ink,
-    paddingHorizontal: 16,
-    marginTop: 16,
+    paddingVertical: 14,
   },
-  manageBeliefsText: { flexShrink: 1, fontFamily: type.semibold, color: '#FFFFFF', fontSize: 14 },
-  manageBeliefsCount: {
+  actionCopy: { flex: 1 },
+  actionTitle: { fontFamily: type.semibold, color: palette.ink, fontSize: 15 },
+  actionDescription: {
+    fontFamily: type.regular,
+    color: palette.inkMuted,
+    fontSize: 12,
+    lineHeight: 18,
+    marginTop: 3,
+  },
+  actionDivider: { height: 1, backgroundColor: palette.hairline },
+  actionCount: {
     minWidth: 28,
     minHeight: 28,
     borderRadius: 14,
-    backgroundColor: palette.moss,
+    backgroundColor: '#EDF0EB',
     fontFamily: type.semibold,
-    color: '#FFFFFF',
+    color: palette.moss,
     fontSize: 13,
     textAlign: 'center',
     lineHeight: 28,
   },
+  actionChevron: {
+    fontFamily: type.regular,
+    color: palette.inkMuted,
+    fontSize: 24,
+    lineHeight: 24,
+  },
+  infoGroup: {
+    borderRadius: 20,
+    borderCurve: 'continuous',
+    backgroundColor: '#F2EFEA',
+    paddingHorizontal: 18,
+    marginBottom: 24,
+  },
+  infoRow: { paddingVertical: 16 },
+  infoTitle: { fontFamily: type.semibold, color: palette.ink, fontSize: 14 },
+  infoCopy: {
+    fontFamily: type.regular,
+    color: palette.inkMuted,
+    fontSize: 12,
+    lineHeight: 18,
+    marginTop: 4,
+  },
+  releaseFooter: { paddingHorizontal: 2, paddingBottom: 8 },
   releaseInfo: { marginTop: 12 },
   releaseInfoRow: { minHeight: 32, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 16 },
   releaseInfoLabel: { fontFamily: type.regular, color: palette.inkMuted, fontSize: 14 },

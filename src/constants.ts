@@ -49,6 +49,7 @@ export const CHECK_IN_EVENTS = Object.freeze({
   BELIEF_SYSTEM_EDITOR_CANCELLED: literal('beliefSystem.editorCancelled'),
   BELIEF_SYSTEM_DRAFT_CHANGED: literal('beliefSystem.draftChanged'),
   GUIDING_BELIEF_SYSTEM_DRAFT_CHANGED: literal('beliefSystem.guidingDraftChanged'),
+  GUIDING_BELIEF_HELP_TOGGLED: literal('beliefSystem.guidingHelpToggled'),
   BELIEF_SYSTEM_EDITOR_CONFIRMED: literal('beliefSystem.editorConfirmed'),
   GUIDING_BELIEF_BACK_REQUESTED: literal('beliefSystem.guidingBackRequested'),
   GUIDING_BELIEF_SKIPPED: literal('beliefSystem.guidingSkipped'),
@@ -202,11 +203,8 @@ export const EMOTION_AXIS_STEP = Math.PI / 4;
 export const BASE_RIPPLE_DURATION = 2800;
 export const BASE_RIPPLE_PHASES = Object.freeze([0, 0.25, 0.5, 0.75]);
 export const REFLECTION_KEYBOARD_BOTTOM_OFFSET = 82;
-export const EMOTION_TEXT_REVEAL_DURATION = 620;
-export const EMOTION_TEXT_REVEAL_STAGGER = 150;
-export const EMOTION_LABEL_TRANSITION_DURATION = 180;
 export const SPLASH_BACKGROUND_COLOR = '#F4F0E8';
 export const SPLASH_LOGO_SIZE = 156;
-export const SPLASH_LOGO_REVEAL_DURATION = 1500;
-export const SPLASH_OVERLAY_VISIBLE_DURATION = 840;
+export const SPLASH_LOGO_REVEAL_DURATION = 680;
+export const SPLASH_OVERLAY_VISIBLE_DURATION = 700;
 export const SPLASH_OVERLAY_FADE_DURATION = 180;

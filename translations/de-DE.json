@@ -364,17 +364,6 @@
       ],
       "types": []
     },
-    "usxXaM4bk/GJu4WGKoOBIA==": {
-      "description": "Settings screen title",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "Ein geschützter Raum.",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
     "QDJ8toc3l5s+TM7/kL9K5g==": {
       "description": "Language setting title",
       "tokens": [],
@@ -2630,17 +2619,6 @@
       ],
       "types": []
     },
-    "onO7dh0NiBmQN4/VuVuZtw==": {
-      "description": "Personal core-belief management setting title",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "Deine Leidsätze",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
     "UETznezzJbjXperxEI8CNQ==": {
       "description": "Personal core-belief management setting explanation",
       "tokens": [],
@@ -2658,6 +2636,78 @@
       "translations": [
         {
           "translation": "Eigene Leidsätze verwalten",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "S7F9pcbLWkoaPk9Vo1YeDQ==": {
+      "description": "Settings screen title",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Dein Raum.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "jG36S+UWgeFOriWURhGcaQ==": {
+      "description": "Heading grouping app preferences in settings",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "EINSTELLUNGEN",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "Oe+cd1nACi3H6KXoSU6/bA==": {
+      "description": "Heading grouping data and product information in settings",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "DEINE DATEN",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "xk7H/Wch4Fg6b9uo/RNb3g==": {
+      "description": "Button hiding guiding belief writing help",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Schreibhilfe ausblenden",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "LamS0twBz8D+Gr3jJ/kD5A==": {
+      "description": "Button revealing guiding belief writing help",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Brauchst du Schreibhilfe?",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "YCkm3HyuDayP80mTpx9rOA==": {
+      "description": "Heading grouping personalization links in settings",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "PERSONALISIEREN",
           "variations": {}
         }
       ],

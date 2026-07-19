@@ -1,8 +1,8 @@
 import { useSelector } from '@xstate/react';
 import { fbs } from 'fbtee';
+import { PressableScale } from 'pressto';
 import {
   ActivityIndicator,
-  Pressable,
   ScrollView,
   StyleSheet,
   Text,
@@ -35,7 +35,7 @@ function LibraryBackButton() {
   const close = () => actor.send({ type: BELIEF_LIBRARY_EVENTS.CLOSED });
 
   return (
-    <Pressable
+    <PressableScale
       accessibilityRole="button"
       onPress={close}
       style={styles.backButton}
@@ -46,7 +46,7 @@ function LibraryBackButton() {
           ‹ Settings
         </fbt>
       </Text>
-    </Pressable>
+    </PressableScale>
   );
 }
 
@@ -85,7 +85,7 @@ function BeliefLibraryRow({
         </View>
       ) : null}
       <View style={styles.rowActions}>
-        <Pressable
+        <PressableScale
           accessibilityRole="button"
           disabled={disabled}
           onPress={edit}
@@ -95,8 +95,8 @@ function BeliefLibraryRow({
           <Text style={styles.editText}>
             <fbt desc="Button editing a personal core belief">Edit</fbt>
           </Text>
-        </Pressable>
-        <Pressable
+        </PressableScale>
+        <PressableScale
           accessibilityRole="button"
           disabled={disabled}
           onPress={confirmRemove}
@@ -106,7 +106,7 @@ function BeliefLibraryRow({
           <Text style={styles.removeText}>
             <fbt desc="Button removing a personal core belief">Remove</fbt>
           </Text>
-        </Pressable>
+        </PressableScale>
       </View>
     </View>
   );
@@ -202,7 +202,7 @@ function BeliefLibraryEditor() {
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator
         >
-          <Pressable
+          <PressableScale
             accessibilityRole="button"
             disabled={saving}
             onPress={cancel}
@@ -214,7 +214,7 @@ function BeliefLibraryEditor() {
                 ‹ Your core beliefs
               </fbt>
             </Text>
-          </Pressable>
+          </PressableScale>
           <Text style={styles.eyebrow}>
             <fbt desc="Eyebrow above personal core-belief editing">EDIT CORE BELIEF</fbt>
           </Text>
@@ -273,7 +273,7 @@ function BeliefLibraryEditor() {
                 </fbt>
               </Text>
             ) : null}
-            <Pressable
+            <PressableScale
               accessibilityRole="button"
               accessibilityState={{ disabled: saving || !harmfulReady }}
               disabled={saving || !harmfulReady}
@@ -286,7 +286,7 @@ function BeliefLibraryEditor() {
                   <fbt desc="Button saving changes to a personal core belief">Save changes</fbt>
                 </Text>
               )}
-            </Pressable>
+            </PressableScale>
           </View>
         </KeyboardAwareScrollView>
       </SafeAreaView>

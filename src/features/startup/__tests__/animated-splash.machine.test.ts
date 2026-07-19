@@ -35,7 +35,12 @@ describe('animated splash model', () => {
     expect(SplashScreen.hide).toHaveBeenCalledTimes(1);
     expect(actor.getSnapshot().matches(SPLASH_STATES.REVEALING)).toBe(true);
 
-    expect(SPLASH_OVERLAY_VISIBLE_DURATION).toBeLessThan(SPLASH_LOGO_REVEAL_DURATION);
+    expect(SPLASH_OVERLAY_VISIBLE_DURATION).toBeGreaterThanOrEqual(
+      SPLASH_LOGO_REVEAL_DURATION,
+    );
+    expect(SPLASH_OVERLAY_VISIBLE_DURATION + SPLASH_OVERLAY_FADE_DURATION).toBeLessThanOrEqual(
+      900,
+    );
     jest.advanceTimersByTime(SPLASH_OVERLAY_VISIBLE_DURATION);
     expect(actor.getSnapshot().matches(SPLASH_STATES.FADING)).toBe(true);
 

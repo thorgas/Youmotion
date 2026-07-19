@@ -9,35 +9,31 @@ tags:
 - tapOn:
     id: language-german
 - extendedWaitUntil:
-    visible: Ein geschützter Raum.
+    visible: Dein Raum.
     timeout: 10000
 - tapOn:
     id: language-english
 - extendedWaitUntil:
-    visible: A protected space.
+    visible: Your space.
     timeout: 10000
 - tapOn:
     id: emotion-label-mode-text
 - tapOn:
     id: tab-today
-- assertVisible:
-    id: emotion-star
-    text: text
+- assertVisible: Disgust
 - tapOn:
     id: tab-settings
 - tapOn:
     id: emotion-label-mode-both
 - tapOn:
     id: tab-today
-- assertVisible:
-    id: emotion-star
-    text: both
+- assertVisible: Disgust
+- assertVisible: 🤢
 - tapOn:
     id: tab-settings
 - tapOn:
     id: emotion-label-mode-emoji
 - tapOn:
     id: tab-today
-- assertVisible:
-    id: emotion-star
-    text: emoji
+- assertNotVisible: Disgust
+- assertVisible: 🤢
