@@ -28,13 +28,15 @@ const selectCanGoBack = (
 function AppStack() {
   const actor = useAppNavigationActor();
   const canGoBack = useSelector(actor, selectCanGoBack);
-  const beforeRemove = (event: { preventDefault: () => void }) => {
-    preventUnavailableNativeBack({ actor, event });
+  const screenListeners = ({ route }: { route: { name?: string } }) => {
+    const beforeRemove = (event: { preventDefault: () => void }) => {
+      preventUnavailableNativeBack({ actor, event, routeName: route.name });
+    };
+    const transitionEnd = (event: { data: { closing: boolean } }) => {
+      nativeRouteTransitionEnded({ actor, event, routeName: route.name });
+    };
+    return { beforeRemove, transitionEnd };
   };
-  const transitionEnd = (event: { data: { closing: boolean } }) => {
-    nativeRouteTransitionEnded({ actor, event });
-  };
-  const screenListeners = { beforeRemove, transitionEnd };
 
   if (process.env.EXPO_OS === 'android') {
     return (

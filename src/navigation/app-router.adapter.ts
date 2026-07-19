@@ -29,7 +29,6 @@ type AppNavigationTransition = Extract<
 
 const routeHistory = new WeakMap<AppNavigationActor, readonly AppRoute[]>();
 const nativeDismissals = new WeakSet<AppNavigationActor>();
-const programmaticDismissals = new WeakSet<AppNavigationActor>();
 
 function isAppNavigationSnapshot(
   snapshot: Snapshot<unknown>,
@@ -52,26 +51,24 @@ function isTabRoute(route: AppRoute) {
   );
 }
 
-function replaceRoute({
-  actor,
-  route,
-}: {
-  actor: AppNavigationActor;
-  route: AppRoute;
-}) {
-  programmaticDismissals.add(actor);
+function replaceRoute(route: AppRoute) {
   router.replace(route);
 }
 
-function dismissToRoute({
-  actor,
-  route,
-}: {
-  actor: AppNavigationActor;
-  route: AppRoute;
-}) {
-  programmaticDismissals.add(actor);
+function dismissToRoute(route: AppRoute) {
   router.dismissTo(route);
+}
+
+function routeNameMatchesAppRoute({
+  route,
+  routeName,
+}: {
+  route: AppRoute;
+  routeName: string | undefined;
+}) {
+  if (!routeName) return false;
+  const routePath = route.slice(1);
+  return routeName === routePath || routeName.endsWith(`/${routePath}`);
 }
 
 function syncNativeDismissal({
@@ -86,14 +83,14 @@ function syncNativeDismissal({
   nativeDismissals.delete(actor);
   const routeIndex = history.lastIndexOf(route);
   if (routeIndex < 0) {
-    replaceRoute({ actor, route });
+    replaceRoute(route);
     routeHistory.set(actor, [route]);
     return;
   }
 
   routeHistory.set(actor, history.slice(0, routeIndex + 1));
   if (routeIndex === history.length - 2) return;
-  dismissToRoute({ actor, route });
+  dismissToRoute(route);
 }
 
 function syncMachineRoute({
@@ -106,7 +103,7 @@ function syncMachineRoute({
   const history = routeHistory.get(actor);
   if (!history) {
     routeHistory.set(actor, [route]);
-    router.replace(route);
+    replaceRoute(route);
     return;
   }
 
@@ -120,20 +117,20 @@ function syncMachineRoute({
 
   if (isTabRoute(route) && currentRoute && isTabRoute(currentRoute)) {
     routeHistory.set(actor, [route]);
-    router.replace(route);
+    replaceRoute(route);
     return;
   }
 
   const routeIndex = history.lastIndexOf(route);
   if (routeIndex >= 0) {
     routeHistory.set(actor, history.slice(0, routeIndex + 1));
-    dismissToRoute({ actor, route });
+    dismissToRoute(route);
     return;
   }
 
   if (isTabRoute(route)) {
     routeHistory.set(actor, [route]);
-    replaceRoute({ actor, route });
+    replaceRoute(route);
     return;
   }
 
@@ -153,26 +150,37 @@ export function inspectAppNavigation(event: InspectionEvent) {
 export function preventUnavailableNativeBack({
   actor,
   event,
+  routeName,
 }: {
   actor: AppNavigationActor;
   event: { preventDefault: () => void };
+  routeName: string | undefined;
 }) {
-  if (programmaticDismissals.has(actor)) return;
-  if (actor.getSnapshot().can({ type: NAVIGATION_EVENTS.BACK_REQUESTED })) return;
+  const snapshot = actor.getSnapshot();
+  if (!routeNameMatchesAppRoute({
+    route: routeForStateValue(snapshot.value),
+    routeName,
+  })) return;
+  if (snapshot.can({ type: NAVIGATION_EVENTS.BACK_REQUESTED })) return;
   event.preventDefault();
 }
 
 export function nativeRouteTransitionEnded({
   actor,
   event,
+  routeName,
 }: {
   actor: AppNavigationActor;
   event: { data: { closing: boolean } };
+  routeName: string | undefined;
 }) {
   if (!event.data.closing) return;
-  if (programmaticDismissals.delete(actor)) return;
 
   const snapshot = actor.getSnapshot();
+  if (!routeNameMatchesAppRoute({
+    route: routeForStateValue(snapshot.value),
+    routeName,
+  })) return;
   if (!snapshot.can({ type: NAVIGATION_EVENTS.BACK_REQUESTED })) {
     router.push(routeForStateValue(snapshot.value));
     return;

@@ -85,6 +85,7 @@ describe('app router adapter', () => {
     nativeRouteTransitionEnded({
       actor,
       event: { data: { closing: true } },
+      routeName: 'reflection',
     });
 
     expect(routeForStateValue(actor.getSnapshot().value)).toBe(APP_ROUTES.TODAY);
@@ -95,8 +96,41 @@ describe('app router adapter', () => {
     const actor = startNavigationActor();
     const preventDefault = jest.fn();
 
-    preventUnavailableNativeBack({ actor, event: { preventDefault } });
+    preventUnavailableNativeBack({
+      actor,
+      event: { preventDefault },
+      routeName: '(tabs)/today',
+    });
 
     expect(preventDefault).toHaveBeenCalledTimes(1);
+  });
+
+  it('allows the initial programmatic replacement to remove the index route', () => {
+    const actor = startNavigationActor();
+    const preventDefault = jest.fn();
+
+    preventUnavailableNativeBack({
+      actor,
+      event: { preventDefault },
+      routeName: 'index',
+    });
+
+    expect(preventDefault).not.toHaveBeenCalled();
+  });
+
+  it('ignores the closing transition from a machine-driven dismissal', () => {
+    const actor = startNavigationActor();
+    actor.send({ type: CHECK_IN_EVENTS.TOUCH_STARTED });
+    actor.send({ type: CHECK_IN_EVENTS.SELECTION_CHANGED, selection });
+    actor.send({ type: CHECK_IN_EVENTS.SELECTION_RELEASED });
+    actor.send({ type: NAVIGATION_EVENTS.BACK_REQUESTED });
+
+    nativeRouteTransitionEnded({
+      actor,
+      event: { data: { closing: true } },
+      routeName: 'reflection',
+    });
+
+    expect(routeForStateValue(actor.getSnapshot().value)).toBe(APP_ROUTES.TODAY);
   });
 });
