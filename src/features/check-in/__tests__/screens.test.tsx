@@ -407,6 +407,7 @@ describe('check-in screens', () => {
     expect(screen.getByTestId('guiding-source-belief')).toHaveTextContent(
       'I always have to function.',
     );
+    expect(screen.queryByTestId('saved-guiding-belief-reason')).toBeNull();
     const finishWithoutGuidingBelief = screen.getByTestId('guiding-belief-finish');
     expect(finishWithoutGuidingBelief.props['accessibilityState']).toEqual({
       disabled: false,
@@ -528,6 +529,41 @@ describe('check-in screens', () => {
     await waitFor(() => expect(
       mockActor.getSnapshot().matches(CHECK_IN_STATES.SUCCESS),
     ).toBe(true));
+  });
+
+  it('explains a reused guiding belief during a fresh check-in', async () => {
+    await act(() => appSettingsStore.trigger.languageChanged({
+      locale: APP_LOCALES.GERMAN,
+    }));
+    await act(() => mockActor.send({
+      type: CHECK_IN_EVENTS.BELIEF_STATEMENTS_HYDRATED,
+      statements: [{
+        kind: 'built-in',
+        beliefSystemId: BELIEF_SYSTEM_IDS.ALWAYS_FUNCTIONING,
+        guidingStatement: 'Ich darf auch einmal mich priorisieren.',
+      }],
+    }));
+    await act(_reachReflection);
+    await act(() => mockActor.send({ type: CHECK_IN_EVENTS.CONFIRMED }));
+    await waitFor(() => expect(
+      mockActor.getSnapshot().matches(CHECK_IN_STATES.BELIEF_SYSTEM),
+    ).toBe(true));
+    await act(() => mockActor.send({
+      type: CHECK_IN_EVENTS.BELIEF_SYSTEM_CHANGED,
+      beliefSystemId: BELIEF_SYSTEM_IDS.ALWAYS_FUNCTIONING,
+    }));
+    await act(() => mockActor.send({ type: CHECK_IN_EVENTS.CONFIRMED }));
+    await waitFor(() => expect(
+      mockActor.getSnapshot().matches(CHECK_IN_STATES.GUIDING_BELIEF),
+    ).toBe(true));
+
+    const screen = await _renderLocalized(<GuidingBeliefScreen />);
+    expect(screen.getByDisplayValue('Ich darf auch einmal mich priorisieren.')).toBeTruthy();
+    expect(screen.getByTestId('saved-guiding-belief-reason')).toBeTruthy();
+    expect(screen.getByText('Bereits für diesen Leidsatz gespeichert')).toBeTruthy();
+    expect(screen.getByText(
+      'Darum ist dein Leitsatz hier schon eingetragen. Du kannst ihn übernehmen oder verändern.',
+    )).toBeTruthy();
   });
 
   it('uses distinct harmful and guiding belief terms in the German locale', async () => {

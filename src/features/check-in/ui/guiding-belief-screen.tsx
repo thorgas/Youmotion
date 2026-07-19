@@ -80,6 +80,7 @@ function guidingBeliefViewModel(snapshot: NavigationSnapshot) {
   const saving = snapshot.matches(CHECK_IN_STATES.PERSISTING_GUIDING_BELIEF);
   const failed = snapshot.matches(CHECK_IN_STATES.GUIDING_BELIEF_FAILURE);
   const guidingReady = snapshot.context.guidingBeliefStatementDraft.trim().length > 0;
+  const hasSavedGuidingBelief = statement?.guidingStatement !== undefined;
   const harmfulReady = !custom || snapshot.context.beliefStatementDraft.trim().length > 0;
   const customTextChanged = statement?.kind === 'custom'
     && snapshot.context.beliefStatementDraft.trim() !== statement.harmfulStatement;
@@ -94,6 +95,7 @@ function guidingBeliefViewModel(snapshot: NavigationSnapshot) {
     custom,
     failed,
     guidingReady,
+    hasSavedGuidingBelief,
     saving,
     selectedText,
     statement,
@@ -109,6 +111,7 @@ export function GuidingBeliefScreen() {
     custom,
     failed,
     guidingReady,
+    hasSavedGuidingBelief,
     saving,
     selectedText,
     statement,
@@ -234,6 +237,20 @@ export function GuidingBeliefScreen() {
                 Your new guiding belief
               </fbt>
             </Text>
+            {hasSavedGuidingBelief ? (
+              <View style={styles.savedGuidingBelief} testID="saved-guiding-belief-reason">
+                <Text style={styles.savedGuidingBeliefTitle}>
+                  <fbt desc="Heading explaining why a guiding belief input is already filled">
+                    Previously saved for this core belief
+                  </fbt>
+                </Text>
+                <Text style={styles.savedGuidingBeliefCopy}>
+                  <fbt desc="Explanation that an earlier guiding belief is reused and remains editable">
+                    That is why your guiding belief is already filled in. You can keep it or change it.
+                  </fbt>
+                </Text>
+              </View>
+            ) : null}
             <TextInput
               accessibilityLabel={guidingBeliefAccessibilityLabel()}
               editable={!saving}
@@ -397,6 +414,25 @@ const styles = StyleSheet.create({
     lineHeight: 25,
     padding: 16,
     textAlignVertical: 'top',
+  },
+  savedGuidingBelief: {
+    borderRadius: 16,
+    borderCurve: 'continuous',
+    backgroundColor: '#EDF0EB',
+    padding: 12,
+    gap: 4,
+  },
+  savedGuidingBeliefTitle: {
+    fontFamily: type.semibold,
+    color: palette.moss,
+    fontSize: 13,
+    lineHeight: 18,
+  },
+  savedGuidingBeliefCopy: {
+    fontFamily: type.regular,
+    color: palette.inkMuted,
+    fontSize: 12,
+    lineHeight: 18,
   },
   tips: { gap: 8 },
   tip: {

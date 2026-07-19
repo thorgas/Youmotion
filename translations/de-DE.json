@@ -1871,6 +1871,28 @@
       ],
       "types": []
     },
+    "nfT3PhycxFv7SkaAOstjtw==": {
+      "description": "Heading explaining why a guiding belief input is already filled",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Bereits für diesen Leidsatz gespeichert",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "Xut7vTV1KpIJPnP+1gbzbw==": {
+      "description": "Explanation that an earlier guiding belief is reused and remains editable",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Darum ist dein Leitsatz hier schon eingetragen. Du kannst ihn übernehmen oder verändern.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
     "Fjv9N5uWkKB6nJNpsNONJA==": {
       "description": "Button for adding a personal core belief",
       "tokens": [],
