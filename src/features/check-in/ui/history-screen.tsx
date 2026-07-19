@@ -18,8 +18,6 @@ import {
 } from './belief-system-copy';
 import {
   confirmCheckInDeletion,
-  deleteMomentAccessibilityLabel,
-  deleteMomentText,
   editMomentAccessibilityHint,
 } from './check-in-deletion';
 import { palette, type } from './theme';
@@ -108,15 +106,6 @@ function MomentRow({ entry, locale }: { entry: CheckIn; locale: string }) {
           {entry.note ? <Text style={styles.note}>{entry.note}</Text> : null}
           <HistoryBelief entry={entry} statements={beliefStatements} />
         </View>
-      </PressableScale>
-      <PressableScale
-        accessibilityLabel={deleteMomentAccessibilityLabel()}
-        accessibilityRole="button"
-        onPress={_confirmDelete}
-        style={styles.deleteButton}
-        testID={`delete-history-moment-${entry.id}`}
-      >
-        <Text style={styles.deleteText}>{deleteMomentText()}</Text>
       </PressableScale>
     </View>
   );
@@ -207,6 +196,4 @@ const styles = StyleSheet.create({
     lineHeight: 20,
     marginTop: 4,
   },
-  deleteButton: { minHeight: 44, justifyContent: 'center', paddingHorizontal: 8 },
-  deleteText: { fontFamily: type.semibold, color: palette.danger, fontSize: 12 },
 });

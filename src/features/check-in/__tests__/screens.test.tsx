@@ -544,11 +544,11 @@ describe('check-in screens', () => {
       showsVerticalScrollIndicator: true,
     });
     expect(screen.getByText('Dein neuer Leitsatz')).toBeTruthy();
-    expect(screen.getByText(
+    expect(screen.queryByText(
       'Schreibe hier deinen neuen Leitsatz auf, z. B.:',
-    )).toBeTruthy();
+    )).toBeNull();
     expect(screen.getByPlaceholderText(
-      'Ich darf auch mal nicht funktionieren und werde trotzdem geliebt.',
+      'Schreibe hier deinen neuen Leitsatz auf, z. B.: Ich darf auch mal nicht funktionieren und werde trotzdem geliebt.',
     )).toBeTruthy();
     await fireEvent.changeText(
       screen.getByTestId('guiding-belief-draft'),
@@ -634,6 +634,8 @@ describe('check-in screens', () => {
     await act(() => mockActor.send({ type: NAVIGATION_EVENTS.HISTORY_OPENED }));
 
     const history = await _renderLocalized(<HistoryScreen />);
+    expect(history.queryByText('Delete moment')).toBeNull();
+    expect(history.queryByTestId(`delete-history-moment-${saved.id}`)).toBeNull();
     await fireEvent(history.getByTestId(`history-moment-${saved.id}`), 'longPress');
     const buttons = alert.mock.calls[alert.mock.calls.length - 1]?.[2];
     const destructive = buttons?.find((button) => button.style === 'destructive');

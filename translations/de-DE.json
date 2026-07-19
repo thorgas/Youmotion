@@ -1860,12 +1860,12 @@
       ],
       "types": []
     },
-    "MV8rl991B4U/C7nphVGPEg==": {
-      "description": "Placeholder example for a compassionate positive guiding belief",
+    "rhLimNlzsbKEfG71oB4N8w==": {
+      "description": "Input placeholder instructing the user to write a compassionate positive guiding belief and providing an example",
       "tokens": [],
       "translations": [
         {
-          "translation": "Ich darf auch mal nicht funktionieren und werde trotzdem geliebt.",
+          "translation": "Schreibe hier deinen neuen Leitsatz auf, z. B.: Ich darf auch mal nicht funktionieren und werde trotzdem geliebt.",
           "variations": {}
         }
       ],
@@ -2075,17 +2075,6 @@
       "translations": [
         {
           "translation": "Dein neuer Leitsatz",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "Kpc7SmOI1qBTe92IFU6E/w==": {
-      "description": "Instruction above the new positive guiding belief input",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "Schreibe hier deinen neuen Leitsatz auf, z. B.:",
           "variations": {}
         }
       ],

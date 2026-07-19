@@ -158,6 +158,6 @@ export const guidingBeliefAccessibilityLabel = () => String(fbs(
 ));
 
 export const guidingBeliefPlaceholder = () => String(fbs(
-  'I may not function sometimes and I am still loved.',
-  'Placeholder example for a compassionate positive guiding belief',
+  'Write your new guiding belief here, for example: I may not function sometimes and I am still loved.',
+  'Input placeholder instructing the user to write a compassionate positive guiding belief and providing an example',
 ));

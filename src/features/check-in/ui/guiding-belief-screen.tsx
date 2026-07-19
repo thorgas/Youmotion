@@ -198,11 +198,6 @@ export function GuidingBeliefScreen() {
                 Your new guiding belief
               </fbt>
             </Text>
-            <Text style={styles.inputHelp}>
-              <fbt desc="Instruction above the new positive guiding belief input">
-                Write down your new guiding belief here, for example:
-              </fbt>
-            </Text>
             <TextInput
               accessibilityLabel={guidingBeliefAccessibilityLabel()}
               editable={!saving}
@@ -350,12 +345,6 @@ const styles = StyleSheet.create({
     lineHeight: 25,
     padding: 16,
     textAlignVertical: 'top',
-  },
-  inputHelp: {
-    color: palette.inkMuted,
-    fontFamily: type.regular,
-    fontSize: 14,
-    lineHeight: 20,
   },
   reflectionCard: {
     borderRadius: 24,
