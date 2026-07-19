@@ -94,6 +94,7 @@ export const CHECK_IN_STATES = Object.freeze({
 });
 
 export const NAVIGATION_EVENTS = Object.freeze({
+  BACK_REQUESTED: literal('navigation.backRequested'),
   TODAY_OPENED: literal('navigation.todayOpened'),
   HISTORY_OPENED: literal('navigation.historyOpened'),
   SETTINGS_OPENED: literal('navigation.settingsOpened'),
@@ -186,11 +187,17 @@ export const SPLASH_STATES = Object.freeze({
 
 export const APP_ROUTES = Object.freeze({
   ONBOARDING: literal('/onboarding'),
+  ONBOARDING_PULSE: literal('/onboarding-pulse'),
+  ONBOARDING_EXAMPLE: literal('/onboarding-example'),
   TODAY: literal('/today'),
   HISTORY: literal('/history'),
   SETTINGS: literal('/settings'),
   BELIEF_LIBRARY: literal('/belief-library'),
+  BELIEF_LIBRARY_EDITOR: literal('/belief-library-editor'),
   REFLECTION: literal('/reflection'),
+  BELIEF_SYSTEM: literal('/belief-system'),
+  BELIEF_SYSTEM_CATALOG: literal('/belief-system-catalog'),
+  BELIEF_SYSTEM_EDITOR: literal('/belief-system-editor'),
   GUIDING_BELIEF: literal('/guiding-belief'),
   SUCCESS: literal('/success'),
 });

@@ -93,6 +93,7 @@ export function OnboardingPulseStep() {
       primaryLabel={selection
         ? String(fbs('Continue', 'Button continuing after the onboarding Pulse example'))
         : String(fbs('Show the example', 'Button showing an accessible onboarding Pulse example'))}
+      scrollEnabled={false}
       step={ONBOARDING_STATES.PULSE}
       stepLabel={String(fbs('02 · PULSE', 'Onboarding Pulse step label'))}>
       <View style={styles.heading}>

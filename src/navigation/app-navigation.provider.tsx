@@ -1,23 +1,22 @@
 import { useMachine } from '@xstate/react';
-import { Redirect, usePathname } from 'expo-router';
 import { createContext, type PropsWithChildren, useContext } from 'react';
 import type { ActorRefFrom } from 'xstate';
 
-import { appNavigationMachine, routeForStateValue } from './app-navigation.machine';
+import { appNavigationMachine } from './app-navigation.machine';
+import { inspectAppNavigation } from './app-router.adapter';
 
-type AppNavigationActor = ActorRefFrom<typeof appNavigationMachine>;
+export type AppNavigationActor = ActorRefFrom<typeof appNavigationMachine>;
 
 const AppNavigationContext = createContext<AppNavigationActor | null>(null);
 
 export function AppNavigationProvider({ children }: PropsWithChildren) {
-  const [snapshot, , actor] = useMachine(appNavigationMachine);
-  const pathname = usePathname();
-  const route = routeForStateValue(snapshot.value);
+  const [, , actor] = useMachine(appNavigationMachine, {
+    inspect: inspectAppNavigation,
+  });
 
   return (
     <AppNavigationContext.Provider value={actor}>
       {children}
-      {pathname === route ? null : <Redirect href={route} />}
     </AppNavigationContext.Provider>
   );
 }

@@ -1,3 +1,4 @@
+import { SymbolView, type SymbolViewProps } from 'expo-symbols';
 import { fbs } from 'fbtee';
 import { StyleSheet, Text, View } from 'react-native';
 
@@ -8,6 +9,12 @@ import {
 import { palette, type } from '@/features/check-in/ui/theme';
 import { useAppNavigationActor } from '@/navigation/app-navigation.provider';
 import { OnboardingStepShell } from './onboarding-step-shell';
+
+const privacySymbol: SymbolViewProps['name'] = {
+  android: 'lock',
+  ios: 'lock.fill',
+  web: 'lock',
+};
 
 function JourneyRow({
   description,
@@ -77,7 +84,16 @@ export function OnboardingWelcomeStep() {
         />
       </View>
       <View style={styles.privacyCard}>
-        <Text style={styles.privacyMark}>◌</Text>
+        <View style={styles.privacyIcon}>
+          <SymbolView
+            accessibilityElementsHidden
+            importantForAccessibility="no-hide-descendants"
+            name={privacySymbol}
+            size={18}
+            testID="onboarding-privacy-symbol"
+            tintColor={palette.moss}
+          />
+        </View>
         <Text style={styles.privacyCopy}>
           <fbt desc="Onboarding privacy explanation">Your moments stay on this device. No account is needed.</fbt>
         </Text>
@@ -169,10 +185,13 @@ const styles = StyleSheet.create({
     marginTop: 18,
     paddingHorizontal: 4,
   },
-  privacyMark: {
-    color: palette.moss,
-    fontFamily: type.semibold,
-    fontSize: 26,
+  privacyIcon: {
+    width: 32,
+    height: 32,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 16,
+    backgroundColor: '#EDF0EB',
   },
   privacyCopy: {
     flex: 1,

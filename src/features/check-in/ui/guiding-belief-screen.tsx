@@ -1,4 +1,5 @@
 import { useSelector } from '@xstate/react';
+import { fbs } from 'fbtee';
 import { PressableScale } from 'pressto';
 import {
   ActivityIndicator,
@@ -10,6 +11,7 @@ import {
 import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { AppBackButton } from '@/components/ui/app-back-button';
 import {
   CHECK_IN_EVENTS,
   CHECK_IN_STATES,
@@ -142,6 +144,10 @@ export function GuidingBeliefScreen() {
     }
     actor.send({ type: CHECK_IN_EVENTS.GUIDING_BELIEF_SKIPPED });
   };
+  const backLabel = String(fbs(
+    'Back',
+    'Button returning from guiding belief formulation to harmful belief selection',
+  ));
 
   if (!beliefSystemId) return null;
 
@@ -163,17 +169,14 @@ export function GuidingBeliefScreen() {
           testID="guiding-belief-scroll"
         >
           <View style={styles.header}>
-            <PressableScale
-              accessibilityRole="button"
+            <AppBackButton
+              accessibilityLabel={backLabel}
               disabled={saving}
+              label={backLabel}
               onPress={_back}
               style={styles.backButton}
               testID="guiding-belief-back"
-            >
-              <Text style={styles.backText}>
-                ‹ <fbt desc="Button returning from guiding belief formulation to harmful belief selection">Back</fbt>
-              </Text>
-            </PressableScale>
+            />
             <Text style={styles.title}>
               <fbt desc="Title for the dedicated positive guiding belief page">
                 What would support you instead?
@@ -357,7 +360,6 @@ const styles = StyleSheet.create({
   },
   flowContent: { paddingTop: 16 },
   backButton: { minHeight: 44, alignSelf: 'flex-start', justifyContent: 'center' },
-  backText: { fontFamily: type.semibold, color: palette.ink, fontSize: 14 },
   header: { gap: 10 },
   title: {
     fontFamily: type.semibold,

@@ -238,6 +238,7 @@ export const appNavigationMachine = setup({
   schemas: {
     context: Schema.standardSchemaV1(AppContextSchema),
     events: {
+      [NAVIGATION_EVENTS.BACK_REQUESTED]: EmptyEventSchema,
       [NAVIGATION_EVENTS.TODAY_OPENED]: EmptyEventSchema,
       [NAVIGATION_EVENTS.HISTORY_OPENED]: EmptyEventSchema,
       [NAVIGATION_EVENTS.SETTINGS_OPENED]: EmptyEventSchema,
@@ -614,6 +615,17 @@ export const appNavigationMachine = setup({
       states: {
         [ONBOARDING_STATES.WELCOME]: {
           on: {
+            [NAVIGATION_EVENTS.BACK_REQUESTED]: ({ context }) => (
+              context.onboardingEntryPoint === ONBOARDING_ENTRY_POINTS.SETTINGS
+                ? {
+                    target: `#appNavigation.${NAVIGATION_STATES.TABS}.${NAVIGATION_STATES.SETTINGS}`,
+                    context: {
+                      onboardingEntryPoint: null,
+                      onboardingSelection: null,
+                    },
+                  }
+                : undefined
+            ),
             [ONBOARDING_EVENTS.NEXT_REQUESTED]: {
               target: ONBOARDING_STATES.PULSE,
             },
@@ -621,6 +633,10 @@ export const appNavigationMachine = setup({
         },
         [ONBOARDING_STATES.PULSE]: {
           on: {
+            [NAVIGATION_EVENTS.BACK_REQUESTED]: {
+              target: ONBOARDING_STATES.WELCOME,
+              context: { onboardingSelection: null },
+            },
             [ONBOARDING_EVENTS.BACK_REQUESTED]: {
               target: ONBOARDING_STATES.WELCOME,
               context: { onboardingSelection: null },
@@ -649,6 +665,9 @@ export const appNavigationMachine = setup({
         },
         [ONBOARDING_STATES.EXAMPLE]: {
           on: {
+            [NAVIGATION_EVENTS.BACK_REQUESTED]: {
+              target: ONBOARDING_STATES.PULSE,
+            },
             [ONBOARDING_EVENTS.BACK_REQUESTED]: {
               target: ONBOARDING_STATES.PULSE,
             },
@@ -768,6 +787,15 @@ export const appNavigationMachine = setup({
     },
     [BELIEF_LIBRARY_STATES.LIBRARY]: {
       on: {
+        [NAVIGATION_EVENTS.BACK_REQUESTED]: {
+          target: `#appNavigation.${NAVIGATION_STATES.TABS}.${NAVIGATION_STATES.SETTINGS}`,
+          context: {
+            beliefLibraryStatementId: null,
+            beliefLibraryHarmfulDraft: '',
+            beliefLibraryGuidingDraft: '',
+            error: null,
+          },
+        },
         [BELIEF_LIBRARY_EVENTS.CLOSED]: {
           target: `#appNavigation.${NAVIGATION_STATES.TABS}.${NAVIGATION_STATES.SETTINGS}`,
           context: {
@@ -808,6 +836,15 @@ export const appNavigationMachine = setup({
     },
     [BELIEF_LIBRARY_STATES.EDITOR]: {
       on: {
+        [NAVIGATION_EVENTS.BACK_REQUESTED]: {
+          target: BELIEF_LIBRARY_STATES.LIBRARY,
+          context: {
+            beliefLibraryStatementId: null,
+            beliefLibraryHarmfulDraft: '',
+            beliefLibraryGuidingDraft: '',
+            error: null,
+          },
+        },
         [BELIEF_LIBRARY_EVENTS.CLOSED]: {
           target: `#appNavigation.${NAVIGATION_STATES.TABS}.${NAVIGATION_STATES.SETTINGS}`,
           context: {
@@ -950,6 +987,19 @@ export const appNavigationMachine = setup({
     },
     [NAVIGATION_STATES.REFLECTION]: {
       on: {
+        [NAVIGATION_EVENTS.BACK_REQUESTED]: ({ context }) => ({
+          target: context.editing
+            ? `#appNavigation.${NAVIGATION_STATES.TABS}.${NAVIGATION_STATES.HISTORY}`
+            : `#appNavigation.${NAVIGATION_STATES.TABS}.${NAVIGATION_STATES.TODAY}.${CHECK_IN_STATES.IDLE}`,
+          context: {
+            selection: null,
+            note: '',
+            beliefSystemId: null,
+            saved: null,
+            editing: null,
+            error: null,
+          },
+        }),
         [CHECK_IN_EVENTS.NOTE_CHANGED]: {
           context: ({ event }) => ({ note: event.note.slice(0, MAX_NOTE_LENGTH) }),
         },
@@ -1010,6 +1060,9 @@ export const appNavigationMachine = setup({
     },
     [CHECK_IN_STATES.BELIEF_SYSTEM]: {
       on: {
+        [NAVIGATION_EVENTS.BACK_REQUESTED]: {
+          target: NAVIGATION_STATES.REFLECTION,
+        },
         [CHECK_IN_EVENTS.BELIEF_SYSTEM_CHANGED]: {
           context: ({ event }) => ({ beliefSystemId: event.beliefSystemId }),
         },
@@ -1052,6 +1105,9 @@ export const appNavigationMachine = setup({
     },
     [CHECK_IN_STATES.BELIEF_SYSTEM_CATALOG]: {
       on: {
+        [NAVIGATION_EVENTS.BACK_REQUESTED]: {
+          target: CHECK_IN_STATES.BELIEF_SYSTEM,
+        },
         [CHECK_IN_EVENTS.BELIEF_SYSTEM_CHANGED]: {
           target: CHECK_IN_STATES.BELIEF_SYSTEM,
           context: ({ event }) => ({ beliefSystemId: event.beliefSystemId }),
@@ -1076,6 +1132,15 @@ export const appNavigationMachine = setup({
     },
     [CHECK_IN_STATES.BELIEF_SYSTEM_EDITOR]: {
       on: {
+        [NAVIGATION_EVENTS.BACK_REQUESTED]: {
+          target: CHECK_IN_STATES.BELIEF_SYSTEM,
+          context: {
+            beliefStatementDraft: '',
+            beliefStatementDraftId: null,
+            guidingBeliefStatementDraft: '',
+            error: null,
+          },
+        },
         [CHECK_IN_EVENTS.BELIEF_SYSTEM_DRAFT_CHANGED]: {
           context: ({ event }) => ({ beliefStatementDraft: event.statement }),
         },
@@ -1141,6 +1206,15 @@ export const appNavigationMachine = setup({
     },
     [CHECK_IN_STATES.BELIEF_STATEMENT_FAILURE]: {
       on: {
+        [NAVIGATION_EVENTS.BACK_REQUESTED]: {
+          target: CHECK_IN_STATES.BELIEF_SYSTEM,
+          context: {
+            beliefStatementDraft: '',
+            beliefStatementDraftId: null,
+            guidingBeliefStatementDraft: '',
+            error: null,
+          },
+        },
         [CHECK_IN_EVENTS.RETRIED]: {
           target: CHECK_IN_STATES.PERSISTING_BELIEF_STATEMENT,
         },
@@ -1218,6 +1292,9 @@ export const appNavigationMachine = setup({
     },
     [CHECK_IN_STATES.BELIEF_SYSTEM_FAILURE]: {
       on: {
+        [NAVIGATION_EVENTS.BACK_REQUESTED]: {
+          target: CHECK_IN_STATES.BELIEF_SYSTEM,
+        },
         [CHECK_IN_EVENTS.RETRIED]: { target: CHECK_IN_STATES.ATTACHING_BELIEF_SYSTEM },
         [CHECK_IN_EVENTS.BELIEF_SYSTEM_BACK_REQUESTED]: {
           target: CHECK_IN_STATES.BELIEF_SYSTEM,
@@ -1226,6 +1303,16 @@ export const appNavigationMachine = setup({
     },
     [CHECK_IN_STATES.GUIDING_BELIEF]: {
       on: {
+        [NAVIGATION_EVENTS.BACK_REQUESTED]: {
+          target: CHECK_IN_STATES.BELIEF_SYSTEM,
+          context: {
+            beliefStatementDraft: '',
+            beliefStatementDraftId: null,
+            guidingBeliefStatementDraft: '',
+            guidingHelpVisible: false,
+            error: null,
+          },
+        },
         [CHECK_IN_EVENTS.BELIEF_SYSTEM_DRAFT_CHANGED]: {
           context: ({ event }) => ({ beliefStatementDraft: event.statement }),
         },
@@ -1420,6 +1507,16 @@ export const appNavigationMachine = setup({
     },
     [CHECK_IN_STATES.GUIDING_BELIEF_FAILURE]: {
       on: {
+        [NAVIGATION_EVENTS.BACK_REQUESTED]: {
+          target: CHECK_IN_STATES.BELIEF_SYSTEM,
+          context: {
+            beliefStatementDraft: '',
+            beliefStatementDraftId: null,
+            guidingBeliefStatementDraft: '',
+            guidingHelpVisible: false,
+            error: null,
+          },
+        },
         [CHECK_IN_EVENTS.RETRIED]: {
           target: CHECK_IN_STATES.PERSISTING_GUIDING_BELIEF,
         },
@@ -1437,6 +1534,17 @@ export const appNavigationMachine = setup({
     },
     [CHECK_IN_STATES.SUCCESS]: {
       on: {
+        [NAVIGATION_EVENTS.BACK_REQUESTED]: {
+          target: `#appNavigation.${NAVIGATION_STATES.TABS}.${NAVIGATION_STATES.TODAY}.${CHECK_IN_STATES.IDLE}`,
+          context: {
+            selection: null,
+            note: '',
+            beliefSystemId: null,
+            saved: null,
+            editing: null,
+            error: null,
+          },
+        },
         [CHECK_IN_EVENTS.RESTARTED]: {
           target: `#appNavigation.${NAVIGATION_STATES.TABS}.${NAVIGATION_STATES.TODAY}.${CHECK_IN_STATES.IDLE}`,
           context: {
@@ -1452,6 +1560,7 @@ export const appNavigationMachine = setup({
     },
     [CHECK_IN_STATES.FAILURE]: {
       on: {
+        [NAVIGATION_EVENTS.BACK_REQUESTED]: { target: NAVIGATION_STATES.REFLECTION },
         [CHECK_IN_EVENTS.RETRIED]: { target: CHECK_IN_STATES.SAVING },
         [CHECK_IN_EVENTS.REFLECTION_CANCELLED]: { target: NAVIGATION_STATES.REFLECTION },
       },
@@ -1459,36 +1568,43 @@ export const appNavigationMachine = setup({
   },
 });
 
-const reflectionRouteStates: readonly StateValue[] = [
-  NAVIGATION_STATES.REFLECTION,
-  CHECK_IN_STATES.SAVING,
-  CHECK_IN_STATES.BELIEF_SYSTEM,
-  CHECK_IN_STATES.BELIEF_SYSTEM_CATALOG,
-  CHECK_IN_STATES.BELIEF_SYSTEM_EDITOR,
-  CHECK_IN_STATES.PERSISTING_BELIEF_STATEMENT,
-  CHECK_IN_STATES.BELIEF_STATEMENT_FAILURE,
-  CHECK_IN_STATES.ATTACHING_BELIEF_SYSTEM,
-  CHECK_IN_STATES.BELIEF_SYSTEM_FAILURE,
-  CHECK_IN_STATES.FAILURE,
-];
-
 function primaryRouteForStateValue(value: StateValue) {
-  if (matchesState(NAVIGATION_STATES.ONBOARDING, value)) return APP_ROUTES.ONBOARDING;
+  if (matchesState(
+    { [NAVIGATION_STATES.ONBOARDING]: ONBOARDING_STATES.EXAMPLE },
+    value,
+  )) {
+    return APP_ROUTES.ONBOARDING_EXAMPLE;
+  }
+  if (matchesState(
+    { [NAVIGATION_STATES.ONBOARDING]: ONBOARDING_STATES.PULSE },
+    value,
+  )) {
+    return APP_ROUTES.ONBOARDING_PULSE;
+  }
+  if (matchesState(NAVIGATION_STATES.ONBOARDING, value)) {
+    return APP_ROUTES.ONBOARDING;
+  }
   if (matchesState(CHECK_IN_STATES.SUCCESS, value)) return APP_ROUTES.SUCCESS;
   return null;
 }
 
-export function routeForStateValue(value: StateValue) {
-  const primaryRoute = primaryRouteForStateValue(value);
-  if (primaryRoute) return primaryRoute;
+function beliefLibraryRouteForStateValue(value: StateValue) {
+  if (
+    matchesState(BELIEF_LIBRARY_STATES.EDITOR, value)
+    || matchesState(BELIEF_LIBRARY_STATES.SAVING, value)
+  ) {
+    return APP_ROUTES.BELIEF_LIBRARY_EDITOR;
+  }
   if (
     matchesState(BELIEF_LIBRARY_STATES.LIBRARY, value)
-    || matchesState(BELIEF_LIBRARY_STATES.EDITOR, value)
-    || matchesState(BELIEF_LIBRARY_STATES.SAVING, value)
     || matchesState(BELIEF_LIBRARY_STATES.RETIRING, value)
   ) {
     return APP_ROUTES.BELIEF_LIBRARY;
   }
+  return null;
+}
+
+function guidingBeliefRouteForStateValue(value: StateValue) {
   if (
     matchesState(CHECK_IN_STATES.GUIDING_BELIEF, value)
     || matchesState(CHECK_IN_STATES.PERSISTING_GUIDING_BELIEF, value)
@@ -1496,9 +1612,52 @@ export function routeForStateValue(value: StateValue) {
   ) {
     return APP_ROUTES.GUIDING_BELIEF;
   }
-  if (reflectionRouteStates.some((state) => matchesState(state, value))) {
+  return null;
+}
+
+function beliefSystemRouteForStateValue(value: StateValue) {
+  if (matchesState(CHECK_IN_STATES.BELIEF_SYSTEM_CATALOG, value)) {
+    return APP_ROUTES.BELIEF_SYSTEM_CATALOG;
+  }
+  if (
+    matchesState(CHECK_IN_STATES.BELIEF_SYSTEM_EDITOR, value)
+    || matchesState(CHECK_IN_STATES.PERSISTING_BELIEF_STATEMENT, value)
+    || matchesState(CHECK_IN_STATES.BELIEF_STATEMENT_FAILURE, value)
+  ) {
+    return APP_ROUTES.BELIEF_SYSTEM_EDITOR;
+  }
+  if (
+    matchesState(CHECK_IN_STATES.BELIEF_SYSTEM, value)
+    || matchesState(CHECK_IN_STATES.ATTACHING_BELIEF_SYSTEM, value)
+    || matchesState(CHECK_IN_STATES.BELIEF_SYSTEM_FAILURE, value)
+  ) {
+    return APP_ROUTES.BELIEF_SYSTEM;
+  }
+  return null;
+}
+
+function reflectionRouteForStateValue(value: StateValue) {
+  if (
+    matchesState(NAVIGATION_STATES.REFLECTION, value)
+    || matchesState(CHECK_IN_STATES.SAVING, value)
+    || matchesState(CHECK_IN_STATES.FAILURE, value)
+  ) {
     return APP_ROUTES.REFLECTION;
   }
+  return null;
+}
+
+export function routeForStateValue(value: StateValue) {
+  const primaryRoute = primaryRouteForStateValue(value);
+  if (primaryRoute) return primaryRoute;
+  const beliefLibraryRoute = beliefLibraryRouteForStateValue(value);
+  if (beliefLibraryRoute) return beliefLibraryRoute;
+  const guidingBeliefRoute = guidingBeliefRouteForStateValue(value);
+  if (guidingBeliefRoute) return guidingBeliefRoute;
+  const beliefSystemRoute = beliefSystemRouteForStateValue(value);
+  if (beliefSystemRoute) return beliefSystemRoute;
+  const reflectionRoute = reflectionRouteForStateValue(value);
+  if (reflectionRoute) return reflectionRoute;
   if (matchesState({ [NAVIGATION_STATES.TABS]: NAVIGATION_STATES.HISTORY }, value)) return APP_ROUTES.HISTORY;
   if (matchesState({ [NAVIGATION_STATES.TABS]: NAVIGATION_STATES.SETTINGS }, value)) return APP_ROUTES.SETTINGS;
   return APP_ROUTES.TODAY;

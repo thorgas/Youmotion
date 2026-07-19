@@ -20,7 +20,7 @@
     "android": {
       "icon": "./assets/images/app-icon-android.png",
       "package": "com.youmotion.mobile",
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": true
     },
     "web": {
       "output": "static",

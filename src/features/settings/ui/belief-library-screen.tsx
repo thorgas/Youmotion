@@ -12,6 +12,7 @@ import {
 import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { AppBackButton } from '@/components/ui/app-back-button';
 import {
   BELIEF_LIBRARY_EVENTS,
   BELIEF_LIBRARY_STATES,
@@ -33,20 +34,19 @@ const selectSnapshot = (
 function LibraryBackButton() {
   const actor = useAppNavigationActor();
   const close = () => actor.send({ type: BELIEF_LIBRARY_EVENTS.CLOSED });
+  const label = String(fbs(
+    'Settings',
+    'Button returning from personal core-belief management to settings',
+  ));
 
   return (
-    <PressableScale
-      accessibilityRole="button"
+    <AppBackButton
+      accessibilityLabel={label}
+      label={label}
       onPress={close}
       style={styles.backButton}
       testID="belief-library-close"
-    >
-      <Text style={styles.backText}>
-        <fbt desc="Button returning from personal core-belief management to settings">
-          ‹ Settings
-        </fbt>
-      </Text>
-    </PressableScale>
+    />
   );
 }
 
@@ -191,6 +191,10 @@ function BeliefLibraryEditor() {
     statement,
   });
   const save = () => actor.send({ type: BELIEF_LIBRARY_EVENTS.SAVE_REQUESTED });
+  const backLabel = String(fbs(
+    'Your core beliefs',
+    'Button returning from personal core-belief editing to its library',
+  ));
 
   return (
     <View style={styles.page} testID="belief-library-editor">
@@ -202,19 +206,14 @@ function BeliefLibraryEditor() {
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator
         >
-          <PressableScale
-            accessibilityRole="button"
+          <AppBackButton
+            accessibilityLabel={backLabel}
             disabled={saving}
+            label={backLabel}
             onPress={cancel}
             style={styles.backButton}
             testID="belief-library-editor-cancel"
-          >
-            <Text style={styles.backText}>
-              <fbt desc="Button returning from personal core-belief editing to its library">
-                ‹ Your core beliefs
-              </fbt>
-            </Text>
-          </PressableScale>
+          />
           <Text style={styles.eyebrow}>
             <fbt desc="Eyebrow above personal core-belief editing">EDIT CORE BELIEF</fbt>
           </Text>
@@ -315,7 +314,6 @@ const styles = StyleSheet.create({
     paddingBottom: 48,
   },
   backButton: { alignSelf: 'flex-start', minHeight: 44, justifyContent: 'center' },
-  backText: { fontFamily: type.semibold, color: palette.ink, fontSize: 15 },
   eyebrow: {
     fontFamily: type.semibold,
     color: palette.inkMuted,

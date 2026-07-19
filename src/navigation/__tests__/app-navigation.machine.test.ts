@@ -376,6 +376,45 @@ describe('app navigation model', () => {
     expect(routeForStateValue(actor.getSnapshot().value)).toBe(APP_ROUTES.TODAY);
   });
 
+  it('maps native back requests through onboarding and check-in stack routes', async () => {
+    const actor = createActor(appNavigationMachine).start();
+    actor.send({ type: NAVIGATION_EVENTS.SETTINGS_OPENED });
+    actor.send({ type: ONBOARDING_EVENTS.OPENED });
+    actor.send({ type: ONBOARDING_EVENTS.NEXT_REQUESTED });
+    expect(routeForStateValue(actor.getSnapshot().value)).toBe(
+      APP_ROUTES.ONBOARDING_PULSE,
+    );
+
+    actor.send({ type: NAVIGATION_EVENTS.BACK_REQUESTED });
+    expect(routeForStateValue(actor.getSnapshot().value)).toBe(APP_ROUTES.ONBOARDING);
+    actor.send({ type: NAVIGATION_EVENTS.BACK_REQUESTED });
+    expect(routeForStateValue(actor.getSnapshot().value)).toBe(APP_ROUTES.SETTINGS);
+
+    actor.send({ type: NAVIGATION_EVENTS.TODAY_OPENED });
+    actor.send({ type: CHECK_IN_EVENTS.TOUCH_STARTED });
+    actor.send({ type: CHECK_IN_EVENTS.SELECTION_CHANGED, selection });
+    actor.send({ type: CHECK_IN_EVENTS.SELECTION_RELEASED });
+    actor.send({ type: CHECK_IN_EVENTS.CONFIRMED });
+    await waitFor(
+      actor,
+      (candidate) => candidate.matches(CHECK_IN_STATES.BELIEF_SYSTEM),
+      { timeout: 1_000 },
+    );
+    actor.send({ type: CHECK_IN_EVENTS.BELIEF_SYSTEM_CATALOG_REQUESTED });
+    actor.send({ type: CHECK_IN_EVENTS.CUSTOM_BELIEF_SYSTEM_REQUESTED });
+    expect(routeForStateValue(actor.getSnapshot().value)).toBe(
+      APP_ROUTES.BELIEF_SYSTEM_EDITOR,
+    );
+
+    actor.send({ type: NAVIGATION_EVENTS.BACK_REQUESTED });
+    expect(routeForStateValue(actor.getSnapshot().value)).toBe(APP_ROUTES.BELIEF_SYSTEM);
+    actor.send({ type: NAVIGATION_EVENTS.BACK_REQUESTED });
+    expect(routeForStateValue(actor.getSnapshot().value)).toBe(APP_ROUTES.REFLECTION);
+    actor.send({ type: NAVIGATION_EVENTS.BACK_REQUESTED });
+    expect(routeForStateValue(actor.getSnapshot().value)).toBe(APP_ROUTES.TODAY);
+    expect(actor.getSnapshot().context.selection).toBeNull();
+  });
+
   it('saves the reflection before offering and attaching a core belief', async () => {
     const actor = createActor(appNavigationMachine).start();
     actor.send({ type: CHECK_IN_EVENTS.TOUCH_STARTED });
@@ -393,10 +432,13 @@ describe('app navigation model', () => {
       note: 'A bright moment',
     });
     expect(savedReflection.context.saved?.beliefSystemId).toBeUndefined();
-    expect(routeForStateValue(savedReflection.value)).toBe(APP_ROUTES.REFLECTION);
+    expect(routeForStateValue(savedReflection.value)).toBe(APP_ROUTES.BELIEF_SYSTEM);
 
     actor.send({ type: CHECK_IN_EVENTS.BELIEF_SYSTEM_CATALOG_REQUESTED });
     expect(actor.getSnapshot().matches(CHECK_IN_STATES.BELIEF_SYSTEM_CATALOG)).toBe(true);
+    expect(routeForStateValue(actor.getSnapshot().value)).toBe(
+      APP_ROUTES.BELIEF_SYSTEM_CATALOG,
+    );
     actor.send({
       type: CHECK_IN_EVENTS.BELIEF_SYSTEM_CHANGED,
       beliefSystemId: BELIEF_SYSTEM_IDS.ALWAYS_FUNCTIONING,
@@ -437,7 +479,9 @@ describe('app navigation model', () => {
     actor.send({ type: CHECK_IN_EVENTS.BELIEF_SYSTEM_CATALOG_REQUESTED });
     actor.send({ type: CHECK_IN_EVENTS.CUSTOM_BELIEF_SYSTEM_REQUESTED });
     expect(actor.getSnapshot().matches(CHECK_IN_STATES.BELIEF_SYSTEM_EDITOR)).toBe(true);
-    expect(routeForStateValue(actor.getSnapshot().value)).toBe(APP_ROUTES.REFLECTION);
+    expect(routeForStateValue(actor.getSnapshot().value)).toBe(
+      APP_ROUTES.BELIEF_SYSTEM_EDITOR,
+    );
     actor.send({
       type: CHECK_IN_EVENTS.BELIEF_SYSTEM_DRAFT_CHANGED,
       statement: 'I must always function.',

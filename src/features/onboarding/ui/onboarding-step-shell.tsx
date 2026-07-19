@@ -9,6 +9,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { AppBackButton } from '@/components/ui/app-back-button';
 import {
   ONBOARDING_STATES,
   ONBOARDING_STEP_COUNT,
@@ -25,6 +26,7 @@ type OnboardingStepShellProps = PropsWithChildren<{
   onSkip: () => void;
   primaryDisabled?: boolean;
   primaryLabel: string;
+  scrollEnabled?: boolean;
   step: OnboardingStep;
   stepLabel: string;
 }>;
@@ -39,6 +41,7 @@ export function OnboardingStepShell({
   onSkip,
   primaryDisabled = false,
   primaryLabel,
+  scrollEnabled = true,
   step,
   stepLabel,
 }: OnboardingStepShellProps) {
@@ -56,13 +59,13 @@ export function OnboardingStepShell({
       <SafeAreaView edges={['top', 'bottom']} style={styles.safeArea}>
         <View style={styles.topBar}>
           {onBack && backLabel ? (
-            <PressableScale
-              accessibilityRole="button"
+            <AppBackButton
+              accessibilityLabel={backLabel}
+              label={backLabel}
               onPress={onBack}
               style={styles.quietAction}
-              testID="onboarding-back">
-              <Text style={styles.quietActionText}>{backLabel}</Text>
-            </PressableScale>
+              testID="onboarding-back"
+            />
           ) : <View style={styles.quietActionPlaceholder} />}
           <Text style={styles.stepLabel}>{stepLabel}</Text>
           <PressableScale
@@ -97,9 +100,12 @@ export function OnboardingStepShell({
           ))}
         </View>
         <ScrollView
+          bounces={scrollEnabled}
           contentContainerStyle={styles.content}
           contentInsetAdjustmentBehavior="automatic"
-          showsVerticalScrollIndicator={false}>
+          scrollEnabled={scrollEnabled}
+          showsVerticalScrollIndicator={false}
+          testID="onboarding-content-scroll">
           {children}
         </ScrollView>
         <View style={styles.footer}>

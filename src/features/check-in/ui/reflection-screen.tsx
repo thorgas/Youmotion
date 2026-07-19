@@ -1,5 +1,6 @@
 import { useSelector } from '@xstate/react';
 import { useSelector as useStoreSelector } from '@xstate/store-react';
+import { fbs } from 'fbtee';
 import { PressableScale } from 'pressto';
 import {
   ActivityIndicator,
@@ -12,6 +13,7 @@ import {
 import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { AppBackButton } from '@/components/ui/app-back-button';
 import {
   CHECK_IN_EVENTS,
   CHECK_IN_STATES,
@@ -475,6 +477,10 @@ function BeliefSystemCatalogStep() {
   const _create = () => actor.send({
     type: CHECK_IN_EVENTS.CUSTOM_BELIEF_SYSTEM_REQUESTED,
   });
+  const backLabel = String(fbs(
+    'Back',
+    'Button returning from the core belief catalog',
+  ));
 
   if (!selection) return null;
 
@@ -488,14 +494,13 @@ function BeliefSystemCatalogStep() {
           testID="belief-system-catalog"
         >
           <View style={styles.catalogHeader}>
-            <PressableScale
-              accessibilityRole="button"
+            <AppBackButton
+              accessibilityLabel={backLabel}
+              label={backLabel}
               onPress={_close}
               style={styles.catalogBack}
               testID="belief-system-catalog-back"
-            >
-              <Text style={styles.secondaryText}>‹ <fbt desc="Button returning from the core belief catalog">Back</fbt></Text>
-            </PressableScale>
+            />
             <Text style={styles.eyebrow}>
               <fbt desc="Label above the complete core belief catalog">CORE BELIEFS</fbt>
             </Text>

@@ -91,6 +91,18 @@ describe('explanation onboarding screen', () => {
     expect(screen.getByText('Make space for what is here.')).toBeTruthy();
     expect(screen.getByLabelText('Step 1 of 3')).toBeTruthy();
     expect(screen.getByText(/No account is needed/)).toBeTruthy();
+    expect(
+      screen.getByTestId('onboarding-privacy-symbol', {
+        includeHiddenElements: true,
+      }).props,
+    ).toMatchObject({
+      accessibilityElementsHidden: true,
+      importantForAccessibility: 'no-hide-descendants',
+    });
+    expect(screen.getByTestId('onboarding-content-scroll').props).toMatchObject({
+      bounces: true,
+      scrollEnabled: true,
+    });
 
     await fireEvent.press(screen.getByTestId('onboarding-primary-action'));
     expect(mockActor.getSnapshot().matches({
@@ -98,6 +110,10 @@ describe('explanation onboarding screen', () => {
     })).toBe(true);
     expect(screen.getByLabelText('Step 2 of 3')).toBeTruthy();
     expect(screen.getByText('Imagine your chest tightens before a difficult meeting.')).toBeTruthy();
+    expect(screen.getByTestId('onboarding-content-scroll').props).toMatchObject({
+      bounces: false,
+      scrollEnabled: false,
+    });
 
     const star = screen.getByTestId('emotion-star');
     await fireEvent(star, 'responderGrant', _panEvent({
