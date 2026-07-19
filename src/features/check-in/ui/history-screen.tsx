@@ -10,8 +10,12 @@ import { CHECK_IN_EVENTS } from '@/constants';
 import { useAppNavigationActor } from '@/navigation/app-navigation.provider';
 import { checkInHistoryStore } from '../application/check-in-history.store';
 import type { CheckIn } from '../domain/check-in';
+import type { BeliefStatement } from '../domain/belief-statement';
 import { emotionSummary } from './emotion-copy';
-import { beliefSystemText } from './belief-system-copy';
+import {
+  beliefSystemText,
+  guidingBeliefSystemText,
+} from './belief-system-copy';
 import {
   confirmCheckInDeletion,
   deleteMomentAccessibilityLabel,
@@ -24,6 +28,61 @@ const _selectHistory = (state: ReturnType<typeof checkInHistoryStore.getSnapshot
 const _selectBeliefStatements = (
   snapshot: ReturnType<ReturnType<typeof useAppNavigationActor>['getSnapshot']>,
 ) => snapshot.context.beliefStatements;
+
+function HistoryBelief({
+  entry,
+  statements,
+}: {
+  entry: CheckIn;
+  statements: readonly BeliefStatement[];
+}) {
+  if (!entry.beliefSystemId) return null;
+
+  const harmfulStatement = beliefSystemText({
+    id: entry.beliefSystemId,
+    statements,
+  });
+  const guidingStatement = guidingBeliefSystemText({
+    id: entry.beliefSystemId,
+    statements,
+  });
+
+  if (!guidingStatement) {
+    return <Text style={styles.beliefSystem}>{harmfulStatement}</Text>;
+  }
+
+  return (
+    <View style={styles.beliefTransition} testID={`history-belief-transition-${entry.id}`}>
+      <Text style={styles.releasedBeliefLabel}>
+        <fbt desc="Label for a harmful core belief that was reframed in check-in history">
+          Released core belief
+        </fbt>
+      </Text>
+      <Text
+        style={styles.releasedBelief}
+        testID={`history-released-belief-${entry.id}`}
+      >
+        {harmfulStatement}
+      </Text>
+      <View
+        style={styles.guidingBeliefCard}
+        testID={`history-guiding-belief-card-${entry.id}`}
+      >
+        <Text style={styles.guidingBeliefLabel}>
+          <fbt desc="Label for the positive guiding belief in check-in history">
+            Your guiding belief
+          </fbt>
+        </Text>
+        <Text
+          style={styles.guidingBelief}
+          testID={`history-guiding-belief-${entry.id}`}
+        >
+          {guidingStatement}
+        </Text>
+      </View>
+    </View>
+  );
+}
 
 function MomentRow({ entry, locale }: { entry: CheckIn; locale: string }) {
   const actor = useAppNavigationActor();
@@ -47,14 +106,7 @@ function MomentRow({ entry, locale }: { entry: CheckIn; locale: string }) {
           <Text style={styles.emotion}>{emotionSummary(entry)}</Text>
           <Text style={styles.date}>{formatHistoryDate({ date: new Date(entry.createdAt), locale })}</Text>
           {entry.note ? <Text style={styles.note}>{entry.note}</Text> : null}
-          {entry.beliefSystemId ? (
-            <Text style={styles.beliefSystem}>
-              {beliefSystemText({
-                id: entry.beliefSystemId,
-                statements: beliefStatements,
-              })}
-            </Text>
-          ) : null}
+          <HistoryBelief entry={entry} statements={beliefStatements} />
         </View>
       </PressableScale>
       <PressableScale
@@ -117,6 +169,44 @@ const styles = StyleSheet.create({
   date: { fontFamily: type.regular, color: palette.inkMuted, fontSize: 12, marginTop: 2 },
   note: { fontFamily: type.regular, color: palette.ink, fontSize: 13, lineHeight: 19, marginTop: 8 },
   beliefSystem: { fontFamily: type.medium, color: palette.moss, fontSize: 12, lineHeight: 18, marginTop: 8 },
+  beliefTransition: { gap: 7, marginTop: 11 },
+  releasedBeliefLabel: {
+    fontFamily: type.semibold,
+    color: palette.inkMuted,
+    fontSize: 9,
+    letterSpacing: 1,
+    textTransform: 'uppercase',
+  },
+  releasedBelief: {
+    fontFamily: type.regular,
+    color: palette.inkMuted,
+    fontSize: 12,
+    lineHeight: 18,
+    textDecorationLine: 'line-through',
+  },
+  guidingBeliefCard: {
+    backgroundColor: '#EDF0EB',
+    borderColor: 'rgba(94, 111, 97, 0.2)',
+    borderRadius: 14,
+    borderWidth: 1,
+    marginTop: 3,
+    paddingHorizontal: 13,
+    paddingVertical: 11,
+  },
+  guidingBeliefLabel: {
+    fontFamily: type.semibold,
+    color: palette.moss,
+    fontSize: 9,
+    letterSpacing: 1,
+    textTransform: 'uppercase',
+  },
+  guidingBelief: {
+    fontFamily: type.medium,
+    color: palette.ink,
+    fontSize: 14,
+    lineHeight: 20,
+    marginTop: 4,
+  },
   deleteButton: { minHeight: 44, justifyContent: 'center', paddingHorizontal: 8 },
   deleteText: { fontFamily: type.semibold, color: palette.danger, fontSize: 12 },
 });

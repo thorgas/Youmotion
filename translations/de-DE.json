@@ -2255,6 +2255,28 @@
         }
       ],
       "types": []
+    },
+    "SDGchp/tebnaGjkgc7ulgg==": {
+      "description": "Label for a harmful core belief that was reframed in check-in history",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Losgelassener Leidsatz",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "idfaveSkr7s5gzOfcGqLTQ==": {
+      "description": "Label for the positive guiding belief in check-in history",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Dein Leitsatz",
+          "variations": {}
+        }
+      ],
+      "types": []
     }
   }
 }

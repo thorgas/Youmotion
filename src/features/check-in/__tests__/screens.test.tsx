@@ -381,6 +381,31 @@ describe('check-in screens', () => {
     expect(success.getByTestId('success-guiding-belief')).toBeTruthy();
     expect(success.getByText('Your guiding belief')).toBeTruthy();
     expect(success.getByText('I may pause and I am still loved.')).toBeTruthy();
+
+    const saved = mockActor.getSnapshot().context.saved;
+    if (!saved) throw new Error('Successful persistence must expose the saved check-in.');
+    await act(() => mockActor.send({ type: CHECK_IN_EVENTS.RESTARTED }));
+    await act(() => mockActor.send({ type: NAVIGATION_EVENTS.HISTORY_OPENED }));
+
+    const history = await _renderLocalized(<HistoryScreen />);
+    expect(history.getByText('Released core belief')).toBeTruthy();
+    expect(history.getByText('Your guiding belief')).toBeTruthy();
+    expect(history.getByTestId(`history-released-belief-${saved.id}`)).toHaveStyle({
+      color: '#9A8F87',
+      fontSize: 12,
+      textDecorationLine: 'line-through',
+    });
+    expect(history.getByTestId(`history-guiding-belief-card-${saved.id}`)).toHaveStyle({
+      backgroundColor: '#EDF0EB',
+      borderWidth: 1,
+    });
+    expect(history.getByTestId(`history-guiding-belief-${saved.id}`)).toHaveStyle({
+      color: '#2A2722',
+      fontSize: 14,
+    });
+    expect(history.getByTestId(`history-guiding-belief-${saved.id}`)).toHaveTextContent(
+      'I may pause and I am still loved.',
+    );
   });
 
   it('creates and reuses a personal core belief from the catalog', async () => {
@@ -467,6 +492,23 @@ describe('check-in screens', () => {
     expect(screen.getByText('Was würde dich stattdessen unterstützen?')).toBeTruthy();
     expect(screen.getByPlaceholderText(
       'Ich darf auch mal nicht funktionieren und werde trotzdem geliebt.',
+    )).toBeTruthy();
+    await fireEvent.changeText(
+      screen.getByTestId('guiding-belief-draft'),
+      'Ich darf innehalten und werde trotzdem geliebt.',
+    );
+    await fireEvent.press(screen.getByTestId('guiding-belief-save'));
+    await waitFor(() => expect(
+      mockActor.getSnapshot().matches(CHECK_IN_STATES.SUCCESS),
+    ).toBe(true));
+    await act(() => mockActor.send({ type: CHECK_IN_EVENTS.RESTARTED }));
+    await act(() => mockActor.send({ type: NAVIGATION_EVENTS.HISTORY_OPENED }));
+
+    const history = await _renderLocalized(<HistoryScreen />);
+    expect(history.getByText('Losgelassener Leidsatz')).toBeTruthy();
+    expect(history.getByText('Dein Leitsatz')).toBeTruthy();
+    expect(history.getByText(
+      'Ich darf innehalten und werde trotzdem geliebt.',
     )).toBeTruthy();
   });
 
