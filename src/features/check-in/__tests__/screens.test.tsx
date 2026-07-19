@@ -325,6 +325,9 @@ describe('check-in screens', () => {
   it('saves a reflection before offering the optional core belief step', async () => {
     await act(_reachReflection);
     const screen = await _renderLocalized(<ReflectionScreen />);
+    const progressHeader = screen.getByTestId('check-in-progress-header');
+    const progressHeaderStyle = progressHeader.props['style'];
+    expect(progressHeader.parent?.children.indexOf(progressHeader)).toBe(0);
     expect(screen.getByTestId('check-in-progress-step-1-active')).toBeTruthy();
     expect(screen.getByTestId('check-in-progress-step-2-upcoming')).toBeTruthy();
     expect(screen.getByTestId('check-in-progress-step-3-upcoming')).toBeTruthy();
@@ -355,6 +358,9 @@ describe('check-in screens', () => {
     expect(await screen.findByText('Your reflection is already saved. Add one only if it feels useful.')).toBeTruthy();
     expect(screen.getByTestId('check-in-progress-step-1-complete')).toBeTruthy();
     expect(screen.getByTestId('check-in-progress-step-2-active')).toBeTruthy();
+    const beliefProgressHeader = screen.getByTestId('check-in-progress-header');
+    expect(beliefProgressHeader.props['style']).toEqual(progressHeaderStyle);
+    expect(beliefProgressHeader.parent?.children.indexOf(beliefProgressHeader)).toBe(0);
     expect(screen.getByTestId('check-in-progress').props['accessibilityValue']).toMatchObject({
       now: 2,
     });
@@ -382,6 +388,9 @@ describe('check-in screens', () => {
     expect(screen.getByTestId('check-in-progress-step-1-complete')).toBeTruthy();
     expect(screen.getByTestId('check-in-progress-step-2-complete')).toBeTruthy();
     expect(screen.getByTestId('check-in-progress-step-3-active')).toBeTruthy();
+    const guidingProgressHeader = screen.getByTestId('check-in-progress-header');
+    expect(guidingProgressHeader.props['style']).toEqual(progressHeaderStyle);
+    expect(guidingProgressHeader.parent?.children.indexOf(guidingProgressHeader)).toBe(0);
     expect(screen.getByTestId('check-in-progress').props['accessibilityValue']).toMatchObject({
       now: 3,
     });

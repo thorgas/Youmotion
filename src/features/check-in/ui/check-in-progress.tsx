@@ -1,10 +1,56 @@
-import type { ReactNode } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
 import { palette, type } from './theme';
 
 type ProgressStep = 1 | 2 | 3;
 type ProgressStatus = 'active' | 'complete' | 'upcoming';
+type ProgressHeaderContext = 'reflection' | 'editing' | 'core-belief' | 'guiding-belief';
+
+function ProgressEyebrow({ context }: { context: ProgressHeaderContext }) {
+  if (context === 'editing') {
+    return (
+      <Text style={styles.eyebrow}>
+        <fbt desc="Label for editing an existing check-in">EDIT MOMENT</fbt>
+      </Text>
+    );
+  }
+  if (context === 'core-belief') {
+    return (
+      <Text style={styles.eyebrow}>
+        <fbt desc="Optional core belief step label">03 · CORE BELIEF</fbt>
+      </Text>
+    );
+  }
+  if (context === 'guiding-belief') {
+    return (
+      <Text style={styles.eyebrow}>
+        <fbt desc="Dedicated positive guiding belief step label">
+          04 · NEW DIRECTION
+        </fbt>
+      </Text>
+    );
+  }
+  return (
+    <Text style={styles.eyebrow}>
+      <fbt desc="Second step label for reflecting on a feeling">02 · REFLECT</fbt>
+    </Text>
+  );
+}
+
+export function CheckInProgressHeader({
+  activeStep,
+  context,
+}: {
+  activeStep: ProgressStep;
+  context: ProgressHeaderContext;
+}) {
+  return (
+    <View style={styles.header} testID="check-in-progress-header">
+      <ProgressEyebrow context={context} />
+      <CheckInProgress activeStep={activeStep} />
+    </View>
+  );
+}
 
 function progressStatus({
   activeStep,
@@ -20,12 +66,10 @@ function progressStatus({
 
 function Step({
   activeStep,
-  label,
   optional,
   step,
 }: {
   activeStep: ProgressStep;
-  label: ReactNode;
   optional: boolean;
   step: ProgressStep;
 }) {
@@ -54,7 +98,15 @@ function Step({
         styles.label,
         emphasized ? styles.labelEmphasized : null,
       ]}>
-        {label}
+        {step === 1
+          ? <fbt desc="Moment step in check-in progress">Moment</fbt>
+          : null}
+        {step === 2
+          ? <fbt desc="Harmful core belief step in check-in progress">Core belief</fbt>
+          : null}
+        {step === 3
+          ? <fbt desc="Positive guiding belief step in check-in progress">Guiding belief</fbt>
+          : null}
       </Text>
       {optional ? (
         <Text
@@ -94,21 +146,18 @@ export function CheckInProgress({ activeStep }: { activeStep: ProgressStep }) {
       <View style={styles.track}>
         <Step
           activeStep={activeStep}
-          label={<fbt desc="Moment step in check-in progress">Moment</fbt>}
           optional={false}
           step={1}
         />
         <Connector activeStep={activeStep} afterStep={1} />
         <Step
           activeStep={activeStep}
-          label={<fbt desc="Harmful core belief step in check-in progress">Core belief</fbt>}
           optional
           step={2}
         />
         <Connector activeStep={activeStep} afterStep={2} />
         <Step
           activeStep={activeStep}
-          label={<fbt desc="Positive guiding belief step in check-in progress">Guiding belief</fbt>}
           optional
           step={3}
         />
@@ -118,6 +167,15 @@ export function CheckInProgress({ activeStep }: { activeStep: ProgressStep }) {
 }
 
 const styles = StyleSheet.create({
+  header: {
+    marginTop: 24,
+  },
+  eyebrow: {
+    color: palette.inkMuted,
+    fontFamily: type.semibold,
+    fontSize: 11,
+    letterSpacing: 1.4,
+  },
   container: {
     marginBottom: 8,
     marginTop: 16,

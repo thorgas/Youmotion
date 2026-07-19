@@ -27,7 +27,7 @@ import {
   guidingBeliefAccessibilityLabel,
   guidingBeliefPlaceholder,
 } from './belief-system-copy';
-import { CheckInProgress } from './check-in-progress';
+import { CheckInProgressHeader } from './check-in-progress';
 import { palette, type } from './theme';
 
 type NavigationSnapshot = ReturnType<
@@ -115,24 +115,22 @@ export function GuidingBeliefScreen() {
           showsVerticalScrollIndicator={false}
           testID="guiding-belief-scroll"
         >
-          <PressableScale
-            accessibilityRole="button"
-            disabled={saving}
-            onPress={_back}
-            style={styles.backButton}
-            testID="guiding-belief-back"
-          >
-            <Text style={styles.backText}>
-              ‹ <fbt desc="Button returning from guiding belief formulation to harmful belief selection">Back</fbt>
-            </Text>
-          </PressableScale>
+          <CheckInProgressHeader
+            activeStep={3}
+            context="guiding-belief"
+          />
           <View style={styles.header}>
-            <Text style={styles.eyebrow}>
-              <fbt desc="Dedicated positive guiding belief step label">
-                04 · NEW DIRECTION
-              </fbt>
-            </Text>
-            <CheckInProgress activeStep={3} />
+            <PressableScale
+              accessibilityRole="button"
+              disabled={saving}
+              onPress={_back}
+              style={styles.backButton}
+              testID="guiding-belief-back"
+            >
+              <Text style={styles.backText}>
+                ‹ <fbt desc="Button returning from guiding belief formulation to harmful belief selection">Back</fbt>
+              </Text>
+            </PressableScale>
             <Text style={styles.title}>
               <fbt desc="Title for the dedicated positive guiding belief page">
                 What would support you instead?
@@ -302,12 +300,6 @@ const styles = StyleSheet.create({
   backButton: { minHeight: 44, alignSelf: 'flex-start', justifyContent: 'center' },
   backText: { fontFamily: type.semibold, color: palette.ink, fontSize: 14 },
   header: { gap: 10 },
-  eyebrow: {
-    fontFamily: type.semibold,
-    color: palette.inkMuted,
-    fontSize: 11,
-    letterSpacing: 1.4,
-  },
   title: {
     fontFamily: type.semibold,
     color: palette.ink,

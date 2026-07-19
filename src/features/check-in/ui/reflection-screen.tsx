@@ -46,7 +46,7 @@ import {
   deleteMomentAccessibilityLabel,
   deleteMomentText,
 } from './check-in-deletion';
-import { CheckInProgress } from './check-in-progress';
+import { CheckInProgressHeader } from './check-in-progress';
 import { palette, type } from './theme';
 
 const _selectSnapshot = (
@@ -200,12 +200,11 @@ function ReflectionNoteStep() {
           showsVerticalScrollIndicator={false}
           testID="reflection-keyboard-scroll"
         >
-          <View style={styles.header}>
-            <Text style={styles.eyebrow}>
-              {editing
-                ? <fbt desc="Label for editing an existing check-in">EDIT MOMENT</fbt>
-                : <fbt desc="Second step label for reflecting on a feeling">02 · REFLECT</fbt>}
-            </Text>
+          <CheckInProgressHeader
+            activeStep={1}
+            context={editing ? 'editing' : 'reflection'}
+          />
+          <View>
             <Text style={styles.title}>
               {editing
                 ? <fbt desc="Title for editing an existing check-in">Edit this moment.</fbt>
@@ -221,7 +220,6 @@ function ReflectionNoteStep() {
                 Next, you can add or change this moment's core belief and guiding belief. Both steps are optional.
               </fbt>
             </Text>
-            <CheckInProgress activeStep={1} />
           </View>
           <View style={styles.card}>
             <PressableScale
@@ -351,11 +349,11 @@ function BeliefSystemStep() {
           showsVerticalScrollIndicator={false}
           testID="belief-system-step"
         >
-          <View style={styles.header}>
-            <Text style={styles.eyebrow}>
-              <fbt desc="Optional core belief step label">03 · CORE BELIEF</fbt>
-            </Text>
-            <CheckInProgress activeStep={2} />
+          <CheckInProgressHeader
+            activeStep={2}
+            context="core-belief"
+          />
+          <View>
             <Text style={styles.title}>
               <fbt desc="Question shown after a reflection is saved">
                 Does a core belief fit this moment?
@@ -711,7 +709,6 @@ const styles = StyleSheet.create({
     padding: 22,
     paddingBottom: 32,
   },
-  header: { marginTop: 24 },
   catalogHeader: { marginTop: 8 },
   eyebrow: {
     fontFamily: type.semibold,
