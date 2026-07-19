@@ -8,13 +8,17 @@ import { appSettingsStore } from '@/features/settings/application/app-settings.s
 import type { EmotionLabelMode } from '@/features/settings/domain/emotion-label-mode';
 import { emotionAngle, selectionFromPoint } from '../domain/emotion-selection';
 import { emotions, type EmotionSelection } from '../domain/emotion';
-import { BaseStateRipples } from './base-state-ripples';
+import {
+  BaseStateRipples,
+  CenteredBaseStateRipples,
+} from './base-state-ripples';
 import { EmotionAxisLabel } from './emotion-axis-label';
 import { emotionName, emotionNuance, emotionStarAccessibility } from './emotion-copy';
 import { palette, textSize, type } from './theme';
 
 type EmotionStarProps = {
   selection: EmotionSelection | null;
+  centerOrigin?: boolean;
   disabled?: boolean;
   onTouchStart: () => void;
   onSelectionChange: (selection: EmotionSelection | null) => void;
@@ -23,6 +27,7 @@ type EmotionStarProps = {
 };
 
 type EmotionFieldProps = {
+  centerOrigin: boolean;
   center: number;
   radius: number;
   rippleOffsetX: SharedValue<number>;
@@ -72,10 +77,21 @@ function EmotionReadout({ selection }: { selection: EmotionSelection }) {
   );
 }
 
-function EmotionField({ center, labelMode, radius, rippleOffsetX, rippleOffsetY, selection, size }: EmotionFieldProps) {
+function EmotionField({
+  center,
+  centerOrigin,
+  labelMode,
+  radius,
+  rippleOffsetX,
+  rippleOffsetY,
+  selection,
+  size,
+}: EmotionFieldProps) {
   return (
     <>
-      <BaseStateRipples offsetX={rippleOffsetX} offsetY={rippleOffsetY} />
+      {centerOrigin
+        ? <CenteredBaseStateRipples />
+        : <BaseStateRipples offsetX={rippleOffsetX} offsetY={rippleOffsetY} />}
       <Svg height={size} viewBox={`0 0 ${size} ${size}`} width={size}>
         {selection ? [0.28, 0.5, 0.72, 0.9].map((scale) => (
           <Circle key={scale} cx={center} cy={center} r={radius * scale} fill="none" stroke={palette.hairline} strokeWidth={1} strokeDasharray="2 7" />
@@ -100,7 +116,15 @@ function EmotionField({ center, labelMode, radius, rippleOffsetX, rippleOffsetY,
   );
 }
 
-export function EmotionStar({ selection, disabled, onTouchStart, onSelectionChange, onCancel, onRelease }: EmotionStarProps) {
+export function EmotionStar({
+  centerOrigin = false,
+  selection,
+  disabled,
+  onTouchStart,
+  onSelectionChange,
+  onCancel,
+  onRelease,
+}: EmotionStarProps) {
   const labelMode = useSelector(appSettingsStore, _selectEmotionLabelMode);
   const { width } = useWindowDimensions();
   const size = Math.min(width - 32, 390);
@@ -159,6 +183,7 @@ export function EmotionStar({ selection, disabled, onTouchStart, onSelectionChan
         {...responder.panHandlers}>
         <EmotionField
           center={center}
+          centerOrigin={centerOrigin}
           labelMode={labelMode}
           radius={radius}
           rippleOffsetX={rippleOffsetX}

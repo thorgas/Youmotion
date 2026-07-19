@@ -716,6 +716,7 @@ describe('app navigation model', () => {
     if (!saved) throw new Error('Successful persistence must expose the saved check-in.');
 
     actor.send({ type: CHECK_IN_EVENTS.RESTARTED });
+    expect(actor.getSnapshot().context.selection).toBeNull();
     actor.send({ type: NAVIGATION_EVENTS.HISTORY_OPENED });
     actor.send({ type: CHECK_IN_EVENTS.EDIT_REQUESTED, entry: saved });
     expect(actor.getSnapshot().matches(NAVIGATION_STATES.REFLECTION)).toBe(true);

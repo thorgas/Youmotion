@@ -74,6 +74,12 @@ export function BaseStateRipples({ offsetX, offsetY }: BaseStateRipplesProps) {
   );
 }
 
+export function CenteredBaseStateRipples() {
+  const offsetX = useSharedValue(0);
+  const offsetY = useSharedValue(0);
+  return <BaseStateRipples offsetX={offsetX} offsetY={offsetY} />;
+}
+
 const styles = StyleSheet.create({
   layer: {
     position: 'absolute',

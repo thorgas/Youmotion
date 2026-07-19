@@ -1,6 +1,7 @@
 import { act, fireEvent, render, waitFor, within } from '@testing-library/react-native';
 import type { ReactElement } from 'react';
 import { Alert, StyleSheet } from 'react-native';
+import { useSharedValue } from 'react-native-reanimated';
 import { createActor, type Actor } from 'xstate';
 import { NONE } from 'react-native-surrealdb';
 
@@ -45,6 +46,10 @@ import { SuccessScreen } from '../ui/success-screen';
 import { SettingsScreen } from '@/features/settings/ui/settings-screen';
 import { BeliefLibraryScreen } from '@/features/settings/ui/belief-library-screen';
 import { appSettingsStore } from '@/features/settings/application/app-settings.store';
+import {
+  BaseStateRipples,
+  CenteredBaseStateRipples,
+} from '../ui/base-state-ripples';
 
 let mockActor: Actor<typeof appNavigationMachine>;
 
@@ -110,6 +115,13 @@ const _panEvent = ({ x, y, timestamp }: { x: number; y: number; timestamp: numbe
     mostRecentTimeStamp: timestamp,
   },
 });
+
+function RippleOriginHarness({ centered }: { centered: boolean }) {
+  const offsetX = useSharedValue(55);
+  const offsetY = useSharedValue(-75);
+  if (centered) return <CenteredBaseStateRipples />;
+  return <BaseStateRipples offsetX={offsetX} offsetY={offsetY} />;
+}
 
 describe('check-in screens', () => {
   beforeEach(() => {
@@ -211,6 +223,41 @@ describe('check-in screens', () => {
 
     expect(screen.getAllByTestId(/^base-emotion-emoji-/)).toHaveLength(7);
     expect(screen.queryAllByTestId(/^base-emotion-label-/)).toHaveLength(0);
+  });
+
+  it('recenters the regular Pulse origin after leaving the selection flow', async () => {
+    const screen = await _renderLocalized(<CheckInScreen />);
+    const star = screen.getByTestId('emotion-star');
+
+    await fireEvent(
+      star,
+      'responderGrant',
+      _panEvent({ x: 250, y: 120, timestamp: 1 }),
+    );
+    await fireEvent(star, 'responderRelease');
+    await act(() => mockActor.send({ type: NAVIGATION_EVENTS.BACK_REQUESTED }));
+
+    expect(mockActor.getSnapshot().context.selection).toBeNull();
+    expect(StyleSheet.flatten(screen.getByTestId('base-state-ripples').props['style']))
+      .toMatchObject({
+        transform: [{ translateX: 0 }, { translateY: 0 }],
+      });
+  });
+
+  it('centers a reset Pulse origin without changing onboarding preservation', async () => {
+    const screen = await render(<RippleOriginHarness centered={false} />);
+    expect(StyleSheet.flatten(screen.getByTestId('base-state-ripples').props['style']))
+      .toMatchObject({
+        transform: [{ translateX: 55 }, { translateY: -75 }],
+      });
+
+    await screen.rerender(
+      <RippleOriginHarness centered />,
+    );
+    expect(StyleSheet.flatten(screen.getByTestId('base-state-ripples').props['style']))
+      .toMatchObject({
+        transform: [{ translateX: 0 }, { translateY: 0 }],
+      });
   });
 
   it('coalesces continuous drag positions and publishes the exact released intensity', async () => {

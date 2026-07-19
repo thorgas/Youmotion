@@ -5,7 +5,11 @@ import { useRef } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { CHECK_IN_EVENTS } from '@/constants';
+import {
+  CHECK_IN_EVENTS,
+  CHECK_IN_STATES,
+  NAVIGATION_STATES,
+} from '@/constants';
 import { useAppNavigationActor } from '@/navigation/app-navigation.provider';
 import type { EmotionSelection } from '../domain/check-in';
 import { selectionForCheckIn } from '../domain/emotion';
@@ -46,6 +50,11 @@ export function CheckInScreen() {
   const publishedSelection = useRef(snapshot.context.selection);
   const latest = entries[0];
   const editing = snapshot.context.editing !== null;
+  const centerOrigin = snapshot.matches({
+    [NAVIGATION_STATES.TABS]: {
+      [NAVIGATION_STATES.TODAY]: CHECK_IN_STATES.IDLE,
+    },
+  });
 
   const _touchStarted = () => {
     latestSelection.current = snapshot.context.selection;
@@ -83,6 +92,7 @@ export function CheckInScreen() {
           </View>
           <View style={styles.starStage}>
             <EmotionStar
+              centerOrigin={centerOrigin}
               selection={snapshot.context.selection}
               onCancel={_selectionCancelled}
               onTouchStart={_touchStarted}

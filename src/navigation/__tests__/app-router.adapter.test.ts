@@ -89,6 +89,7 @@ describe('app router adapter', () => {
     });
 
     expect(routeForStateValue(actor.getSnapshot().value)).toBe(APP_ROUTES.TODAY);
+    expect(actor.getSnapshot().context.selection).toBeNull();
     expect(mockRouter.dismissTo).not.toHaveBeenCalled();
   });
 
