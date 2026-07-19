@@ -36,6 +36,38 @@ type NavigationSnapshot = ReturnType<
 
 const _selectSnapshot = (snapshot: NavigationSnapshot) => snapshot;
 
+function GuidingBeliefFinishLabel({
+  canSave,
+  failed,
+}: {
+  canSave: boolean;
+  failed: boolean;
+}) {
+  if (failed) {
+    return (
+      <Text style={styles.primaryText}>
+        <fbt desc="Button retrying positive guiding belief persistence">Try again</fbt>
+      </Text>
+    );
+  }
+  if (canSave) {
+    return (
+      <Text style={styles.primaryText}>
+        <fbt desc="Button saving a positive guiding belief and completing the flow">
+          Save and finish
+        </fbt>
+      </Text>
+    );
+  }
+  return (
+    <Text style={styles.primaryText}>
+      <fbt desc="Button completing an optional guiding belief step without entering one">
+        Finish without a guiding belief
+      </fbt>
+    </Text>
+  );
+}
+
 function guidingBeliefViewModel(snapshot: NavigationSnapshot) {
   const beliefSystemId = snapshot.context.beliefSystemId;
   const statements = snapshot.context.beliefStatements;
@@ -56,7 +88,6 @@ function guidingBeliefViewModel(snapshot: NavigationSnapshot) {
   const selectedText = beliefSystemId
     ? beliefSystemText({ id: beliefSystemId, statements })
     : '';
-  const skipDisabled = saving || failed;
   return {
     beliefSystemId,
     canSave,
@@ -65,7 +96,6 @@ function guidingBeliefViewModel(snapshot: NavigationSnapshot) {
     guidingReady,
     saving,
     selectedText,
-    skipDisabled,
     statement,
   };
 }
@@ -81,14 +111,12 @@ export function GuidingBeliefScreen() {
     guidingReady,
     saving,
     selectedText,
-    skipDisabled,
     statement,
   } = guidingBeliefViewModel(snapshot);
 
   const _back = () => actor.send({
     type: CHECK_IN_EVENTS.GUIDING_BELIEF_BACK_REQUESTED,
   });
-  const _skip = () => actor.send({ type: CHECK_IN_EVENTS.GUIDING_BELIEF_SKIPPED });
   const _beliefChanged = (harmfulStatement: string) => actor.send({
     type: CHECK_IN_EVENTS.BELIEF_SYSTEM_DRAFT_CHANGED,
     statement: harmfulStatement,
@@ -97,9 +125,17 @@ export function GuidingBeliefScreen() {
     type: CHECK_IN_EVENTS.GUIDING_BELIEF_SYSTEM_DRAFT_CHANGED,
     statement: guidingStatement,
   });
-  const _save = () => actor.send({
-    type: failed ? CHECK_IN_EVENTS.RETRIED : CHECK_IN_EVENTS.GUIDING_BELIEF_CONFIRMED,
-  });
+  const _finish = () => {
+    if (failed) {
+      actor.send({ type: CHECK_IN_EVENTS.RETRIED });
+      return;
+    }
+    if (canSave) {
+      actor.send({ type: CHECK_IN_EVENTS.GUIDING_BELIEF_CONFIRMED });
+      return;
+    }
+    actor.send({ type: CHECK_IN_EVENTS.GUIDING_BELIEF_SKIPPED });
+  };
 
   if (!beliefSystemId) return null;
 
@@ -248,33 +284,15 @@ export function GuidingBeliefScreen() {
           <View style={styles.actions}>
             <PressableScale
               accessibilityRole="button"
-              accessibilityState={{ disabled: skipDisabled }}
-              disabled={skipDisabled}
-              onPress={_skip}
-              style={styles.secondaryButton}
-              testID="guiding-belief-skip"
-            >
-              <Text style={styles.secondaryText}>
-                <fbt desc="Button finishing a check-in without changing its positive guiding belief">
-                  Finish for now
-                </fbt>
-              </Text>
-            </PressableScale>
-            <PressableScale
-              accessibilityRole="button"
-              accessibilityState={{ disabled: saving || !canSave }}
-              disabled={saving || !canSave}
-              onPress={_save}
+              accessibilityState={{ disabled: saving }}
+              disabled={saving}
+              onPress={_finish}
               style={styles.primaryButton}
-              testID="guiding-belief-save"
+              testID="guiding-belief-finish"
             >
-              {saving ? <ActivityIndicator color="#FFFFFF" /> : (
-                <Text style={styles.primaryText}>
-                  {failed
-                    ? <fbt desc="Button retrying positive guiding belief persistence">Try again</fbt>
-                    : <fbt desc="Button saving a positive guiding belief and completing the flow">Save and finish</fbt>}
-                </Text>
-              )}
+              {saving
+                ? <ActivityIndicator color="#FFFFFF" />
+                : <GuidingBeliefFinishLabel canSave={canSave} failed={failed} />}
             </PressableScale>
           </View>
         </KeyboardAwareScrollView>
@@ -400,24 +418,7 @@ const styles = StyleSheet.create({
     fontSize: 12,
     lineHeight: 18,
   },
-  actions: { flexDirection: 'row', gap: 12 },
-  secondaryButton: {
-    minHeight: 54,
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: 18,
-    borderCurve: 'continuous',
-    borderWidth: 1,
-    borderColor: palette.hairline,
-    paddingHorizontal: 12,
-  },
-  secondaryText: {
-    fontFamily: type.semibold,
-    color: palette.ink,
-    fontSize: 13,
-    textAlign: 'center',
-  },
+  actions: { flexDirection: 'row' },
   primaryButton: {
     minHeight: 54,
     flex: 1,

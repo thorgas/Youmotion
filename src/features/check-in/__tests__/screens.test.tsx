@@ -407,11 +407,17 @@ describe('check-in screens', () => {
     expect(screen.getByTestId('guiding-source-belief')).toHaveTextContent(
       'I always have to function.',
     );
+    const finishWithoutGuidingBelief = screen.getByTestId('guiding-belief-finish');
+    expect(finishWithoutGuidingBelief.props['accessibilityState']).toEqual({
+      disabled: false,
+    });
+    expect(screen.getByText('Finish without a guiding belief')).toBeTruthy();
     await fireEvent.changeText(
       screen.getByTestId('guiding-belief-draft'),
       'I may pause and I am still loved.',
     );
-    await fireEvent.press(screen.getByTestId('guiding-belief-save'));
+    expect(screen.getByText('Save and finish')).toBeTruthy();
+    await fireEvent.press(screen.getByTestId('guiding-belief-finish'));
 
     await waitFor(() => expect(mockActor.getSnapshot().matches(CHECK_IN_STATES.SUCCESS)).toBe(true));
     expect(mockActor.getSnapshot().context.saved?.beliefSystemId).toBe(
@@ -487,13 +493,41 @@ describe('check-in screens', () => {
       screen.getByTestId('guiding-belief-draft'),
       'Rest is part of a full life.',
     );
-    await fireEvent.press(screen.getByTestId('guiding-belief-save'));
+    await fireEvent.press(screen.getByTestId('guiding-belief-finish'));
     await waitFor(() => expect(
       mockActor.getSnapshot().matches(CHECK_IN_STATES.SUCCESS),
     ).toBe(true));
 
     const success = await _renderLocalized(<SuccessScreen />);
     expect(success.getByText('Rest is part of a full life.')).toBeTruthy();
+  });
+
+  it('finishes the optional guiding belief step through its enabled primary action', async () => {
+    await act(_reachReflection);
+    await act(() => mockActor.send({ type: CHECK_IN_EVENTS.CONFIRMED }));
+    await waitFor(() => expect(
+      mockActor.getSnapshot().matches(CHECK_IN_STATES.BELIEF_SYSTEM),
+    ).toBe(true));
+    await act(() => mockActor.send({
+      type: CHECK_IN_EVENTS.BELIEF_SYSTEM_CHANGED,
+      beliefSystemId: BELIEF_SYSTEM_IDS.ALWAYS_FUNCTIONING,
+    }));
+    await act(() => mockActor.send({ type: CHECK_IN_EVENTS.CONFIRMED }));
+    await waitFor(() => expect(
+      mockActor.getSnapshot().matches(CHECK_IN_STATES.GUIDING_BELIEF),
+    ).toBe(true));
+
+    const screen = await _renderLocalized(<GuidingBeliefScreen />);
+    const finish = screen.getByTestId('guiding-belief-finish');
+    expect(finish.props['accessibilityState']).toEqual({ disabled: false });
+    expect(screen.getByText('Finish without a guiding belief')).toBeTruthy();
+    expect(screen.queryByTestId('guiding-belief-save')).toBeNull();
+    expect(screen.queryByTestId('guiding-belief-skip')).toBeNull();
+
+    await fireEvent.press(finish);
+    await waitFor(() => expect(
+      mockActor.getSnapshot().matches(CHECK_IN_STATES.SUCCESS),
+    ).toBe(true));
   });
 
   it('uses distinct harmful and guiding belief terms in the German locale', async () => {
@@ -550,11 +584,13 @@ describe('check-in screens', () => {
     expect(screen.getByPlaceholderText(
       'Schreibe hier deinen neuen Leitsatz auf, z. B.: Ich darf auch mal nicht funktionieren und werde trotzdem geliebt.',
     )).toBeTruthy();
+    expect(screen.getByText('Ohne Leitsatz abschließen')).toBeTruthy();
     await fireEvent.changeText(
       screen.getByTestId('guiding-belief-draft'),
       'Ich darf innehalten und werde trotzdem geliebt.',
     );
-    await fireEvent.press(screen.getByTestId('guiding-belief-save'));
+    expect(screen.getByText('Speichern und abschließen')).toBeTruthy();
+    await fireEvent.press(screen.getByTestId('guiding-belief-finish'));
     await waitFor(() => expect(
       mockActor.getSnapshot().matches(CHECK_IN_STATES.SUCCESS),
     ).toBe(true));

@@ -2135,12 +2135,12 @@
       ],
       "types": []
     },
-    "CIgG0LKUA+qMrVmlItjjTA==": {
-      "description": "Button finishing a check-in without changing its positive guiding belief",
+    "SJAxrnvLClo5fbgTlPfhOA==": {
+      "description": "Button completing an optional guiding belief step without entering one",
       "tokens": [],
       "translations": [
         {
-          "translation": "Für jetzt abschließen",
+          "translation": "Ohne Leitsatz abschließen",
           "variations": {}
         }
       ],
