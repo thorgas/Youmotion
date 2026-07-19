@@ -169,16 +169,17 @@ const styles = StyleSheet.create({
   beliefTransition: { gap: 7, marginTop: 11 },
   releasedBeliefLabel: {
     fontFamily: type.semibold,
-    color: palette.inkMuted,
+    color: palette.releasedInk,
     fontSize: 9,
     letterSpacing: 1,
     textTransform: 'uppercase',
   },
   releasedBelief: {
     fontFamily: type.regular,
-    color: palette.inkMuted,
+    color: palette.releasedInk,
     fontSize: 12,
     lineHeight: 18,
+    textDecorationColor: palette.releasedInk,
     textDecorationLine: 'line-through',
   },
   guidingBeliefCard: {
@@ -198,10 +199,10 @@ const styles = StyleSheet.create({
     textTransform: 'uppercase',
   },
   guidingBelief: {
-    fontFamily: type.medium,
+    fontFamily: type.semibold,
     color: palette.ink,
-    fontSize: 14,
-    lineHeight: 20,
+    fontSize: 15,
+    lineHeight: 22,
     marginTop: 4,
   },
 });

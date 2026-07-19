@@ -93,7 +93,14 @@ describe('Effect check-in repository', () => {
     mockSurrealQuery.mockResolvedValueOnce([{ statementIndex: 0, value: [stored] }]);
 
     const loaded = await Effect.runPromise(loadCheckIns);
-    expect(loaded).toEqual([{ ...stored, level: 2 }]);
+    expect(loaded).toEqual([{
+      id: stored.id,
+      createdAt: stored.createdAt,
+      emotionId: stored.emotionId,
+      intensity: stored.intensity,
+      level: 2,
+      note: stored.note,
+    }]);
   });
 
   it('migrates legacy AsyncStorage check-ins without localized labels', async () => {

@@ -11,7 +11,10 @@ jest.mock('react-native-surrealdb', () => {
     }
   }
 
-  return { SurrealRecordId };
+  return {
+    NONE: Object.freeze({ kind: 'none' }),
+    SurrealRecordId,
+  };
 });
 
 jest.mock('expo-haptics', () => ({

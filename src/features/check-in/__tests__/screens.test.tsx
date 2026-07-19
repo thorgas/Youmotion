@@ -2,6 +2,7 @@ import { act, fireEvent, render, waitFor, within } from '@testing-library/react-
 import type { ReactElement } from 'react';
 import { Alert, StyleSheet } from 'react-native';
 import { createActor, type Actor } from 'xstate';
+import { NONE } from 'react-native-surrealdb';
 
 import {
   APP_LOCALES,
@@ -17,7 +18,11 @@ import {
 } from '@/constants';
 import { AppLocaleProvider } from '@/localization/app-locale-provider';
 import { appNavigationMachine } from '@/navigation/app-navigation.machine';
-import type { EmotionSelection } from '../domain/check-in';
+import {
+  CheckInId,
+  CheckInTimestamp,
+  type EmotionSelection,
+} from '../domain/check-in';
 import {
   CustomBeliefSystemId,
   type BeliefStatement,
@@ -25,6 +30,7 @@ import {
 import { checkInHistoryStore } from '../application/check-in-history.store';
 import {
   mockSurrealDatabase,
+  mockSurrealQuery,
   resetSurrealDatabaseMock,
 } from '@/test-utils/surrealdb.repository.mock';
 import { CheckInScreen } from '../ui/check-in-screen';
@@ -449,7 +455,7 @@ describe('check-in screens', () => {
     expect(history.getByText('Released core belief')).toBeTruthy();
     expect(history.getByText('Your guiding belief')).toBeTruthy();
     expect(history.getByTestId(`history-released-belief-${saved.id}`)).toHaveStyle({
-      color: '#6F6760',
+      color: '#9A8F87',
       fontSize: 12,
       textDecorationLine: 'line-through',
     });
@@ -459,11 +465,87 @@ describe('check-in screens', () => {
     });
     expect(history.getByTestId(`history-guiding-belief-${saved.id}`)).toHaveStyle({
       color: '#2A2722',
-      fontSize: 14,
+      fontFamily: 'Fraunces_600SemiBold',
+      fontSize: 15,
     });
     expect(history.getByTestId(`history-guiding-belief-${saved.id}`)).toHaveTextContent(
       'I may pause and I am still loved.',
     );
+  });
+
+  it('restores the released and guiding belief hierarchy after cold hydration', async () => {
+    const checkInId = CheckInId.make('cold-history-belief');
+    const createdAt = CheckInTimestamp.make('2026-07-19T01:06:00.000Z');
+    mockActor.stop();
+    checkInHistoryStore.trigger.hydrated({ entries: [] });
+    mockSurrealQuery.mockImplementation(async (surql) => {
+      if (surql.startsWith('SELECT checkInId AS id')) {
+        return [{
+          statementIndex: 0,
+          value: [{
+            id: checkInId,
+            createdAt,
+            emotionId: EMOTION_IDS.FEAR,
+            intensity: 0.5,
+            level: 2,
+            note: 'A moment when I need rest.',
+            beliefSystemId: BELIEF_SYSTEM_IDS.ALWAYS_FUNCTIONING,
+          }],
+        }];
+      }
+      if (surql.startsWith('SELECT kind, statementId AS beliefSystemId')) {
+        return [{
+          statementIndex: 0,
+          value: [{
+            kind: 'built-in',
+            beliefSystemId: BELIEF_SYSTEM_IDS.ALWAYS_FUNCTIONING,
+            harmfulStatement: NONE,
+            guidingStatement: 'I may pause and I am still loved.',
+            archivedAt: NONE,
+          }, {
+            kind: 'custom',
+            beliefSystemId: CustomBeliefSystemId.make('custom-without-guiding'),
+            harmfulStatement: 'I must never need help.',
+            guidingStatement: NONE,
+            archivedAt: NONE,
+          }],
+        }];
+      }
+      if (surql.startsWith('SELECT locale, emotionLabelMode')) {
+        return [{
+          statementIndex: 0,
+          value: [{
+            locale: APP_LOCALES.ENGLISH,
+            emotionLabelMode: EMOTION_LABEL_MODES.EMOJI,
+          }],
+        }];
+      }
+      return [{ statementIndex: 0, value: null }];
+    });
+
+    mockActor = createActor(appNavigationMachine).start();
+    await waitFor(() => expect(
+      checkInHistoryStore.getSnapshot().context.entries,
+    ).toHaveLength(1));
+    await waitFor(() => expect(
+      mockActor.getSnapshot().context.beliefStatements,
+    ).toContainEqual({
+      kind: 'built-in',
+      beliefSystemId: BELIEF_SYSTEM_IDS.ALWAYS_FUNCTIONING,
+      guidingStatement: 'I may pause and I am still loved.',
+    }));
+
+    const history = await _renderLocalized(<HistoryScreen />);
+    expect(history.getByTestId(`history-released-belief-${checkInId}`)).toHaveStyle({
+      color: '#9A8F87',
+      textDecorationLine: 'line-through',
+    });
+    expect(history.getByTestId(`history-guiding-belief-${checkInId}`)).toHaveStyle({
+      fontFamily: 'Fraunces_600SemiBold',
+      fontSize: 15,
+    });
+    expect(history.getByText('I always have to function.')).toBeTruthy();
+    expect(history.getByText('I may pause and I am still loved.')).toBeTruthy();
   });
 
   it('creates and reuses a personal core belief from the catalog', async () => {

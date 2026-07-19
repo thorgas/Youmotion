@@ -113,5 +113,20 @@ describe('personal belief flow on the device runtime', () => {
       harmfulStatement: 'I must earn every pause.',
       guidingStatement: 'Rest is part of a full life.',
     });
+
+    currentActor().stop();
+    actor = createActor(appNavigationMachine).start();
+    await waitUntil(
+      () => currentActor().getSnapshot().context.beliefStatements.some(
+        (statement) => statement.beliefSystemId === createdBeliefSystemId,
+      ),
+      waitOptions,
+    );
+    expect(currentActor().getSnapshot().context.beliefStatements).toContainEqual({
+      kind: 'custom',
+      beliefSystemId: createdBeliefSystemId,
+      harmfulStatement: 'I must earn every pause.',
+      guidingStatement: 'Rest is part of a full life.',
+    });
   });
 });

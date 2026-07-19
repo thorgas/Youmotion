@@ -5,6 +5,7 @@ export const palette = Object.freeze({
   paperRaised: '#FCFBF9',
   ink: '#2A2722',
   inkMuted: '#6F6760',
+  releasedInk: '#9A8F87',
   hairline: 'rgba(42, 39, 34, 0.12)',
   whiteWash: 'rgba(255, 255, 255, 0.72)',
   moss: '#5E6F61',

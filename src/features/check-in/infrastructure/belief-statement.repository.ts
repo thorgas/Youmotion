@@ -9,8 +9,9 @@ import {
 
 import {
   BeliefStatementArchiveTimestamp,
-  BeliefStatementListSchema,
+  BeliefStatementText,
   BeliefStatementSchema,
+  BuiltInBeliefStatementSchema,
   CustomBeliefStatementSchema,
   type BeliefSystemId,
   type BeliefStatement,
@@ -35,6 +36,37 @@ export class BeliefStatementDataError extends Schema.TaggedError<BeliefStatement
   },
 ) {}
 
+const SurrealNoneSchema = Schema.Struct({ kind: Schema.Literal('none') });
+const CustomBeliefStatementDatabaseSchema = Schema.Struct({
+  kind: CustomBeliefStatementSchema.fields.kind,
+  beliefSystemId: CustomBeliefStatementSchema.fields.beliefSystemId,
+  harmfulStatement: CustomBeliefStatementSchema.fields.harmfulStatement,
+  guidingStatement: Schema.optional(Schema.Union(
+    BeliefStatementText,
+    SurrealNoneSchema,
+  )),
+  archivedAt: Schema.optional(Schema.Union(
+    BeliefStatementArchiveTimestamp,
+    SurrealNoneSchema,
+  )),
+});
+const BeliefStatementDatabaseListSchema = Schema.Array(Schema.Union(
+  BuiltInBeliefStatementSchema,
+  CustomBeliefStatementDatabaseSchema,
+));
+
+function beliefStatementFromDatabase(
+  statement: typeof BeliefStatementDatabaseListSchema.Type[number],
+): BeliefStatement {
+  if (statement.kind === 'built-in') return statement;
+  const { guidingStatement, archivedAt, ...custom } = statement;
+  return CustomBeliefStatementSchema.make({
+    ...custom,
+    ...(typeof guidingStatement === 'string' ? { guidingStatement } : {}),
+    ...(typeof archivedAt === 'string' ? { archivedAt } : {}),
+  });
+}
+
 export const loadBeliefStatements = Effect.tryPromise({
   try: async () => {
     const database = await getDatabase();
@@ -44,13 +76,14 @@ export const loadBeliefStatements = Effect.tryPromise({
   },
   catch: (cause) => BeliefStatementStorageError.make({ operation: 'read', cause }),
 }).pipe(
-  Effect.flatMap((statements) => Schema.decodeUnknown(BeliefStatementListSchema)(
+  Effect.flatMap((statements) => Schema.decodeUnknown(BeliefStatementDatabaseListSchema)(
     statements[0]?.value ?? [],
   ).pipe(
     Effect.mapError((cause) => BeliefStatementDataError.make({
       operation: 'decode',
       cause,
     })),
+    Effect.map((decoded) => decoded.map(beliefStatementFromDatabase)),
   )),
   Effect.withSpan('BeliefStatementRepository.load'),
 );

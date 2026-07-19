@@ -1,4 +1,5 @@
 import * as Effect from 'effect/Effect';
+import { NONE } from 'react-native-surrealdb';
 
 import { BELIEF_SYSTEM_IDS } from '@/constants';
 import {
@@ -69,15 +70,32 @@ describe('Effect belief statement repository', () => {
   });
 
   it('loads schema-validated statements from SurrealDB', async () => {
-    const stored = {
+    mockSurrealQuery.mockResolvedValueOnce([{
+      statementIndex: 0,
+      value: [{
+        kind: 'built-in',
+        beliefSystemId: BELIEF_SYSTEM_IDS.ALWAYS_FUNCTIONING,
+        harmfulStatement: NONE,
+        guidingStatement: 'I may pause and I am still loved.',
+        archivedAt: NONE,
+      }, {
+        kind: 'custom',
+        beliefSystemId: 'custom-pause',
+        harmfulStatement: 'I must always function.',
+        guidingStatement: NONE,
+        archivedAt: NONE,
+      }],
+    }]);
+
+    await expect(Effect.runPromise(loadBeliefStatements)).resolves.toEqual([{
+      kind: 'built-in',
+      beliefSystemId: BELIEF_SYSTEM_IDS.ALWAYS_FUNCTIONING,
+      guidingStatement: 'I may pause and I am still loved.',
+    }, {
       kind: 'custom',
       beliefSystemId: 'custom-pause',
       harmfulStatement: 'I must always function.',
-      guidingStatement: 'I may pause and I am still loved.',
-    };
-    mockSurrealQuery.mockResolvedValueOnce([{ statementIndex: 0, value: [stored] }]);
-
-    await expect(Effect.runPromise(loadBeliefStatements)).resolves.toEqual([stored]);
+    }]);
   });
 
   it('loads archived statements so historical moments keep their wording', async () => {
