@@ -2,6 +2,7 @@ import * as Effect from 'effect/Effect';
 
 import { BELIEF_SYSTEM_IDS } from '@/constants';
 import {
+  BeliefStatementArchiveTimestamp,
   CustomBeliefSystemId,
   type BeliefStatement,
 } from '../domain/belief-statement';
@@ -9,6 +10,7 @@ import {
   deleteBeliefStatement,
   loadBeliefStatements,
   persistBeliefStatement,
+  retireCustomBeliefStatement,
 } from '../infrastructure/belief-statement.repository';
 import {
   failNextSurrealDelete,
@@ -78,6 +80,18 @@ describe('Effect belief statement repository', () => {
     await expect(Effect.runPromise(loadBeliefStatements)).resolves.toEqual([stored]);
   });
 
+  it('loads archived statements so historical moments keep their wording', async () => {
+    const stored = {
+      kind: 'custom',
+      beliefSystemId: 'custom-archived',
+      harmfulStatement: 'I must never need help.',
+      archivedAt: '2026-07-19T12:00:00.000Z',
+    };
+    mockSurrealQuery.mockResolvedValueOnce([{ statementIndex: 0, value: [stored] }]);
+
+    await expect(Effect.runPromise(loadBeliefStatements)).resolves.toEqual([stored]);
+  });
+
   it('deletes a guiding statement by its stable belief ID', async () => {
     await Effect.runPromise(
       deleteBeliefStatement(BELIEF_SYSTEM_IDS.ALWAYS_FUNCTIONING),
@@ -91,6 +105,68 @@ describe('Effect belief statement repository', () => {
           value: expect.stringContaining(BELIEF_SYSTEM_IDS.ALWAYS_FUNCTIONING),
         }),
       }),
+    );
+  });
+
+  it('hard-deletes an unused personal belief', async () => {
+    const statement = {
+      kind: 'custom',
+      beliefSystemId: CustomBeliefSystemId.make('custom-unused'),
+      harmfulStatement: 'I must never need help.',
+    } satisfies BeliefStatement;
+
+    await expect(Effect.runPromise(retireCustomBeliefStatement({
+      statement,
+      archivedAt: BeliefStatementArchiveTimestamp.make('2026-07-19T12:00:00.000Z'),
+    }))).resolves.toBeNull();
+
+    expect(mockSurrealQuery).toHaveBeenCalledWith(
+      expect.stringContaining('WHERE beliefSystemId = $beliefSystemId LIMIT 1'),
+      { beliefSystemId: statement.beliefSystemId },
+    );
+    expect(mockSurrealQuery).toHaveBeenCalledWith(
+      'DELETE $record',
+      expect.objectContaining({
+        record: expect.objectContaining({
+          value: expect.stringContaining(statement.beliefSystemId),
+        }),
+      }),
+    );
+  });
+
+  it('archives a referenced personal belief instead of breaking history', async () => {
+    const statement = {
+      kind: 'custom',
+      beliefSystemId: CustomBeliefSystemId.make('custom-referenced'),
+      harmfulStatement: 'I must never need help.',
+      guidingStatement: 'I can ask for support.',
+    } satisfies BeliefStatement;
+    mockSurrealQuery.mockResolvedValueOnce([{
+      statementIndex: 0,
+      value: ['saved-check-in'],
+    }]);
+
+    const retired = await Effect.runPromise(retireCustomBeliefStatement({
+      statement,
+      archivedAt: BeliefStatementArchiveTimestamp.make('2026-07-19T12:00:00.000Z'),
+    }));
+
+    expect(retired).toEqual({
+      ...statement,
+      archivedAt: '2026-07-19T12:00:00.000Z',
+    });
+    expect(mockSurrealQuery).toHaveBeenCalledWith(
+      'UPSERT $record CONTENT $statement',
+      expect.objectContaining({
+        statement: expect.objectContaining({
+          statementId: statement.beliefSystemId,
+          archivedAt: '2026-07-19T12:00:00.000Z',
+        }),
+      }),
+    );
+    expect(mockSurrealQuery).not.toHaveBeenCalledWith(
+      'DELETE $record',
+      expect.anything(),
     );
   });
 

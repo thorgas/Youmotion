@@ -9,6 +9,7 @@ import {
   type CheckIn,
 } from '../domain/check-in';
 import {
+  BeliefStatementArchiveTimestamp,
   CustomBeliefSystemId,
   type BeliefStatement,
   type BeliefSystemId,
@@ -103,5 +104,42 @@ describe('core belief recommendations', () => {
 
     expect(recommendations).toHaveLength(beliefSystemIds.length + 1);
     expect(recommendations[0]).toBe(beliefSystemId);
+  });
+
+  it('keeps archived personal beliefs resolvable but out of future recommendations', () => {
+    const activeId = CustomBeliefSystemId.make('custom-active');
+    const archivedId = CustomBeliefSystemId.make('custom-archived');
+    const statements = [
+      {
+        kind: 'custom',
+        beliefSystemId: activeId,
+        harmfulStatement: 'I must earn every pause.',
+      },
+      {
+        kind: 'custom',
+        beliefSystemId: archivedId,
+        harmfulStatement: 'I must never need help.',
+        archivedAt: BeliefStatementArchiveTimestamp.make('2026-07-19T12:00:00.000Z'),
+      },
+    ] satisfies readonly BeliefStatement[];
+
+    const recommendations = recommendedBeliefSystemIds({
+      emotionId: EMOTION_IDS.JOY,
+      history: [
+        checkIn({
+          id: 'archived-use',
+          emotionId: EMOTION_IDS.JOY,
+          beliefSystemId: archivedId,
+        }),
+      ],
+      statements,
+    });
+
+    expect(recommendations).toContain(activeId);
+    expect(recommendations).not.toContain(archivedId);
+    expect(statements).toContainEqual(expect.objectContaining({
+      beliefSystemId: archivedId,
+      harmfulStatement: 'I must never need help.',
+    }));
   });
 });

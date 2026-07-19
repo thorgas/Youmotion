@@ -45,7 +45,8 @@ The main graph contains these navigable states:
 tabs.today.idle → tabs.today.exploring → reflection → saving → beliefSystem → attaching → guidingBelief → persistingGuidingBelief → success
                                                 ↘ failure → saving       ↘ catalog          ↘ failure → retry
                                                                           ↘ editor → persisting
-tabs.today ↔ tabs.history ↔ tabs.settings
+tabs.today ↔ tabs.history ↔ tabs.settings → beliefLibrary ↔ beliefLibraryEditor
+                                                ↘ saving / retiring → beliefLibrary
 ```
 
 Persistence uses `Schema.parseJson` and typed `Schema.TaggedError` failures. There is no application dependency on Zod and no raw JSON parsing.
@@ -61,6 +62,8 @@ The reflection, optional Leidsatz, and optional Leitsatz screens share a labeled
 A selected Leidsatz continues to the dedicated `/guiding-belief` page. Its short reflection prompts are adapted from the supplied `Leitsätze-Verändern.pdf`: consider what the old rule once protected, where it restricts life now, and what a small change would look like tomorrow. The page then helps reformulate the Leidsatz into a compassionate positive `Leitsatz` while avoiding absolute language and keeping the result memorable.
 
 The Leitsatz remains optional. A Leitsatz belongs to its Leidsatz rather than to a single check-in, so selecting the same Leidsatz during a fresh check-in reuses the previously saved Leitsatz. The reformulation page explains that origin whenever it prefills the editable value. An existing Leitsatz can be changed or removed; a custom Leidsatz's original wording can also be edited on this page. Editing a saved moment reopens emotion, intensity, nuance, note, attached Leidsatz, custom wording, and Leitsatz values without creating a second history entry. When the completed check-in has an attached Leidsatz with a Leitsatz, “Du bist bei dir angekommen” shows that positive statement. Persisted check-ins reference the stable ID; custom Leidsatz text and attached Leitsätze are stored separately in the local database. Built-in display copy remains localized at render time.
+
+Settings links to the dedicated `/belief-library` page for managing custom Leidsätze. Editing keeps the stable ID and therefore updates the wording shown in earlier moments; the editor makes that shared-data behavior explicit. Removing an unused custom Leidsatz physically deletes its record. Removing one that is still referenced sets its optional `archivedAt` timestamp instead: archived records remain hydrated so history can resolve the original Leidsatz and Leitsatz, but they are excluded from new catalogs and recommendations. Built-in Leidsätze cannot be edited or removed through this library.
 
 ### Belief-system flow
 
@@ -158,7 +161,7 @@ pnpm i18n:all
 
 `i18n:prepare` adds new phrases to the editable German catalog with a `new` status. Translate those entries and remove the status before committing. The compact runtime catalog under `src/translations` is generated during `pnpm install` and intentionally ignored.
 
-Persisted check-ins store stable emotion IDs, intensity, nuance levels, and an optional `beliefSystemId` rather than localized labels. Existing German-label records and records without a belief system remain readable and are projected into the active locale at render time. User-authored Leidsätze and Leitsätze retain the language in which they were entered and are not passed through the translation catalog.
+Persisted check-ins store stable emotion IDs, intensity, nuance levels, and an optional `beliefSystemId` rather than localized labels. Existing German-label records and records without a belief system remain readable and are projected into the active locale at render time. User-authored Leidsätze and Leitsätze retain the language in which they were entered and are not passed through the translation catalog. The separate `belief_statement` record owns custom wording, an optional guiding statement, and an optional archive timestamp. Repository retirement checks the complete `check_in` table rather than the 30-entry presentation cache before deciding between archival and physical deletion, preventing dangling custom-belief references.
 
 ## Developer tooling
 

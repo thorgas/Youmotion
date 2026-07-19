@@ -50,12 +50,19 @@ export const BeliefStatementText = Schema.String.pipe(
   Schema.maxLength(MAX_BELIEF_STATEMENT_LENGTH),
 );
 
+export const BeliefStatementArchiveTimestamp = Schema.String.pipe(
+  Schema.brand('BeliefStatementArchiveTimestamp'),
+);
+export type BeliefStatementArchiveTimestamp = typeof BeliefStatementArchiveTimestamp.Type;
+
 export const CustomBeliefStatementSchema = Schema.Struct({
   kind: Schema.Literal('custom'),
   beliefSystemId: CustomBeliefSystemId,
   harmfulStatement: BeliefStatementText,
   guidingStatement: Schema.optional(BeliefStatementText),
+  archivedAt: Schema.optional(BeliefStatementArchiveTimestamp),
 });
+export type CustomBeliefStatement = typeof CustomBeliefStatementSchema.Type;
 
 export const BuiltInBeliefStatementSchema = Schema.Struct({
   kind: Schema.Literal('built-in'),
@@ -104,9 +111,23 @@ export function customBeliefSystemIds(
 ): readonly CustomBeliefSystemId[] {
   const ids: CustomBeliefSystemId[] = [];
   for (const statement of statements) {
-    if (statement.kind === 'custom') ids.push(statement.beliefSystemId);
+    if (statement.kind === 'custom' && statement.archivedAt === undefined) {
+      ids.push(statement.beliefSystemId);
+    }
   }
   return ids;
+}
+
+export function activeCustomBeliefStatements(
+  statements: readonly BeliefStatement[],
+): readonly CustomBeliefStatement[] {
+  const active: CustomBeliefStatement[] = [];
+  for (const statement of statements) {
+    if (statement.kind === 'custom' && statement.archivedAt === undefined) {
+      active.push(statement);
+    }
+  }
+  return active;
 }
 
 export function recordBeliefStatement({

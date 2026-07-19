@@ -5,6 +5,8 @@ import { createActor, type Actor } from 'xstate';
 
 import {
   APP_LOCALES,
+  BELIEF_LIBRARY_EVENTS,
+  BELIEF_LIBRARY_STATES,
   CHECK_IN_EVENTS,
   CHECK_IN_STATES,
   EMOTION_LABEL_MODES,
@@ -16,6 +18,10 @@ import {
 import { AppLocaleProvider } from '@/localization/app-locale-provider';
 import { appNavigationMachine } from '@/navigation/app-navigation.machine';
 import type { EmotionSelection } from '../domain/check-in';
+import {
+  CustomBeliefSystemId,
+  type BeliefStatement,
+} from '../domain/belief-statement';
 import { checkInHistoryStore } from '../application/check-in-history.store';
 import {
   mockSurrealDatabase,
@@ -29,6 +35,7 @@ import { ReflectionScreen } from '../ui/reflection-screen';
 import { GuidingBeliefScreen } from '../ui/guiding-belief-screen';
 import { SuccessScreen } from '../ui/success-screen';
 import { SettingsScreen } from '@/features/settings/ui/settings-screen';
+import { BeliefLibraryScreen } from '@/features/settings/ui/belief-library-screen';
 import { appSettingsStore } from '@/features/settings/application/app-settings.store';
 
 let mockActor: Actor<typeof appNavigationMachine>;
@@ -669,6 +676,71 @@ describe('check-in screens', () => {
     expect(settings.getByText('App-Informationen')).toBeTruthy();
     await fireEvent.press(settings.getByText('Englisch'));
     await waitFor(() => expect(settings.getByText('Private by design')).toBeTruthy());
+  });
+
+  it('edits and removes personal beliefs from the settings library', async () => {
+    const alert = jest.spyOn(Alert, 'alert');
+    const beliefSystemId = CustomBeliefSystemId.make('custom-settings-library');
+    await act(() => mockActor.send({
+      type: CHECK_IN_EVENTS.BELIEF_STATEMENTS_HYDRATED,
+      statements: [{
+        kind: 'custom',
+        beliefSystemId,
+        harmfulStatement: 'I must never need help.',
+        guidingStatement: 'I can ask for support.',
+      }] satisfies readonly BeliefStatement[],
+    }));
+    await act(() => mockActor.send({ type: NAVIGATION_EVENTS.SETTINGS_OPENED }));
+
+    const settings = await _renderLocalized(<SettingsScreen />);
+    expect(settings.getByText('Manage personal core beliefs')).toBeTruthy();
+    expect(settings.getByText('1')).toBeTruthy();
+    await fireEvent.press(settings.getByTestId('open-belief-library'));
+    expect(mockActor.getSnapshot().matches(BELIEF_LIBRARY_STATES.LIBRARY)).toBe(true);
+
+    const library = await _renderLocalized(<BeliefLibraryScreen />);
+    expect(library.getByText('I must never need help.')).toBeTruthy();
+    expect(library.getByText('I can ask for support.')).toBeTruthy();
+    await fireEvent.press(library.getByTestId(`edit-custom-belief-${beliefSystemId}`));
+    expect(mockActor.getSnapshot().matches(BELIEF_LIBRARY_STATES.EDITOR)).toBe(true);
+    await fireEvent.changeText(
+      library.getByTestId('belief-library-harmful-draft'),
+      'I may need help sometimes.',
+    );
+    await fireEvent.changeText(
+      library.getByTestId('belief-library-guiding-draft'),
+      'Support makes connection possible.',
+    );
+    await fireEvent.press(library.getByTestId('belief-library-save'));
+    await waitFor(() => expect(
+      mockActor.getSnapshot().matches(BELIEF_LIBRARY_STATES.LIBRARY),
+    ).toBe(true));
+    expect(mockActor.getSnapshot().context.beliefStatements).toContainEqual({
+      kind: 'custom',
+      beliefSystemId,
+      harmfulStatement: 'I may need help sometimes.',
+      guidingStatement: 'Support makes connection possible.',
+    });
+    expect(library.getByText('I may need help sometimes.')).toBeTruthy();
+
+    await fireEvent.press(library.getByTestId(`remove-custom-belief-${beliefSystemId}`));
+    expect(alert).toHaveBeenLastCalledWith(
+      'Remove this core belief?',
+      'It will no longer appear in future suggestions. Earlier moments keep their wording.',
+      expect.any(Array),
+    );
+    const buttons = alert.mock.calls[alert.mock.calls.length - 1]?.[2];
+    const destructive = buttons?.find((button) => button.style === 'destructive');
+    await act(() => destructive?.onPress?.());
+    await waitFor(() => expect(
+      mockActor.getSnapshot().matches(BELIEF_LIBRARY_STATES.LIBRARY),
+    ).toBe(true));
+    expect(library.queryByTestId(`belief-library-row-${beliefSystemId}`)).toBeNull();
+
+    await act(() => mockActor.send({ type: BELIEF_LIBRARY_EVENTS.CLOSED }));
+    expect(mockActor.getSnapshot().matches({
+      [NAVIGATION_STATES.TABS]: NAVIGATION_STATES.SETTINGS,
+    })).toBe(true);
   });
 
   it('opens a captured moment for editing when its history row is pressed', async () => {

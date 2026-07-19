@@ -1,0 +1,447 @@
+import { useSelector } from '@xstate/react';
+import { fbs } from 'fbtee';
+import {
+  ActivityIndicator,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+} from 'react-native';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
+import { SafeAreaView } from 'react-native-safe-area-context';
+
+import {
+  BELIEF_LIBRARY_EVENTS,
+  BELIEF_LIBRARY_STATES,
+  MAX_BELIEF_STATEMENT_LENGTH,
+  REFLECTION_KEYBOARD_BOTTOM_OFFSET,
+} from '@/constants';
+import {
+  activeCustomBeliefStatements,
+  type CustomBeliefStatement,
+} from '@/features/check-in/domain/belief-statement';
+import { palette, type } from '@/features/check-in/ui/theme';
+import { useAppNavigationActor } from '@/navigation/app-navigation.provider';
+import { confirmBeliefRemoval } from './belief-library-removal';
+
+const selectSnapshot = (
+  snapshot: ReturnType<ReturnType<typeof useAppNavigationActor>['getSnapshot']>,
+) => snapshot;
+
+function LibraryBackButton() {
+  const actor = useAppNavigationActor();
+  const close = () => actor.send({ type: BELIEF_LIBRARY_EVENTS.CLOSED });
+
+  return (
+    <Pressable
+      accessibilityRole="button"
+      onPress={close}
+      style={styles.backButton}
+      testID="belief-library-close"
+    >
+      <Text style={styles.backText}>
+        <fbt desc="Button returning from personal core-belief management to settings">
+          ‹ Settings
+        </fbt>
+      </Text>
+    </Pressable>
+  );
+}
+
+function BeliefLibraryRow({
+  disabled,
+  statement,
+}: {
+  disabled: boolean;
+  statement: CustomBeliefStatement;
+}) {
+  const actor = useAppNavigationActor();
+  const edit = () => actor.send({
+    type: BELIEF_LIBRARY_EVENTS.EDIT_REQUESTED,
+    beliefSystemId: statement.beliefSystemId,
+  });
+  const remove = () => actor.send({
+    type: BELIEF_LIBRARY_EVENTS.REMOVE_REQUESTED,
+    beliefSystemId: statement.beliefSystemId,
+  });
+  const confirmRemove = () => confirmBeliefRemoval(remove);
+
+  return (
+    <View style={styles.beliefCard} testID={`belief-library-row-${statement.beliefSystemId}`}>
+      <Text style={styles.statementLabel}>
+        <fbt desc="Label above a personal harmful core belief in settings">CORE BELIEF</fbt>
+      </Text>
+      <Text style={styles.harmfulStatement}>{statement.harmfulStatement}</Text>
+      {statement.guidingStatement ? (
+        <View style={styles.guidingCard}>
+          <Text style={styles.guidingLabel}>
+            <fbt desc="Label above a personal positive guiding belief in settings">
+              YOUR GUIDING BELIEF
+            </fbt>
+          </Text>
+          <Text style={styles.guidingStatement}>{statement.guidingStatement}</Text>
+        </View>
+      ) : null}
+      <View style={styles.rowActions}>
+        <Pressable
+          accessibilityRole="button"
+          disabled={disabled}
+          onPress={edit}
+          style={styles.editButton}
+          testID={`edit-custom-belief-${statement.beliefSystemId}`}
+        >
+          <Text style={styles.editText}>
+            <fbt desc="Button editing a personal core belief">Edit</fbt>
+          </Text>
+        </Pressable>
+        <Pressable
+          accessibilityRole="button"
+          disabled={disabled}
+          onPress={confirmRemove}
+          style={styles.removeButton}
+          testID={`remove-custom-belief-${statement.beliefSystemId}`}
+        >
+          <Text style={styles.removeText}>
+            <fbt desc="Button removing a personal core belief">Remove</fbt>
+          </Text>
+        </Pressable>
+      </View>
+    </View>
+  );
+}
+
+function BeliefLibraryList() {
+  const actor = useAppNavigationActor();
+  const snapshot = useSelector(actor, selectSnapshot);
+  const statements = activeCustomBeliefStatements(snapshot.context.beliefStatements);
+  const retiring = snapshot.matches(BELIEF_LIBRARY_STATES.RETIRING);
+
+  return (
+    <View style={styles.page} testID="belief-library-screen">
+      <SafeAreaView style={styles.safeArea}>
+        <ScrollView
+          contentContainerStyle={styles.content}
+          showsVerticalScrollIndicator
+          testID="belief-library-scroll"
+        >
+          <LibraryBackButton />
+          <Text style={styles.eyebrow}>
+            <fbt desc="Eyebrow above personal core-belief management">YOUR CORE BELIEFS</fbt>
+          </Text>
+          <Text style={styles.title}>
+            <fbt desc="Title of personal core-belief management">Your own words.</fbt>
+          </Text>
+          <Text style={styles.copy}>
+            <fbt desc="Explanation of personal core-belief management">
+              Edit the beliefs you created or remove them from future suggestions.
+            </fbt>
+          </Text>
+          {snapshot.context.error ? (
+            <Text style={styles.error}>
+              <fbt desc="Error shown when a personal core-belief management action fails">
+                Your change could not be saved.
+              </fbt>
+            </Text>
+          ) : null}
+          {statements.length === 0 ? (
+            <View style={styles.emptyCard} testID="belief-library-empty">
+              <Text style={styles.emptyTitle}>
+                <fbt desc="Title shown when no personal core beliefs exist">
+                  No personal core beliefs yet.
+                </fbt>
+              </Text>
+              <Text style={styles.emptyCopy}>
+                <fbt desc="Explanation shown when no personal core beliefs exist">
+                  You can add one during the optional core-belief step of a check-in.
+                </fbt>
+              </Text>
+            </View>
+          ) : (
+            <View style={styles.list}>
+              {statements.map((statement) => (
+                <BeliefLibraryRow
+                  disabled={retiring}
+                  key={statement.beliefSystemId}
+                  statement={statement}
+                />
+              ))}
+            </View>
+          )}
+          {retiring ? <ActivityIndicator color={palette.moss} /> : null}
+        </ScrollView>
+      </SafeAreaView>
+    </View>
+  );
+}
+
+function BeliefLibraryEditor() {
+  const actor = useAppNavigationActor();
+  const snapshot = useSelector(actor, selectSnapshot);
+  const saving = snapshot.matches(BELIEF_LIBRARY_STATES.SAVING);
+  const harmfulReady = snapshot.context.beliefLibraryHarmfulDraft.trim().length > 0;
+  const cancel = () => actor.send({ type: BELIEF_LIBRARY_EVENTS.EDIT_CANCELLED });
+  const harmfulChanged = (statement: string) => actor.send({
+    type: BELIEF_LIBRARY_EVENTS.HARMFUL_DRAFT_CHANGED,
+    statement,
+  });
+  const guidingChanged = (statement: string) => actor.send({
+    type: BELIEF_LIBRARY_EVENTS.GUIDING_DRAFT_CHANGED,
+    statement,
+  });
+  const save = () => actor.send({ type: BELIEF_LIBRARY_EVENTS.SAVE_REQUESTED });
+
+  return (
+    <View style={styles.page} testID="belief-library-editor">
+      <SafeAreaView style={styles.safeArea}>
+        <KeyboardAwareScrollView
+          bottomOffset={REFLECTION_KEYBOARD_BOTTOM_OFFSET}
+          contentContainerStyle={styles.content}
+          keyboardDismissMode="interactive"
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator
+        >
+          <Pressable
+            accessibilityRole="button"
+            disabled={saving}
+            onPress={cancel}
+            style={styles.backButton}
+            testID="belief-library-editor-cancel"
+          >
+            <Text style={styles.backText}>
+              <fbt desc="Button returning from personal core-belief editing to its library">
+                ‹ Your core beliefs
+              </fbt>
+            </Text>
+          </Pressable>
+          <Text style={styles.eyebrow}>
+            <fbt desc="Eyebrow above personal core-belief editing">EDIT CORE BELIEF</fbt>
+          </Text>
+          <Text style={styles.title}>
+            <fbt desc="Title of personal core-belief editing">Keep it true to you.</fbt>
+          </Text>
+          <Text style={styles.copy}>
+            <fbt desc="Explanation that editing a shared personal belief updates earlier moments">
+              Changes also appear in your earlier moments because they share this belief.
+            </fbt>
+          </Text>
+          <View style={styles.editorCard}>
+            <Text style={styles.fieldLabel}>
+              <fbt desc="Input label for editing a personal harmful core belief">Core belief</fbt>
+            </Text>
+            <TextInput
+              accessibilityLabel={String(fbs(
+                'Personal core belief',
+                'Accessibility label for personal harmful core-belief editing',
+              ))}
+              editable={!saving}
+              maxLength={MAX_BELIEF_STATEMENT_LENGTH}
+              multiline
+              onChangeText={harmfulChanged}
+              style={styles.input}
+              testID="belief-library-harmful-draft"
+              value={snapshot.context.beliefLibraryHarmfulDraft}
+            />
+            <Text style={styles.fieldLabel}>
+              <fbt desc="Input label for editing a personal positive guiding belief">
+                Guiding belief
+              </fbt>
+            </Text>
+            <TextInput
+              accessibilityLabel={String(fbs(
+                'Personal guiding belief',
+                'Accessibility label for personal positive guiding-belief editing',
+              ))}
+              editable={!saving}
+              maxLength={MAX_BELIEF_STATEMENT_LENGTH}
+              multiline
+              onChangeText={guidingChanged}
+              placeholder={String(fbs(
+                'Optional',
+                'Placeholder for an optional positive guiding belief',
+              ))}
+              placeholderTextColor={palette.inkMuted}
+              style={styles.input}
+              testID="belief-library-guiding-draft"
+              value={snapshot.context.beliefLibraryGuidingDraft}
+            />
+            {snapshot.context.error ? (
+              <Text style={styles.error}>
+                <fbt desc="Error shown when personal core-belief editing cannot be saved">
+                  Your change could not be saved.
+                </fbt>
+              </Text>
+            ) : null}
+            <Pressable
+              accessibilityRole="button"
+              accessibilityState={{ disabled: saving || !harmfulReady }}
+              disabled={saving || !harmfulReady}
+              onPress={save}
+              style={[styles.saveButton, !harmfulReady && styles.saveButtonDisabled]}
+              testID="belief-library-save"
+            >
+              {saving ? <ActivityIndicator color="#FFFFFF" /> : (
+                <Text style={styles.saveText}>
+                  <fbt desc="Button saving changes to a personal core belief">Save changes</fbt>
+                </Text>
+              )}
+            </Pressable>
+          </View>
+        </KeyboardAwareScrollView>
+      </SafeAreaView>
+    </View>
+  );
+}
+
+export function BeliefLibraryScreen() {
+  const actor = useAppNavigationActor();
+  const editing = useSelector(actor, (snapshot) => (
+    snapshot.matches(BELIEF_LIBRARY_STATES.EDITOR)
+    || snapshot.matches(BELIEF_LIBRARY_STATES.SAVING)
+  ));
+
+  return editing ? <BeliefLibraryEditor /> : <BeliefLibraryList />;
+}
+
+const styles = StyleSheet.create({
+  page: { flex: 1, backgroundColor: palette.paper },
+  safeArea: { flex: 1 },
+  content: {
+    width: '100%',
+    maxWidth: 520,
+    alignSelf: 'center',
+    padding: 22,
+    paddingBottom: 48,
+  },
+  backButton: { alignSelf: 'flex-start', minHeight: 44, justifyContent: 'center' },
+  backText: { fontFamily: type.semibold, color: palette.ink, fontSize: 15 },
+  eyebrow: {
+    fontFamily: type.semibold,
+    color: palette.inkMuted,
+    fontSize: 11,
+    letterSpacing: 1.4,
+    marginTop: 12,
+  },
+  title: { fontFamily: type.semibold, color: palette.ink, fontSize: 34, marginTop: 8 },
+  copy: {
+    fontFamily: type.regular,
+    color: palette.inkMuted,
+    fontSize: 15,
+    lineHeight: 22,
+    marginTop: 10,
+    marginBottom: 24,
+  },
+  list: { gap: 14 },
+  beliefCard: {
+    backgroundColor: palette.paperRaised,
+    borderRadius: 24,
+    borderWidth: 1,
+    borderColor: palette.hairline,
+    padding: 20,
+  },
+  statementLabel: {
+    fontFamily: type.semibold,
+    color: palette.inkMuted,
+    fontSize: 11,
+    letterSpacing: 1.2,
+  },
+  harmfulStatement: {
+    fontFamily: type.medium,
+    color: palette.ink,
+    fontSize: 19,
+    lineHeight: 27,
+    marginTop: 6,
+  },
+  guidingCard: {
+    backgroundColor: '#EDF0EB',
+    borderRadius: 18,
+    padding: 14,
+    marginTop: 16,
+  },
+  guidingLabel: {
+    fontFamily: type.semibold,
+    color: palette.moss,
+    fontSize: 10,
+    letterSpacing: 1.1,
+  },
+  guidingStatement: {
+    fontFamily: type.medium,
+    color: palette.ink,
+    fontSize: 17,
+    lineHeight: 24,
+    marginTop: 5,
+  },
+  rowActions: { flexDirection: 'row', gap: 10, marginTop: 18 },
+  editButton: {
+    minHeight: 44,
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 14,
+    backgroundColor: palette.ink,
+  },
+  editText: { fontFamily: type.semibold, color: '#FFFFFF', fontSize: 14 },
+  removeButton: {
+    minHeight: 44,
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: palette.hairline,
+  },
+  removeText: { fontFamily: type.semibold, color: palette.danger, fontSize: 14 },
+  emptyCard: {
+    backgroundColor: palette.paperRaised,
+    borderRadius: 24,
+    borderWidth: 1,
+    borderColor: palette.hairline,
+    padding: 20,
+  },
+  emptyTitle: { fontFamily: type.medium, color: palette.ink, fontSize: 20 },
+  emptyCopy: {
+    fontFamily: type.regular,
+    color: palette.inkMuted,
+    fontSize: 14,
+    lineHeight: 21,
+    marginTop: 7,
+  },
+  error: {
+    fontFamily: type.regular,
+    color: palette.danger,
+    fontSize: 14,
+    lineHeight: 20,
+    marginBottom: 14,
+  },
+  editorCard: {
+    backgroundColor: palette.paperRaised,
+    borderRadius: 24,
+    borderWidth: 1,
+    borderColor: palette.hairline,
+    padding: 20,
+    gap: 10,
+  },
+  fieldLabel: { fontFamily: type.semibold, color: palette.ink, fontSize: 14, marginTop: 4 },
+  input: {
+    minHeight: 112,
+    borderRadius: 18,
+    backgroundColor: '#F3EEE6',
+    padding: 16,
+    fontFamily: type.medium,
+    color: palette.ink,
+    fontSize: 17,
+    lineHeight: 24,
+    textAlignVertical: 'top',
+  },
+  saveButton: {
+    minHeight: 52,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 16,
+    backgroundColor: palette.ink,
+    marginTop: 8,
+  },
+  saveButtonDisabled: { opacity: 0.45 },
+  saveText: { fontFamily: type.semibold, color: '#FFFFFF', fontSize: 15 },
+});

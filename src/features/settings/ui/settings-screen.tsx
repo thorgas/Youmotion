@@ -1,3 +1,4 @@
+import { useSelector as useActorSelector } from '@xstate/react';
 import { useSelector } from '@xstate/store-react';
 import { PressableScale } from 'pressto';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
@@ -5,14 +6,19 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import {
   APP_LOCALES,
+  BELIEF_LIBRARY_EVENTS,
   EMOTION_LABEL_MODES,
   SETTINGS_EVENTS,
 } from '@/constants';
+import { activeCustomBeliefStatements } from '@/features/check-in/domain/belief-statement';
 import { palette, type } from '@/features/check-in/ui/theme';
 import { useAppNavigationActor } from '@/navigation/app-navigation.provider';
 import { appSettingsStore } from '../application/app-settings.store';
 
 const _selectSettings = (state: ReturnType<typeof appSettingsStore.getSnapshot>) => state.context;
+const _selectBeliefStatements = (
+  snapshot: ReturnType<ReturnType<typeof useAppNavigationActor>['getSnapshot']>,
+) => snapshot.context.beliefStatements;
 
 function AppReleaseInfoCard({
   appVersion,
@@ -55,6 +61,8 @@ export function SettingsScreen() {
     updateChannel,
     gitCommit,
   } = useSelector(appSettingsStore, _selectSettings);
+  const beliefStatements = useActorSelector(actor, _selectBeliefStatements);
+  const personalBeliefCount = activeCustomBeliefStatements(beliefStatements).length;
   const _setEnglish = () => actor.send({
     type: SETTINGS_EVENTS.LANGUAGE_CHANGED,
     locale: APP_LOCALES.ENGLISH,
@@ -66,6 +74,7 @@ export function SettingsScreen() {
   const _showEmoji = () => actor.send({ type: SETTINGS_EVENTS.EMOTION_LABEL_MODE_CHANGED, mode: EMOTION_LABEL_MODES.EMOJI });
   const _showText = () => actor.send({ type: SETTINGS_EVENTS.EMOTION_LABEL_MODE_CHANGED, mode: EMOTION_LABEL_MODES.TEXT });
   const _showBoth = () => actor.send({ type: SETTINGS_EVENTS.EMOTION_LABEL_MODE_CHANGED, mode: EMOTION_LABEL_MODES.BOTH });
+  const _openBeliefLibrary = () => actor.send({ type: BELIEF_LIBRARY_EVENTS.OPENED });
 
   return (
     <View style={styles.page} testID="settings-screen">
@@ -126,6 +135,29 @@ export function SettingsScreen() {
           </View>
         </View>
         <View style={styles.card}>
+          <Text style={styles.cardTitle}>
+            <fbt desc="Personal core-belief management setting title">Your core beliefs</fbt>
+          </Text>
+          <Text style={styles.cardCopy}>
+            <fbt desc="Personal core-belief management setting explanation">
+              Edit or remove the core beliefs you wrote yourself.
+            </fbt>
+          </Text>
+          <PressableScale
+            accessibilityRole="button"
+            onPress={_openBeliefLibrary}
+            style={styles.manageBeliefsButton}
+            testID="open-belief-library"
+          >
+            <Text style={styles.manageBeliefsText}>
+              <fbt desc="Button opening personal core-belief management">
+                Manage personal core beliefs
+              </fbt>
+            </Text>
+            <Text style={styles.manageBeliefsCount}>{personalBeliefCount}</Text>
+          </PressableScale>
+        </View>
+        <View style={styles.card}>
           <Text style={styles.cardTitle}><fbt desc="Local privacy setting title">Private by design</fbt></Text>
           <Text style={styles.cardCopy}><fbt desc="Local privacy explanation">Your check-ins are currently stored exclusively on this device.</fbt></Text>
         </View>
@@ -161,6 +193,29 @@ const styles = StyleSheet.create({
   labelModeRow: { flexDirection: 'row', gap: 8, marginTop: 16 },
   labelModeButton: { minHeight: 42, flex: 1, alignItems: 'center', justifyContent: 'center', borderRadius: 14, borderWidth: 1, borderColor: palette.hairline, paddingHorizontal: 8 },
   labelModeText: { fontFamily: type.semibold, color: palette.ink, fontSize: 13 },
+  manageBeliefsButton: {
+    minHeight: 48,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: 12,
+    borderRadius: 16,
+    backgroundColor: palette.ink,
+    paddingHorizontal: 16,
+    marginTop: 16,
+  },
+  manageBeliefsText: { flexShrink: 1, fontFamily: type.semibold, color: '#FFFFFF', fontSize: 14 },
+  manageBeliefsCount: {
+    minWidth: 28,
+    minHeight: 28,
+    borderRadius: 14,
+    backgroundColor: palette.moss,
+    fontFamily: type.semibold,
+    color: '#FFFFFF',
+    fontSize: 13,
+    textAlign: 'center',
+    lineHeight: 28,
+  },
   releaseInfo: { marginTop: 12 },
   releaseInfoRow: { minHeight: 32, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 16 },
   releaseInfoLabel: { fontFamily: type.regular, color: palette.inkMuted, fontSize: 14 },

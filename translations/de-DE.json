@@ -2343,6 +2343,325 @@
         }
       ],
       "types": []
+    },
+    "prnr+hW0MauFB+5/D9Z4Mg==": {
+      "description": "Button cancelling removal of a personal core belief",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Abbrechen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "trUc8sImKh9p3Ei002Ygcw==": {
+      "description": "Button removing a personal core belief from future choices",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Entfernen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "OZJdeB0aQGH+CI0Na9DNkg==": {
+      "description": "Title confirming removal of a personal core belief",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Diesen Leidsatz entfernen?",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "VUZC4Z16+aJCaUxuWCD/Ng==": {
+      "description": "Explanation that removing a personal core belief preserves historical moments",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Er erscheint nicht mehr in zukünftigen Vorschlägen. In früheren Momenten bleibt sein Wortlaut erhalten.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "CIQnp0UKgOTSMMOMfEQ1Vg==": {
+      "description": "Button returning from personal core-belief management to settings",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "‹ Einstellungen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "NDBLNU7htKoYneh7bOE4dg==": {
+      "description": "Label above a personal harmful core belief in settings",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "LEIDSATZ",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "F6Ug0BU+OFZ4ooDoTbsoSw==": {
+      "description": "Label above a personal positive guiding belief in settings",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "DEIN LEITSATZ",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "lDyqyHM8VRJYuJ24+NTfJw==": {
+      "description": "Button editing a personal core belief",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Bearbeiten",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "XBjzPkTQMSup2gwrTvRklA==": {
+      "description": "Button removing a personal core belief",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Entfernen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "YbUn3Qpon1bixzfirdRC/g==": {
+      "description": "Eyebrow above personal core-belief management",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "DEINE LEIDSÄTZE",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "WVxXDUCjOplLDr+e1avVJg==": {
+      "description": "Title of personal core-belief management",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Deine eigenen Worte.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "0RIYoOpfvWud54Ucb3E86w==": {
+      "description": "Explanation of personal core-belief management",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Bearbeite deine eigenen Leidsätze oder entferne sie aus zukünftigen Vorschlägen.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "HOkqtu7ZAa+VBgJR4Z+BqA==": {
+      "description": "Error shown when a personal core-belief management action fails",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Deine Änderung konnte nicht gespeichert werden.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "kNgxGcyNnM6HBncGA+Q3zQ==": {
+      "description": "Title shown when no personal core beliefs exist",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Noch keine eigenen Leidsätze.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "Xlzzkk/sU8mUevdP3FkH/A==": {
+      "description": "Explanation shown when no personal core beliefs exist",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Du kannst im optionalen Leidsatz-Schritt eines Check-ins einen hinzufügen.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "N8kHEGH7WoPcZViXxZAelA==": {
+      "description": "Button returning from personal core-belief editing to its library",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "‹ Deine Leidsätze",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "MK3TUl+Ax2c2H46UxFXjUQ==": {
+      "description": "Eyebrow above personal core-belief editing",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "LEIDSATZ BEARBEITEN",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "tmZzHiCuozhE+0CQOvJrBw==": {
+      "description": "Title of personal core-belief editing",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Bleib deinen Worten treu.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "uFoLBJMkAYVKEjEpL7O0zw==": {
+      "description": "Explanation that editing a shared personal belief updates earlier moments",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Änderungen erscheinen auch in deinen früheren Momenten, weil sie diesen Leidsatz teilen.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "TLA7F30my0mtR3gv7ajc9w==": {
+      "description": "Input label for editing a personal harmful core belief",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Leidsatz",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "kfrh3SVMo+7Q+LqHDLTVZg==": {
+      "description": "Accessibility label for personal harmful core-belief editing",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Eigener Leidsatz",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "1z+BAMB443EvmEDVGr2VqA==": {
+      "description": "Input label for editing a personal positive guiding belief",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Leitsatz",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "iSdLO66R78rav5qoZKT6IQ==": {
+      "description": "Accessibility label for personal positive guiding-belief editing",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Eigener Leitsatz",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "76FUSzfuQJth//xPGYnHNA==": {
+      "description": "Placeholder for an optional positive guiding belief",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Optional",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "AU4Cp34QRPRfFp6HnwKB9Q==": {
+      "description": "Error shown when personal core-belief editing cannot be saved",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Deine Änderung konnte nicht gespeichert werden.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "yHWoSZXc6iuCQH4mM+xLAQ==": {
+      "description": "Button saving changes to a personal core belief",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Änderungen speichern",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "onO7dh0NiBmQN4/VuVuZtw==": {
+      "description": "Personal core-belief management setting title",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Deine Leidsätze",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "UETznezzJbjXperxEI8CNQ==": {
+      "description": "Personal core-belief management setting explanation",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Bearbeite oder entferne die Leidsätze, die du selbst formuliert hast.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "m1IM5/IF7XZzb9B7/k3ULQ==": {
+      "description": "Button opening personal core-belief management",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Eigene Leidsätze verwalten",
+          "variations": {}
+        }
+      ],
+      "types": []
     }
   }
 }

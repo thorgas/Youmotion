@@ -3,6 +3,8 @@ import { createActor, waitFor, type Actor } from 'xstate';
 import {
   APP_ROUTES,
   APP_LOCALES,
+  BELIEF_LIBRARY_EVENTS,
+  BELIEF_LIBRARY_STATES,
   CHECK_IN_EVENTS,
   CHECK_IN_STATES,
   EMOTION_LABEL_MODES,
@@ -12,6 +14,10 @@ import {
   NAVIGATION_STATES,
   SETTINGS_EVENTS,
 } from '@/constants';
+import {
+  CustomBeliefSystemId,
+  type BeliefStatement,
+} from '@/features/check-in/domain/belief-statement';
 import {
   CheckInId,
   CheckInTimestamp,
@@ -98,6 +104,62 @@ describe('app navigation model', () => {
 
     actor.send({ type: NAVIGATION_EVENTS.TODAY_OPENED });
     expect(routeForStateValue(actor.getSnapshot().value)).toBe(APP_ROUTES.TODAY);
+  });
+
+  it('edits and removes personal beliefs through explicit library states', async () => {
+    const actor = createActor(appNavigationMachine).start();
+    const beliefSystemId = CustomBeliefSystemId.make('custom-manage-me');
+    actor.send({
+      type: CHECK_IN_EVENTS.BELIEF_STATEMENTS_HYDRATED,
+      statements: [{
+        kind: 'custom',
+        beliefSystemId,
+        harmfulStatement: 'I must never need help.',
+        guidingStatement: 'I can ask for support.',
+      }] satisfies readonly BeliefStatement[],
+    });
+    actor.send({ type: NAVIGATION_EVENTS.SETTINGS_OPENED });
+    actor.send({ type: BELIEF_LIBRARY_EVENTS.OPENED });
+
+    expect(actor.getSnapshot().matches(BELIEF_LIBRARY_STATES.LIBRARY)).toBe(true);
+    expect(routeForStateValue(actor.getSnapshot().value)).toBe(APP_ROUTES.BELIEF_LIBRARY);
+
+    actor.send({ type: BELIEF_LIBRARY_EVENTS.EDIT_REQUESTED, beliefSystemId });
+    expect(actor.getSnapshot().matches(BELIEF_LIBRARY_STATES.EDITOR)).toBe(true);
+    actor.send({
+      type: BELIEF_LIBRARY_EVENTS.HARMFUL_DRAFT_CHANGED,
+      statement: 'I may need help sometimes.',
+    });
+    actor.send({
+      type: BELIEF_LIBRARY_EVENTS.GUIDING_DRAFT_CHANGED,
+      statement: 'Support makes connection possible.',
+    });
+    actor.send({ type: BELIEF_LIBRARY_EVENTS.SAVE_REQUESTED });
+    await waitFor(
+      actor,
+      (candidate) => candidate.matches(BELIEF_LIBRARY_STATES.LIBRARY),
+      { timeout: 1_000 },
+    );
+
+    expect(actor.getSnapshot().context.beliefStatements).toContainEqual({
+      kind: 'custom',
+      beliefSystemId,
+      harmfulStatement: 'I may need help sometimes.',
+      guidingStatement: 'Support makes connection possible.',
+    });
+
+    actor.send({ type: BELIEF_LIBRARY_EVENTS.REMOVE_REQUESTED, beliefSystemId });
+    await waitFor(
+      actor,
+      (candidate) => candidate.matches(BELIEF_LIBRARY_STATES.LIBRARY),
+      { timeout: 1_000 },
+    );
+
+    expect(actor.getSnapshot().context.beliefStatements).not.toContainEqual(
+      expect.objectContaining({ beliefSystemId }),
+    );
+    actor.send({ type: BELIEF_LIBRARY_EVENTS.CLOSED });
+    expect(routeForStateValue(actor.getSnapshot().value)).toBe(APP_ROUTES.SETTINGS);
   });
 
   it('models all emotion-label setting choices', () => {

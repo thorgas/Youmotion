@@ -106,6 +106,27 @@ export const SETTINGS_EVENTS = Object.freeze({
   APP_SETTINGS_PERSISTENCE_FAILED: literal('settings.appSettingsPersistenceFailed'),
 });
 
+export const BELIEF_LIBRARY_EVENTS = Object.freeze({
+  OPENED: literal('beliefLibrary.opened'),
+  CLOSED: literal('beliefLibrary.closed'),
+  EDIT_REQUESTED: literal('beliefLibrary.editRequested'),
+  EDIT_CANCELLED: literal('beliefLibrary.editCancelled'),
+  HARMFUL_DRAFT_CHANGED: literal('beliefLibrary.harmfulDraftChanged'),
+  GUIDING_DRAFT_CHANGED: literal('beliefLibrary.guidingDraftChanged'),
+  SAVE_REQUESTED: literal('beliefLibrary.saveRequested'),
+  REMOVE_REQUESTED: literal('beliefLibrary.removeRequested'),
+  STATEMENT_SAVED: literal('beliefLibrary.statementSaved'),
+  STATEMENT_RETIRED: literal('beliefLibrary.statementRetired'),
+  OPERATION_FAILED: literal('beliefLibrary.operationFailed'),
+});
+
+export const BELIEF_LIBRARY_STATES = Object.freeze({
+  LIBRARY: literal('beliefLibrary'),
+  EDITOR: literal('beliefLibraryEditor'),
+  SAVING: literal('savingBeliefLibraryStatement'),
+  RETIRING: literal('retiringBeliefLibraryStatement'),
+});
+
 export const EMOTION_LABEL_MODES = Object.freeze({
   EMOJI: literal('emoji'),
   TEXT: literal('text'),
@@ -140,6 +161,7 @@ export const APP_ROUTES = Object.freeze({
   TODAY: literal('/today'),
   HISTORY: literal('/history'),
   SETTINGS: literal('/settings'),
+  BELIEF_LIBRARY: literal('/belief-library'),
   REFLECTION: literal('/reflection'),
   GUIDING_BELIEF: literal('/guiding-belief'),
   SUCCESS: literal('/success'),
