@@ -12,6 +12,9 @@ import {
   BELIEF_SYSTEM_IDS,
   NAVIGATION_EVENTS,
   NAVIGATION_STATES,
+  ONBOARDING_ENTRY_POINTS,
+  ONBOARDING_EVENTS,
+  ONBOARDING_STATES,
   SETTINGS_EVENTS,
 } from '@/constants';
 import {
@@ -87,6 +90,7 @@ describe('app navigation model', () => {
       settings: {
         locale: APP_LOCALES.ENGLISH,
         emotionLabelMode: EMOTION_LABEL_MODES.EMOJI,
+        onboardingCompleted: true,
       },
     });
   });
@@ -104,6 +108,127 @@ describe('app navigation model', () => {
 
     actor.send({ type: NAVIGATION_EVENTS.TODAY_OPENED });
     expect(routeForStateValue(actor.getSnapshot().value)).toBe(APP_ROUTES.TODAY);
+  });
+
+  it('guides an incomplete first launch through every onboarding model state', () => {
+    appSettingsStore.trigger.onboardingCompletedChanged({ completed: false });
+    mockSurrealQuery.mockImplementation(async (surql) => [{
+      statementIndex: 0,
+      value: surql.startsWith('SELECT locale, emotionLabelMode, onboardingCompleted')
+        ? [{
+            locale: APP_LOCALES.ENGLISH,
+            emotionLabelMode: EMOTION_LABEL_MODES.EMOJI,
+            onboardingCompleted: false,
+          }]
+        : [],
+    }]);
+    const actor = createActor(appNavigationMachine).start();
+
+    expect(actor.getSnapshot().matches({
+      [NAVIGATION_STATES.ONBOARDING]: ONBOARDING_STATES.WELCOME,
+    })).toBe(true);
+    expect(actor.getSnapshot().context.onboardingEntryPoint).toBe(
+      ONBOARDING_ENTRY_POINTS.FIRST_LAUNCH,
+    );
+    expect(routeForStateValue(actor.getSnapshot().value)).toBe(APP_ROUTES.ONBOARDING);
+
+    actor.send({ type: ONBOARDING_EVENTS.NEXT_REQUESTED });
+    expect(actor.getSnapshot().matches({
+      [NAVIGATION_STATES.ONBOARDING]: ONBOARDING_STATES.PULSE,
+    })).toBe(true);
+    actor.send({ type: ONBOARDING_EVENTS.EXAMPLE_REQUESTED });
+    expect(actor.getSnapshot().context.onboardingSelection).toMatchObject({
+      emotionId: EMOTION_IDS.FEAR,
+      level: 3,
+    });
+    actor.send({ type: ONBOARDING_EVENTS.NEXT_REQUESTED });
+    expect(actor.getSnapshot().matches({
+      [NAVIGATION_STATES.ONBOARDING]: ONBOARDING_STATES.EXAMPLE,
+    })).toBe(true);
+
+    actor.send({ type: ONBOARDING_EVENTS.FINISHED });
+
+    expect(routeForStateValue(actor.getSnapshot().value)).toBe(APP_ROUTES.TODAY);
+    expect(actor.getSnapshot().context.onboardingSelection).toBeNull();
+    expect(actor.getSnapshot().context.onboardingEntryPoint).toBeNull();
+    expect(appSettingsStore.getSnapshot().context.onboardingCompleted).toBe(true);
+  });
+
+  it('skips first-launch onboarding without blocking navigation on persistence', async () => {
+    appSettingsStore.trigger.onboardingCompletedChanged({ completed: false });
+    const actor = createActor(appNavigationMachine).start();
+    failNextSurrealUpsert(new Error('onboarding preference unavailable'));
+
+    actor.send({ type: ONBOARDING_EVENTS.SKIPPED });
+
+    expect(routeForStateValue(actor.getSnapshot().value)).toBe(APP_ROUTES.TODAY);
+    await waitFor(
+      actor,
+      () => appSettingsStore.getSnapshot().context.error !== null,
+      { timeout: 1_000 },
+    );
+    expect(appSettingsStore.getSnapshot().context.onboardingCompleted).toBe(true);
+  });
+
+  it('replays onboarding from Settings and returns there without changing completion', () => {
+    const actor = createActor(appNavigationMachine).start();
+    actor.send({ type: NAVIGATION_EVENTS.SETTINGS_OPENED });
+    actor.send({ type: ONBOARDING_EVENTS.OPENED });
+
+    expect(routeForStateValue(actor.getSnapshot().value)).toBe(APP_ROUTES.ONBOARDING);
+    expect(actor.getSnapshot().context.onboardingEntryPoint).toBe(
+      ONBOARDING_ENTRY_POINTS.SETTINGS,
+    );
+    actor.send({ type: ONBOARDING_EVENTS.NEXT_REQUESTED });
+    actor.send({ type: ONBOARDING_EVENTS.EXAMPLE_REQUESTED });
+    actor.send({ type: ONBOARDING_EVENTS.NEXT_REQUESTED });
+    actor.send({ type: ONBOARDING_EVENTS.FINISHED });
+
+    expect(routeForStateValue(actor.getSnapshot().value)).toBe(APP_ROUTES.SETTINGS);
+    expect(appSettingsStore.getSnapshot().context.onboardingCompleted).toBe(true);
+  });
+
+  it('allows Settings replays to be skipped from every onboarding step', () => {
+    const steps = [
+      ONBOARDING_STATES.WELCOME,
+      ONBOARDING_STATES.PULSE,
+      ONBOARDING_STATES.EXAMPLE,
+    ];
+
+    steps.forEach((step) => {
+      const actor = createActor(appNavigationMachine).start();
+      actor.send({ type: NAVIGATION_EVENTS.SETTINGS_OPENED });
+      actor.send({ type: ONBOARDING_EVENTS.OPENED });
+      if (step !== ONBOARDING_STATES.WELCOME) {
+        actor.send({ type: ONBOARDING_EVENTS.NEXT_REQUESTED });
+      }
+      if (step === ONBOARDING_STATES.EXAMPLE) {
+        actor.send({ type: ONBOARDING_EVENTS.EXAMPLE_REQUESTED });
+        actor.send({ type: ONBOARDING_EVENTS.NEXT_REQUESTED });
+      }
+
+      expect(actor.getSnapshot().matches({
+        [NAVIGATION_STATES.ONBOARDING]: step,
+      })).toBe(true);
+      actor.send({ type: ONBOARDING_EVENTS.SKIPPED });
+      expect(routeForStateValue(actor.getSnapshot().value)).toBe(APP_ROUTES.SETTINGS);
+      actor.stop();
+    });
+  });
+
+  it('clears a cancelled Pulse practice and supports back navigation', () => {
+    const actor = createActor(appNavigationMachine).start();
+    actor.send({ type: NAVIGATION_EVENTS.SETTINGS_OPENED });
+    actor.send({ type: ONBOARDING_EVENTS.OPENED });
+    actor.send({ type: ONBOARDING_EVENTS.NEXT_REQUESTED });
+    actor.send({ type: ONBOARDING_EVENTS.EXAMPLE_REQUESTED });
+    actor.send({ type: ONBOARDING_EVENTS.SELECTION_CANCELLED });
+
+    expect(actor.getSnapshot().context.onboardingSelection).toBeNull();
+    actor.send({ type: ONBOARDING_EVENTS.BACK_REQUESTED });
+    expect(actor.getSnapshot().matches({
+      [NAVIGATION_STATES.ONBOARDING]: ONBOARDING_STATES.WELCOME,
+    })).toBe(true);
   });
 
   it('edits and removes personal beliefs through explicit library states', async () => {
@@ -189,9 +314,10 @@ describe('app navigation model', () => {
     mockSurrealQuery.mockImplementation(async (surql) => [{
       statementIndex: 0,
       value: surql.startsWith('SELECT locale, emotionLabelMode')
-        ? [{
+          ? [{
             locale: APP_LOCALES.GERMAN,
             emotionLabelMode: EMOTION_LABEL_MODES.BOTH,
+            onboardingCompleted: true,
           }]
         : [],
     }]);
@@ -206,6 +332,7 @@ describe('app navigation model', () => {
     expect(appSettingsStore.getSnapshot().context).toMatchObject({
       locale: APP_LOCALES.GERMAN,
       emotionLabelMode: EMOTION_LABEL_MODES.BOTH,
+      onboardingCompleted: true,
       hydrated: true,
     });
   });

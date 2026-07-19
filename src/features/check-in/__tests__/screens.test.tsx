@@ -15,6 +15,8 @@ import {
   BELIEF_SYSTEM_IDS,
   NAVIGATION_EVENTS,
   NAVIGATION_STATES,
+  ONBOARDING_EVENTS,
+  ONBOARDING_STATES,
 } from '@/constants';
 import { AppLocaleProvider } from '@/localization/app-locale-provider';
 import { appNavigationMachine } from '@/navigation/app-navigation.machine';
@@ -117,6 +119,7 @@ describe('check-in screens', () => {
       settings: {
         locale: APP_LOCALES.ENGLISH,
         emotionLabelMode: EMOTION_LABEL_MODES.EMOJI,
+        onboardingCompleted: true,
       },
     });
     mockActor = createActor(appNavigationMachine).start();
@@ -824,6 +827,23 @@ describe('check-in screens', () => {
     expect(library.queryByTestId(`belief-library-row-${beliefSystemId}`)).toBeNull();
 
     await act(() => mockActor.send({ type: BELIEF_LIBRARY_EVENTS.CLOSED }));
+    expect(mockActor.getSnapshot().matches({
+      [NAVIGATION_STATES.TABS]: NAVIGATION_STATES.SETTINGS,
+    })).toBe(true);
+  });
+
+  it('opens the explanation guide from Settings and returns there when skipped', async () => {
+    await act(() => mockActor.send({ type: NAVIGATION_EVENTS.SETTINGS_OPENED }));
+    const settings = await _renderLocalized(<SettingsScreen />);
+
+    expect(settings.getByText('UNDERSTAND YOUMOTION')).toBeTruthy();
+    expect(settings.getByText('Open short guide')).toBeTruthy();
+    await fireEvent.press(settings.getByTestId('open-onboarding'));
+
+    expect(mockActor.getSnapshot().matches({
+      [NAVIGATION_STATES.ONBOARDING]: ONBOARDING_STATES.WELCOME,
+    })).toBe(true);
+    await act(() => mockActor.send({ type: ONBOARDING_EVENTS.SKIPPED }));
     expect(mockActor.getSnapshot().matches({
       [NAVIGATION_STATES.TABS]: NAVIGATION_STATES.SETTINGS,
     })).toBe(true);

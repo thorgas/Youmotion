@@ -62,6 +62,7 @@ describe('personal belief library on the device runtime', () => {
         settings: {
           locale: APP_LOCALES.ENGLISH,
           emotionLabelMode: EMOTION_LABEL_MODES.EMOJI,
+          onboardingCompleted: true,
         },
       });
       actor = createActor(appNavigationMachine).start();

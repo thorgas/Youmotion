@@ -47,10 +47,30 @@ describe('app settings repository', () => {
     await expect(Effect.runPromise(loadAppSettings)).resolves.toEqual({
       locale: APP_LOCALES.ENGLISH,
       emotionLabelMode: EMOTION_LABEL_MODES.EMOJI,
+      onboardingCompleted: false,
     });
     expect(storedSettings).toEqual({
       locale: APP_LOCALES.ENGLISH,
       emotionLabelMode: EMOTION_LABEL_MODES.EMOJI,
+      onboardingCompleted: false,
+    });
+  });
+
+  it('migrates a legacy settings row so every existing user sees onboarding once', async () => {
+    storedSettings = {
+      locale: APP_LOCALES.GERMAN,
+      emotionLabelMode: EMOTION_LABEL_MODES.BOTH,
+    };
+
+    await expect(Effect.runPromise(loadAppSettings)).resolves.toEqual({
+      locale: APP_LOCALES.GERMAN,
+      emotionLabelMode: EMOTION_LABEL_MODES.BOTH,
+      onboardingCompleted: false,
+    });
+    expect(storedSettings).toEqual({
+      locale: APP_LOCALES.GERMAN,
+      emotionLabelMode: EMOTION_LABEL_MODES.BOTH,
+      onboardingCompleted: false,
     });
   });
 
@@ -58,6 +78,7 @@ describe('app settings repository', () => {
     const settings = {
       locale: APP_LOCALES.GERMAN,
       emotionLabelMode: EMOTION_LABEL_MODES.TEXT,
+      onboardingCompleted: true,
     } satisfies AppSettings;
 
     await Effect.runPromise(persistAppSettings(settings));
@@ -69,6 +90,7 @@ describe('app settings repository', () => {
     storedSettings = {
       locale: 'fr-FR',
       emotionLabelMode: 'pictures',
+      onboardingCompleted: 'yes',
     };
 
     const result = await Effect.runPromise(Effect.either(loadAppSettings));

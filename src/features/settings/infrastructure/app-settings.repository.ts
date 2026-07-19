@@ -10,7 +10,9 @@ import {
 } from '@/constants';
 import { getDatabase } from '@/features/check-in/infrastructure/surrealdb.database';
 import { appLocaleForLanguageCodes } from '../domain/app-locale';
+import { AppLocaleSchema } from '../domain/app-locale';
 import { AppSettingsSchema, type AppSettings } from '../domain/app-settings';
+import { EmotionLabelModeSchema } from '../domain/emotion-label-mode';
 
 export class AppSettingsStorageError extends Schema.TaggedError<AppSettingsStorageError>()(
   'AppSettingsStorageError',
@@ -28,7 +30,12 @@ export class AppSettingsDataError extends Schema.TaggedError<AppSettingsDataErro
   },
 ) {}
 
-const AppSettingsDatabaseListSchema = Schema.Array(AppSettingsSchema);
+const LegacyAppSettingsSchema = Schema.Struct({
+  locale: AppLocaleSchema,
+  emotionLabelMode: EmotionLabelModeSchema,
+  onboardingCompleted: Schema.optional(Schema.Boolean),
+});
+const LegacyAppSettingsDatabaseListSchema = Schema.Array(LegacyAppSettingsSchema);
 const appSettingsRecord = new SurrealRecordId(
   `${APP_SETTINGS_TABLE}:${APP_SETTINGS_RECORD_ID}`,
 );
@@ -44,6 +51,7 @@ function defaultAppSettings(): AppSettings {
   return {
     locale: appLocaleForLanguageCodes(getLocales().map(({ languageCode }) => languageCode)),
     emotionLabelMode: EMOTION_LABEL_MODES.EMOJI,
+    onboardingCompleted: false,
   };
 }
 
@@ -51,13 +59,13 @@ const selectAppSettings = Effect.tryPromise({
   try: async () => {
     const database = await getDatabase();
     return database.query<unknown>(
-      'SELECT locale, emotionLabelMode FROM $record',
+      'SELECT locale, emotionLabelMode, onboardingCompleted FROM $record',
       { record: appSettingsRecord },
     );
   },
   catch: (cause) => AppSettingsStorageError.make({ operation: 'read', cause }),
 }).pipe(
-  Effect.flatMap((statements) => Schema.decodeUnknown(AppSettingsDatabaseListSchema)(
+  Effect.flatMap((statements) => Schema.decodeUnknown(LegacyAppSettingsDatabaseListSchema)(
     statements[0]?.value ?? [],
   ).pipe(
     Effect.mapError((cause) => AppSettingsDataError.make({ operation: 'decode', cause })),
@@ -86,9 +94,17 @@ const initializeAppSettings = Effect.suspend(() => {
 });
 
 export const loadAppSettings = selectAppSettings.pipe(
-  Effect.flatMap((settings) => settings[0]
-    ? Effect.succeed(settings[0])
-    : initializeAppSettings),
+  Effect.flatMap((settings) => {
+    const stored = settings[0];
+    if (!stored) return initializeAppSettings;
+    const normalized = {
+      ...stored,
+      onboardingCompleted: stored.onboardingCompleted ?? false,
+    } satisfies AppSettings;
+    return stored.onboardingCompleted === undefined
+      ? upsertAppSettings(normalized).pipe(Effect.as(normalized))
+      : Effect.succeed(normalized);
+  }),
   Effect.withSpan('AppSettingsRepository.load'),
 );
 

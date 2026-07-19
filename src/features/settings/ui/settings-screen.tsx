@@ -9,6 +9,7 @@ import {
   APP_LOCALES,
   BELIEF_LIBRARY_EVENTS,
   EMOTION_LABEL_MODES,
+  ONBOARDING_EVENTS,
   SETTINGS_EVENTS,
 } from '@/constants';
 import { activeCustomBeliefStatements } from '@/features/check-in/domain/belief-statement';
@@ -105,6 +106,7 @@ export function SettingsScreen() {
   const _showEmoji = () => actor.send({ type: SETTINGS_EVENTS.EMOTION_LABEL_MODE_CHANGED, mode: EMOTION_LABEL_MODES.EMOJI });
   const _showText = () => actor.send({ type: SETTINGS_EVENTS.EMOTION_LABEL_MODE_CHANGED, mode: EMOTION_LABEL_MODES.TEXT });
   const _showBoth = () => actor.send({ type: SETTINGS_EVENTS.EMOTION_LABEL_MODE_CHANGED, mode: EMOTION_LABEL_MODES.BOTH });
+  const _openOnboarding = () => actor.send({ type: ONBOARDING_EVENTS.OPENED });
   const _openBeliefLibrary = () => actor.send({ type: BELIEF_LIBRARY_EVENTS.OPENED });
 
   return (
@@ -170,6 +172,23 @@ export function SettingsScreen() {
             </PressableScale>
           </View>
           </View>
+        </View>
+        <Text style={styles.sectionHeading}>
+          <fbt desc="Heading for the Settings onboarding replay action">UNDERSTAND YOUMOTION</fbt>
+        </Text>
+        <View style={styles.actionGroup}>
+          <SettingsActionRow
+            description={String(fbs(
+              'Replay the short guide to the Pulse, reflection, and optional beliefs.',
+              'Settings explanation of the onboarding replay action',
+            ))}
+            onPress={_openOnboarding}
+            testID="open-onboarding"
+            title={String(fbs(
+              'Open short guide',
+              'Settings button that replays the explanation onboarding',
+            ))}
+          />
         </View>
         <Text style={styles.sectionHeading}>
           <fbt desc="Heading grouping personalization links in settings">PERSONALIZE</fbt>

@@ -2712,6 +2712,450 @@
         }
       ],
       "types": []
+    },
+    "ko9IuIqKtdNn4Dbke2loVA==": {
+      "description": "Heading for the Settings onboarding replay action",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "YOUMOTION VERSTEHEN",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "yW4/q6lnog2Gbws1FafrfQ==": {
+      "description": "Settings explanation of the onboarding replay action",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Spiele die kurze Einführung zu Pulse, Reflexion und optionalen Leid- und Leitsätzen erneut ab.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "dA/1sj8C+h8UYRbAikrR4A==": {
+      "description": "Settings button that replays the explanation onboarding",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Kurze Einführung öffnen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "ANf9ImxKHMIWV1d3S1CxRw==": {
+      "description": "Button returning to the previous onboarding step",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Zurück",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "q6fGZqPKyE+72865nZz2rQ==": {
+      "description": "Button completing onboarding and opening the real Pulse",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Probiere deinen ersten Check-in",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "J/slOZF5cAsDAqocs73XVg==": {
+      "description": "Onboarding reflection step label",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "03 · REFLEKTIEREN",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "H09zM5NYgxK31Q2Ezm6aBw==": {
+      "description": "Onboarding reflection example title",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Ein paar Worte können den Moment festhalten.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "LXXH3N6zqqW3+HKlym2HUA==": {
+      "description": "Onboarding reflection optionality explanation",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Nach dem Pulse ist die Reflexion kurz. Tiefer zu gehen ist immer optional.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "pjMoasJB/sZBvPsziVs5qg==": {
+      "description": "Onboarding meeting reflection example",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "„Vor dem schwierigen Gespräch wurde meine Brust ganz eng.“",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "N/ZE7bjYmWgKJuAZBDrSJQ==": {
+      "description": "Explanation of when the basic reflection is saved",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Gefühl und Notiz werden vor der optionalen Arbeit mit Leid- und Leitsätzen gespeichert.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "DXpVRqd9Sfg8knQtNbioaA==": {
+      "description": "Optional belief-work onboarding label",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "WENN ES HILFT, GEH TIEFER",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "lc+IagHFI03pKzRpfji9rg==": {
+      "description": "Core belief example label",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Leidsatz",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "8IVYQnTztZdCQlGtUjs0gA==": {
+      "description": "Core belief onboarding example",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "„Ich muss immer Leistung bringen.“",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "QhA07YboLSpBNIP53zSpEw==": {
+      "description": "Guiding belief example label",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Leitsatz",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "kh+Vz+B1AP6XE4ILdwbwDA==": {
+      "description": "Guiding belief onboarding example",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "„Ich kann mich vorbereiten und trotzdem unperfekt sein.“",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "wYGmnB8yNiYTae1c5/E3Lg==": {
+      "description": "Onboarding History explanation",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Gespeicherte Momente erscheinen im Verlauf und können bearbeitet oder gelöscht werden. Sie bleiben auf diesem Gerät.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "UPP64uoQuoTSb3uMIsfg7A==": {
+      "description": "Button continuing after the onboarding Pulse example",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Weiter",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "azeSJm3b9jDWiMQyNcFBSw==": {
+      "description": "Button showing an accessible onboarding Pulse example",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Beispiel anzeigen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "BZkuGRXgNUBe/ZLMBI/7CQ==": {
+      "description": "Onboarding Pulse step label",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "02 · PULSE",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "dSaQpWKEr6F410twf9pLQw==": {
+      "description": "Onboarding Pulse practice title",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Probiere den Pulse.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "qHf3SVRUx/9fylu6vGCtpQ==": {
+      "description": "Onboarding Pulse practice scenario",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Stell dir vor, deine Brust wird vor einem schwierigen Gespräch ganz eng.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "CbRePYNbSDeyI96x9roHQA==": {
+      "description": "Explanation of the emotion star dimensions",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Die Richtung benennt das Gefühl. Der Abstand zeigt, wie stark es da ist.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "bEb7lQP8df5IBIMoSmpgyA==": {
+      "description": "Explanation that the onboarding Pulse example is transient",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Das ist ein Übungsbeispiel. Es wird nicht in deinem Verlauf gespeichert.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "9p58cNulhcgZXkcIeTfDRA==": {
+      "description": "Button that skips the explanation onboarding",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Überspringen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "RYf510U3qv/gw/Itu6GA8w==": {
+      "description": "Button continuing from the onboarding welcome step",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "So funktioniert es",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "I8iXV0bx9f/ypY+SiPo1dQ==": {
+      "description": "Onboarding welcome step label",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "01 · START",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "1FpzTof+mokqhuTTO57psg==": {
+      "description": "Onboarding welcome eyebrow",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "EIN RUHIGER CHECK-IN",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "DZqFd/wsi3F7VmuVJ5y8Kw==": {
+      "description": "Onboarding welcome title",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Gib dem Raum, was gerade da ist.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "1ttZiFfArahoI144KkuAlA==": {
+      "description": "Onboarding welcome explanation",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Gefühle sind im Moment manchmal schwer zu benennen. Youmotion gibt dir einen ruhigen Weg, sie wahrzunehmen, ohne sie zu diagnostizieren oder zu bewerten.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "i7AWpzz+go9TSxKGWL6Fkw==": {
+      "description": "Description of the notice onboarding stage",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Wähle ein Gefühl und seine Intensität.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "dwfV4X2NUOzuWnY86FFRcw==": {
+      "description": "Title of the notice onboarding stage",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Wahrnehmen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "qnmAiGJMeE+kS91F3SGAXw==": {
+      "description": "Description of the reflect onboarding stage",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Füge ein paar Worte hinzu, aber nur, wenn sie helfen.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "0vf76Lgm/VjothuZG+vN+w==": {
+      "description": "Title of the reflect onboarding stage",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Reflektieren",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "36uZKXtocW5WDFIKkqvrmQ==": {
+      "description": "Description of the return onboarding stage",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Kehre später zu dem Moment zurück, bearbeite oder lösche ihn.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "bxWoob01sjUE1lE87x4+9g==": {
+      "description": "Title of the return onboarding stage",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Zurückkehren",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "Y9dUOlozwkwmiVVLPbYEWg==": {
+      "description": "Onboarding privacy explanation",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Deine Momente bleiben auf diesem Gerät. Du brauchst kein Konto.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "UBAeaSTWGa5Z1ErwparJrA==": {
+      "description": "Accessibility label for onboarding progress",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Schritt {currentStep} von {stepCount}",
+          "variations": {}
+        }
+      ],
+      "types": []
     }
   }
 }

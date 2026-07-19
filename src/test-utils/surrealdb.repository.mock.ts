@@ -22,12 +22,13 @@ async function defaultQuery(surql: string): Promise<QueryResult> {
     nextDeleteFailure = undefined;
     throw cause;
   }
-  if (surql.startsWith('SELECT locale, emotionLabelMode')) {
+  if (surql.startsWith('SELECT locale, emotionLabelMode, onboardingCompleted')) {
     return [{
       statementIndex: 0,
       value: [{
         locale: APP_LOCALES.ENGLISH,
         emotionLabelMode: EMOTION_LABEL_MODES.EMOJI,
+        onboardingCompleted: true,
       }],
     }];
   }

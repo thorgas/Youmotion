@@ -99,6 +99,30 @@ export const NAVIGATION_EVENTS = Object.freeze({
   SETTINGS_OPENED: literal('navigation.settingsOpened'),
 });
 
+export const ONBOARDING_EVENTS = Object.freeze({
+  OPENED: literal('onboarding.opened'),
+  NEXT_REQUESTED: literal('onboarding.nextRequested'),
+  BACK_REQUESTED: literal('onboarding.backRequested'),
+  SKIPPED: literal('onboarding.skipped'),
+  FINISHED: literal('onboarding.finished'),
+  TOUCH_STARTED: literal('onboarding.touchStarted'),
+  SELECTION_CHANGED: literal('onboarding.selectionChanged'),
+  SELECTION_CANCELLED: literal('onboarding.selectionCancelled'),
+  SELECTION_RELEASED: literal('onboarding.selectionReleased'),
+  EXAMPLE_REQUESTED: literal('onboarding.exampleRequested'),
+});
+
+export const ONBOARDING_STATES = Object.freeze({
+  WELCOME: literal('welcome'),
+  PULSE: literal('pulse'),
+  EXAMPLE: literal('example'),
+});
+
+export const ONBOARDING_ENTRY_POINTS = Object.freeze({
+  FIRST_LAUNCH: literal('firstLaunch'),
+  SETTINGS: literal('settings'),
+});
+
 export const SETTINGS_EVENTS = Object.freeze({
   LANGUAGE_CHANGED: literal('settings.languageChanged'),
   EMOTION_LABEL_MODE_CHANGED: literal('settings.emotionLabelModeChanged'),
@@ -135,6 +159,8 @@ export const EMOTION_LABEL_MODES = Object.freeze({
 });
 
 export const NAVIGATION_STATES = Object.freeze({
+  STARTING: literal('starting'),
+  ONBOARDING: literal('onboarding'),
   TABS: literal('tabs'),
   TODAY: literal('today'),
   HISTORY: literal('history'),
@@ -159,6 +185,7 @@ export const SPLASH_STATES = Object.freeze({
 });
 
 export const APP_ROUTES = Object.freeze({
+  ONBOARDING: literal('/onboarding'),
   TODAY: literal('/today'),
   HISTORY: literal('/history'),
   SETTINGS: literal('/settings'),
@@ -208,3 +235,4 @@ export const SPLASH_LOGO_SIZE = 156;
 export const SPLASH_LOGO_REVEAL_DURATION = 680;
 export const SPLASH_OVERLAY_VISIBLE_DURATION = 700;
 export const SPLASH_OVERLAY_FADE_DURATION = 180;
+export const ONBOARDING_STEP_COUNT = 3;

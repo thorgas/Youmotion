@@ -20,6 +20,9 @@ import {
   MAX_NOTE_LENGTH,
   NAVIGATION_EVENTS,
   NAVIGATION_STATES,
+  ONBOARDING_ENTRY_POINTS,
+  ONBOARDING_EVENTS,
+  ONBOARDING_STATES,
   SETTINGS_EVENTS,
   SETTINGS_FAILURE_MESSAGE,
 } from '@/constants';
@@ -62,12 +65,19 @@ import { AppLocaleSchema } from '@/features/settings/domain/app-locale';
 import { AppSettingsSchema } from '@/features/settings/domain/app-settings';
 import { EmotionLabelModeSchema } from '@/features/settings/domain/emotion-label-mode';
 import {
+  OnboardingEntryPointSchema,
+  OnboardingSelectionSchema,
+  onboardingExampleSelection,
+} from '@/features/onboarding/domain/onboarding';
+import {
   loadAppSettings,
   persistAppSettings,
 } from '@/features/settings/infrastructure/app-settings.repository';
 
 const AppContextSchema = Schema.Struct({
   selection: Schema.NullOr(EmotionSelectionSchema),
+  onboardingSelection: OnboardingSelectionSchema,
+  onboardingEntryPoint: Schema.NullOr(OnboardingEntryPointSchema),
   note: Schema.String,
   beliefSystemId: Schema.NullOr(BeliefSystemId),
   beliefStatements: BeliefStatementListSchema,
@@ -186,6 +196,14 @@ function managedBeliefStatementFromDraft({
 
 export const appNavigationMachine = setup({
   states: {
+    [NAVIGATION_STATES.STARTING]: {},
+    [NAVIGATION_STATES.ONBOARDING]: {
+      states: {
+        [ONBOARDING_STATES.WELCOME]: {},
+        [ONBOARDING_STATES.PULSE]: {},
+        [ONBOARDING_STATES.EXAMPLE]: {},
+      },
+    },
     [NAVIGATION_STATES.TABS]: {
       states: {
         [NAVIGATION_STATES.TODAY]: {
@@ -223,6 +241,18 @@ export const appNavigationMachine = setup({
       [NAVIGATION_EVENTS.TODAY_OPENED]: EmptyEventSchema,
       [NAVIGATION_EVENTS.HISTORY_OPENED]: EmptyEventSchema,
       [NAVIGATION_EVENTS.SETTINGS_OPENED]: EmptyEventSchema,
+      [ONBOARDING_EVENTS.OPENED]: EmptyEventSchema,
+      [ONBOARDING_EVENTS.NEXT_REQUESTED]: EmptyEventSchema,
+      [ONBOARDING_EVENTS.BACK_REQUESTED]: EmptyEventSchema,
+      [ONBOARDING_EVENTS.SKIPPED]: EmptyEventSchema,
+      [ONBOARDING_EVENTS.FINISHED]: EmptyEventSchema,
+      [ONBOARDING_EVENTS.TOUCH_STARTED]: EmptyEventSchema,
+      [ONBOARDING_EVENTS.SELECTION_CHANGED]: Schema.standardSchemaV1(
+        Schema.Struct({ selection: OnboardingSelectionSchema }),
+      ),
+      [ONBOARDING_EVENTS.SELECTION_CANCELLED]: EmptyEventSchema,
+      [ONBOARDING_EVENTS.SELECTION_RELEASED]: EmptyEventSchema,
+      [ONBOARDING_EVENTS.EXAMPLE_REQUESTED]: EmptyEventSchema,
       [CHECK_IN_EVENTS.TOUCH_STARTED]: EmptyEventSchema,
       [CHECK_IN_EVENTS.SELECTION_CHANGED]: Schema.standardSchemaV1(
         Schema.Struct({ selection: Schema.NullOr(EmotionSelectionSchema) }),
@@ -334,9 +364,11 @@ export const appNavigationMachine = setup({
   },
 }).createMachine({
   id: 'appNavigation',
-  initial: NAVIGATION_STATES.TABS,
+  initial: NAVIGATION_STATES.STARTING,
   context: {
     selection: null,
+    onboardingSelection: null,
+    onboardingEntryPoint: null,
     note: '',
     beliefSystemId: null,
     beliefStatements: [],
@@ -432,10 +464,14 @@ export const appNavigationMachine = setup({
     [SETTINGS_EVENTS.EMOTION_LABEL_MODE_CHANGED]: ({ event, self }, enq) => {
       enq(() => {
         appSettingsStore.trigger.emotionLabelModeChanged({ mode: event.mode });
-        const { locale } = appSettingsStore.getSnapshot().context;
+        const {
+          locale,
+          onboardingCompleted,
+        } = appSettingsStore.getSnapshot().context;
         void Effect.runPromise(persistAppSettings({
           locale,
           emotionLabelMode: event.mode,
+          onboardingCompleted,
         })).catch(() => self.send({
           type: SETTINGS_EVENTS.APP_SETTINGS_PERSISTENCE_FAILED,
           message: SETTINGS_FAILURE_MESSAGE,
@@ -445,10 +481,14 @@ export const appNavigationMachine = setup({
     [SETTINGS_EVENTS.LANGUAGE_CHANGED]: ({ event, self }, enq) => {
       enq(() => {
         appSettingsStore.trigger.languageChanged({ locale: event.locale });
-        const { emotionLabelMode } = appSettingsStore.getSnapshot().context;
+        const {
+          emotionLabelMode,
+          onboardingCompleted,
+        } = appSettingsStore.getSnapshot().context;
         void Effect.runPromise(persistAppSettings({
           locale: event.locale,
           emotionLabelMode,
+          onboardingCompleted,
         })).catch(() => self.send({
           type: SETTINGS_EVENTS.APP_SETTINGS_PERSISTENCE_FAILED,
           message: SETTINGS_FAILURE_MESSAGE,
@@ -466,6 +506,156 @@ export const appNavigationMachine = setup({
     },
   },
   states: {
+    [NAVIGATION_STATES.STARTING]: {
+      always: () => {
+        const settings = appSettingsStore.getSnapshot().context;
+        if (!settings.hydrated) return undefined;
+        return settings.onboardingCompleted
+          ? { target: `#appNavigation.${NAVIGATION_STATES.TABS}` }
+          : {
+              target: `#appNavigation.${NAVIGATION_STATES.ONBOARDING}`,
+              context: {
+                onboardingEntryPoint: ONBOARDING_ENTRY_POINTS.FIRST_LAUNCH,
+                onboardingSelection: null,
+              },
+            };
+      },
+      on: {
+        [SETTINGS_EVENTS.APP_SETTINGS_HYDRATED]: ({ event }, enq) => {
+          enq(() => appSettingsStore.trigger.hydrated({ settings: event.settings }));
+          return event.settings.onboardingCompleted
+            ? { target: `#appNavigation.${NAVIGATION_STATES.TABS}` }
+            : {
+                target: `#appNavigation.${NAVIGATION_STATES.ONBOARDING}`,
+                context: {
+                  onboardingEntryPoint: ONBOARDING_ENTRY_POINTS.FIRST_LAUNCH,
+                  onboardingSelection: null,
+                },
+              };
+        },
+        [SETTINGS_EVENTS.APP_SETTINGS_HYDRATION_FAILED]: ({ event }, enq) => {
+          enq(() => appSettingsStore.trigger.hydrationFailed({ message: event.message }));
+          return {
+            target: `#appNavigation.${NAVIGATION_STATES.ONBOARDING}`,
+            context: {
+              onboardingEntryPoint: ONBOARDING_ENTRY_POINTS.FIRST_LAUNCH,
+              onboardingSelection: null,
+            },
+          };
+        },
+      },
+    },
+    [NAVIGATION_STATES.ONBOARDING]: {
+      initial: ONBOARDING_STATES.WELCOME,
+      on: {
+        [ONBOARDING_EVENTS.SKIPPED]: ({ context, self }, enq) => {
+          const firstLaunch = (
+            context.onboardingEntryPoint === ONBOARDING_ENTRY_POINTS.FIRST_LAUNCH
+          );
+          if (firstLaunch) {
+            enq(() => {
+              appSettingsStore.trigger.onboardingCompletedChanged({ completed: true });
+              const {
+                emotionLabelMode,
+                locale,
+              } = appSettingsStore.getSnapshot().context;
+              void Effect.runPromise(persistAppSettings({
+                locale,
+                emotionLabelMode,
+                onboardingCompleted: true,
+              })).catch(() => self.send({
+                type: SETTINGS_EVENTS.APP_SETTINGS_PERSISTENCE_FAILED,
+                message: SETTINGS_FAILURE_MESSAGE,
+              }));
+            });
+          }
+          return {
+            target: firstLaunch
+              ? `#appNavigation.${NAVIGATION_STATES.TABS}`
+              : `#appNavigation.${NAVIGATION_STATES.TABS}.${NAVIGATION_STATES.SETTINGS}`,
+            context: {
+              onboardingEntryPoint: null,
+              onboardingSelection: null,
+            },
+          };
+        },
+        [ONBOARDING_EVENTS.FINISHED]: ({ context, self }, enq) => {
+          const firstLaunch = (
+            context.onboardingEntryPoint === ONBOARDING_ENTRY_POINTS.FIRST_LAUNCH
+          );
+          if (firstLaunch) {
+            enq(() => {
+              appSettingsStore.trigger.onboardingCompletedChanged({ completed: true });
+              const {
+                emotionLabelMode,
+                locale,
+              } = appSettingsStore.getSnapshot().context;
+              void Effect.runPromise(persistAppSettings({
+                locale,
+                emotionLabelMode,
+                onboardingCompleted: true,
+              })).catch(() => self.send({
+                type: SETTINGS_EVENTS.APP_SETTINGS_PERSISTENCE_FAILED,
+                message: SETTINGS_FAILURE_MESSAGE,
+              }));
+            });
+          }
+          return {
+            target: firstLaunch
+              ? `#appNavigation.${NAVIGATION_STATES.TABS}`
+              : `#appNavigation.${NAVIGATION_STATES.TABS}.${NAVIGATION_STATES.SETTINGS}`,
+            context: {
+              onboardingEntryPoint: null,
+              onboardingSelection: null,
+            },
+          };
+        },
+      },
+      states: {
+        [ONBOARDING_STATES.WELCOME]: {
+          on: {
+            [ONBOARDING_EVENTS.NEXT_REQUESTED]: {
+              target: ONBOARDING_STATES.PULSE,
+            },
+          },
+        },
+        [ONBOARDING_STATES.PULSE]: {
+          on: {
+            [ONBOARDING_EVENTS.BACK_REQUESTED]: {
+              target: ONBOARDING_STATES.WELCOME,
+              context: { onboardingSelection: null },
+            },
+            [ONBOARDING_EVENTS.SELECTION_CHANGED]: ({ context, event }, enq) => {
+              if (
+                event.selection
+                && event.selection.level !== context.onboardingSelection?.level
+              ) {
+                enq(() => { void Haptics.selectionAsync(); });
+              }
+              return { context: { onboardingSelection: event.selection } };
+            },
+            [ONBOARDING_EVENTS.SELECTION_CANCELLED]: {
+              context: { onboardingSelection: null },
+            },
+            [ONBOARDING_EVENTS.EXAMPLE_REQUESTED]: {
+              context: { onboardingSelection: onboardingExampleSelection },
+            },
+            [ONBOARDING_EVENTS.NEXT_REQUESTED]: ({ context }) => (
+              context.onboardingSelection
+                ? { target: ONBOARDING_STATES.EXAMPLE }
+                : undefined
+            ),
+          },
+        },
+        [ONBOARDING_STATES.EXAMPLE]: {
+          on: {
+            [ONBOARDING_EVENTS.BACK_REQUESTED]: {
+              target: ONBOARDING_STATES.PULSE,
+            },
+          },
+        },
+      },
+    },
     [NAVIGATION_STATES.TABS]: {
       initial: NAVIGATION_STATES.TODAY,
       on: {
@@ -555,6 +745,14 @@ export const appNavigationMachine = setup({
         [NAVIGATION_STATES.HISTORY]: {},
         [NAVIGATION_STATES.SETTINGS]: {
           on: {
+            [ONBOARDING_EVENTS.OPENED]: {
+              target: `#appNavigation.${NAVIGATION_STATES.ONBOARDING}.${ONBOARDING_STATES.WELCOME}`,
+              context: {
+                onboardingEntryPoint: ONBOARDING_ENTRY_POINTS.SETTINGS,
+                onboardingSelection: null,
+                error: null,
+              },
+            },
             [BELIEF_LIBRARY_EVENTS.OPENED]: {
               target: `#appNavigation.${BELIEF_LIBRARY_STATES.LIBRARY}`,
               context: {
@@ -1274,8 +1472,15 @@ const reflectionRouteStates: readonly StateValue[] = [
   CHECK_IN_STATES.FAILURE,
 ];
 
-export function routeForStateValue(value: StateValue) {
+function primaryRouteForStateValue(value: StateValue) {
+  if (matchesState(NAVIGATION_STATES.ONBOARDING, value)) return APP_ROUTES.ONBOARDING;
   if (matchesState(CHECK_IN_STATES.SUCCESS, value)) return APP_ROUTES.SUCCESS;
+  return null;
+}
+
+export function routeForStateValue(value: StateValue) {
+  const primaryRoute = primaryRouteForStateValue(value);
+  if (primaryRoute) return primaryRoute;
   if (
     matchesState(BELIEF_LIBRARY_STATES.LIBRARY, value)
     || matchesState(BELIEF_LIBRARY_STATES.EDITOR, value)

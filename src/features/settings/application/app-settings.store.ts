@@ -16,6 +16,7 @@ const configuredGitCommit: unknown = Constants.expoConfig?.extra?.['gitCommit'];
 const initialContext = {
   locale: APP_LOCALES.ENGLISH,
   emotionLabelMode: EMOTION_LABEL_MODES.EMOJI,
+  onboardingCompleted: false,
   appVersion: Constants.expoConfig?.version ?? null,
   updateChannel: Updates.channel,
   gitCommit: typeof configuredGitCommit === 'string' ? configuredGitCommit : null,
@@ -34,6 +35,7 @@ export const appSettingsStore = createStore({
     context: Schema.standardSchemaV1(Schema.Struct({
       locale: AppLocaleSchema,
       emotionLabelMode: EmotionLabelModeSchema,
+      onboardingCompleted: Schema.Boolean,
       appVersion: Schema.NullOr(Schema.String),
       updateChannel: Schema.NullOr(Schema.String),
       gitCommit: Schema.NullOr(Schema.String),
@@ -44,6 +46,9 @@ export const appSettingsStore = createStore({
       languageChanged: Schema.standardSchemaV1(Schema.Struct({ locale: AppLocaleSchema })),
       emotionLabelModeChanged: Schema.standardSchemaV1(
         Schema.Struct({ mode: EmotionLabelModeSchema }),
+      ),
+      onboardingCompletedChanged: Schema.standardSchemaV1(
+        Schema.Struct({ completed: Schema.Boolean }),
       ),
       hydrated: Schema.standardSchemaV1(Schema.Struct({ settings: AppSettingsSchema })),
       hydrationFailed: Schema.standardSchemaV1(Schema.Struct({ message: Schema.String })),
@@ -56,6 +61,11 @@ export const appSettingsStore = createStore({
     emotionLabelModeChanged: (context, event) => ({
       ...context,
       emotionLabelMode: event.mode,
+      error: null,
+    }),
+    onboardingCompletedChanged: (context, event) => ({
+      ...context,
+      onboardingCompleted: event.completed,
       error: null,
     }),
     hydrated: (context, event) => ({
