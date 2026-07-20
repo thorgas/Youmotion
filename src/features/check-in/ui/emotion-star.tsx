@@ -1,18 +1,9 @@
 import { useCallback, useMemo } from 'react';
 import { useSelector } from '@xstate/store-react';
 import { PanResponder, StyleSheet, Text, useWindowDimensions, View, type StyleProp, type TextStyle } from 'react-native';
-import Animated, {
-  FadeInDown,
-  FadeOut,
-  ReduceMotion,
-  useAnimatedStyle,
-  useSharedValue,
-  withTiming,
-  type SharedValue,
-} from 'react-native-reanimated';
+import { useSharedValue, type SharedValue } from 'react-native-reanimated';
 import Svg, { Circle } from 'react-native-svg';
 
-import { MOTION_DURATION, MOTION_OFFSET } from '@/constants';
 import { appSettingsStore } from '@/features/settings/application/app-settings.store';
 import type { EmotionLabelMode } from '@/features/settings/domain/emotion-label-mode';
 import { emotionAngle, selectionFromPoint } from '../domain/emotion-selection';
@@ -56,21 +47,6 @@ const _selectEmotionLabelMode = (state: ReturnType<typeof appSettingsStore.getSn
   state.context.emotionLabelMode
 );
 
-const readoutEntering = FadeInDown
-  .duration(MOTION_DURATION.STATE)
-  .reduceMotion(ReduceMotion.System)
-  .withInitialValues({
-    opacity: 0,
-    transform: [{ translateY: MOTION_OFFSET.STATE }],
-  });
-const readoutExiting = FadeOut
-  .duration(MOTION_DURATION.MICRO)
-  .reduceMotion(ReduceMotion.System);
-const stateAnimation = {
-  duration: MOTION_DURATION.STATE,
-  reduceMotion: ReduceMotion.System,
-};
-
 const _polar = ({ center, radius, angle }: { center: number; radius: number; angle: number }) => ({
   x: center + Math.cos(angle) * radius,
   y: center + Math.sin(angle) * radius,
@@ -86,11 +62,7 @@ function ReadoutText({ style, testID, text }: ReadoutTextProps) {
 
 function EmotionReadout({ selection }: { selection: EmotionSelection }) {
   return (
-    <Animated.View
-      entering={readoutEntering}
-      exiting={readoutExiting}
-      style={styles.selectedReadout}
-      testID="emotion-readout-selection">
+    <View style={styles.selectedReadout} testID="emotion-readout-selection">
       <ReadoutText
         style={[styles.readoutEmotion, styles.readoutEmotionSelected]}
         testID="emotion-nuance-reveal"
@@ -101,7 +73,7 @@ function EmotionReadout({ selection }: { selection: EmotionSelection }) {
         testID="emotion-name-reveal"
         text={emotionName(selection.emotionId)}
       />
-    </Animated.View>
+    </View>
   );
 }
 
@@ -115,25 +87,16 @@ function EmotionField({
   selection,
   size,
 }: EmotionFieldProps) {
-  const guideStyle = useAnimatedStyle(() => ({
-    opacity: withTiming(selection ? 1 : 0, stateAnimation),
-    transform: [{
-      scale: withTiming(selection ? 1 : 0.985, stateAnimation),
-    }],
-  }), [selection]);
-
   return (
     <>
       {centerOrigin
         ? <CenteredBaseStateRipples />
         : <BaseStateRipples offsetX={rippleOffsetX} offsetY={rippleOffsetY} />}
-      <Animated.View style={[styles.guide, { height: size, width: size }, guideStyle]}>
-        <Svg height={size} viewBox={`0 0 ${size} ${size}`} width={size}>
-          {[0.28, 0.5, 0.72, 0.9].map((scale) => (
+      <Svg height={size} viewBox={`0 0 ${size} ${size}`} width={size}>
+        {selection ? [0.28, 0.5, 0.72, 0.9].map((scale) => (
           <Circle key={scale} cx={center} cy={center} r={radius * scale} fill="none" stroke={palette.hairline} strokeWidth={1} strokeDasharray="2 7" />
-          ))}
-        </Svg>
-      </Animated.View>
+        )) : null}
+      </Svg>
       {emotions.map((emotion, index) => {
         const angle = emotionAngle(index);
         const label = _polar({ center, radius: radius * 0.86, angle });
@@ -169,12 +132,6 @@ export function EmotionStar({
   const radius = size * 0.45;
   const rippleOffsetX = useSharedValue(0);
   const rippleOffsetY = useSharedValue(0);
-  const promptStyle = useAnimatedStyle(() => ({
-    opacity: withTiming(selection ? 0 : 1, stateAnimation),
-    transform: [{
-      translateY: withTiming(selection ? -MOTION_OFFSET.STATE : 0, stateAnimation),
-    }],
-  }), [selection]);
 
   const _updateSelection = useCallback(({ x, y }: { x: number; y: number }) => {
     rippleOffsetX.set(x - center);
@@ -206,15 +163,15 @@ export function EmotionStar({
   return (
     <View style={styles.frame} testID="emotion-star-frame">
       <View style={styles.readout} testID="emotion-readout">
-        <Animated.View
+        <View
           accessibilityElementsHidden={selection !== null}
           importantForAccessibility={selection ? 'no-hide-descendants' : 'auto'}
-          style={[styles.readoutPrompt, promptStyle]}
+          style={[styles.readoutPrompt, selection && styles.readoutPromptHidden]}
           testID="emotion-readout-prompt">
           <Text style={styles.readoutEmotion}><fbt desc="Prompt above the emotion star before touching">Touch the point</fbt></Text>
           <Text style={styles.readoutNuance}><fbt desc="Second line of the emotion star gesture prompt">and move your finger.</fbt></Text>
           <Text style={styles.readoutRelease}><fbt desc="Third line explaining how to confirm an emotion selection">Release your finger to select the feeling.</fbt></Text>
-        </Animated.View>
+        </View>
         {selection ? <EmotionReadout selection={selection} /> : null}
       </View>
       <View
@@ -252,10 +209,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  guide: {
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
   readout: {
     pointerEvents: 'none',
     width: 260,
@@ -263,6 +216,9 @@ const styles = StyleSheet.create({
   },
   readoutPrompt: {
     alignItems: 'center',
+  },
+  readoutPromptHidden: {
+    opacity: 0,
   },
   selectedReadout: {
     position: 'absolute',

@@ -1,13 +1,6 @@
-import { StyleSheet } from 'react-native';
-import Animated, {
-  FadeIn,
-  FadeOut,
-  ReduceMotion,
-  useAnimatedStyle,
-  withTiming,
-} from 'react-native-reanimated';
+import { StyleSheet, Text, View } from 'react-native';
 
-import { EMOTION_LABEL_MODES, MOTION_DURATION } from '@/constants';
+import { EMOTION_LABEL_MODES } from '@/constants';
 import type { EmotionLabelMode } from '@/features/settings/domain/emotion-label-mode';
 import type { Emotion } from '../domain/emotion';
 import { emotionEmoji, emotionName } from './emotion-copy';
@@ -21,17 +14,6 @@ type EmotionAxisLabelProps = {
   y: number;
 };
 
-const labelEntering = FadeIn
-  .duration(MOTION_DURATION.MICRO)
-  .reduceMotion(ReduceMotion.System);
-const labelExiting = FadeOut
-  .duration(MOTION_DURATION.MICRO)
-  .reduceMotion(ReduceMotion.System);
-const stateAnimation = {
-  duration: MOTION_DURATION.STATE,
-  reduceMotion: ReduceMotion.System,
-};
-
 export function EmotionAxisLabel({
   emotion,
   isActive,
@@ -41,14 +23,9 @@ export function EmotionAxisLabel({
 }: EmotionAxisLabelProps) {
   const showsBoth = labelMode === EMOTION_LABEL_MODES.BOTH;
   const showsWord = labelMode === EMOTION_LABEL_MODES.TEXT || isActive;
-  const activeStyle = useAnimatedStyle(() => ({
-    transform: [{
-      scale: withTiming(isActive ? 1.04 : 1, stateAnimation),
-    }],
-  }), [isActive]);
 
   return (
-    <Animated.View
+    <View
       pointerEvents="none"
       style={[
         styles.container,
@@ -56,30 +33,25 @@ export function EmotionAxisLabel({
           left: x - 52,
           top: y - 27,
         },
-        activeStyle,
       ]}
       testID={`base-emotion-axis-${emotion.id}`}>
       {showsBoth || !showsWord ? (
-        <Animated.Text
-          entering={labelEntering}
-          exiting={labelExiting}
+        <Text
           key={`${emotion.id}-emoji`}
           style={[styles.emoji, showsBoth && styles.combinedEmoji]}
           testID={`base-emotion-emoji-${emotion.id}`}>
           {emotionEmoji(emotion.id)}
-        </Animated.Text>
+        </Text>
       ) : null}
       {showsBoth || showsWord ? (
-        <Animated.Text
-          entering={labelEntering}
-          exiting={labelExiting}
+        <Text
           key={`${emotion.id}-word`}
           style={[styles.word, showsBoth && styles.combinedWord]}
           testID={`base-emotion-label-${emotion.id}`}>
           {emotionName(emotion.id)}
-        </Animated.Text>
+        </Text>
       ) : null}
-    </Animated.View>
+    </View>
   );
 }
 

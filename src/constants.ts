@@ -236,15 +236,6 @@ export const EMOTION_AXIS_START_ANGLE = -Math.PI / 4;
 export const EMOTION_AXIS_STEP = Math.PI / 4;
 export const BASE_RIPPLE_DURATION = 2800;
 export const BASE_RIPPLE_PHASES = Object.freeze([0, 0.25, 0.5, 0.75]);
-export const MOTION_DURATION = Object.freeze({
-  MICRO: 140,
-  STATE: 180,
-  ENTER: 240,
-});
-export const MOTION_OFFSET = Object.freeze({
-  STATE: 4,
-  ENTER: 8,
-});
 export const REFLECTION_KEYBOARD_BOTTOM_OFFSET = 82;
 export const SPLASH_BACKGROUND_COLOR = '#F4F0E8';
 export const SPLASH_LOGO_SIZE = 156;

@@ -7,18 +7,12 @@ import {
   Text,
   View,
 } from 'react-native';
-import Animated, {
-  ReduceMotion,
-  useAnimatedStyle,
-  withTiming,
-} from 'react-native-reanimated';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { AppBackButton } from '@/components/ui/app-back-button';
 import {
   ONBOARDING_STATES,
   ONBOARDING_STEP_COUNT,
-  MOTION_DURATION,
 } from '@/constants';
 import { onboardingStepNumber } from '../application/onboarding-progress';
 import { palette, type } from '@/features/check-in/ui/theme';
@@ -38,25 +32,6 @@ type OnboardingStepShellProps = PropsWithChildren<{
 }>;
 
 const progressSteps = Object.freeze([1, 2, 3]);
-const progressAnimation = {
-  duration: MOTION_DURATION.STATE,
-  reduceMotion: ReduceMotion.System,
-};
-
-function ProgressTrack({ active }: { active: boolean }) {
-  const fillStyle = useAnimatedStyle(() => ({
-    opacity: withTiming(active ? 1 : 0, progressAnimation),
-    transform: [{
-      scaleX: withTiming(active ? 1 : 0.6, progressAnimation),
-    }],
-  }), [active]);
-
-  return (
-    <View style={styles.progressTrack}>
-      <Animated.View style={[styles.progressTrackFill, fillStyle]} />
-    </View>
-  );
-}
 
 export function OnboardingStepShell({
   backLabel,
@@ -115,9 +90,12 @@ export function OnboardingStepShell({
           style={styles.progress}
           testID="onboarding-progress">
           {progressSteps.map((candidate) => (
-            <ProgressTrack
-              active={candidate <= stepNumber}
+            <View
               key={candidate}
+              style={[
+                styles.progressTrack,
+                candidate <= stepNumber && styles.progressTrackActive,
+              ]}
             />
           ))}
         </View>
@@ -204,16 +182,9 @@ const styles = StyleSheet.create({
     flex: 1,
     borderRadius: 2,
     backgroundColor: palette.hairline,
-    overflow: 'hidden',
   },
-  progressTrackFill: {
-    position: 'absolute',
-    top: 0,
-    right: 0,
-    bottom: 0,
-    left: 0,
+  progressTrackActive: {
     backgroundColor: palette.moss,
-    transformOrigin: 'left',
   },
   content: {
     width: '100%',
