@@ -183,8 +183,8 @@ export function GuidingBeliefScreen() {
               </fbt>
             </Text>
             <Text style={styles.copy}>
-              <fbt desc="Contrast between restrictive core beliefs and supportive guiding beliefs">
-                Your core belief describes what limits you. Your guiding belief offers a more supportive direction.
+              <fbt desc="Explanation that harmful beliefs may once have helped but can become restrictive">
+                An inner rule may once have helped you feel safe, capable, or accepted.
               </fbt>
             </Text>
           </View>

@@ -1574,6 +1574,17 @@
       ],
       "types": []
     },
+    "3lum3q9U3hU6okcmbqcnmg==": {
+      "description": "Explanation that the reflection was saved before core belief selection",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Deine Reflexion ist bereits gespeichert. Füge nur einen hinzu, wenn es sich hilfreich anfühlt.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
     "qfYTAuAdG0Oxw1b0hGm/tw==": {
       "description": "Confirmation that the reflection text is persisted",
       "tokens": [],
@@ -2003,6 +2014,17 @@
       ],
       "types": []
     },
+    "Z4gJmOPBGVo1SpU/OqII/Q==": {
+      "description": "Explanation that harmful beliefs may once have helped but can become restrictive",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Eine innere Regel hat dir vielleicht einmal geholfen, dich sicher, kompetent oder angenommen zu fühlen.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
     "lw6QpcFrQOfBcpV1hTbJ+A==": {
       "description": "Label above the attached harmful belief on the guiding page",
       "tokens": [],
@@ -2355,6 +2377,39 @@
       ],
       "types": []
     },
+    "CIQnp0UKgOTSMMOMfEQ1Vg==": {
+      "description": "Button returning from personal core-belief management to settings",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "‹ Einstellungen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "NDBLNU7htKoYneh7bOE4dg==": {
+      "description": "Label above a personal harmful core belief in settings",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "LEIDSATZ",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "F6Ug0BU+OFZ4ooDoTbsoSw==": {
+      "description": "Label above a personal positive guiding belief in settings",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "DEIN LEITSATZ",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
     "lDyqyHM8VRJYuJ24+NTfJw==": {
       "description": "Button editing a personal core belief",
       "tokens": [],
@@ -2438,6 +2493,17 @@
       "translations": [
         {
           "translation": "Du kannst im optionalen Leidsatz-Schritt eines Check-ins einen hinzufügen.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "N8kHEGH7WoPcZViXxZAelA==": {
+      "description": "Button returning from personal core-belief editing to its library",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "‹ Deine Leidsätze",
           "variations": {}
         }
       ],
@@ -2779,6 +2845,18 @@
       ],
       "types": []
     },
+    "lc+IagHFI03pKzRpfji9rg==": {
+      "description": "Core belief example label",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Leidsatz",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
     "8IVYQnTztZdCQlGtUjs0gA==": {
       "description": "Core belief onboarding example",
       "status": "new",
@@ -2786,6 +2864,18 @@
       "translations": [
         {
           "translation": "„Ich muss immer Leistung bringen.“",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "QhA07YboLSpBNIP53zSpEw==": {
+      "description": "Guiding belief example label",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Leitsatz",
           "variations": {}
         }
       ],
@@ -3062,102 +3152,6 @@
       "translations": [
         {
           "translation": "Schritt {currentStep} von {stepCount}",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "F0cd0VJ02Vl+P27XJ49h1g==": {
-      "description": "Button returning from personal core-belief management to settings",
-      "status": "new",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "‹ Einstellungen",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "9KkC+8a9ZUN/WG7Dx3biNw==": {
-      "description": "Label above a personal positive guiding belief in settings",
-      "status": "new",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "LEITSATZ · UNTERSTÜTZEND",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "PWfPU3nGvMt09qB6OwqTWA==": {
-      "description": "Button returning from personal core-belief editing to its library",
-      "status": "new",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "‹ Deine Leidsätze",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "VkzeBc6nbLvu7gm2JhqgHA==": {
-      "description": "Guiding belief example label explaining its supportive role",
-      "status": "new",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "Leitsatz · was dich unterstützt",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "WgWvNrWy5PPO2PEvraXGzQ==": {
-      "description": "Label above a personal restrictive core belief in settings",
-      "status": "new",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "LEIDSATZ · EINENGEND",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "JxwkoHj2zLD/7+eIAaEKaQ==": {
-      "description": "Core belief example label explaining its restrictive role",
-      "status": "new",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "Leidsatz · was dich einengt",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "zvbGC8fQuBcMjQz6buG+Kg==": {
-      "description": "Contrast between restrictive core beliefs and supportive guiding beliefs",
-      "status": "new",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "Dein Leidsatz beschreibt, was dich einengt. Dein Leitsatz gibt dir eine hilfreichere Richtung.",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "eR9IWYKRZHUtTgM6yvo4hw==": {
-      "description": "Explanation of a restrictive core belief",
-      "status": "new",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "Ein Leidsatz ist eine innere Regel, die dich in diesem Moment einengt.",
           "variations": {}
         }
       ],

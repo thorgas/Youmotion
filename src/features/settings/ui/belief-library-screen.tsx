@@ -71,16 +71,14 @@ function BeliefLibraryRow({
   return (
     <View style={styles.beliefCard} testID={`belief-library-row-${statement.beliefSystemId}`}>
       <Text style={styles.statementLabel}>
-        <fbt desc="Label above a personal restrictive core belief in settings">
-          CORE BELIEF · LIMITING
-        </fbt>
+        <fbt desc="Label above a personal harmful core belief in settings">CORE BELIEF</fbt>
       </Text>
       <Text style={styles.harmfulStatement}>{statement.harmfulStatement}</Text>
       {statement.guidingStatement ? (
         <View style={styles.guidingCard}>
           <Text style={styles.guidingLabel}>
             <fbt desc="Label above a personal positive guiding belief in settings">
-              GUIDING BELIEF · SUPPORTIVE
+              YOUR GUIDING BELIEF
             </fbt>
           </Text>
           <Text style={styles.guidingStatement}>{statement.guidingStatement}</Text>
