@@ -1,9 +1,18 @@
 import { useSelector } from '@xstate/react';
 import { PressableScale } from 'pressto';
 import { StyleSheet, Text, View } from 'react-native';
+import Animated, {
+  FadeInDown,
+  ReduceMotion,
+  ZoomIn,
+} from 'react-native-reanimated';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { CHECK_IN_EVENTS } from '@/constants';
+import {
+  CHECK_IN_EVENTS,
+  MOTION_DURATION,
+  MOTION_OFFSET,
+} from '@/constants';
 import { useAppNavigationActor } from '@/navigation/app-navigation.provider';
 import { savedCheckInCopy } from './emotion-copy';
 import { guidingBeliefSystemText } from './belief-system-copy';
@@ -12,6 +21,25 @@ import { palette, type } from './theme';
 const _selectContext = (
   snapshot: ReturnType<ReturnType<typeof useAppNavigationActor>['getSnapshot']>,
 ) => snapshot.context;
+
+const haloEntering = ZoomIn
+  .duration(MOTION_DURATION.ENTER)
+  .reduceMotion(ReduceMotion.System)
+  .withInitialValues({
+    transform: [{ scale: 0.94 }],
+  });
+const revealAfter = (delay: number) => FadeInDown
+  .delay(delay)
+  .duration(MOTION_DURATION.ENTER)
+  .reduceMotion(ReduceMotion.System)
+  .withInitialValues({
+    opacity: 0,
+    transform: [{ translateY: MOTION_OFFSET.ENTER }],
+  });
+const titleEntering = revealAfter(50);
+const copyEntering = revealAfter(90);
+const guidingCardEntering = revealAfter(130);
+const buttonEntering = revealAfter(170);
 
 export function SuccessScreen() {
   const actor = useAppNavigationActor();
@@ -30,22 +58,33 @@ export function SuccessScreen() {
   return (
     <View style={styles.page} testID="success-screen">
       <SafeAreaView style={styles.content}>
-        <View style={styles.halo}><Text style={styles.check}>✓</Text></View>
-        <Text style={styles.title}><fbt desc="Successful check-in title">You arrived with yourself.</fbt></Text>
-        <Text style={styles.copy}>{savedCheckInCopy(saved)}</Text>
+        <Animated.View entering={haloEntering} style={styles.halo}>
+          <Text style={styles.check}>✓</Text>
+        </Animated.View>
+        <Animated.Text entering={titleEntering} style={styles.title}>
+          <fbt desc="Successful check-in title">You arrived with yourself.</fbt>
+        </Animated.Text>
+        <Animated.Text entering={copyEntering} style={styles.copy}>
+          {savedCheckInCopy(saved)}
+        </Animated.Text>
         {guidingStatement ? (
-          <View style={styles.guidingCard} testID="success-guiding-belief">
+          <Animated.View
+            entering={guidingCardEntering}
+            style={styles.guidingCard}
+            testID="success-guiding-belief">
             <Text style={styles.guidingLabel}>
               <fbt desc="Label above the positive guiding belief on the completed check-in screen">
                 Your guiding belief
               </fbt>
             </Text>
             <Text style={styles.guidingText}>{guidingStatement}</Text>
-          </View>
+          </Animated.View>
         ) : null}
-        <PressableScale accessibilityRole="button" onPress={_finish} style={styles.button} testID="check-in-done">
-          <Text style={styles.buttonText}><fbt desc="Button finishing the completed check-in flow">Done</fbt></Text>
-        </PressableScale>
+        <Animated.View entering={buttonEntering}>
+          <PressableScale accessibilityRole="button" onPress={_finish} style={styles.button} testID="check-in-done">
+            <Text style={styles.buttonText}><fbt desc="Button finishing the completed check-in flow">Done</fbt></Text>
+          </PressableScale>
+        </Animated.View>
       </SafeAreaView>
     </View>
   );

@@ -1,10 +1,21 @@
 import { StyleSheet, Text, View } from 'react-native';
+import Animated, {
+  ReduceMotion,
+  useAnimatedStyle,
+  withTiming,
+} from 'react-native-reanimated';
 
+import { MOTION_DURATION } from '@/constants';
 import { palette, type } from './theme';
 
 type ProgressStep = 1 | 2 | 3;
 type ProgressStatus = 'active' | 'complete' | 'upcoming';
 type ProgressHeaderContext = 'reflection' | 'editing' | 'core-belief' | 'guiding-belief';
+
+const progressAnimation = {
+  duration: MOTION_DURATION.STATE,
+  reduceMotion: ReduceMotion.System,
+};
 
 function ProgressEyebrow({ context }: { context: ProgressHeaderContext }) {
   if (context === 'editing') {
@@ -75,6 +86,39 @@ function Step({
 }) {
   const status = progressStatus({ activeStep, step });
   const emphasized = status !== 'upcoming';
+  const markerStyle = useAnimatedStyle(() => ({
+    backgroundColor: withTiming(
+      status === 'active'
+        ? palette.ink
+        : status === 'complete'
+          ? palette.moss
+          : palette.paperRaised,
+      progressAnimation,
+    ),
+    borderColor: withTiming(
+      status === 'active'
+        ? palette.ink
+        : status === 'complete'
+          ? palette.moss
+          : palette.hairline,
+      progressAnimation,
+    ),
+    transform: [{
+      scale: withTiming(status === 'active' ? 1.06 : 1, progressAnimation),
+    }],
+  }), [status]);
+  const markerTextStyle = useAnimatedStyle(() => ({
+    color: withTiming(
+      emphasized ? palette.paperRaised : palette.inkMuted,
+      progressAnimation,
+    ),
+  }), [emphasized]);
+  const labelStyle = useAnimatedStyle(() => ({
+    color: withTiming(
+      emphasized ? palette.ink : palette.inkMuted,
+      progressAnimation,
+    ),
+  }), [emphasized]);
 
   return (
     <View
@@ -82,22 +126,12 @@ function Step({
       style={styles.step}
       testID={`check-in-progress-step-${step}-${status}`}
     >
-      <View style={[
-        styles.marker,
-        status === 'active' ? styles.markerActive : null,
-        status === 'complete' ? styles.markerComplete : null,
-      ]}>
-        <Text style={[
-          styles.markerText,
-          emphasized ? styles.markerTextEmphasized : null,
-        ]}>
+      <Animated.View style={[styles.marker, markerStyle]}>
+        <Animated.Text style={[styles.markerText, markerTextStyle]}>
           {status === 'complete' ? '✓' : step}
-        </Text>
-      </View>
-      <Text style={[
-        styles.label,
-        emphasized ? styles.labelEmphasized : null,
-      ]}>
+        </Animated.Text>
+      </Animated.View>
+      <Animated.Text style={[styles.label, labelStyle]}>
         {step === 1
           ? <fbt desc="Moment step in check-in progress">Moment</fbt>
           : null}
@@ -107,7 +141,7 @@ function Step({
         {step === 3
           ? <fbt desc="Positive guiding belief step in check-in progress">Guiding belief</fbt>
           : null}
-      </Text>
+      </Animated.Text>
       {optional ? (
         <Text
           style={styles.optional}
@@ -127,11 +161,18 @@ function Connector({
   activeStep: ProgressStep;
   afterStep: 1 | 2;
 }) {
+  const complete = activeStep > afterStep;
+  const fillStyle = useAnimatedStyle(() => ({
+    opacity: withTiming(complete ? 1 : 0, progressAnimation),
+    transform: [{
+      scaleX: withTiming(complete ? 1 : 0.6, progressAnimation),
+    }],
+  }), [complete]);
+
   return (
-    <View style={[
-      styles.connector,
-      activeStep > afterStep ? styles.connectorComplete : null,
-    ]} />
+    <View style={styles.connector}>
+      <Animated.View style={[styles.connectorFill, fillStyle]} />
+    </View>
   );
 }
 
@@ -203,21 +244,10 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     width: 24,
   },
-  markerActive: {
-    backgroundColor: palette.ink,
-    borderColor: palette.ink,
-  },
-  markerComplete: {
-    backgroundColor: palette.moss,
-    borderColor: palette.moss,
-  },
   markerText: {
     color: palette.inkMuted,
     fontFamily: type.semibold,
     fontSize: 10,
-  },
-  markerTextEmphasized: {
-    color: palette.paperRaised,
   },
   label: {
     color: palette.inkMuted,
@@ -225,9 +255,6 @@ const styles = StyleSheet.create({
     fontSize: 10,
     marginTop: 6,
     textAlign: 'center',
-  },
-  labelEmphasized: {
-    color: palette.ink,
   },
   optional: {
     color: palette.inkMuted,
@@ -245,8 +272,15 @@ const styles = StyleSheet.create({
     flex: 0.48,
     height: 1,
     marginTop: 12,
+    overflow: 'hidden',
   },
-  connectorComplete: {
+  connectorFill: {
+    position: 'absolute',
+    top: 0,
+    right: 0,
+    bottom: 0,
+    left: 0,
     backgroundColor: palette.moss,
+    transformOrigin: 'left',
   },
 });
