@@ -1,7 +1,7 @@
 import { Fraunces_400Regular, Fraunces_500Medium, Fraunces_600SemiBold } from '@expo-google-fonts/fraunces';
 import { useSelector } from '@xstate/react';
 import { useFonts } from 'expo-font';
-import { Stack } from 'expo-router';
+import { ExperimentalStack, Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { KeyboardProvider } from 'react-native-keyboard-controller';
@@ -37,6 +37,15 @@ function AppStack() {
     };
     return { beforeRemove, transitionEnd };
   };
+
+  if (process.env.EXPO_OS === 'android') {
+    return (
+      <ExperimentalStack
+        screenListeners={screenListeners}
+        screenOptions={{ headerShown: false }}
+      />
+    );
+  }
 
   return (
     <Stack
