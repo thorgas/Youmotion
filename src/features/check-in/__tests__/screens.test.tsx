@@ -517,7 +517,7 @@ describe('check-in screens', () => {
     });
     expect(history.getByTestId(`history-guiding-belief-${saved.id}`)).toHaveStyle({
       color: '#2A2722',
-      fontFamily: 'InstrumentSans_600SemiBold',
+      fontFamily: 'Fraunces_600SemiBold',
       fontSize: 15,
     });
     expect(history.getByTestId(`history-guiding-belief-${saved.id}`)).toHaveTextContent(
@@ -593,7 +593,7 @@ describe('check-in screens', () => {
       textDecorationLine: 'line-through',
     });
     expect(history.getByTestId(`history-guiding-belief-${checkInId}`)).toHaveStyle({
-      fontFamily: 'InstrumentSans_600SemiBold',
+      fontFamily: 'Fraunces_600SemiBold',
       fontSize: 15,
     });
     expect(history.getByText('I always have to function.')).toBeTruthy();

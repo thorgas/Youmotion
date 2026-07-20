@@ -208,9 +208,9 @@ export const APP_LOCALES = Object.freeze({
 });
 
 export const APP_TYPE = Object.freeze({
-  regular: 'InstrumentSans_400Regular',
-  medium: 'InstrumentSans_500Medium',
-  semibold: 'InstrumentSans_600SemiBold',
+  regular: 'Fraunces_400Regular',
+  medium: 'Fraunces_500Medium',
+  semibold: 'Fraunces_600SemiBold',
 });
 
 export const CHECK_IN_STORAGE_KEY = 'youmotion.check-ins.v1';
