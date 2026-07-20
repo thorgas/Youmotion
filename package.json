@@ -98,6 +98,8 @@
     "start:tools": "WITH_ROZENITE=true expo start --dev-client",
     "android": "expo run:android",
     "ios": "expo run:ios",
+    "install:release:android": "expo run:android --variant release --device --no-bundler",
+    "install:release:ios": "pnpm preios && expo run:ios --configuration Release --device --no-bundler",
     "web": "expo start --web",
     "cali:review": "cali review --quiet",
     "devtools:react": "agent-react-devtools start",

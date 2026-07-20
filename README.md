@@ -143,6 +143,26 @@ pnpm test:harness
 pnpm doctor:react
 ```
 
+### Install a Release build on a connected phone
+
+These are full first-install commands: no previous Youmotion installation or Expo Update-enabled binary is required. They compile and install the app's native Release configuration directly over USB. The JavaScript bundle is embedded, so Metro does not need to be running after installation. The resulting local build targets the `development` EAS Update channel configured in `app.json`; it is intended for real-device release testing, not App Store or Google Play submission.
+
+Install dependencies first, connect and unlock the phone, and then follow the platform-specific setup:
+
+- iPhone: use macOS with Xcode, enable Developer Mode on the phone, trust the computer, and select a valid Apple development team when Xcode asks. A signed install is still required even though the phone is connected by cable.
+
+  ```bash
+  pnpm install:release:ios
+  ```
+
+- Android: enable Developer options and USB debugging, accept the computer's authorization prompt, and confirm that `adb devices` lists the phone with the status `device`.
+
+  ```bash
+  pnpm install:release:android
+  ```
+
+Each command prompts for a connected device when more than one is available. The Android build uses the repository's local release variant and debug signing key; the iOS build uses the selected Apple development team. Reinstall after native dependency, native configuration, or runtime-version changes. JavaScript and asset-only changes for the same runtime can instead be published with `pnpm eas:update:development`.
+
 `pnpm typecheck` invokes TypeScript 7 directly. `typecheck:compat` checks the compatibility compiler used by editor and lint integrations.
 The pnpm patches for `expo-modules-core` and `expo-modules-jsi` keep Expo SDK 57 buildable with the repository host's Xcode 26.1 Swift compiler. They only replace invalid immutable weak references with mutable weak references and can be removed after moving to Expo's supported Xcode 26.4 or newer toolchain.
 
