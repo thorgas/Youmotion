@@ -41,6 +41,7 @@ import { selectionFromPoint } from '../domain/emotion-selection';
 import { EmotionStar } from '../ui/emotion-star';
 import { HistoryScreen } from '../ui/history-screen';
 import { ReflectionScreen } from '../ui/reflection-screen';
+import { reflectionNoteShouldAutoFocus } from '../ui/reflection-note-focus';
 import { GuidingBeliefScreen } from '../ui/guiding-belief-screen';
 import { SuccessScreen } from '../ui/success-screen';
 import { SettingsScreen } from '@/features/settings/ui/settings-screen';
@@ -114,6 +115,13 @@ const _panEvent = ({ x, y, timestamp }: { x: number; y: number; timestamp: numbe
     indexOfSingleActiveTouch: 0,
     mostRecentTimeStamp: timestamp,
   },
+});
+
+describe('reflection note focus', () => {
+  it('waits for an explicit tap on Android so the keyboard does not obscure the prompt', () => {
+    expect(reflectionNoteShouldAutoFocus('android')).toBe(false);
+    expect(reflectionNoteShouldAutoFocus('ios')).toBe(true);
+  });
 });
 
 function RippleOriginHarness({ centered }: { centered: boolean }) {

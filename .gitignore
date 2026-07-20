@@ -12,6 +12,7 @@ web-build/
 coverage/
 .reassure/
 /artifacts/maestro/
+/artifacts/resolution-agent/
 /artifacts/screenshots/
 /.maestro/debug/
 /.maestro/tests/

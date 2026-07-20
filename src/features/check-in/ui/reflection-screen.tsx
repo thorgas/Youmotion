@@ -4,6 +4,7 @@ import { fbs } from 'fbtee';
 import { PressableScale } from 'pressto';
 import {
   ActivityIndicator,
+  Platform,
   ScrollView,
   StyleSheet,
   Text,
@@ -49,6 +50,7 @@ import {
   deleteMomentText,
 } from './check-in-deletion';
 import { CheckInProgressHeader } from './check-in-progress';
+import { reflectionNoteShouldAutoFocus } from './reflection-note-focus';
 import { palette, type } from './theme';
 
 const _selectSnapshot = (
@@ -246,7 +248,7 @@ function ReflectionNoteStep() {
             </PressableScale>
             <TextInput
               accessibilityLabel={optionalNoteAccessibilityLabel()}
-              autoFocus
+              autoFocus={reflectionNoteShouldAutoFocus(Platform.OS)}
               editable={!saving}
               maxLength={240}
               multiline
