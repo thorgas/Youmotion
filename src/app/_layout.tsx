@@ -1,4 +1,8 @@
-import { Fraunces_400Regular, Fraunces_500Medium, Fraunces_600SemiBold } from '@expo-google-fonts/fraunces';
+import {
+  InstrumentSans_400Regular,
+  InstrumentSans_500Medium,
+  InstrumentSans_600SemiBold,
+} from '@expo-google-fonts/instrument-sans';
 import { useSelector } from '@xstate/react';
 import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
@@ -52,9 +56,9 @@ function AppStack() {
 
 export default function RootLayout() {
   const [fontsLoaded, fontError] = useFonts({
-    Fraunces_400Regular,
-    Fraunces_500Medium,
-    Fraunces_600SemiBold,
+    InstrumentSans_400Regular,
+    InstrumentSans_500Medium,
+    InstrumentSans_600SemiBold,
   });
 
   if (!fontsLoaded && !fontError) return null;
