@@ -77,6 +77,8 @@ describe('onboarding Pulse on the device runtime', () => {
     await screen.findByAccessibilityLabel('Fear · Worry');
     await userEvent.press(await screen.findByTestId('onboarding-primary-action'));
     await screen.findByTestId('onboarding-example-step');
+    await screen.findByAccessibilityLabel('Core belief · what limits you');
+    await screen.findByAccessibilityLabel('Guiding belief · what supports you');
     await userEvent.press(await screen.findByTestId('onboarding-skip'));
 
     expect(currentActor().getSnapshot().matches({

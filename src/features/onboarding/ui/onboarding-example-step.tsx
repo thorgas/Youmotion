@@ -64,14 +64,18 @@ export function OnboardingExampleStep() {
           <fbt desc="Optional belief-work onboarding label">IF IT HELPS, GO DEEPER</fbt>
         </Text>
         <Text style={styles.beliefLabel}>
-          <fbt desc="Core belief example label">Core belief</fbt>
+          <fbt desc="Core belief example label explaining its restrictive role">
+            Core belief · what limits you
+          </fbt>
         </Text>
         <Text style={styles.belief}>
           <fbt desc="Core belief onboarding example">“I must always perform.”</fbt>
         </Text>
         <View style={styles.beliefDivider} />
         <Text style={styles.beliefLabel}>
-          <fbt desc="Guiding belief example label">Guiding belief</fbt>
+          <fbt desc="Guiding belief example label explaining its supportive role">
+            Guiding belief · what supports you
+          </fbt>
         </Text>
         <Text style={styles.belief}>
           <fbt desc="Guiding belief onboarding example">“I can prepare and still be imperfect.”</fbt>

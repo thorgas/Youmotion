@@ -421,7 +421,9 @@ describe('check-in screens', () => {
     ).toBe(true));
     expect(mockActor.getSnapshot().context.saved?.note).toBe('Ein heller Moment.');
     expect(mockActor.getSnapshot().context.saved?.beliefSystemId).toBeUndefined();
-    expect(await screen.findByText('Your reflection is already saved. Add one only if it feels useful.')).toBeTruthy();
+    expect(await screen.findByText(
+      'A core belief is an inner rule that limits you in this moment.',
+    )).toBeTruthy();
     expect(screen.getByTestId('check-in-progress-step-1-complete')).toBeTruthy();
     expect(screen.getByTestId('check-in-progress-step-2-active')).toBeTruthy();
     const beliefProgressHeader = screen.getByTestId('check-in-progress-header');
@@ -721,6 +723,9 @@ describe('check-in screens', () => {
     const screen = await _renderLocalized(<ReflectionScreen />);
 
     expect(screen.getByText('Passt ein Leidsatz zu diesem Moment?')).toBeTruthy();
+    expect(screen.getByText(
+      'Ein Leidsatz ist eine innere Regel, die dich in diesem Moment einengt.',
+    )).toBeTruthy();
     await fireEvent.press(screen.getByText('Alle Leidsätze ansehen'));
     expect(await screen.findByText('LEIDSÄTZE')).toBeTruthy();
     await fireEvent.press(screen.getByText('Eigenen Leidsatz hinzufügen'));
@@ -749,7 +754,7 @@ describe('check-in screens', () => {
     expect(screen.getByText(/Zurück/)).toBeTruthy();
     expect(screen.getByText('Was würde dich stattdessen unterstützen?')).toBeTruthy();
     expect(screen.getByText(
-      'Eine innere Regel hat dir vielleicht einmal geholfen, dich sicher, kompetent oder angenommen zu fühlen.',
+      'Dein Leidsatz beschreibt, was dich einengt. Dein Leitsatz gibt dir eine hilfreichere Richtung.',
     )).toBeTruthy();
     expect(screen.queryByText(/Spüre nach/)).toBeNull();
     expect(screen.queryByText(/Du kannst ihr eine neue Richtung geben/)).toBeNull();
@@ -782,6 +787,12 @@ describe('check-in screens', () => {
     expect(history.getByText(
       'Ich darf innehalten und werde trotzdem geliebt.',
     )).toBeTruthy();
+
+    await act(() => mockActor.send({ type: NAVIGATION_EVENTS.SETTINGS_OPENED }));
+    await act(() => mockActor.send({ type: BELIEF_LIBRARY_EVENTS.OPENED }));
+    const library = await _renderLocalized(<BeliefLibraryScreen />);
+    expect(library.getByText('LEIDSATZ · EINENGEND')).toBeTruthy();
+    expect(library.getByText('LEITSATZ · UNTERSTÜTZEND')).toBeTruthy();
   });
 
   it('renders success, history, and settings destinations', async () => {
@@ -835,6 +846,8 @@ describe('check-in screens', () => {
     expect(mockActor.getSnapshot().matches(BELIEF_LIBRARY_STATES.LIBRARY)).toBe(true);
 
     const library = await _renderLocalized(<BeliefLibraryScreen />);
+    expect(library.getByText('CORE BELIEF · LIMITING')).toBeTruthy();
+    expect(library.getByText('GUIDING BELIEF · SUPPORTIVE')).toBeTruthy();
     expect(library.getByText('I must never need help.')).toBeTruthy();
     expect(library.getByText('I can ask for support.')).toBeTruthy();
     await fireEvent.press(library.getByTestId(`edit-custom-belief-${beliefSystemId}`));
