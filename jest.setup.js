@@ -32,6 +32,17 @@ jest.mock('expo-splash-screen', () => ({
   preventAutoHideAsync: jest.fn(() => Promise.resolve(true)),
 }));
 
+function mockReanimatedAnimationBuilder() {
+  const builder = {
+    delay: jest.fn(() => builder),
+    duration: jest.fn(() => builder),
+    reduceMotion: jest.fn(() => builder),
+    withInitialValues: jest.fn(() => builder),
+  };
+
+  return builder;
+}
+
 jest.mock('react-native-reanimated', () => {
   const { Text, View } = require('react-native');
 
@@ -41,6 +52,9 @@ jest.mock('react-native-reanimated', () => {
     createAnimatedComponent: (component) => component,
     Easing: { bezier: jest.fn(() => (value) => value) },
     Extrapolation: { CLAMP: 'clamp' },
+    FadeIn: mockReanimatedAnimationBuilder(),
+    FadeInDown: mockReanimatedAnimationBuilder(),
+    FadeOut: mockReanimatedAnimationBuilder(),
     interpolate: jest.fn((_value, _input, output) => output[0]),
     ReduceMotion: { Always: 'always', Never: 'never', System: 'system' },
     useAnimatedProps: jest.fn((props) => props()),
@@ -61,6 +75,7 @@ jest.mock('react-native-reanimated', () => {
     }),
     withDelay: jest.fn((_delay, value) => value),
     withTiming: jest.fn((value) => value),
+    ZoomIn: mockReanimatedAnimationBuilder(),
   };
 });
 

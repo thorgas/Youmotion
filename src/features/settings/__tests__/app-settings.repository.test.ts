@@ -1,4 +1,5 @@
 import * as Effect from 'effect/Effect';
+import { getLocales, type Locale } from 'expo-localization';
 
 import {
   APP_LOCALES,
@@ -16,6 +17,28 @@ type QueryResult = readonly [{
 }];
 
 let storedSettings: unknown;
+
+function systemLocale({
+  languageCode,
+  languageTag,
+}: Pick<Locale, 'languageCode' | 'languageTag'>): Locale {
+  return {
+    currencyCode: null,
+    currencySymbol: null,
+    decimalSeparator: null,
+    digitGroupingSeparator: null,
+    languageCode,
+    languageCurrencyCode: null,
+    languageCurrencySymbol: null,
+    languageRegionCode: null,
+    languageScriptCode: null,
+    languageTag,
+    measurementSystem: null,
+    regionCode: null,
+    temperatureUnit: null,
+    textDirection: 'ltr',
+  };
+}
 
 const mockQuery = jest.fn(async (
   surql: string,
@@ -41,9 +64,37 @@ describe('app settings repository', () => {
   beforeEach(() => {
     storedSettings = undefined;
     mockQuery.mockClear();
+    jest.mocked(getLocales).mockClear();
+    jest.mocked(getLocales).mockReturnValue([
+      systemLocale({ languageCode: 'en', languageTag: 'en-US' }),
+    ]);
   });
 
-  it('initializes a fresh SurrealDB settings record with app defaults', async () => {
+  it('uses German for a fresh settings record when it is a preferred system language', async () => {
+    jest.mocked(getLocales).mockReturnValue([
+      systemLocale({ languageCode: 'fr', languageTag: 'fr-FR' }),
+      systemLocale({ languageCode: 'de', languageTag: 'de-DE' }),
+      systemLocale({ languageCode: 'en', languageTag: 'en-US' }),
+    ]);
+
+    await expect(Effect.runPromise(loadAppSettings)).resolves.toEqual({
+      locale: APP_LOCALES.GERMAN,
+      emotionLabelMode: EMOTION_LABEL_MODES.EMOJI,
+      onboardingCompleted: false,
+    });
+    expect(storedSettings).toEqual({
+      locale: APP_LOCALES.GERMAN,
+      emotionLabelMode: EMOTION_LABEL_MODES.EMOJI,
+      onboardingCompleted: false,
+    });
+  });
+
+  it('falls back to English when no preferred system language is supported', async () => {
+    jest.mocked(getLocales).mockReturnValue([
+      systemLocale({ languageCode: 'fr', languageTag: 'fr-FR' }),
+      systemLocale({ languageCode: 'es', languageTag: 'es-ES' }),
+    ]);
+
     await expect(Effect.runPromise(loadAppSettings)).resolves.toEqual({
       locale: APP_LOCALES.ENGLISH,
       emotionLabelMode: EMOTION_LABEL_MODES.EMOJI,
@@ -54,6 +105,20 @@ describe('app settings repository', () => {
       emotionLabelMode: EMOTION_LABEL_MODES.EMOJI,
       onboardingCompleted: false,
     });
+  });
+
+  it('keeps a saved language choice instead of replacing it from the system', async () => {
+    jest.mocked(getLocales).mockReturnValue([
+      systemLocale({ languageCode: 'de', languageTag: 'de-DE' }),
+    ]);
+    storedSettings = {
+      locale: APP_LOCALES.ENGLISH,
+      emotionLabelMode: EMOTION_LABEL_MODES.TEXT,
+      onboardingCompleted: true,
+    };
+
+    await expect(Effect.runPromise(loadAppSettings)).resolves.toEqual(storedSettings);
+    expect(getLocales).not.toHaveBeenCalled();
   });
 
   it('migrates a legacy settings row so every existing user sees onboarding once', async () => {

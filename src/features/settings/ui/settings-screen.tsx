@@ -2,13 +2,27 @@ import { useSelector as useActorSelector } from '@xstate/react';
 import { useSelector } from '@xstate/store-react';
 import { fbs } from 'fbtee';
 import { PressableScale } from 'pressto';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import {
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+  type StyleProp,
+  type TextStyle,
+  type ViewStyle,
+} from 'react-native';
+import Animated, {
+  ReduceMotion,
+  useAnimatedStyle,
+  withTiming,
+} from 'react-native-reanimated';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import {
   APP_LOCALES,
   BELIEF_LIBRARY_EVENTS,
   EMOTION_LABEL_MODES,
+  MOTION_DURATION,
   ONBOARDING_EVENTS,
   SETTINGS_EVENTS,
 } from '@/constants';
@@ -21,6 +35,53 @@ const _selectSettings = (state: ReturnType<typeof appSettingsStore.getSnapshot>)
 const _selectBeliefStatements = (
   snapshot: ReturnType<ReturnType<typeof useAppNavigationActor>['getSnapshot']>,
 ) => snapshot.context.beliefStatements;
+const selectionAnimation = {
+  duration: MOTION_DURATION.STATE,
+  reduceMotion: ReduceMotion.System,
+};
+
+function PreferenceOption({
+  label,
+  onPress,
+  selected,
+  style,
+  testID,
+  textStyle,
+}: {
+  label: string;
+  onPress: () => void;
+  selected: boolean;
+  style: StyleProp<ViewStyle>;
+  testID: string;
+  textStyle: StyleProp<TextStyle>;
+}) {
+  const selectionStyle = useAnimatedStyle(() => ({
+    opacity: withTiming(selected ? 1 : 0, selectionAnimation),
+    transform: [{
+      scale: withTiming(selected ? 1 : 0.96, selectionAnimation),
+    }],
+  }), [selected]);
+  const selectionTextStyle = useAnimatedStyle(() => ({
+    color: withTiming(selected ? '#FFFFFF' : palette.ink, selectionAnimation),
+  }), [selected]);
+
+  return (
+    <PressableScale
+      accessibilityRole="button"
+      accessibilityState={{ selected }}
+      onPress={onPress}
+      style={style}
+      testID={testID}>
+      <Animated.View
+        pointerEvents="none"
+        style={[styles.preferenceSelection, selectionStyle]}
+      />
+      <Animated.Text style={[textStyle, selectionTextStyle]}>
+        {label}
+      </Animated.Text>
+    </PressableScale>
+  );
+}
 
 function AppReleaseInfoCard({
   appVersion,
@@ -123,22 +184,22 @@ export function SettingsScreen() {
           <Text style={styles.cardTitle}><fbt desc="Language setting title">Language</fbt></Text>
           <Text style={styles.cardCopy}><fbt desc="Language setting explanation">Choose the language used throughout Youmotion.</fbt></Text>
           <View style={styles.languageRow}>
-            <PressableScale
-              accessibilityRole="button"
-              accessibilityState={{ selected: locale === APP_LOCALES.ENGLISH }}
+            <PreferenceOption
+              label={String(fbs('English', 'English language option'))}
               onPress={_setEnglish}
-              style={[styles.languageButton, locale === APP_LOCALES.ENGLISH && styles.languageButtonSelected]}
-              testID="language-english">
-              <Text style={[styles.languageText, locale === APP_LOCALES.ENGLISH && styles.languageTextSelected]}><fbt desc="English language option">English</fbt></Text>
-            </PressableScale>
-            <PressableScale
-              accessibilityRole="button"
-              accessibilityState={{ selected: locale === APP_LOCALES.GERMAN }}
+              selected={locale === APP_LOCALES.ENGLISH}
+              style={styles.languageButton}
+              testID="language-english"
+              textStyle={styles.languageText}
+            />
+            <PreferenceOption
+              label={String(fbs('German', 'German language option'))}
               onPress={_setGerman}
-              style={[styles.languageButton, locale === APP_LOCALES.GERMAN && styles.languageButtonSelected]}
-              testID="language-german">
-              <Text style={[styles.languageText, locale === APP_LOCALES.GERMAN && styles.languageTextSelected]}><fbt desc="German language option">German</fbt></Text>
-            </PressableScale>
+              selected={locale === APP_LOCALES.GERMAN}
+              style={styles.languageButton}
+              testID="language-german"
+              textStyle={styles.languageText}
+            />
           </View>
           </View>
           <View style={styles.preferenceDivider} />
@@ -146,30 +207,30 @@ export function SettingsScreen() {
           <Text style={styles.cardTitle}><fbt desc="Emotion star label display setting title">Emotion labels</fbt></Text>
           <Text style={styles.cardCopy}><fbt desc="Explanation of the emotion star label display setting">Choose what appears around the emotion star before you touch it.</fbt></Text>
           <View style={styles.labelModeRow}>
-            <PressableScale
-              accessibilityRole="button"
-              accessibilityState={{ selected: emotionLabelMode === EMOTION_LABEL_MODES.EMOJI }}
+            <PreferenceOption
+              label={String(fbs('Emoji', 'Emoji-only emotion label display option'))}
               onPress={_showEmoji}
-              style={[styles.labelModeButton, emotionLabelMode === EMOTION_LABEL_MODES.EMOJI && styles.languageButtonSelected]}
-              testID="emotion-label-mode-emoji">
-              <Text style={[styles.labelModeText, emotionLabelMode === EMOTION_LABEL_MODES.EMOJI && styles.languageTextSelected]}><fbt desc="Emoji-only emotion label display option">Emoji</fbt></Text>
-            </PressableScale>
-            <PressableScale
-              accessibilityRole="button"
-              accessibilityState={{ selected: emotionLabelMode === EMOTION_LABEL_MODES.TEXT }}
+              selected={emotionLabelMode === EMOTION_LABEL_MODES.EMOJI}
+              style={styles.labelModeButton}
+              testID="emotion-label-mode-emoji"
+              textStyle={styles.labelModeText}
+            />
+            <PreferenceOption
+              label={String(fbs('Text', 'Text-only emotion label display option'))}
               onPress={_showText}
-              style={[styles.labelModeButton, emotionLabelMode === EMOTION_LABEL_MODES.TEXT && styles.languageButtonSelected]}
-              testID="emotion-label-mode-text">
-              <Text style={[styles.labelModeText, emotionLabelMode === EMOTION_LABEL_MODES.TEXT && styles.languageTextSelected]}><fbt desc="Text-only emotion label display option">Text</fbt></Text>
-            </PressableScale>
-            <PressableScale
-              accessibilityRole="button"
-              accessibilityState={{ selected: emotionLabelMode === EMOTION_LABEL_MODES.BOTH }}
+              selected={emotionLabelMode === EMOTION_LABEL_MODES.TEXT}
+              style={styles.labelModeButton}
+              testID="emotion-label-mode-text"
+              textStyle={styles.labelModeText}
+            />
+            <PreferenceOption
+              label={String(fbs('Both', 'Emoji and text emotion label display option'))}
               onPress={_showBoth}
-              style={[styles.labelModeButton, emotionLabelMode === EMOTION_LABEL_MODES.BOTH && styles.languageButtonSelected]}
-              testID="emotion-label-mode-both">
-              <Text style={[styles.labelModeText, emotionLabelMode === EMOTION_LABEL_MODES.BOTH && styles.languageTextSelected]}><fbt desc="Emoji and text emotion label display option">Both</fbt></Text>
-            </PressableScale>
+              selected={emotionLabelMode === EMOTION_LABEL_MODES.BOTH}
+              style={styles.labelModeButton}
+              testID="emotion-label-mode-both"
+              textStyle={styles.labelModeText}
+            />
           </View>
           </View>
         </View>
@@ -262,13 +323,19 @@ const styles = StyleSheet.create({
   cardTitle: { fontFamily: type.medium, color: palette.ink, fontSize: 18 },
   cardCopy: { fontFamily: type.regular, color: palette.inkMuted, fontSize: 14, lineHeight: 21, marginTop: 7 },
   languageRow: { flexDirection: 'row', gap: 10, marginTop: 16 },
-  languageButton: { minHeight: 42, flex: 1, alignItems: 'center', justifyContent: 'center', borderRadius: 14, borderWidth: 1, borderColor: palette.hairline },
-  languageButtonSelected: { backgroundColor: palette.ink, borderColor: palette.ink },
+  languageButton: { minHeight: 42, flex: 1, alignItems: 'center', justifyContent: 'center', borderRadius: 14, borderWidth: 1, borderColor: palette.hairline, overflow: 'hidden' },
   languageText: { fontFamily: type.semibold, color: palette.ink, fontSize: 14 },
-  languageTextSelected: { color: '#FFFFFF' },
   labelModeRow: { flexDirection: 'row', gap: 8, marginTop: 16 },
-  labelModeButton: { minHeight: 42, flex: 1, alignItems: 'center', justifyContent: 'center', borderRadius: 14, borderWidth: 1, borderColor: palette.hairline, paddingHorizontal: 8 },
+  labelModeButton: { minHeight: 42, flex: 1, alignItems: 'center', justifyContent: 'center', borderRadius: 14, borderWidth: 1, borderColor: palette.hairline, paddingHorizontal: 8, overflow: 'hidden' },
   labelModeText: { fontFamily: type.semibold, color: palette.ink, fontSize: 13 },
+  preferenceSelection: {
+    position: 'absolute',
+    top: 0,
+    right: 0,
+    bottom: 0,
+    left: 0,
+    backgroundColor: palette.ink,
+  },
   actionGroup: {
     borderTopWidth: 1,
     borderBottomWidth: 1,
