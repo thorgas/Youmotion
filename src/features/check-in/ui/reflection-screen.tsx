@@ -364,8 +364,8 @@ function BeliefSystemStep() {
               </fbt>
             </Text>
             <Text style={styles.copy}>
-              <fbt desc="Explanation that the reflection was saved before core belief selection">
-                Your reflection is already saved. Add one only if it feels useful.
+              <fbt desc="Explanation of a restrictive core belief">
+                A core belief is an inner rule that limits you in this moment.
               </fbt>
             </Text>
           </View>
