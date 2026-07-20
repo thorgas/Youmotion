@@ -1,4 +1,4 @@
-import { StyleSheet } from 'react-native';
+import { StyleSheet, Text } from 'react-native';
 import Animated, {
   FadeIn,
   FadeOut,
@@ -60,24 +60,28 @@ export function EmotionAxisLabel({
       ]}
       testID={`base-emotion-axis-${emotion.id}`}>
       {showsBoth || !showsWord ? (
-        <Animated.Text
+        <Animated.View
           entering={labelEntering}
           exiting={labelExiting}
-          key={`${emotion.id}-emoji`}
-          style={[styles.emoji, showsBoth && styles.combinedEmoji]}
-          testID={`base-emotion-emoji-${emotion.id}`}>
-          {emotionEmoji(emotion.id)}
-        </Animated.Text>
+          key={`${emotion.id}-emoji`}>
+          <Text
+            style={[styles.emoji, showsBoth && styles.combinedEmoji]}
+            testID={`base-emotion-emoji-${emotion.id}`}>
+            {emotionEmoji(emotion.id)}
+          </Text>
+        </Animated.View>
       ) : null}
       {showsBoth || showsWord ? (
-        <Animated.Text
+        <Animated.View
           entering={labelEntering}
           exiting={labelExiting}
-          key={`${emotion.id}-word`}
-          style={[styles.word, showsBoth && styles.combinedWord]}
-          testID={`base-emotion-label-${emotion.id}`}>
-          {emotionName(emotion.id)}
-        </Animated.Text>
+          key={`${emotion.id}-word`}>
+          <Text
+            style={[styles.word, showsBoth && styles.combinedWord]}
+            testID={`base-emotion-label-${emotion.id}`}>
+            {emotionName(emotion.id)}
+          </Text>
+        </Animated.View>
       ) : null}
     </Animated.View>
   );
