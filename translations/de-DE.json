@@ -2173,7 +2173,7 @@
       "tokens": [],
       "translations": [
         {
-          "translation": "Benenne den Satz, der Leiden verursacht. Nachdem du ihn angehängt hast, kannst du ihm eine neue Richtung geben.",
+          "translation": "Benenne den Satz, der Leiden verursacht. Ein Leidsatz ist eine innere Regel, die dich in diesem Moment einengt. Oft enthalten Leidsätze Absolutismen wie “immer” und “alles” und “nie”. Nachdem du ihn angehängt hast, kannst du ihm eine neue Richtung geben.",
           "variations": {}
         }
       ],
@@ -2399,17 +2399,6 @@
       ],
       "types": []
     },
-    "0RIYoOpfvWud54Ucb3E86w==": {
-      "description": "Explanation of personal core-belief management",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "Bearbeite deine eigenen Leidsätze oder entferne sie aus zukünftigen Vorschlägen.",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
     "HOkqtu7ZAa+VBgJR4Z+BqA==": {
       "description": "Error shown when a personal core-belief management action fails",
       "tokens": [],
@@ -2427,17 +2416,6 @@
       "translations": [
         {
           "translation": "Noch keine eigenen Leidsätze.",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "Xlzzkk/sU8mUevdP3FkH/A==": {
-      "description": "Explanation shown when no personal core beliefs exist",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "Du kannst im optionalen Leidsatz-Schritt eines Check-ins einen hinzufügen.",
           "variations": {}
         }
       ],
@@ -3073,7 +3051,7 @@
       "tokens": [],
       "translations": [
         {
-          "translation": "‹ Einstellungen",
+          "translation": "Einstellungen",
           "variations": {}
         }
       ],
@@ -3097,7 +3075,7 @@
       "tokens": [],
       "translations": [
         {
-          "translation": "‹ Deine Leidsätze",
+          "translation": "Deine Leidsätze",
           "variations": {}
         }
       ],
@@ -3157,7 +3135,84 @@
       "tokens": [],
       "translations": [
         {
-          "translation": "Ein Leidsatz ist eine innere Regel, die dich in diesem Moment einengt.",
+          "translation": "Ein Leidsatz ist eine innere Regel, die dich in diesem Moment einengt. Oft enthalten Leidsätze Absolutismen wie “immer” und “alles” und “nie”.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "Zae9JiIgdZqz1bnOKF1Z8A==": {
+      "description": "Button creating a personal core belief from its settings library",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Leidsatz hinzufügen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "Pi9r/R5fl/caj3+N5k6YFg==": {
+      "description": "Explanation shown when no personal core beliefs exist",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Erstelle hier einen oder während des optionalen Leidsatz-Schritts eines Check-ins.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "Or6KscII8Q0FbKemsXNBhg==": {
+      "description": "Eyebrow above personal core-belief creation in settings",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "LEIDSATZ HINZUFÜGEN",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "Cl41DQ5vD703lMpJQ3Ncmg==": {
+      "description": "Title of personal core-belief creation in settings",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Formuliere ihn in deinen eigenen Worten.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "50yykz3eu3me7moMyc8ERA==": {
+      "description": "Explanation of personal core-belief creation with optional guiding belief",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Benenne den Satz, der Leiden verursacht. Ein Leidsatz ist eine innere Regel, die dich in diesem Moment einengt. Oft enthalten Leidsätze Absolutismen wie “immer” und “alles” und “nie”. Du kannst direkt einen unterstützenden Leitsatz ergänzen oder das Feld leer lassen.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "3UDYCnOcyt2zwlXNKPAUZQ==": {
+      "description": "Button saving a new personal core belief from settings",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Leidsatz hinzufügen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "cfvGXQEw/KNujuNm2Qj5pw==": {
+      "description": "Explanation of personal core-belief management",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Erstelle und bearbeite deine eigenen Leidsätze oder entferne sie aus zukünftigen Vorschlägen.",
           "variations": {}
         }
       ],

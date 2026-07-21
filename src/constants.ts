@@ -135,6 +135,7 @@ export const SETTINGS_EVENTS = Object.freeze({
 export const BELIEF_LIBRARY_EVENTS = Object.freeze({
   OPENED: literal('beliefLibrary.opened'),
   CLOSED: literal('beliefLibrary.closed'),
+  CREATE_REQUESTED: literal('beliefLibrary.createRequested'),
   EDIT_REQUESTED: literal('beliefLibrary.editRequested'),
   EDIT_CANCELLED: literal('beliefLibrary.editCancelled'),
   HARMFUL_DRAFT_CHANGED: literal('beliefLibrary.harmfulDraftChanged'),

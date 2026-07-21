@@ -181,14 +181,24 @@ function managedBeliefStatementFromDraft({
   beliefStatements: readonly BeliefStatement[];
 }): CustomBeliefStatement | null {
   if (!beliefLibraryStatementId) return null;
+  const harmfulStatement = beliefLibraryHarmfulDraft.trim();
+  if (!harmfulStatement) return null;
+  const guidingStatement = beliefLibraryGuidingDraft.trim();
   const existing = beliefStatementForId({
     beliefSystemId: beliefLibraryStatementId,
     statements: beliefStatements,
   });
-  if (existing?.kind !== 'custom' || existing.archivedAt !== undefined) return null;
-  const harmfulStatement = beliefLibraryHarmfulDraft.trim();
-  if (!harmfulStatement) return null;
-  const guidingStatement = beliefLibraryGuidingDraft.trim();
+  if (!existing) {
+    return guidingStatement
+      ? {
+          kind: 'custom',
+          beliefSystemId: beliefLibraryStatementId,
+          harmfulStatement,
+          guidingStatement,
+        }
+      : { kind: 'custom', beliefSystemId: beliefLibraryStatementId, harmfulStatement };
+  }
+  if (existing.kind !== 'custom' || existing.archivedAt !== undefined) return null;
   return guidingStatement
     ? { ...existing, harmfulStatement, guidingStatement }
     : { kind: 'custom', beliefSystemId: existing.beliefSystemId, harmfulStatement };
@@ -335,6 +345,7 @@ export const appNavigationMachine = setup({
       ),
       [BELIEF_LIBRARY_EVENTS.OPENED]: EmptyEventSchema,
       [BELIEF_LIBRARY_EVENTS.CLOSED]: EmptyEventSchema,
+      [BELIEF_LIBRARY_EVENTS.CREATE_REQUESTED]: EmptyEventSchema,
       [BELIEF_LIBRARY_EVENTS.EDIT_REQUESTED]: Schema.standardSchemaV1(
         Schema.Struct({ beliefSystemId: CustomBeliefSystemId }),
       ),
@@ -800,6 +811,18 @@ export const appNavigationMachine = setup({
           target: `#appNavigation.${NAVIGATION_STATES.TABS}.${NAVIGATION_STATES.SETTINGS}`,
           context: {
             beliefLibraryStatementId: null,
+            beliefLibraryHarmfulDraft: '',
+            beliefLibraryGuidingDraft: '',
+            error: null,
+          },
+        },
+        [BELIEF_LIBRARY_EVENTS.CREATE_REQUESTED]: {
+          target: BELIEF_LIBRARY_STATES.EDITOR,
+          context: {
+            beliefLibraryStatementId: createCustomBeliefSystemId({
+              timestamp: Date.now(),
+              nonce: Math.random().toString(16).slice(2),
+            }),
             beliefLibraryHarmfulDraft: '',
             beliefLibraryGuidingDraft: '',
             error: null,

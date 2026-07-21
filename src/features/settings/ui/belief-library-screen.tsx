@@ -21,6 +21,7 @@ import {
 } from '@/constants';
 import {
   activeCustomBeliefStatements,
+  beliefStatementForId,
   type CustomBeliefStatement,
 } from '@/features/check-in/domain/belief-statement';
 import { palette, type } from '@/features/check-in/ui/theme';
@@ -119,6 +120,7 @@ function BeliefLibraryList() {
   const snapshot = useSelector(actor, selectSnapshot);
   const statements = activeCustomBeliefStatements(snapshot.context.beliefStatements);
   const retiring = snapshot.matches(BELIEF_LIBRARY_STATES.RETIRING);
+  const create = () => actor.send({ type: BELIEF_LIBRARY_EVENTS.CREATE_REQUESTED });
 
   return (
     <View style={styles.page} testID="belief-library-screen">
@@ -137,7 +139,7 @@ function BeliefLibraryList() {
           </Text>
           <Text style={styles.copy}>
             <fbt desc="Explanation of personal core-belief management">
-              Edit the beliefs you created or remove them from future suggestions.
+              Create and edit your own beliefs, or remove them from future suggestions.
             </fbt>
           </Text>
           {snapshot.context.error ? (
@@ -147,6 +149,20 @@ function BeliefLibraryList() {
               </fbt>
             </Text>
           ) : null}
+          <PressableScale
+            accessibilityRole="button"
+            accessibilityState={{ disabled: retiring }}
+            disabled={retiring}
+            onPress={create}
+            style={styles.createButton}
+            testID="belief-library-create"
+          >
+            <Text style={styles.createText}>
+              <fbt desc="Button creating a personal core belief from its settings library">
+                Add core belief
+              </fbt>
+            </Text>
+          </PressableScale>
           {statements.length === 0 ? (
             <View style={styles.emptyCard} testID="belief-library-empty">
               <Text style={styles.emptyTitle}>
@@ -156,7 +172,7 @@ function BeliefLibraryList() {
               </Text>
               <Text style={styles.emptyCopy}>
                 <fbt desc="Explanation shown when no personal core beliefs exist">
-                  You can add one during the optional core-belief step of a check-in.
+                  Create one here or during the optional core-belief step of a check-in.
                 </fbt>
               </Text>
             </View>
@@ -182,6 +198,13 @@ function BeliefLibraryEditor() {
   const actor = useAppNavigationActor();
   const snapshot = useSelector(actor, selectSnapshot);
   const saving = snapshot.matches(BELIEF_LIBRARY_STATES.SAVING);
+  const editingStatement = snapshot.context.beliefLibraryStatementId
+    ? beliefStatementForId({
+        beliefSystemId: snapshot.context.beliefLibraryStatementId,
+        statements: snapshot.context.beliefStatements,
+      })
+    : undefined;
+  const creating = editingStatement === undefined;
   const harmfulReady = snapshot.context.beliefLibraryHarmfulDraft.trim().length > 0;
   const cancel = () => actor.send({ type: BELIEF_LIBRARY_EVENTS.EDIT_CANCELLED });
   const harmfulChanged = (statement: string) => actor.send({
@@ -217,15 +240,33 @@ function BeliefLibraryEditor() {
             testID="belief-library-editor-cancel"
           />
           <Text style={styles.eyebrow}>
-            <fbt desc="Eyebrow above personal core-belief editing">EDIT CORE BELIEF</fbt>
+            {creating ? (
+              <fbt desc="Eyebrow above personal core-belief creation in settings">
+                ADD CORE BELIEF
+              </fbt>
+            ) : (
+              <fbt desc="Eyebrow above personal core-belief editing">EDIT CORE BELIEF</fbt>
+            )}
           </Text>
           <Text style={styles.title}>
-            <fbt desc="Title of personal core-belief editing">Keep it true to you.</fbt>
+            {creating ? (
+              <fbt desc="Title of personal core-belief creation in settings">
+                Put it in your own words.
+              </fbt>
+            ) : (
+              <fbt desc="Title of personal core-belief editing">Keep it true to you.</fbt>
+            )}
           </Text>
           <Text style={styles.copy}>
-            <fbt desc="Explanation that editing a shared personal belief updates earlier moments">
-              Changes also appear in your earlier moments because they share this belief.
-            </fbt>
+            {creating ? (
+              <fbt desc="Explanation of personal core-belief creation with optional guiding belief">
+                Name the belief that causes suffering. You can add a supportive guiding belief now or leave it blank.
+              </fbt>
+            ) : (
+              <fbt desc="Explanation that editing a shared personal belief updates earlier moments">
+                Changes also appear in your earlier moments because they share this belief.
+              </fbt>
+            )}
           </Text>
           <View style={styles.editorCard}>
             <Text style={styles.fieldLabel}>
@@ -284,7 +325,13 @@ function BeliefLibraryEditor() {
             >
               {saving ? <ActivityIndicator color="#FFFFFF" /> : (
                 <Text style={styles.saveText}>
-                  <fbt desc="Button saving changes to a personal core belief">Save changes</fbt>
+                  {creating ? (
+                    <fbt desc="Button saving a new personal core belief from settings">
+                      Add core belief
+                    </fbt>
+                  ) : (
+                    <fbt desc="Button saving changes to a personal core belief">Save changes</fbt>
+                  )}
                 </Text>
               )}
             </PressableScale>
@@ -333,6 +380,15 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   list: { gap: 14 },
+  createButton: {
+    minHeight: 52,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 16,
+    backgroundColor: palette.ink,
+    marginBottom: 16,
+  },
+  createText: { fontFamily: type.semibold, color: '#FFFFFF', fontSize: 15 },
   beliefCard: {
     backgroundColor: palette.paperRaised,
     borderRadius: 24,

@@ -249,6 +249,26 @@ describe('app navigation model', () => {
     expect(actor.getSnapshot().matches(BELIEF_LIBRARY_STATES.LIBRARY)).toBe(true);
     expect(routeForStateValue(actor.getSnapshot().value)).toBe(APP_ROUTES.BELIEF_LIBRARY);
 
+    actor.send({ type: BELIEF_LIBRARY_EVENTS.CREATE_REQUESTED });
+    const createdBeliefSystemId = actor.getSnapshot().context.beliefLibraryStatementId;
+    expect(createdBeliefSystemId).not.toBeNull();
+    expect(actor.getSnapshot().matches(BELIEF_LIBRARY_STATES.EDITOR)).toBe(true);
+    actor.send({
+      type: BELIEF_LIBRARY_EVENTS.HARMFUL_DRAFT_CHANGED,
+      statement: 'I must always stay strong.',
+    });
+    actor.send({ type: BELIEF_LIBRARY_EVENTS.SAVE_REQUESTED });
+    await waitFor(
+      actor,
+      (candidate) => candidate.matches(BELIEF_LIBRARY_STATES.LIBRARY),
+      { timeout: 1_000 },
+    );
+    expect(actor.getSnapshot().context.beliefStatements).toContainEqual({
+      kind: 'custom',
+      beliefSystemId: createdBeliefSystemId,
+      harmfulStatement: 'I must always stay strong.',
+    });
+
     actor.send({ type: BELIEF_LIBRARY_EVENTS.EDIT_REQUESTED, beliefSystemId });
     expect(actor.getSnapshot().matches(BELIEF_LIBRARY_STATES.EDITOR)).toBe(true);
     actor.send({

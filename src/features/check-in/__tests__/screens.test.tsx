@@ -761,7 +761,7 @@ describe('check-in screens', () => {
 
     expect(screen.getByText('Passt ein Leidsatz zu diesem Moment?')).toBeTruthy();
     expect(screen.getByText(
-      'Ein Leidsatz ist eine innere Regel, die dich in diesem Moment einengt.',
+      'Ein Leidsatz ist eine innere Regel, die dich in diesem Moment einengt. Oft enthalten Leidsätze Absolutismen wie “immer” und “alles” und “nie”.',
     )).toBeTruthy();
     await fireEvent.press(screen.getByText('Alle Leidsätze ansehen'));
     expect(await screen.findByText('LEIDSÄTZE')).toBeTruthy();
@@ -828,8 +828,19 @@ describe('check-in screens', () => {
     await act(() => mockActor.send({ type: NAVIGATION_EVENTS.SETTINGS_OPENED }));
     await act(() => mockActor.send({ type: BELIEF_LIBRARY_EVENTS.OPENED }));
     const library = await _renderLocalized(<BeliefLibraryScreen />);
+    expect(library.getByText('Einstellungen')).toBeTruthy();
+    expect(library.queryByText('‹ Einstellungen')).toBeNull();
+    await fireEvent.press(library.getByText('Leidsatz hinzufügen'));
+    expect(library.getByText('LEIDSATZ HINZUFÜGEN')).toBeTruthy();
+    expect(library.getByText(
+      'Benenne den Satz, der Leiden verursacht. Ein Leidsatz ist eine innere Regel, die dich in diesem Moment einengt. Oft enthalten Leidsätze Absolutismen wie “immer” und “alles” und “nie”. Du kannst direkt einen unterstützenden Leitsatz ergänzen oder das Feld leer lassen.',
+    )).toBeTruthy();
+    await fireEvent.press(library.getByTestId('belief-library-editor-cancel'));
     expect(library.getByText('LEIDSATZ · EINENGEND')).toBeTruthy();
     expect(library.getByText('LEITSATZ · UNTERSTÜTZEND')).toBeTruthy();
+    await fireEvent.press(library.getByText('Bearbeiten'));
+    expect(library.getByText('Deine Leidsätze')).toBeTruthy();
+    expect(library.queryByText('‹ Deine Leidsätze')).toBeNull();
   });
 
   it('renders success, history, and settings destinations', async () => {
@@ -887,6 +898,30 @@ describe('check-in screens', () => {
     expect(library.getByText('GUIDING BELIEF · SUPPORTIVE')).toBeTruthy();
     expect(library.getByText('I must never need help.')).toBeTruthy();
     expect(library.getByText('I can ask for support.')).toBeTruthy();
+    await fireEvent.press(library.getByTestId('belief-library-create'));
+    expect(mockActor.getSnapshot().matches(BELIEF_LIBRARY_STATES.EDITOR)).toBe(true);
+    expect(library.getByText('ADD CORE BELIEF')).toBeTruthy();
+    await fireEvent.changeText(
+      library.getByTestId('belief-library-harmful-draft'),
+      'I must always stay strong.',
+    );
+    await fireEvent.changeText(
+      library.getByTestId('belief-library-guiding-draft'),
+      'I can let others support me.',
+    );
+    await fireEvent.press(library.getByTestId('belief-library-save'));
+    await waitFor(() => expect(
+      mockActor.getSnapshot().matches(BELIEF_LIBRARY_STATES.LIBRARY),
+    ).toBe(true));
+    expect(mockActor.getSnapshot().context.beliefStatements).toContainEqual(
+      expect.objectContaining({
+        kind: 'custom',
+        harmfulStatement: 'I must always stay strong.',
+        guidingStatement: 'I can let others support me.',
+      }),
+    );
+    expect(library.getByText('I must always stay strong.')).toBeTruthy();
+    expect(library.getByText('I can let others support me.')).toBeTruthy();
     await fireEvent.press(library.getByTestId(`edit-custom-belief-${beliefSystemId}`));
     expect(mockActor.getSnapshot().matches(BELIEF_LIBRARY_STATES.EDITOR)).toBe(true);
     await fireEvent.changeText(
