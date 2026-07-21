@@ -41,7 +41,7 @@ import { selectionFromPoint } from '../domain/emotion-selection';
 import { EmotionStar } from '../ui/emotion-star';
 import { HistoryScreen } from '../ui/history-screen';
 import { ReflectionScreen } from '../ui/reflection-screen';
-import { reflectionNoteShouldAutoFocus } from '../ui/reflection-note-focus';
+import { reflectionResponsiveLayout } from '../ui/reflection-responsive-layout';
 import { GuidingBeliefScreen } from '../ui/guiding-belief-screen';
 import { SuccessScreen } from '../ui/success-screen';
 import { SettingsScreen } from '@/features/settings/ui/settings-screen';
@@ -117,10 +117,39 @@ const _panEvent = ({ x, y, timestamp }: { x: number; y: number; timestamp: numbe
   },
 });
 
-describe('reflection note focus', () => {
-  it('waits for an explicit tap on Android so the keyboard does not obscure the prompt', () => {
-    expect(reflectionNoteShouldAutoFocus('android')).toBe(false);
-    expect(reflectionNoteShouldAutoFocus('ios')).toBe(true);
+describe('reflection responsive layout', () => {
+  it('compacts the keyboard-open Android viewport without double-scaling density', () => {
+    expect(reflectionResponsiveLayout({
+      height: 914,
+      keyboardHeight: 420,
+      keyboardVisible: true,
+      platform: 'android',
+      width: 411,
+    })).toMatchObject({
+      bottomOffset: 12,
+      compact: true,
+      contentHorizontalPadding: 22,
+      inputMinHeight: 112,
+      keyboardAwareScrollEnabled: false,
+      titleFontSize: 28,
+    });
+  });
+
+  it('preserves the spacious layout without a constrained Android keyboard', () => {
+    expect(reflectionResponsiveLayout({
+      height: 914,
+      keyboardHeight: 0,
+      keyboardVisible: false,
+      platform: 'android',
+      width: 320,
+    })).toMatchObject({
+      bottomOffset: 82,
+      compact: false,
+      contentHorizontalPadding: 20,
+      inputMinHeight: 150,
+      keyboardAwareScrollEnabled: true,
+      titleFontSize: 31,
+    });
   });
 });
 

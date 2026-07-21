@@ -50,15 +50,20 @@ function ProgressEyebrow({ context }: { context: ProgressHeaderContext }) {
 
 export function CheckInProgressHeader({
   activeStep,
+  compact = false,
   context,
 }: {
   activeStep: ProgressStep;
+  compact?: boolean;
   context: ProgressHeaderContext;
 }) {
   return (
-    <View style={styles.header} testID="check-in-progress-header">
+    <View
+      style={[styles.header, compact ? styles.headerCompact : null]}
+      testID="check-in-progress-header"
+    >
       <ProgressEyebrow context={context} />
-      <CheckInProgress activeStep={activeStep} />
+      <CheckInProgress activeStep={activeStep} compact={compact} />
     </View>
   );
 }
@@ -176,12 +181,18 @@ function Connector({
   );
 }
 
-export function CheckInProgress({ activeStep }: { activeStep: ProgressStep }) {
+export function CheckInProgress({
+  activeStep,
+  compact = false,
+}: {
+  activeStep: ProgressStep;
+  compact?: boolean;
+}) {
   return (
     <View
       accessibilityRole="progressbar"
       accessibilityValue={{ min: 1, max: 3, now: activeStep }}
-      style={styles.container}
+      style={[styles.container, compact ? styles.containerCompact : null]}
       testID="check-in-progress"
     >
       <View style={styles.track}>
@@ -216,6 +227,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 22,
     width: '100%',
   },
+  headerCompact: { marginTop: 8 },
   eyebrow: {
     color: palette.inkMuted,
     fontFamily: type.semibold,
@@ -226,6 +238,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
     marginTop: 16,
   },
+  containerCompact: { marginBottom: 0, marginTop: 8 },
   track: {
     alignItems: 'flex-start',
     flexDirection: 'row',

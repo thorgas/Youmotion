@@ -9,9 +9,13 @@ import {
   StyleSheet,
   Text,
   TextInput,
+  useWindowDimensions,
   View,
 } from 'react-native';
-import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
+import {
+  KeyboardAwareScrollView,
+  useKeyboardState,
+} from 'react-native-keyboard-controller';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { AppBackButton } from '@/components/ui/app-back-button';
@@ -50,7 +54,7 @@ import {
   deleteMomentText,
 } from './check-in-deletion';
 import { CheckInProgressHeader } from './check-in-progress';
-import { reflectionNoteShouldAutoFocus } from './reflection-note-focus';
+import { reflectionResponsiveLayout } from './reflection-responsive-layout';
 import { palette, type } from './theme';
 
 const _selectSnapshot = (
@@ -172,6 +176,18 @@ function SelectionSummary({
 function ReflectionNoteStep() {
   const actor = useAppNavigationActor();
   const snapshot = useSelector(actor, _selectSnapshot);
+  const window = useWindowDimensions();
+  const keyboard = useKeyboardState((state) => ({
+    height: state.height,
+    isVisible: state.isVisible,
+  }));
+  const responsive = reflectionResponsiveLayout({
+    height: window.height,
+    keyboardHeight: keyboard.height,
+    keyboardVisible: keyboard.isVisible,
+    platform: Platform.OS,
+    width: window.width,
+  });
   const selection = snapshot.context.selection;
   const saving = snapshot.matches(CHECK_IN_STATES.SAVING);
   const failed = snapshot.matches(CHECK_IN_STATES.FAILURE);
@@ -198,11 +214,20 @@ function ReflectionNoteStep() {
       <SafeAreaView style={styles.safeArea}>
         <CheckInProgressHeader
           activeStep={1}
+          compact={responsive.compact}
           context={editing ? 'editing' : 'reflection'}
         />
         <KeyboardAwareScrollView
-          bottomOffset={REFLECTION_KEYBOARD_BOTTOM_OFFSET}
-          contentContainerStyle={[styles.content, styles.flowContent]}
+          bottomOffset={responsive.bottomOffset}
+          contentContainerStyle={[
+            styles.content,
+            styles.flowContent,
+            {
+              paddingHorizontal: responsive.contentHorizontalPadding,
+              paddingTop: responsive.contentTopPadding,
+            },
+          ]}
+          enabled={responsive.keyboardAwareScrollEnabled}
           keyboardDismissMode="interactive"
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
@@ -210,7 +235,15 @@ function ReflectionNoteStep() {
           testID="reflection-keyboard-scroll"
         >
           <View>
-            <Text style={styles.title}>
+            <Text
+              style={[
+                styles.title,
+                {
+                  fontSize: responsive.titleFontSize,
+                  lineHeight: responsive.titleLineHeight,
+                },
+              ]}
+            >
               {editing
                 ? <fbt desc="Title for editing an existing check-in">Edit this moment.</fbt>
                 : <fbt desc="Reflection screen question">What is present right now?</fbt>}
@@ -226,12 +259,23 @@ function ReflectionNoteStep() {
               </fbt>
             </Text>
           </View>
-          <View style={styles.card}>
+          <View
+            style={[
+              styles.card,
+              {
+                marginTop: responsive.cardMarginTop,
+                padding: responsive.cardPadding,
+              },
+            ]}
+          >
             <PressableScale
               accessibilityRole={editing ? 'button' : undefined}
               disabled={!editing || saving}
               onPress={_editSelection}
-              style={styles.selectionRow}
+              style={[
+                styles.selectionRow,
+                { marginBottom: responsive.selectionMarginBottom },
+              ]}
             >
               <View style={[styles.dot, { backgroundColor: selection.color }]} />
               <View style={styles.selectionCopy}>
@@ -248,7 +292,7 @@ function ReflectionNoteStep() {
             </PressableScale>
             <TextInput
               accessibilityLabel={optionalNoteAccessibilityLabel()}
-              autoFocus={reflectionNoteShouldAutoFocus(Platform.OS)}
+              autoFocus
               editable={!saving}
               maxLength={240}
               multiline
@@ -256,7 +300,7 @@ function ReflectionNoteStep() {
               placeholder={optionalNotePlaceholder()}
               placeholderTextColor={palette.inkMuted}
               returnKeyType="done"
-              style={styles.input}
+              style={[styles.input, { minHeight: responsive.inputMinHeight }]}
               submitBehavior="blurAndSubmit"
               testID="reflection-note-input"
               value={snapshot.context.note}
