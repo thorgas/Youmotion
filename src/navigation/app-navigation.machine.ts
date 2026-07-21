@@ -52,6 +52,7 @@ import {
   deleteCheckIn,
   loadCheckIns,
   persistCheckIn,
+  persistGuidingStatementSnapshot,
 } from '@/features/check-in/infrastructure/check-in.repository';
 import {
   deleteBeliefStatement,
@@ -224,6 +225,7 @@ export const appNavigationMachine = setup({
           },
         },
         [NAVIGATION_STATES.HISTORY]: {},
+        [NAVIGATION_STATES.ANALYTICS]: {},
         [NAVIGATION_STATES.SETTINGS]: {},
       },
     },
@@ -252,6 +254,7 @@ export const appNavigationMachine = setup({
       [NAVIGATION_EVENTS.BACK_REQUESTED]: EmptyEventSchema,
       [NAVIGATION_EVENTS.TODAY_OPENED]: EmptyEventSchema,
       [NAVIGATION_EVENTS.HISTORY_OPENED]: EmptyEventSchema,
+      [NAVIGATION_EVENTS.ANALYTICS_OPENED]: EmptyEventSchema,
       [NAVIGATION_EVENTS.SETTINGS_OPENED]: EmptyEventSchema,
       [ONBOARDING_EVENTS.OPENED]: EmptyEventSchema,
       [ONBOARDING_EVENTS.NEXT_REQUESTED]: EmptyEventSchema,
@@ -713,6 +716,17 @@ export const appNavigationMachine = setup({
             error: null,
           },
         },
+        [NAVIGATION_EVENTS.ANALYTICS_OPENED]: {
+          target: `.${NAVIGATION_STATES.ANALYTICS}`,
+          context: {
+            selection: null,
+            note: '',
+            beliefSystemId: null,
+            saved: null,
+            editing: null,
+            error: null,
+          },
+        },
         [NAVIGATION_EVENTS.SETTINGS_OPENED]: {
           target: `.${NAVIGATION_STATES.SETTINGS}`,
           context: {
@@ -775,6 +789,7 @@ export const appNavigationMachine = setup({
           },
         },
         [NAVIGATION_STATES.HISTORY]: {},
+        [NAVIGATION_STATES.ANALYTICS]: {},
         [NAVIGATION_STATES.SETTINGS]: {
           on: {
             [ONBOARDING_EVENTS.OPENED]: {
@@ -1435,7 +1450,22 @@ export const appNavigationMachine = setup({
             statements: context.beliefStatements,
           });
           if (statement) {
-            void Effect.runPromise(persistBeliefStatement(statement)).then(
+            void Effect.runPromise(persistBeliefStatement(statement).pipe(
+              Effect.flatMap((persisted) => {
+                if (!context.saved || !persisted.guidingStatement) {
+                  return Effect.succeed(persisted);
+                }
+                return persistGuidingStatementSnapshot({
+                  checkIn: context.saved,
+                  guidingStatement: persisted.guidingStatement,
+                }).pipe(
+                  Effect.tap((saved) => Effect.sync(() => {
+                    checkInHistoryStore.trigger.recorded({ entry: saved });
+                  })),
+                  Effect.as(persisted),
+                );
+              }),
+            )).then(
               (persisted) => self.send({
                 type: CHECK_IN_EVENTS.BELIEF_STATEMENT_PERSISTED,
                 statement: persisted,
@@ -1697,6 +1727,7 @@ export function routeForStateValue(value: StateValue) {
   const reflectionRoute = reflectionRouteForStateValue(value);
   if (reflectionRoute) return reflectionRoute;
   if (matchesState({ [NAVIGATION_STATES.TABS]: NAVIGATION_STATES.HISTORY }, value)) return APP_ROUTES.HISTORY;
+  if (matchesState({ [NAVIGATION_STATES.TABS]: NAVIGATION_STATES.ANALYTICS }, value)) return APP_ROUTES.ANALYTICS;
   if (matchesState({ [NAVIGATION_STATES.TABS]: NAVIGATION_STATES.SETTINGS }, value)) return APP_ROUTES.SETTINGS;
   return APP_ROUTES.TODAY;
 }

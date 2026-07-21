@@ -9,6 +9,7 @@ import {
   deleteCheckIn,
   loadCheckIns,
   persistCheckIn,
+  persistGuidingStatementSnapshot,
 } from '../infrastructure/check-in.repository';
 import {
   failNextSurrealDelete,
@@ -80,6 +81,30 @@ describe('Effect check-in repository', () => {
     });
   });
 
+  it('snapshots the guiding statement on the referenced check-in', async () => {
+    const saved = await Effect.runPromise(persistCheckIn({
+      selection,
+      note: '',
+      beliefSystemId: BELIEF_SYSTEM_IDS.ALWAYS_FUNCTIONING,
+      existing: null,
+    }));
+
+    const updated = await Effect.runPromise(persistGuidingStatementSnapshot({
+      checkIn: saved,
+      guidingStatement: 'I may pause and still be worthy.',
+    }));
+
+    expect(updated.guidingStatementSnapshot).toBe('I may pause and still be worthy.');
+    expect(mockSurrealQuery).toHaveBeenLastCalledWith(
+      'UPSERT $record CONTENT $checkIn',
+      expect.objectContaining({
+        checkIn: expect.objectContaining({
+          guidingStatementSnapshot: 'I may pause and still be worthy.',
+        }),
+      }),
+    );
+  });
+
   it('loads schema-validated check-ins from SurrealDB', async () => {
     const stored = {
       id: 'stored-check-in',
@@ -93,6 +118,9 @@ describe('Effect check-in repository', () => {
     mockSurrealQuery.mockResolvedValueOnce([{ statementIndex: 0, value: [stored] }]);
 
     const loaded = await Effect.runPromise(loadCheckIns);
+    expect(mockSurrealQuery).toHaveBeenCalledWith(
+      expect.not.stringContaining('LIMIT'),
+    );
     expect(loaded).toEqual([{
       id: stored.id,
       createdAt: stored.createdAt,

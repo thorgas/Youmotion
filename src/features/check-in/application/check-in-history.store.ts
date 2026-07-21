@@ -1,7 +1,6 @@
 import { createStore } from '@xstate/store';
 import * as Schema from 'effect/Schema';
 
-import { MAX_CHECK_IN_HISTORY } from '@/constants';
 import { CheckInId, CheckInSchema, type CheckIn } from '../domain/check-in';
 
 const emptyEntries: readonly CheckIn[] = [];
@@ -17,7 +16,7 @@ const initialContext = {
 
 const _recordEntry = ({ entries, entry }: { entries: readonly CheckIn[]; entry: CheckIn }) => {
   const alreadyRecorded = entries.some((candidate) => candidate.id === entry.id);
-  if (!alreadyRecorded) return [entry, ...entries].slice(0, MAX_CHECK_IN_HISTORY);
+  if (!alreadyRecorded) return [entry, ...entries];
   return entries.map((candidate) => candidate.id === entry.id ? entry : candidate);
 };
 

@@ -75,6 +75,16 @@ describe('app router adapter', () => {
     expect(mockRouter.dismissTo).toHaveBeenCalledWith(APP_ROUTES.TODAY);
   });
 
+  it('replaces one tab route with the Analytics tab route', () => {
+    const actor = startNavigationActor();
+    jest.clearAllMocks();
+
+    actor.send({ type: NAVIGATION_EVENTS.ANALYTICS_OPENED });
+
+    expect(mockRouter.replace).toHaveBeenCalledWith(APP_ROUTES.ANALYTICS);
+    expect(mockRouter.push).not.toHaveBeenCalled();
+  });
+
   it('lets a completed native dismissal drive the machine without dismissing twice', () => {
     const actor = startNavigationActor();
     actor.send({ type: CHECK_IN_EVENTS.TOUCH_STARTED });

@@ -1,0 +1,212 @@
+import { fbs } from 'fbtee';
+
+import { ANALYTICS_TIMEFRAMES, APP_LOCALES } from '@/constants';
+import type { BeliefStatement } from '@/features/check-in/domain/belief-statement';
+import type { AppLocale } from '@/features/settings/domain/app-locale';
+import type { AnalyticsObservation } from '../domain/check-in-analytics';
+import type {
+  AnalyticsDateRange,
+  AnalyticsTimeframe,
+  TopLeitsatz,
+} from '../domain/analytics-timeframe';
+import { beliefSystemText } from '@/features/check-in/ui/belief-system-copy';
+import { emotionName } from '@/features/check-in/ui/emotion-copy';
+
+const englishCalendarDateFormatter = new Intl.DateTimeFormat(APP_LOCALES.ENGLISH, {
+  day: 'numeric',
+  month: 'long',
+  year: 'numeric',
+});
+const germanCalendarDateFormatter = new Intl.DateTimeFormat(APP_LOCALES.GERMAN, {
+  day: 'numeric',
+  month: 'long',
+  year: 'numeric',
+});
+const englishMonthFormatter = new Intl.DateTimeFormat(APP_LOCALES.ENGLISH, {
+  month: 'long',
+  year: 'numeric',
+});
+const germanMonthFormatter = new Intl.DateTimeFormat(APP_LOCALES.GERMAN, {
+  month: 'long',
+  year: 'numeric',
+});
+const englishWeekdayFormatter = new Intl.DateTimeFormat(APP_LOCALES.ENGLISH, {
+  weekday: 'narrow',
+});
+const germanWeekdayFormatter = new Intl.DateTimeFormat(APP_LOCALES.GERMAN, {
+  weekday: 'narrow',
+});
+const englishRangeDateFormatter = new Intl.DateTimeFormat(APP_LOCALES.ENGLISH, {
+  day: 'numeric',
+  month: 'short',
+  year: 'numeric',
+});
+const germanRangeDateFormatter = new Intl.DateTimeFormat(APP_LOCALES.GERMAN, {
+  day: 'numeric',
+  month: 'short',
+  year: 'numeric',
+});
+
+function localeFormatter({
+  english,
+  german,
+  locale,
+}: {
+  english: Intl.DateTimeFormat;
+  german: Intl.DateTimeFormat;
+  locale: AppLocale;
+}) {
+  return locale === APP_LOCALES.GERMAN ? german : english;
+}
+
+export function analyticsMonthLabel({ date, locale }: { date: Date; locale: AppLocale }) {
+  return localeFormatter({
+    english: englishMonthFormatter,
+    german: germanMonthFormatter,
+    locale,
+  }).format(date);
+}
+
+export function analyticsWeekdayLabel({ date, locale }: { date: Date; locale: AppLocale }) {
+  return localeFormatter({
+    english: englishWeekdayFormatter,
+    german: germanWeekdayFormatter,
+    locale,
+  }).format(date);
+}
+
+function analyticsDateRangeLabel({
+  end,
+  locale,
+  start,
+}: {
+  end: Date;
+  locale: AppLocale;
+  start: Date;
+}) {
+  const formatter = localeFormatter({
+    english: englishRangeDateFormatter,
+    german: germanRangeDateFormatter,
+    locale,
+  });
+  return `${formatter.format(start)} – ${formatter.format(end)}`;
+}
+
+export function analyticsTimeframeRangeLabel({
+  locale,
+  range,
+  timeframe,
+}: {
+  locale: AppLocale;
+  range: AnalyticsDateRange;
+  timeframe: AnalyticsTimeframe;
+}) {
+  if (timeframe === ANALYTICS_TIMEFRAMES.ALL_TIME || range.start === null) {
+    return String(fbs('All recorded moments', 'Date range label for all-time analytics'));
+  }
+  const inclusiveEnd = new Date(
+    range.end.getFullYear(),
+    range.end.getMonth(),
+    range.end.getDate() - 1,
+  );
+  return analyticsDateRangeLabel({ end: inclusiveEnd, locale, start: range.start });
+}
+
+export function topLeitsatzEvidenceCopy({
+  leitsatz,
+  locale,
+}: {
+  leitsatz: TopLeitsatz;
+  locale: AppLocale;
+}) {
+  const range = analyticsDateRangeLabel({
+    end: leitsatz.weekEndsAt,
+    locale,
+    start: leitsatz.weekStartsAt,
+  });
+  return String(fbs(
+    'Selected '
+      + fbs.param('count', String(leitsatz.count))
+      + ' times · '
+      + fbs.param('range', range),
+    'Evidence below the most frequently selected guiding belief last week',
+  ));
+}
+
+export function observationCopy({ observation, statements }: {
+  observation: AnalyticsObservation;
+  statements: readonly BeliefStatement[];
+}) {
+  if (observation.kind === 'history') {
+    return String(fbs(
+      'You recorded '
+        + fbs.param('momentCount', String(observation.momentCount))
+        + ' moments across '
+        + fbs.param('dayCount', String(observation.dayCount))
+        + ' different days.',
+      'Analytics observation summarizing recorded moments and days',
+    ));
+  }
+  if (observation.kind === 'emotion') {
+    return String(fbs(
+      fbs.param('emotion', emotionName(observation.emotionId))
+        + ' appeared in '
+        + fbs.param('count', String(observation.count))
+        + ' of the moments you chose to record.',
+      'Analytics observation about the most frequently recorded emotion',
+    ));
+  }
+  if (observation.kind === 'belief') {
+    return String(fbs(
+      fbs.param('belief', beliefSystemText({
+        id: observation.beliefSystemId,
+        statements,
+      }))
+        + ' appeared alongside '
+        + fbs.param('emotion', emotionName(observation.emotionId))
+        + ' in '
+        + fbs.param('count', String(observation.count))
+        + ' recorded moments.',
+      'Analytics observation about a recurring emotion and core belief pairing',
+    ));
+  }
+  return String(fbs(
+    'You added a written reflection to '
+      + fbs.param('count', String(observation.count))
+      + ' of '
+      + fbs.param('momentCount', String(observation.momentCount))
+      + ' recorded moments.',
+    'Analytics observation summarizing written reflection use',
+  ));
+}
+
+export function calendarDayAccessibilityLabel({
+  date,
+  entries,
+  locale,
+}: {
+  date: Date;
+  entries: readonly { emotionId: Parameters<typeof emotionName>[0] }[];
+  locale: AppLocale;
+}) {
+  const dateLabel = localeFormatter({
+    english: englishCalendarDateFormatter,
+    german: germanCalendarDateFormatter,
+    locale,
+  }).format(date);
+  if (entries.length === 0) {
+    return String(fbs(
+      fbs.param('date', dateLabel) + '. No recorded moments.',
+      'Accessibility label for an empty analytics calendar day',
+    ));
+  }
+  return String(fbs(
+    fbs.param('date', dateLabel)
+      + '. '
+      + fbs.param('count', String(entries.length))
+      + ' recorded moments: '
+      + fbs.param('emotions', entries.map(({ emotionId }) => emotionName(emotionId)).join(', '))
+      + '.',
+    'Accessibility label for an analytics calendar day with recorded emotions',
+  ));
+}

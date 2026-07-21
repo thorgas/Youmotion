@@ -1,7 +1,7 @@
 import * as Schema from 'effect/Schema';
 
 import { EMOTION_IDS, MAX_NOTE_LENGTH } from '@/constants';
-import { BeliefSystemId } from './belief-statement';
+import { BeliefStatementText, BeliefSystemId } from './belief-statement';
 
 export const EmotionId = Schema.Literal(
   EMOTION_IDS.JOY,
@@ -36,6 +36,7 @@ export const CheckInSchema = Schema.Struct({
   level: Schema.optional(Schema.Int.pipe(Schema.nonNegative())),
   note: Schema.String.pipe(Schema.maxLength(MAX_NOTE_LENGTH)),
   beliefSystemId: Schema.optional(BeliefSystemId),
+  guidingStatementSnapshot: Schema.optional(BeliefStatementText),
 });
 export type CheckIn = typeof CheckInSchema.Type;
 

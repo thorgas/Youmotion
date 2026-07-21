@@ -6,7 +6,6 @@ import { SurrealRecordId } from 'react-native-surrealdb';
 import {
   CHECK_IN_STORAGE_KEY,
   CHECK_IN_TABLE,
-  MAX_CHECK_IN_HISTORY,
 } from '@/constants';
 
 import {
@@ -17,7 +16,7 @@ import {
   type CheckIn,
   type EmotionSelection,
 } from '../domain/check-in';
-import { BeliefSystemId } from '../domain/belief-statement';
+import { BeliefStatementText, BeliefSystemId } from '../domain/belief-statement';
 import { getDatabase } from './surrealdb.database';
 
 export class CheckInStorageError extends Schema.TaggedError<CheckInStorageError>()(
@@ -77,6 +76,10 @@ const CheckInDatabaseSchema = Schema.Struct({
   level: Schema.optional(SurrealNonNegativeInteger),
   note: CheckInSchema.fields.note,
   beliefSystemId: Schema.optional(SurrealOptionalBeliefSystemId),
+  guidingStatementSnapshot: Schema.optional(Schema.Union(
+    BeliefStatementText,
+    Schema.Struct({ kind: Schema.Literal('none') }),
+  )),
 });
 
 const CheckInDatabaseListSchema = Schema.Array(CheckInDatabaseSchema);
@@ -84,11 +87,14 @@ const CheckInDatabaseListSchema = Schema.Array(CheckInDatabaseSchema);
 function checkInFromDatabase(
   entry: typeof CheckInDatabaseSchema.Type,
 ): CheckIn {
-  const { beliefSystemId, ...checkIn } = entry;
+  const { beliefSystemId, guidingStatementSnapshot, ...checkIn } = entry;
+  const statementSnapshot = typeof guidingStatementSnapshot === 'string'
+    ? { guidingStatementSnapshot }
+    : {};
   if (beliefSystemId === undefined || typeof beliefSystemId !== 'string') {
-    return checkIn;
+    return { ...checkIn, ...statementSnapshot };
   }
-  return { ...checkIn, beliefSystemId };
+  return { ...checkIn, beliefSystemId, ...statementSnapshot };
 }
 
 const readLegacy = Effect.tryPromise({
@@ -105,12 +111,11 @@ const decodeLegacy = readLegacy.pipe(
   }),
 );
 
-const selectRecentCheckIns = Effect.tryPromise({
+const selectCheckIns = Effect.tryPromise({
   try: async () => {
     const database = await getDatabase();
     return database.query<unknown>(
-      `SELECT checkInId AS id, createdAt, emotionId, intensity, level, note, beliefSystemId FROM ${CHECK_IN_TABLE} ORDER BY createdAt DESC LIMIT $limit`,
-      { limit: MAX_CHECK_IN_HISTORY },
+      `SELECT checkInId AS id, createdAt, emotionId, intensity, level, note, beliefSystemId, guidingStatementSnapshot FROM ${CHECK_IN_TABLE} ORDER BY createdAt DESC`,
     );
   },
   catch: (cause) => CheckInStorageError.make({ operation: 'read', cause }),
@@ -150,7 +155,7 @@ const migrateLegacyCheckIns = decodeLegacy.pipe(
   )),
 );
 
-export const loadCheckIns = selectRecentCheckIns.pipe(
+export const loadCheckIns = selectCheckIns.pipe(
   Effect.flatMap((entries) => (
     entries.length === 0 ? migrateLegacyCheckIns : Effect.succeed(entries)
   )),
@@ -173,6 +178,12 @@ export const persistCheckIn = Effect.fn('CheckInRepository.persist')(({
     createdAt: CheckInTimestamp.make(new Date().toISOString()),
   };
   const beliefSystem = beliefSystemId === null ? {} : { beliefSystemId };
+  const existingStatementSnapshot = existing?.guidingStatementSnapshot;
+  const guidingStatementSnapshot = beliefSystemId !== null
+    && beliefSystemId === existing?.beliefSystemId
+    && existingStatementSnapshot
+    ? { guidingStatementSnapshot: existingStatementSnapshot }
+    : {};
   const checkIn: CheckIn = {
     id: identity.id,
     createdAt: identity.createdAt,
@@ -181,8 +192,25 @@ export const persistCheckIn = Effect.fn('CheckInRepository.persist')(({
     level: selection.level,
     note: note.trim(),
     ...beliefSystem,
+    ...guidingStatementSnapshot,
   };
   return upsertCheckIn(checkIn).pipe(Effect.as(checkIn));
+});
+
+export const persistGuidingStatementSnapshot = Effect.fn(
+  'CheckInRepository.persistGuidingStatementSnapshot',
+)(({
+  checkIn,
+  guidingStatement,
+}: {
+  checkIn: CheckIn;
+  guidingStatement: typeof BeliefStatementText.Type;
+}) => {
+  const updated = CheckInSchema.make({
+    ...checkIn,
+    guidingStatementSnapshot: guidingStatement,
+  });
+  return upsertCheckIn(updated).pipe(Effect.as(updated));
 });
 
 export const deleteCheckIn = Effect.fn('CheckInRepository.delete')((id: CheckInId) => (

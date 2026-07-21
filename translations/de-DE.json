@@ -2454,17 +2454,6 @@
       ],
       "types": []
     },
-    "TLA7F30my0mtR3gv7ajc9w==": {
-      "description": "Input label for editing a personal harmful core belief",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "Leidsatz",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
     "kfrh3SVMo+7Q+LqHDLTVZg==": {
       "description": "Accessibility label for personal harmful core-belief editing",
       "tokens": [],
@@ -2476,34 +2465,12 @@
       ],
       "types": []
     },
-    "1z+BAMB443EvmEDVGr2VqA==": {
-      "description": "Input label for editing a personal positive guiding belief",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "Leitsatz",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
     "iSdLO66R78rav5qoZKT6IQ==": {
       "description": "Accessibility label for personal positive guiding-belief editing",
       "tokens": [],
       "translations": [
         {
           "translation": "Eigener Leitsatz",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "76FUSzfuQJth//xPGYnHNA==": {
-      "description": "Placeholder for an optional positive guiding belief",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "Optional",
           "variations": {}
         }
       ],
@@ -3141,17 +3108,6 @@
       ],
       "types": []
     },
-    "Zae9JiIgdZqz1bnOKF1Z8A==": {
-      "description": "Button creating a personal core belief from its settings library",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "Leidsatz hinzufügen",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
     "Pi9r/R5fl/caj3+N5k6YFg==": {
       "description": "Explanation shown when no personal core beliefs exist",
       "tokens": [],
@@ -3213,6 +3169,402 @@
       "translations": [
         {
           "translation": "Erstelle und bearbeite deine eigenen Leidsätze oder entferne sie aus zukünftigen Vorschlägen.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "Pkqixb+Ipbj59I5C1Hjc3Q==": {
+      "description": "Analytics insights tab title",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Einblicke",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "UvkK+E2F9ehTqehB6s+tXw==": {
+      "description": "Analytics observation summarizing recorded moments and days",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Du hast {momentCount} Momente an {dayCount} verschiedenen Tagen festgehalten.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "eyMaIiDJwnyuvEf2Ie0vOA==": {
+      "description": "Analytics observation about the most frequently recorded emotion",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "{emotion} kam in {count} der von dir festgehaltenen Momente vor.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "/vpNC1QcDmfMUknh3BsXaQ==": {
+      "description": "Analytics observation about a recurring emotion and core belief pairing",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "{belief} trat in {count} festgehaltenen Momenten gemeinsam mit {emotion} auf.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "LAkxVGoXf7hiT59jYGzYow==": {
+      "description": "Analytics observation summarizing written reflection use",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Du hast {count} von {momentCount} festgehaltenen Momenten um eine schriftliche Reflexion ergänzt.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "HgjmX03zfTKSAwB/eTGYTA==": {
+      "description": "Accessibility label for an empty analytics calendar day",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "{date}. Keine festgehaltenen Momente.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "VHnd3urQdkqV0u3gK0TMoQ==": {
+      "description": "Accessibility label for an analytics calendar day with recorded emotions",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "{date}. {count} festgehaltene Momente: {emotions}.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "W+ly/uVSyw9AOG5BeSMdyA==": {
+      "description": "Label for the analytics history summary observation",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Alle Momente",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "DrgUNpiQoxWw0b8zZ4SVNg==": {
+      "description": "Label for a recurring emotion observation",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Wiederkehrendes Gefühl",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "8OCACT5y49Q0IK1HevriWQ==": {
+      "description": "Label for a recurring emotion and core belief observation",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Wiederkehrendes Paar",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "m5wuLKrNXijJ6oUKNROu8g==": {
+      "description": "Label for the analytics note usage observation",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Schriftliche Reflexionen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "qI+m5nn/D/xgwOvcPwN0BA==": {
+      "description": "Analytics observation section label",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "WAS AUFFÄLLT",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "1BjAMW9cDhZfsp3wdY8N2g==": {
+      "description": "Analytics calendar section label",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "MOMENTKALENDER",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "sva4P5UaID2sv0YLVQnWag==": {
+      "description": "Analytics calendar previous month button",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Vorheriger Monat",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "YuFHRJ4jZOyUN+nP9onc8A==": {
+      "description": "Analytics calendar next month button",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Nächster Monat",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "PdZ6kjwjB5c2glSZ/PuQIg==": {
+      "description": "Analytics screen eyebrow",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "DEINE EINBLICKE",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "dws2Vc+SRSOKU0n+m5L1JA==": {
+      "description": "Analytics screen title",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Muster, die du wahrgenommen hast.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "+EzsYs9ywQwLFqq/Yu/ijA==": {
+      "description": "Emotion constellation section label",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "GEFÜHLSKONSTELLATION",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "Lki6Xidf39B7/Z09P+3lGw==": {
+      "description": "Emotion constellation title",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Was du wahrgenommen hast.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "ipZJ/C1/SJAib+A9VCdPoA==": {
+      "description": "Date range label for all-time analytics",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Alle festgehaltenen Momente",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "3J/J8iV66RsJq+TU5U2rDA==": {
+      "description": "Evidence below the most frequently selected guiding belief last week",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "{count}-mal gewählt · {range}",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "vN8UIqx66eIwfMPau2ZSSA==": {
+      "description": "Label above the analytics timeframe selector",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "ZEITRAUM",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "3NAXwqe/y+soOSgJIdLYiw==": {
+      "description": "Analytics timeframe option for the previous completed week",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Letzte Woche",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "w69kkADNF/PEqJBXHuXyKg==": {
+      "description": "Analytics timeframe option for the previous four completed weeks",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "4 Wochen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "+f5PV2GUA2OWp/pjNo++/A==": {
+      "description": "Analytics timeframe option for all recorded moments",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Gesamt",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "ECBM+iQ4vOCfbDTRqsqfWw==": {
+      "description": "Label for the most frequently selected positive guiding statement last week",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "LEITSATZ DER LETZTEN WOCHE",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "QGOrhHYb4ewpb+54Yu7g9Q==": {
+      "description": "Explanation that emotion colors connect the radar chart and calendar",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Dieselben Farben markieren die Emotionen im Diagramm und im Kalender.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "uHLRQFkdUsRPWCnn0o3ovg==": {
+      "description": "Explanation that calendar dots use the emotion colors from the chart",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Jeder Punkt steht für einen festgehaltenen Moment und nutzt die Emotionsfarben oben.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "ut/WyKt1mNsnABIte0CzJA==": {
+      "description": "Explanation that the all-time calendar can browse recorded moments by month",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Durchsuche alle festgehaltenen Momente nach Monat. Die Punkte nutzen die Emotionsfarben oben.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "lD8cnFdz6kovG4Y9435UbA==": {
+      "description": "Analytics screen explanation and privacy note",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Eine private Ansicht der Momente, die du auf diesem Gerät festgehalten hast.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "xF+U9ZL5Ak2BJHvnAlXl6g==": {
+      "description": "Empty selected analytics timeframe title",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Keine Momente in diesem Zeitraum.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "zf6N+mzii/lD247+SkqO5Q==": {
+      "description": "Empty selected analytics timeframe explanation",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Wähle einen anderen Zeitraum oder schau nach einem neuen Moment wieder vorbei.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "TZcTUJ/CzX0vvztdmpeCqQ==": {
+      "description": "Emotion constellation explanation",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Jede Richtung zeigt, wie oft eine Emotion im gewählten Zeitraum vorkommt.",
           "variations": {}
         }
       ],

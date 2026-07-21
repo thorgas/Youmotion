@@ -12,9 +12,11 @@
     "@ottrelite/core": "0.1.1",
     "@react-native-async-storage/async-storage": "2.2.0",
     "@ubjs/core": "0.31.0-3",
+    "@wuba/react-native-echarts": "3.1.1",
     "@xstate/react": "^7.0.0-alpha.1",
     "@xstate/store": "^4.1.0",
     "@xstate/store-react": "^2.0.0",
+    "echarts": "6.1.0",
     "effect": "^3.21.4",
     "expo": "~57.0.6",
     "expo-build-properties": "~57.0.5",
@@ -53,8 +55,10 @@
     "react-native-svg": "15.15.4",
     "react-native-web": "~0.21.0",
     "react-native-worklets": "0.10.0",
+    "tslib": "2.8.1",
     "uniffi-bindgen-react-native": "0.31.0-3",
-    "xstate": "^6.0.0-alpha.20"
+    "xstate": "^6.0.0-alpha.20",
+    "zrender": "6.1.0"
   },
   "devDependencies": {
     "@expo/fingerprint": "~0.20.5",

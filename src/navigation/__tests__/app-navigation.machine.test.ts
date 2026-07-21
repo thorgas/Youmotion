@@ -103,6 +103,12 @@ describe('app navigation model', () => {
     expect(actor.getSnapshot().matches({ [NAVIGATION_STATES.TABS]: NAVIGATION_STATES.HISTORY })).toBe(true);
     expect(routeForStateValue(actor.getSnapshot().value)).toBe(APP_ROUTES.HISTORY);
 
+    actor.send({ type: NAVIGATION_EVENTS.ANALYTICS_OPENED });
+    expect(actor.getSnapshot().matches({
+      [NAVIGATION_STATES.TABS]: NAVIGATION_STATES.ANALYTICS,
+    })).toBe(true);
+    expect(routeForStateValue(actor.getSnapshot().value)).toBe(APP_ROUTES.ANALYTICS);
+
     actor.send({ type: NAVIGATION_EVENTS.SETTINGS_OPENED });
     expect(routeForStateValue(actor.getSnapshot().value)).toBe(APP_ROUTES.SETTINGS);
 
@@ -554,6 +560,12 @@ describe('app navigation model', () => {
       harmfulStatement: 'I must always function.',
       guidingStatement: 'I may pause and I am still loved.',
     });
+    expect(checkInHistoryStore.getSnapshot().context.entries).toContainEqual(
+      expect.objectContaining({
+        id: completed.context.saved?.id,
+        guidingStatementSnapshot: 'I may pause and I am still loved.',
+      }),
+    );
   });
 
   it('adds a guiding belief to a built-in core belief', async () => {

@@ -47,6 +47,7 @@ function isTabRoute(route: AppRoute) {
   return (
     route === APP_ROUTES.TODAY
     || route === APP_ROUTES.HISTORY
+    || route === APP_ROUTES.ANALYTICS
     || route === APP_ROUTES.SETTINGS
   );
 }

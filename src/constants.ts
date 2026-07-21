@@ -97,7 +97,21 @@ export const NAVIGATION_EVENTS = Object.freeze({
   BACK_REQUESTED: literal('navigation.backRequested'),
   TODAY_OPENED: literal('navigation.todayOpened'),
   HISTORY_OPENED: literal('navigation.historyOpened'),
+  ANALYTICS_OPENED: literal('navigation.analyticsOpened'),
   SETTINGS_OPENED: literal('navigation.settingsOpened'),
+});
+
+export const ANALYTICS_EVENTS = Object.freeze({
+  PREVIOUS_MONTH_REQUESTED: literal('analytics.previousMonthRequested'),
+  NEXT_MONTH_REQUESTED: literal('analytics.nextMonthRequested'),
+  CURRENT_MONTH_REQUESTED: literal('analytics.currentMonthRequested'),
+  TIMEFRAME_SELECTED: literal('analytics.timeframeSelected'),
+});
+
+export const ANALYTICS_TIMEFRAMES = Object.freeze({
+  LAST_WEEK: literal('lastWeek'),
+  LAST_FOUR_WEEKS: literal('lastFourWeeks'),
+  ALL_TIME: literal('allTime'),
 });
 
 export const ONBOARDING_EVENTS = Object.freeze({
@@ -167,6 +181,7 @@ export const NAVIGATION_STATES = Object.freeze({
   TABS: literal('tabs'),
   TODAY: literal('today'),
   HISTORY: literal('history'),
+  ANALYTICS: literal('analytics'),
   SETTINGS: literal('settings'),
   REFLECTION: literal('reflection'),
 });
@@ -193,6 +208,7 @@ export const APP_ROUTES = Object.freeze({
   ONBOARDING_EXAMPLE: literal('/onboarding-example'),
   TODAY: literal('/today'),
   HISTORY: literal('/history'),
+  ANALYTICS: literal('/analytics'),
   SETTINGS: literal('/settings'),
   BELIEF_LIBRARY: literal('/belief-library'),
   BELIEF_LIBRARY_EDITOR: literal('/belief-library-editor'),
@@ -225,7 +241,6 @@ export const CHECK_IN_TABLE = 'check_in';
 export const BELIEF_STATEMENT_TABLE = 'belief_statement';
 export const APP_SETTINGS_TABLE = 'app_settings';
 export const APP_SETTINGS_RECORD_ID = 'current';
-export const MAX_CHECK_IN_HISTORY = 30;
 export const MAX_NOTE_LENGTH = 240;
 export const MAX_BELIEF_STATEMENT_LENGTH = 240;
 export const CUSTOM_BELIEF_SYSTEM_ID_PREFIX = 'custom-';
