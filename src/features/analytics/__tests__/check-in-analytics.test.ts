@@ -13,6 +13,7 @@ import {
   emotionFrequencies,
 } from '../domain/check-in-analytics';
 import {
+  calendarEmotionFrequencies,
   calendarMonth,
   monthAtOffset,
   periodCalendarDays,
@@ -20,7 +21,7 @@ import {
 import {
   analyticsDateRange,
   entriesForAnalyticsTimeframe,
-  topLeitsatzForPreviousWeek,
+  topLeitsaetzeForPreviousWeek,
 } from '../domain/analytics-timeframe';
 
 function checkIn({ beliefSystemId, day, emotionId, guidingStatementSnapshot, id }: {
@@ -70,6 +71,34 @@ describe('check-in analytics', () => {
     expect(result.days).toHaveLength(31);
     expect(result.days[4]?.entries).toHaveLength(2);
     expect(result.days[20]?.entries).toHaveLength(1);
+  });
+
+  it('shows every daily emotion once, ranked by count with Pulse-order ties', () => {
+    const entries = [
+      checkIn({ day: 5, emotionId: EMOTION_IDS.FEAR, id: 'fear-1' }),
+      checkIn({ day: 5, emotionId: EMOTION_IDS.JOY, id: 'joy-1' }),
+      checkIn({ day: 5, emotionId: EMOTION_IDS.FEAR, id: 'fear-2' }),
+      checkIn({ day: 5, emotionId: EMOTION_IDS.ANGER, id: 'anger-1' }),
+      checkIn({ day: 5, emotionId: EMOTION_IDS.JOY, id: 'joy-2' }),
+      checkIn({ day: 5, emotionId: EMOTION_IDS.SADNESS, id: 'sadness-1' }),
+    ];
+
+    expect(calendarEmotionFrequencies(entries)).toEqual([
+      { emotionId: EMOTION_IDS.JOY, count: 2 },
+      { emotionId: EMOTION_IDS.FEAR, count: 2 },
+      { emotionId: EMOTION_IDS.SADNESS, count: 1 },
+      { emotionId: EMOTION_IDS.ANGER, count: 1 },
+    ]);
+  });
+
+  it('keeps all seven daily emotion colors visible', () => {
+    const entries = Object.values(EMOTION_IDS).map((emotionId, index) => checkIn({
+      day: 5,
+      emotionId,
+      id: `emotion-${index}`,
+    }));
+
+    expect(calendarEmotionFrequencies(entries)).toHaveLength(7);
   });
 
   it('never resolves a calendar offset into the future', () => {
@@ -128,7 +157,7 @@ describe('check-in analytics', () => {
       }),
     ];
 
-    const result = topLeitsatzForPreviousWeek({
+    const result = topLeitsaetzeForPreviousWeek({
       entries,
       now: new Date(2026, 6, 21, 12),
       statements: [{
@@ -138,14 +167,14 @@ describe('check-in analytics', () => {
       }],
     });
 
-    expect(result).toMatchObject({
+    expect(result?.leitsaetze[0]).toMatchObject({
       beliefSystemId: BELIEF_SYSTEM_IDS.ALWAYS_FUNCTIONING,
       count: 2,
       guidingStatement: 'Rest belongs in my life.',
     });
   });
 
-  it('does not invent a top Leitsatz when last week is tied', () => {
+  it('returns all equally frequent top Leitsätze instead of hiding a tie', () => {
     const entries = [
       checkIn({
         beliefSystemId: BELIEF_SYSTEM_IDS.ALWAYS_FUNCTIONING,
@@ -163,11 +192,18 @@ describe('check-in analytics', () => {
       }),
     ];
 
-    expect(topLeitsatzForPreviousWeek({
+    const result = topLeitsaetzeForPreviousWeek({
       entries,
       now: new Date(2026, 6, 21, 12),
       statements: [],
-    })).toBeNull();
+    });
+
+    expect(result?.additionalCount).toBe(0);
+    expect(result?.leitsaetze).toHaveLength(2);
+    expect(result?.leitsaetze.map(({ guidingStatement }) => guidingStatement)).toEqual([
+      'I may learn.',
+      'I may pause.',
+    ]);
   });
 
   it('returns at most three factual observations without comparing intensities', () => {

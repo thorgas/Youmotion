@@ -3246,18 +3246,6 @@
       ],
       "types": []
     },
-    "VHnd3urQdkqV0u3gK0TMoQ==": {
-      "description": "Accessibility label for an analytics calendar day with recorded emotions",
-      "status": "new",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "{date}. {count} festgehaltene Momente: {emotions}.",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
     "W+ly/uVSyw9AOG5BeSMdyA==": {
       "description": "Label for the analytics history summary observation",
       "status": "new",
@@ -3426,6 +3414,18 @@
       ],
       "types": []
     },
+    "UQxRUu3PsKeWa8EzlirzmQ==": {
+      "description": "Copy below tied guiding beliefs when more equally frequent beliefs exist than the card displays",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Weitere gleich häufig gewählte Leitsätze: {count}",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
     "vN8UIqx66eIwfMPau2ZSSA==": {
       "description": "Label above the analytics timeframe selector",
       "status": "new",
@@ -3486,6 +3486,18 @@
       ],
       "types": []
     },
+    "dLsinq8CmHsKM0M4rEng7g==": {
+      "description": "Label for equally most frequently selected positive guiding statements last week",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "LEITSÄTZE DER LETZTEN WOCHE",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
     "QGOrhHYb4ewpb+54Yu7g9Q==": {
       "description": "Explanation that emotion colors connect the radar chart and calendar",
       "status": "new",
@@ -3493,30 +3505,6 @@
       "translations": [
         {
           "translation": "Dieselben Farben markieren die Emotionen im Diagramm und im Kalender.",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "uHLRQFkdUsRPWCnn0o3ovg==": {
-      "description": "Explanation that calendar dots use the emotion colors from the chart",
-      "status": "new",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "Jeder Punkt steht für einen festgehaltenen Moment und nutzt die Emotionsfarben oben.",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "ut/WyKt1mNsnABIte0CzJA==": {
-      "description": "Explanation that the all-time calendar can browse recorded moments by month",
-      "status": "new",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "Durchsuche alle festgehaltenen Momente nach Monat. Die Punkte nutzen die Emotionsfarben oben.",
           "variations": {}
         }
       ],
@@ -3565,6 +3553,54 @@
       "translations": [
         {
           "translation": "Jede Richtung zeigt, wie oft eine Emotion im gewählten Zeitraum vorkommt.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "QqgBVOSFM6uH7xDGAHiiyw==": {
+      "description": "Accessibility label for an analytics calendar day with ranked emotion counts",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "{date}. {count} festgehaltene Momente: {emotions}.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "z+QDTLQD2ZE6erxSJIdJbQ==": {
+      "description": "Explanation of distinct and frequency-ordered emotion colors in each analytics calendar date",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Erkenne, welche Gefühle du pro Tag wahrgenommen hast. Jede Farbe erscheint einmal – von häufig nach selten sortiert.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "56U65ARrL9RMHvL4jxWuSQ==": {
+      "description": "Empty filtered check-in history title",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Keine Momente in diesem Zeitraum.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "NTZqUkOD2CG0MNMJUJgKlA==": {
+      "description": "Empty filtered check-in history explanation",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Wähle einen anderen Zeitraum, um mehr von deinem Verlauf zu sehen.",
           "variations": {}
         }
       ],

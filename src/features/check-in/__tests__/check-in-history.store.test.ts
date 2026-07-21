@@ -1,5 +1,10 @@
-import { EMOTION_IDS } from '@/constants';
+import {
+  ANALYTICS_TIMEFRAMES,
+  EMOTION_IDS,
+  HISTORY_EVENTS,
+} from '@/constants';
 import { checkInHistoryStore } from '../application/check-in-history.store';
+import { historyTimeframeStore } from '../application/history-timeframe.store';
 import {
   CheckInId,
   CheckInTimestamp,
@@ -20,6 +25,9 @@ function entry(index: number): CheckIn {
 describe('check-in history store', () => {
   beforeEach(() => {
     checkInHistoryStore.trigger.hydrated({ entries: [] });
+    historyTimeframeStore.trigger[HISTORY_EVENTS.TIMEFRAME_SELECTED]({
+      timeframe: ANALYTICS_TIMEFRAMES.ALL_TIME,
+    });
   });
 
   it('keeps every recorded moment in memory', () => {
@@ -28,5 +36,19 @@ describe('check-in history store', () => {
     });
 
     expect(checkInHistoryStore.getSnapshot().context.entries).toHaveLength(35);
+  });
+
+  it('keeps the history timeframe separate and defaults it to all time', () => {
+    expect(historyTimeframeStore.getSnapshot().context.timeframe).toBe(
+      ANALYTICS_TIMEFRAMES.ALL_TIME,
+    );
+
+    historyTimeframeStore.trigger[HISTORY_EVENTS.TIMEFRAME_SELECTED]({
+      timeframe: ANALYTICS_TIMEFRAMES.LAST_WEEK,
+    });
+
+    expect(historyTimeframeStore.getSnapshot().context.timeframe).toBe(
+      ANALYTICS_TIMEFRAMES.LAST_WEEK,
+    );
   });
 });

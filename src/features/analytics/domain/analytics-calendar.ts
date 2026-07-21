@@ -1,7 +1,12 @@
 import type { CheckIn } from '@/features/check-in/domain/check-in';
+import { emotions } from '@/features/check-in/domain/emotion';
 import type { AnalyticsDateRange } from './analytics-timeframe';
 
 export type CalendarDay = Readonly<{ day: number; entries: readonly CheckIn[] }>;
+export type CalendarEmotionFrequency = Readonly<{
+  emotionId: CheckIn['emotionId'];
+  count: number;
+}>;
 export type CalendarMonth = Readonly<{
   year: number;
   month: number;
@@ -9,6 +14,22 @@ export type CalendarMonth = Readonly<{
   days: readonly CalendarDay[];
 }>;
 export type PeriodCalendarDay = Readonly<{ date: Date; entries: readonly CheckIn[] }>;
+
+export function calendarEmotionFrequencies(entries: readonly CheckIn[]) {
+  const counts = entries.reduce<Map<CheckIn['emotionId'], number>>((result, entry) => {
+    result.set(entry.emotionId, (result.get(entry.emotionId) ?? 0) + 1);
+    return result;
+  }, new Map());
+
+  return emotions.reduce<readonly CalendarEmotionFrequency[]>((ranked, emotion) => {
+    const count = counts.get(emotion.id) ?? 0;
+    if (count === 0) return ranked;
+    const frequency = { emotionId: emotion.id, count };
+    const insertAt = ranked.findIndex((candidate) => count > candidate.count);
+    if (insertAt < 0) return ranked.concat(frequency);
+    return ranked.slice(0, insertAt).concat(frequency, ranked.slice(insertAt));
+  }, []);
+}
 
 function sameLocalMonth({ date, month, year }: {
   date: Date;

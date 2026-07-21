@@ -1,3 +1,4 @@
+import { screen } from '@react-native-harness/ui';
 import { describe, expect, render, test } from 'react-native-harness';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { StyleSheet } from 'react-native';
@@ -47,6 +48,78 @@ const entries = [
   checkIn({ day: 21, emotionId: EMOTION_IDS.SADNESS, id: 'sadness-1' }),
 ] satisfies readonly CheckIn[];
 
+function checkInsForBelief({
+  beliefSystemId,
+  count,
+  day,
+  emotionId,
+  guidingStatementSnapshot,
+  prefix,
+}: {
+  beliefSystemId: CheckIn['beliefSystemId'];
+  count: number;
+  day: number;
+  emotionId: CheckIn['emotionId'];
+  guidingStatementSnapshot: string;
+  prefix: string;
+}): readonly CheckIn[] {
+  return Array.from({ length: count }, (_, index) => ({
+    id: CheckInId.make(`${prefix}-${String(index + 1)}`),
+    beliefSystemId,
+    createdAt: CheckInTimestamp.make(
+      new Date(2026, 6, day, 10, index).toISOString(),
+    ),
+    emotionId,
+    guidingStatementSnapshot,
+    intensity: 0.5,
+    level: 2,
+    note: `Moment ${String(index + 1)}`,
+  }));
+}
+
+const tiedScreenshotShape = [
+  ...checkInsForBelief({
+    beliefSystemId: BELIEF_SYSTEM_IDS.LOVE_REQUIRES_HELPING,
+    count: 7,
+    day: 18,
+    emotionId: EMOTION_IDS.ANGER,
+    guidingStatementSnapshot: 'I may prioritize myself too.',
+    prefix: 'previous-saturday-prioritize',
+  }),
+  ...checkInsForBelief({
+    beliefSystemId: BELIEF_SYSTEM_IDS.ALWAYS_FUNCTIONING,
+    count: 7,
+    day: 19,
+    emotionId: EMOTION_IDS.SADNESS,
+    guidingStatementSnapshot: 'I may pause and still be worthy.',
+    prefix: 'previous-sunday-pause',
+  }),
+  ...checkInsForBelief({
+    beliefSystemId: BELIEF_SYSTEM_IDS.NO_MISTAKES,
+    count: 1,
+    day: 19,
+    emotionId: EMOTION_IDS.SHAME,
+    guidingStatementSnapshot: 'Mistakes help me learn.',
+    prefix: 'previous-sunday-learn',
+  }),
+  ...checkInsForBelief({
+    beliefSystemId: BELIEF_SYSTEM_IDS.NO_MISTAKES,
+    count: 9,
+    day: 20,
+    emotionId: EMOTION_IDS.LOVE,
+    guidingStatementSnapshot: 'Mistakes help me learn.',
+    prefix: 'current-monday',
+  }),
+  ...checkInsForBelief({
+    beliefSystemId: BELIEF_SYSTEM_IDS.ALWAYS_FUNCTIONING,
+    count: 7,
+    day: 21,
+    emotionId: EMOTION_IDS.JOY,
+    guidingStatementSnapshot: 'I may pause and still be worthy.',
+    prefix: 'current-tuesday',
+  }),
+] satisfies readonly CheckIn[];
+
 describe('analytics on the device runtime', () => {
   test('renders the populated constellation on the device runtime', async () => {
     expect(analyticsObservations(entries)).toHaveLength(3);
@@ -64,6 +137,37 @@ describe('analytics on the device runtime', () => {
         />
       </GestureHandlerRootView>,
     );
+
+    expect(
+      await screen.findByAccessibilityLabel(
+        'July 15, 2026. 2 recorded moments: Joy 1, Fear 1.',
+      ),
+    ).not.toBeNull();
+  });
+
+  test('renders every tied top Leitsatz instead of hiding the card', async () => {
+    expect(tiedScreenshotShape).toHaveLength(31);
+    await render(
+      <GestureHandlerRootView style={styles.root}>
+        <AnalyticsContent
+          entries={tiedScreenshotShape}
+          locale={APP_LOCALES.ENGLISH}
+          now={FIXED_NOW}
+          statements={[]}
+        />
+      </GestureHandlerRootView>,
+    );
+
+    expect(
+      await screen.findByTestId(
+        `analytics-last-week-leitsatz-${BELIEF_SYSTEM_IDS.ALWAYS_FUNCTIONING}`,
+      ),
+    ).not.toBeNull();
+    expect(
+      await screen.findByTestId(
+        `analytics-last-week-leitsatz-${BELIEF_SYSTEM_IDS.LOVE_REQUIRES_HELPING}`,
+      ),
+    ).not.toBeNull();
   });
 });
 

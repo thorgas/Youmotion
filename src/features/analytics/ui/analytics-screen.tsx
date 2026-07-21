@@ -2,10 +2,10 @@ import { useSelector as useActorSelector } from '@xstate/react';
 import { useSelector } from '@xstate/store-react';
 import { fbs } from 'fbtee';
 import {
+  Pressable,
   ScrollView,
   StyleSheet,
   Text,
-  TouchableOpacity,
   useWindowDimensions,
   View,
 } from 'react-native';
@@ -21,6 +21,11 @@ import {
   MOTION_DURATION,
   MOTION_OFFSET,
 } from '@/constants';
+import {
+  tabScreenContentStyle,
+  tabScreenEyebrowStyle,
+  tabScreenTitleStyle,
+} from '@/components/ui/tab-screen-layout';
 import { checkInHistoryStore } from '@/features/check-in/application/check-in-history.store';
 import type { CheckIn } from '@/features/check-in/domain/check-in';
 import { emotions } from '@/features/check-in/domain/emotion';
@@ -38,6 +43,7 @@ import {
   type EmotionFrequency,
 } from '../domain/check-in-analytics';
 import {
+  calendarEmotionFrequencies,
   calendarMonth,
   monthAtOffset,
   periodCalendarDays,
@@ -45,17 +51,19 @@ import {
 import {
   analyticsDateRange,
   entriesForAnalyticsTimeframe,
-  topLeitsatzForPreviousWeek,
+  topLeitsaetzeForPreviousWeek,
   type AnalyticsTimeframe,
 } from '../domain/analytics-timeframe';
 import {
   analyticsMonthLabel,
   analyticsTimeframeRangeLabel,
+  additionalTopLeitsaetzeCopy,
   analyticsWeekdayLabel,
   calendarDayAccessibilityLabel,
   observationCopy,
   topLeitsatzEvidenceCopy,
 } from './analytics-copy';
+import { AnalyticsTimeframeSelector } from './analytics-timeframe-selector';
 import { EmotionRadarChart } from './emotion-radar-chart';
 
 const _selectHistory = (state: ReturnType<typeof checkInHistoryStore.getSnapshot>) => (
@@ -97,75 +105,6 @@ const leitsatzEntering = FadeInDown
     transform: [{ translateY: MOTION_OFFSET.STATE }],
   });
 
-function TimeframeOption({
-  label,
-  onPress,
-  selected,
-  testID,
-}: {
-  label: string;
-  onPress: () => void;
-  selected: boolean;
-  testID: string;
-}) {
-  return (
-    <TouchableOpacity
-      accessibilityRole="button"
-      accessibilityState={{ selected }}
-      activeOpacity={0.72}
-      onPress={onPress}
-      style={[styles.timeframeOption, selected ? styles.timeframeOptionSelected : null]}
-      testID={testID}
-    >
-      <Text style={[styles.timeframeOptionText, selected ? styles.timeframeOptionTextSelected : null]}>
-        {label}
-      </Text>
-    </TouchableOpacity>
-  );
-}
-
-function TimeframeSelector({
-  locale,
-  now,
-  timeframe,
-}: {
-  locale: AppLocale;
-  now: Date;
-  timeframe: AnalyticsTimeframe;
-}) {
-  const range = analyticsDateRange({ now, timeframe });
-  return (
-    <View style={styles.timeframeSection} testID="analytics-timeframe-selector">
-      <Text style={styles.timeframeLabel}>
-        <fbt desc="Label above the analytics timeframe selector">TIMEFRAME</fbt>
-      </Text>
-      <View style={styles.timeframeControl}>
-        <TimeframeOption
-          label={String(fbs('Last week', 'Analytics timeframe option for the previous completed week'))}
-          onPress={_selectLastWeek}
-          selected={timeframe === ANALYTICS_TIMEFRAMES.LAST_WEEK}
-          testID="analytics-timeframe-last-week"
-        />
-        <TimeframeOption
-          label={String(fbs('4 weeks', 'Analytics timeframe option for the previous four completed weeks'))}
-          onPress={_selectLastFourWeeks}
-          selected={timeframe === ANALYTICS_TIMEFRAMES.LAST_FOUR_WEEKS}
-          testID="analytics-timeframe-four-weeks"
-        />
-        <TimeframeOption
-          label={String(fbs('All time', 'Analytics timeframe option for all recorded moments'))}
-          onPress={_selectAllTime}
-          selected={timeframe === ANALYTICS_TIMEFRAMES.ALL_TIME}
-          testID="analytics-timeframe-all"
-        />
-      </View>
-      <Text style={styles.timeframeRange} testID="analytics-timeframe-range">
-        {analyticsTimeframeRangeLabel({ locale, range, timeframe })}
-      </Text>
-    </View>
-  );
-}
-
 function LastWeekLeitsatz({
   entries,
   locale,
@@ -177,8 +116,9 @@ function LastWeekLeitsatz({
   now: Date;
   statements: readonly BeliefStatement[];
 }) {
-  const leitsatz = topLeitsatzForPreviousWeek({ entries, now, statements });
-  if (!leitsatz) return null;
+  const group = topLeitsaetzeForPreviousWeek({ entries, now, statements });
+  if (!group) return null;
+  const multiple = group.leitsaetze.length > 1 || group.additionalCount > 0;
   return (
     <Animated.View
       entering={leitsatzEntering}
@@ -186,14 +126,33 @@ function LastWeekLeitsatz({
       testID="analytics-last-week-leitsatz"
     >
       <Text style={styles.leitsatzLabel}>
-        <fbt desc="Label for the most frequently selected positive guiding statement last week">
-          LAST WEEK&apos;S GUIDING BELIEF
-        </fbt>
+        {multiple ? (
+          <fbt desc="Label for equally most frequently selected positive guiding statements last week">
+            LAST WEEK&apos;S GUIDING BELIEFS
+          </fbt>
+        ) : (
+          <fbt desc="Label for the most frequently selected positive guiding statement last week">
+            LAST WEEK&apos;S GUIDING BELIEF
+          </fbt>
+        )}
       </Text>
-      <Text style={styles.leitsatzText}>“{leitsatz.guidingStatement}”</Text>
-      <Text style={styles.leitsatzEvidence}>
-        {topLeitsatzEvidenceCopy({ leitsatz, locale })}
-      </Text>
+      {group.leitsaetze.map((leitsatz, index) => (
+        <View
+          key={leitsatz.beliefSystemId}
+          style={index === 0 ? undefined : styles.leitsatzTie}
+          testID={`analytics-last-week-leitsatz-${leitsatz.beliefSystemId}`}
+        >
+          <Text style={styles.leitsatzText}>“{leitsatz.guidingStatement}”</Text>
+          <Text style={styles.leitsatzEvidence}>
+            {topLeitsatzEvidenceCopy({ leitsatz, locale })}
+          </Text>
+        </View>
+      ))}
+      {group.additionalCount > 0 ? (
+        <Text style={styles.leitsatzAdditional}>
+          {additionalTopLeitsaetzeCopy(group.additionalCount)}
+        </Text>
+      ) : null}
     </Animated.View>
   );
 }
@@ -303,29 +262,26 @@ function CalendarDayCell({ date, entries, locale, today }: {
   const isToday = date.getFullYear() === today.getFullYear()
     && date.getMonth() === today.getMonth()
     && date.getDate() === today.getDate();
-  const visibleEntries = entries.slice(0, 4);
+  const frequencies = calendarEmotionFrequencies(entries);
   return (
     <View
       accessible
-      accessibilityLabel={calendarDayAccessibilityLabel({ date, entries, locale })}
+      accessibilityLabel={calendarDayAccessibilityLabel({ date, frequencies, locale })}
       style={[styles.calendarCell, isToday ? styles.calendarToday : null]}
       testID={`analytics-calendar-day-${localDateKey(date)}`}
     >
       <Text style={[styles.calendarDayNumber, isToday ? styles.calendarTodayNumber : null]}>
         {date.getDate()}
       </Text>
-      <View style={styles.calendarDots}>
-        {visibleEntries.map((entry) => (
+      <View accessibilityElementsHidden style={styles.calendarDots}>
+        {frequencies.map((frequency) => (
           <View
-            key={entry.id}
+            key={frequency.emotionId}
             style={[styles.calendarDot, {
-              backgroundColor: emotionColors.get(entry.emotionId) ?? palette.inkMuted,
+              backgroundColor: emotionColors.get(frequency.emotionId) ?? palette.inkMuted,
             }]}
           />
         ))}
-        {entries.length > visibleEntries.length ? (
-          <Text style={styles.calendarMore}>+{entries.length - visibleEntries.length}</Text>
-        ) : null}
       </View>
     </View>
   );
@@ -367,8 +323,8 @@ function PeriodCalendar({
         {analyticsTimeframeRangeLabel({ locale, range, timeframe })}
       </Text>
       <Text style={styles.calendarExplanation}>
-        <fbt desc="Explanation that calendar dots use the emotion colors from the chart">
-          Each dot is a recorded moment, using the emotion colors above.
+        <fbt desc="Explanation of distinct and frequency-ordered emotion colors in each analytics calendar date">
+          See which emotions you noticed each day. Each color appears once, ordered from most to least frequent.
         </fbt>
       </Text>
       <WeekdayLabels locale={locale} />
@@ -423,7 +379,7 @@ function CalendarSection({ entries, locale, now }: {
       <View style={styles.calendarHeader}>
         <Text style={styles.sectionTitle} testID="analytics-calendar-month">{monthLabel}</Text>
         <View style={styles.calendarActions}>
-          <TouchableOpacity
+          <Pressable
             accessibilityLabel={String(fbs('Previous month', 'Analytics calendar previous month button'))}
             accessibilityRole="button"
             hitSlop={8}
@@ -432,8 +388,8 @@ function CalendarSection({ entries, locale, now }: {
             testID="analytics-calendar-previous"
           >
             <Text style={styles.monthButtonText}>‹</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
+          </Pressable>
+          <Pressable
             accessibilityLabel={String(fbs('Next month', 'Analytics calendar next month button'))}
             accessibilityRole="button"
             disabled={isCurrentMonth}
@@ -443,12 +399,12 @@ function CalendarSection({ entries, locale, now }: {
             testID="analytics-calendar-next"
           >
             <Text style={styles.monthButtonText}>›</Text>
-          </TouchableOpacity>
+          </Pressable>
         </View>
       </View>
       <Text style={styles.calendarExplanation}>
-        <fbt desc="Explanation that the all-time calendar can browse recorded moments by month">
-          Browse all recorded moments by month. Dots use the emotion colors above.
+        <fbt desc="Explanation of distinct and frequency-ordered emotion colors in each analytics calendar date">
+          See which emotions you noticed each day. Each color appears once, ordered from most to least frequent.
         </fbt>
       </Text>
       <WeekdayLabels locale={locale} />
@@ -494,16 +450,19 @@ export function AnalyticsContent({ entries, locale, now, statements }: {
     <View style={styles.page} testID="analytics-screen">
       <SafeAreaView edges={['top']} style={styles.safeArea}>
         <ScrollView contentContainerStyle={styles.content}>
-          <Text style={styles.eyebrow}><fbt desc="Analytics screen eyebrow">YOUR INSIGHTS</fbt></Text>
+          <Text style={styles.eyebrow} testID="analytics-eyebrow"><fbt desc="Analytics screen eyebrow">YOUR INSIGHTS</fbt></Text>
           <Text style={styles.title}><fbt desc="Analytics screen title">Patterns you noticed.</fbt></Text>
           <Text style={styles.intro}>
             <fbt desc="Analytics screen explanation and privacy note">
               A private view of the moments you recorded on this device.
             </fbt>
           </Text>
-          <TimeframeSelector
+          <AnalyticsTimeframeSelector
             locale={locale}
             now={now}
+            onAllTimePress={_selectAllTime}
+            onFourWeeksPress={_selectLastFourWeeks}
+            onLastWeekPress={_selectLastWeek}
             timeframe={analytics.timeframe}
           />
           <LastWeekLeitsatz
@@ -570,59 +529,10 @@ export function AnalyticsScreen({ now }: { now?: Date }) {
 const styles = StyleSheet.create({
   page: { flex: 1, backgroundColor: palette.paper },
   safeArea: { flex: 1 },
-  content: {
-    width: '100%',
-    maxWidth: 520,
-    alignSelf: 'center',
-    paddingHorizontal: 22,
-    paddingTop: 18,
-    paddingBottom: 48,
-  },
-  eyebrow: { fontFamily: type.semibold, color: palette.inkMuted, fontSize: 11, letterSpacing: 1.4 },
-  title: { fontFamily: type.semibold, color: palette.ink, fontSize: 34, lineHeight: 40, marginTop: 8 },
+  content: tabScreenContentStyle,
+  eyebrow: tabScreenEyebrowStyle,
+  title: tabScreenTitleStyle,
   intro: { fontFamily: type.regular, color: palette.inkMuted, fontSize: 14, lineHeight: 21, marginTop: 10 },
-  timeframeSection: { marginTop: 24 },
-  timeframeLabel: {
-    fontFamily: type.semibold,
-    color: palette.inkMuted,
-    fontSize: 10,
-    letterSpacing: 1.2,
-  },
-  timeframeControl: {
-    flexDirection: 'row',
-    gap: 4,
-    marginTop: 9,
-    padding: 4,
-    borderRadius: 16,
-    backgroundColor: 'rgba(42, 39, 34, 0.055)',
-  },
-  timeframeOption: {
-    flex: 1,
-    minHeight: 38,
-    borderRadius: 12,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingHorizontal: 6,
-  },
-  timeframeOptionSelected: {
-    backgroundColor: palette.paperRaised,
-    borderWidth: 1,
-    borderColor: palette.hairline,
-  },
-  timeframeOptionText: {
-    fontFamily: type.medium,
-    color: palette.inkMuted,
-    fontSize: 12,
-    textAlign: 'center',
-  },
-  timeframeOptionTextSelected: { fontFamily: type.semibold, color: palette.ink },
-  timeframeRange: {
-    fontFamily: type.regular,
-    color: palette.inkMuted,
-    fontSize: 12,
-    lineHeight: 18,
-    marginTop: 7,
-  },
   leitsatzCard: {
     marginTop: 26,
     padding: 21,
@@ -651,6 +561,19 @@ const styles = StyleSheet.create({
     fontSize: 12,
     lineHeight: 18,
     marginTop: 11,
+  },
+  leitsatzTie: {
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(94, 111, 97, 0.24)',
+    marginTop: 17,
+    paddingTop: 7,
+  },
+  leitsatzAdditional: {
+    fontFamily: type.regular,
+    color: palette.inkMuted,
+    fontSize: 12,
+    lineHeight: 18,
+    marginTop: 17,
   },
   section: { backgroundColor: palette.paper, marginTop: 34 },
   constellationSection: { backgroundColor: palette.paper, marginTop: 38 },
@@ -728,7 +651,6 @@ const styles = StyleSheet.create({
   calendarTodayNumber: { fontFamily: type.semibold, color: palette.moss },
   calendarDots: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', gap: 3, width: 30, marginTop: 6 },
   calendarDot: { width: 5, height: 5, borderRadius: 3 },
-  calendarMore: { fontFamily: type.semibold, color: palette.inkMuted, fontSize: 8, lineHeight: 8 },
   empty: { borderRadius: 24, backgroundColor: palette.paperRaised, padding: 24, marginTop: 30 },
   emptyTitle: { fontFamily: type.medium, color: palette.ink, fontSize: 20 },
   emptyCopy: { fontFamily: type.regular, color: palette.inkMuted, fontSize: 14, lineHeight: 21, marginTop: 7 },

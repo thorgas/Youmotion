@@ -7,6 +7,7 @@ import { NONE } from 'react-native-surrealdb';
 
 import {
   APP_LOCALES,
+  ANALYTICS_TIMEFRAMES,
   BELIEF_LIBRARY_EVENTS,
   BELIEF_LIBRARY_STATES,
   CHECK_IN_EVENTS,
@@ -18,12 +19,14 @@ import {
   NAVIGATION_STATES,
   ONBOARDING_EVENTS,
   ONBOARDING_STATES,
+  HISTORY_EVENTS,
 } from '@/constants';
 import { AppLocaleProvider } from '@/localization/app-locale-provider';
 import { appNavigationMachine } from '@/navigation/app-navigation.machine';
 import {
   CheckInId,
   CheckInTimestamp,
+  type CheckIn,
   type EmotionSelection,
 } from '../domain/check-in';
 import {
@@ -31,6 +34,7 @@ import {
   type BeliefStatement,
 } from '../domain/belief-statement';
 import { checkInHistoryStore } from '../application/check-in-history.store';
+import { historyTimeframeStore } from '../application/history-timeframe.store';
 import {
   mockSurrealDatabase,
   mockSurrealQuery,
@@ -164,6 +168,9 @@ describe('check-in screens', () => {
   beforeEach(() => {
     resetSurrealDatabaseMock();
     checkInHistoryStore.trigger.hydrated({ entries: [] });
+    historyTimeframeStore.trigger[HISTORY_EVENTS.TIMEFRAME_SELECTED]({
+      timeframe: ANALYTICS_TIMEFRAMES.ALL_TIME,
+    });
     appSettingsStore.trigger.hydrated({
       settings: {
         locale: APP_LOCALES.ENGLISH,
@@ -854,6 +861,38 @@ describe('check-in screens', () => {
     await fireEvent.press(library.getByText('Bearbeiten'));
     expect(library.getByText('Deine Leidsätze')).toBeTruthy();
     expect(library.queryByText('‹ Deine Leidsätze')).toBeNull();
+  });
+
+  it('filters history moments with its all-time default preserved', async () => {
+    const moments = [{
+      id: CheckInId.make('history-current-week'),
+      createdAt: CheckInTimestamp.make(new Date(2026, 6, 21, 12).toISOString()),
+      emotionId: EMOTION_IDS.JOY,
+      intensity: 0.5,
+      level: 2,
+      note: 'Current week',
+    }, {
+      id: CheckInId.make('history-previous-week'),
+      createdAt: CheckInTimestamp.make(new Date(2026, 6, 19, 12).toISOString()),
+      emotionId: EMOTION_IDS.FEAR,
+      intensity: 0.5,
+      level: 2,
+      note: 'Previous week',
+    }] satisfies readonly CheckIn[];
+    checkInHistoryStore.trigger.hydrated({ entries: moments });
+
+    const history = await _renderLocalized(
+      <HistoryScreen now={new Date(2026, 6, 21, 12)} />,
+    );
+    expect(history.getByTestId('history-moment-history-current-week')).toBeTruthy();
+    expect(history.getByTestId('history-moment-history-previous-week')).toBeTruthy();
+
+    await fireEvent.press(history.getByTestId('analytics-timeframe-last-week'));
+
+    await waitFor(() => expect(
+      history.queryByTestId('history-moment-history-current-week'),
+    ).toBeNull());
+    expect(history.getByTestId('history-moment-history-previous-week')).toBeTruthy();
   });
 
   it('renders success, history, and settings destinations', async () => {

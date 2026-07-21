@@ -26,6 +26,11 @@ import {
   ONBOARDING_EVENTS,
   SETTINGS_EVENTS,
 } from '@/constants';
+import {
+  tabScreenContentStyle,
+  tabScreenEyebrowStyle,
+  tabScreenTitleStyle,
+} from '@/components/ui/tab-screen-layout';
 import { activeCustomBeliefStatements } from '@/features/check-in/domain/belief-statement';
 import { palette, type } from '@/features/check-in/ui/theme';
 import { useAppNavigationActor } from '@/navigation/app-navigation.provider';
@@ -174,7 +179,7 @@ export function SettingsScreen() {
     <View style={styles.page} testID="settings-screen">
       <SafeAreaView edges={['top']} style={styles.safeArea}>
         <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
-        <Text style={styles.eyebrow}><fbt desc="Settings screen eyebrow heading">SETTINGS</fbt></Text>
+        <Text style={styles.eyebrow} testID="settings-eyebrow"><fbt desc="Settings screen eyebrow heading">SETTINGS</fbt></Text>
         <Text style={styles.title}><fbt desc="Settings screen title">Your space.</fbt></Text>
         <Text style={styles.sectionHeading}>
           <fbt desc="Heading grouping app preferences in settings">PREFERENCES</fbt>
@@ -297,9 +302,12 @@ export function SettingsScreen() {
 const styles = StyleSheet.create({
   page: { flex: 1, backgroundColor: palette.paper },
   safeArea: { flex: 1 },
-  content: { width: '100%', maxWidth: 520, alignSelf: 'center', padding: 22, paddingBottom: 40 },
-  eyebrow: { fontFamily: type.semibold, color: palette.inkMuted, fontSize: 11, letterSpacing: 1.4, marginTop: 18 },
-  title: { fontFamily: type.semibold, color: palette.ink, fontSize: 36, marginTop: 8, marginBottom: 30 },
+  content: tabScreenContentStyle,
+  eyebrow: tabScreenEyebrowStyle,
+  title: {
+    ...tabScreenTitleStyle,
+    marginBottom: 30,
+  },
   sectionHeading: {
     fontFamily: type.semibold,
     color: palette.inkMuted,

@@ -6,9 +6,21 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { formatHistoryDate } from '@/localization/date-copy';
 import { useAppLocale } from '@/localization/app-locale-provider';
-import { CHECK_IN_EVENTS } from '@/constants';
+import {
+  ANALYTICS_TIMEFRAMES,
+  CHECK_IN_EVENTS,
+  HISTORY_EVENTS,
+} from '@/constants';
+import {
+  tabScreenContentStyle,
+  tabScreenEyebrowStyle,
+  tabScreenTitleStyle,
+} from '@/components/ui/tab-screen-layout';
+import { AnalyticsTimeframeSelector } from '@/features/analytics/ui/analytics-timeframe-selector';
+import { entriesForAnalyticsTimeframe } from '@/features/analytics/domain/analytics-timeframe';
 import { useAppNavigationActor } from '@/navigation/app-navigation.provider';
 import { checkInHistoryStore } from '../application/check-in-history.store';
+import { historyTimeframeStore } from '../application/history-timeframe.store';
 import type { CheckIn } from '../domain/check-in';
 import { selectionForCheckIn } from '../domain/emotion';
 import type { BeliefStatement } from '../domain/belief-statement';
@@ -24,9 +36,27 @@ import {
 import { palette, type } from './theme';
 
 const _selectHistory = (state: ReturnType<typeof checkInHistoryStore.getSnapshot>) => state.context;
+const _selectTimeframe = (state: ReturnType<typeof historyTimeframeStore.getSnapshot>) => (
+  state.context
+);
 const _selectBeliefStatements = (
   snapshot: ReturnType<ReturnType<typeof useAppNavigationActor>['getSnapshot']>,
 ) => snapshot.context.beliefStatements;
+const _selectLastWeek = () => {
+  historyTimeframeStore.trigger[HISTORY_EVENTS.TIMEFRAME_SELECTED]({
+    timeframe: ANALYTICS_TIMEFRAMES.LAST_WEEK,
+  });
+};
+const _selectLastFourWeeks = () => {
+  historyTimeframeStore.trigger[HISTORY_EVENTS.TIMEFRAME_SELECTED]({
+    timeframe: ANALYTICS_TIMEFRAMES.LAST_FOUR_WEEKS,
+  });
+};
+const _selectAllTime = () => {
+  historyTimeframeStore.trigger[HISTORY_EVENTS.TIMEFRAME_SELECTED]({
+    timeframe: ANALYTICS_TIMEFRAMES.ALL_TIME,
+  });
+};
 
 function HistoryBelief({
   entry,
@@ -118,28 +148,58 @@ function MomentRow({ entry, locale }: { entry: CheckIn; locale: string }) {
   );
 }
 
-export function HistoryScreen() {
+export function HistoryScreen({ now }: { now?: Date }) {
   const history = useSelector(checkInHistoryStore, _selectHistory);
+  const selection = useSelector(historyTimeframeStore, _selectTimeframe);
   const locale = useAppLocale();
+  const currentDate = now ?? new Date();
+  const scopedEntries = entriesForAnalyticsTimeframe({
+    entries: history.entries,
+    now: currentDate,
+    timeframe: selection.timeframe,
+  });
 
   return (
     <View style={styles.page} testID="history-screen">
       <SafeAreaView edges={['top']} style={styles.safeArea}>
-        <ScrollView contentContainerStyle={styles.content}>
-          <Text style={styles.eyebrow}><fbt desc="Check-in history eyebrow heading">YOUR HISTORY</fbt></Text>
+        <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+          <Text style={styles.eyebrow} testID="history-eyebrow"><fbt desc="Check-in history eyebrow heading">YOUR HISTORY</fbt></Text>
           <Text style={styles.title}><fbt desc="Check-in history title">Moments you noticed.</fbt></Text>
           <Text style={styles.intro}><fbt desc="Privacy note above check-in history">Your check-ins stay locally on this device.</fbt></Text>
-          {history.error ? (
-            <Text style={styles.error}>
-              <fbt desc="Error shown when check-in history cannot be updated">Your history could not be updated.</fbt>
-            </Text>
-          ) : null}
-          {history.entries.length === 0 ? (
-            <View style={styles.empty}>
-              <Text style={styles.emptyTitle}><fbt desc="Empty check-in history title">Still quiet here.</fbt></Text>
-              <Text style={styles.emptyCopy}><fbt desc="Empty check-in history explanation">After your first check-in, a gentle history will appear here.</fbt></Text>
-            </View>
-          ) : history.entries.map((entry) => <MomentRow key={entry.id} entry={entry} locale={locale} />)}
+          <AnalyticsTimeframeSelector
+            locale={locale}
+            now={currentDate}
+            onAllTimePress={_selectAllTime}
+            onFourWeeksPress={_selectLastFourWeeks}
+            onLastWeekPress={_selectLastWeek}
+            timeframe={selection.timeframe}
+          />
+          <View style={styles.results}>
+            {history.error ? (
+              <Text style={styles.error}>
+                <fbt desc="Error shown when check-in history cannot be updated">Your history could not be updated.</fbt>
+              </Text>
+            ) : null}
+            {history.entries.length === 0 ? (
+              <View style={styles.empty}>
+                <Text style={styles.emptyTitle}><fbt desc="Empty check-in history title">Still quiet here.</fbt></Text>
+                <Text style={styles.emptyCopy}><fbt desc="Empty check-in history explanation">After your first check-in, a gentle history will appear here.</fbt></Text>
+              </View>
+            ) : scopedEntries.length === 0 ? (
+              <View style={styles.empty}>
+                <Text style={styles.emptyTitle}>
+                  <fbt desc="Empty filtered check-in history title">No moments in this period.</fbt>
+                </Text>
+                <Text style={styles.emptyCopy}>
+                  <fbt desc="Empty filtered check-in history explanation">
+                    Choose another timeframe to see more of your history.
+                  </fbt>
+                </Text>
+              </View>
+            ) : scopedEntries.map((entry) => (
+              <MomentRow key={entry.id} entry={entry} locale={locale} />
+            ))}
+          </View>
         </ScrollView>
       </SafeAreaView>
     </View>
@@ -149,10 +209,11 @@ export function HistoryScreen() {
 const styles = StyleSheet.create({
   page: { flex: 1, backgroundColor: palette.paper },
   safeArea: { flex: 1 },
-  content: { width: '100%', maxWidth: 520, alignSelf: 'center', padding: 22, paddingBottom: 40 },
-  eyebrow: { fontFamily: type.semibold, color: palette.inkMuted, fontSize: 11, letterSpacing: 1.4, marginTop: 18 },
-  title: { fontFamily: type.semibold, color: palette.ink, fontSize: 34, lineHeight: 40, marginTop: 8 },
-  intro: { fontFamily: type.regular, color: palette.inkMuted, fontSize: 14, marginTop: 10, marginBottom: 28 },
+  content: tabScreenContentStyle,
+  eyebrow: tabScreenEyebrowStyle,
+  title: tabScreenTitleStyle,
+  intro: { fontFamily: type.regular, color: palette.inkMuted, fontSize: 14, lineHeight: 21, marginTop: 10 },
+  results: { marginTop: 28 },
   empty: { borderRadius: 26, backgroundColor: palette.paperRaised, borderWidth: 1, borderColor: palette.hairline, padding: 26 },
   emptyTitle: { fontFamily: type.medium, color: palette.ink, fontSize: 22 },
   emptyCopy: { fontFamily: type.regular, color: palette.inkMuted, fontSize: 14, lineHeight: 21, marginTop: 8 },

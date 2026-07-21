@@ -114,6 +114,10 @@ export const ANALYTICS_TIMEFRAMES = Object.freeze({
   ALL_TIME: literal('allTime'),
 });
 
+export const HISTORY_EVENTS = Object.freeze({
+  TIMEFRAME_SELECTED: literal('history.timeframeSelected'),
+});
+
 export const ONBOARDING_EVENTS = Object.freeze({
   OPENED: literal('onboarding.opened'),
   NEXT_REQUESTED: literal('onboarding.nextRequested'),

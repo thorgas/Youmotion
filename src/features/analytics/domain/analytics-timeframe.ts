@@ -24,6 +24,10 @@ export const TopLeitsatzSchema = Schema.Struct({
   weekEndsAt: Schema.DateFromSelf,
 });
 export type TopLeitsatz = typeof TopLeitsatzSchema.Type;
+export type TopLeitsatzGroup = Readonly<{
+  additionalCount: number;
+  leitsaetze: readonly TopLeitsatz[];
+}>;
 
 export type AnalyticsDateRange = Readonly<{ start: Date | null; end: Date }>;
 
@@ -69,21 +73,29 @@ export function entriesForAnalyticsTimeframe({
   });
 }
 
-function twoHighestCounts<Item extends Readonly<{ count: number }>>(items: readonly Item[]) {
-  let first: Item | undefined;
-  let second: Item | undefined;
-  items.forEach((item) => {
-    if (!first || item.count > first.count) {
-      second = first;
-      first = item;
-      return;
-    }
-    if (!second || item.count > second.count) second = item;
-  });
-  return { first, second };
+const MAX_VISIBLE_TOP_LEITSAETZE = 3;
+
+type LeitsatzFrequency = Readonly<{
+  beliefSystemId: BeliefSystemId;
+  count: number;
+  guidingStatement: string;
+  latestAt: number;
+}>;
+
+function rankLeitsatzFrequencies(items: readonly LeitsatzFrequency[]) {
+  return items.reduce<readonly LeitsatzFrequency[]>((ranked, item) => {
+    const insertionIndex = ranked.findIndex((candidate) => (
+      item.count > candidate.count
+      || (item.count === candidate.count && item.latestAt > candidate.latestAt)
+    ));
+    if (insertionIndex === -1) return ranked.concat(item);
+    return ranked
+      .slice(0, insertionIndex)
+      .concat(item, ranked.slice(insertionIndex));
+  }, []);
 }
 
-export function topLeitsatzForPreviousWeek({
+export function topLeitsaetzeForPreviousWeek({
   entries,
   now,
   statements,
@@ -91,20 +103,16 @@ export function topLeitsatzForPreviousWeek({
   entries: readonly CheckIn[];
   now: Date;
   statements: readonly BeliefStatement[];
-}): TopLeitsatz | null {
+}): TopLeitsatzGroup | null {
   const range = analyticsDateRange({ now, timeframe: ANALYTICS_TIMEFRAMES.LAST_WEEK });
   if (range.start === null) return null;
+  const weekStartsAt = range.start;
   const weeklyEntries = entriesForAnalyticsTimeframe({
     entries,
     now,
     timeframe: ANALYTICS_TIMEFRAMES.LAST_WEEK,
   });
-  const frequencies = weeklyEntries.reduce<ReadonlyArray<{
-    beliefSystemId: BeliefSystemId;
-    count: number;
-    guidingStatement: string;
-    latestAt: number;
-  }>>((items, entry) => {
+  const frequencies = weeklyEntries.reduce<readonly LeitsatzFrequency[]>((items, entry) => {
     if (!entry.beliefSystemId) return items;
     const statement = beliefStatementForId({
       beliefSystemId: entry.beliefSystemId,
@@ -129,13 +137,21 @@ export function topLeitsatzForPreviousWeek({
       latestAt: Math.max(createdAt, item.latestAt),
     });
   }, []);
-  const { first, second } = twoHighestCounts(frequencies);
-  if (!first || first.count === second?.count) return null;
-  return TopLeitsatzSchema.make({
-    beliefSystemId: first.beliefSystemId,
-    guidingStatement: first.guidingStatement,
-    count: first.count,
-    weekStartsAt: range.start,
-    weekEndsAt: daysBefore({ date: range.end, dayCount: 1 }),
-  });
+  const ranked = rankLeitsatzFrequencies(frequencies);
+  const highestCount = ranked[0]?.count;
+  if (highestCount === undefined) return null;
+  const coLeaders = ranked.filter(({ count }) => count === highestCount);
+  const visibleLeitsaetze = coLeaders
+    .slice(0, MAX_VISIBLE_TOP_LEITSAETZE)
+    .map((leader) => TopLeitsatzSchema.make({
+      beliefSystemId: leader.beliefSystemId,
+      guidingStatement: leader.guidingStatement,
+      count: leader.count,
+      weekStartsAt,
+      weekEndsAt: daysBefore({ date: range.end, dayCount: 1 }),
+    }));
+  return {
+    additionalCount: coLeaders.length - visibleLeitsaetze.length,
+    leitsaetze: visibleLeitsaetze,
+  };
 }

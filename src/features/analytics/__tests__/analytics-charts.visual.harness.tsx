@@ -67,13 +67,17 @@ function checkIn({
   beliefSystemId,
   day,
   emotionId,
+  guidingStatementSnapshot,
   id,
 }: {
   beliefSystemId?: CheckIn['beliefSystemId'];
   day: number;
   emotionId: CheckIn['emotionId'];
+  guidingStatementSnapshot?: string;
   id: string;
 }): CheckIn {
+  const statementSnapshot = guidingStatementSnapshot
+    ?? (beliefSystemId ? 'I may pause and still be worthy.' : undefined);
   return {
     id: CheckInId.make(id),
     beliefSystemId,
@@ -82,9 +86,7 @@ function checkIn({
     intensity: 0.5,
     level: 2,
     note: '',
-    guidingStatementSnapshot: beliefSystemId
-      ? 'I may pause and still be worthy.'
-      : undefined,
+    ...(statementSnapshot ? { guidingStatementSnapshot: statementSnapshot } : {}),
   };
 }
 
@@ -109,7 +111,40 @@ const fullAnalyticsEntries = [
   }),
   checkIn({ day: 19, emotionId: EMOTION_IDS.JOY, id: 'joy-2' }),
   checkIn({ day: 19, emotionId: EMOTION_IDS.JOY, id: 'joy-3' }),
+  checkIn({ day: 19, emotionId: EMOTION_IDS.LOVE, id: 'love-2' }),
+  checkIn({ day: 19, emotionId: EMOTION_IDS.SHAME, id: 'shame-2' }),
+  checkIn({ day: 19, emotionId: EMOTION_IDS.DISGUST, id: 'disgust-2' }),
   checkIn({ day: 19, emotionId: EMOTION_IDS.SADNESS, id: 'sadness-2' }),
+  checkIn({ day: 19, emotionId: EMOTION_IDS.ANGER, id: 'anger-2' }),
+] satisfies readonly CheckIn[];
+
+const tiedLeitsatzEntries = [
+  checkIn({
+    beliefSystemId: BELIEF_SYSTEM_IDS.ALWAYS_FUNCTIONING,
+    day: 18,
+    emotionId: EMOTION_IDS.SADNESS,
+    id: 'tie-pause-1',
+  }),
+  checkIn({
+    beliefSystemId: BELIEF_SYSTEM_IDS.ALWAYS_FUNCTIONING,
+    day: 19,
+    emotionId: EMOTION_IDS.FEAR,
+    id: 'tie-pause-2',
+  }),
+  checkIn({
+    beliefSystemId: BELIEF_SYSTEM_IDS.LOVE_REQUIRES_HELPING,
+    day: 18,
+    emotionId: EMOTION_IDS.SHAME,
+    guidingStatementSnapshot: 'I may prioritize myself too.',
+    id: 'tie-prioritize-1',
+  }),
+  checkIn({
+    beliefSystemId: BELIEF_SYSTEM_IDS.LOVE_REQUIRES_HELPING,
+    day: 19,
+    emotionId: EMOTION_IDS.ANGER,
+    guidingStatementSnapshot: 'I may prioritize myself too.',
+    id: 'tie-prioritize-2',
+  }),
 ] satisfies readonly CheckIn[];
 
 describe('analytics chart visual regression', () => {
@@ -134,6 +169,24 @@ describe('analytics chart visual regression', () => {
     await expectImageSnapshot({
       name: 'analytics-radar-balanced-full-chart',
       testID: 'analytics-radar-visual-fixture',
+    });
+  });
+
+  visualTest('keeps tied top Leitsätze visible together', async () => {
+    await render(
+      <GestureHandlerRootView style={styles.root}>
+        <AnalyticsContent
+          entries={tiedLeitsatzEntries}
+          locale={APP_LOCALES.ENGLISH}
+          now={FIXED_NOW}
+          statements={[]}
+        />
+      </GestureHandlerRootView>,
+    );
+
+    await expectImageSnapshot({
+      name: 'analytics-tied-top-leitsaetze',
+      testID: 'analytics-last-week-leitsatz',
     });
   });
 

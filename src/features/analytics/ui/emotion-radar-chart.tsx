@@ -59,18 +59,18 @@ export class EmotionRadarChart extends PureComponent<EmotionRadarChartProps> {
 
   private _option(): RadarOption {
     const maximum = Math.max(...this.props.frequencies.map(({ count }) => count), 1);
-    const emotionLabelStyles = this.props.colors.reduce<Record<string, {
+    const emotionLabelStyles: Record<string, {
       color: string;
       fontFamily: string;
       fontSize: number;
-    }>>((styles, color, index) => ({
-      ...styles,
-      [`emotion${index}`]: {
+    }> = {};
+    this.props.colors.forEach((color, index) => {
+      emotionLabelStyles[`emotion${index}`] = {
         color,
         fontFamily: APP_TYPE.semibold,
         fontSize: 13,
-      },
-    }), {});
+      };
+    });
     return {
       animation: false,
       radar: {

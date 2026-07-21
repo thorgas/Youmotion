@@ -9,6 +9,7 @@ import type {
   AnalyticsTimeframe,
   TopLeitsatz,
 } from '../domain/analytics-timeframe';
+import type { CalendarEmotionFrequency } from '../domain/analytics-calendar';
 import { beliefSystemText } from '@/features/check-in/ui/belief-system-copy';
 import { emotionName } from '@/features/check-in/ui/emotion-copy';
 
@@ -133,6 +134,13 @@ export function topLeitsatzEvidenceCopy({
   ));
 }
 
+export function additionalTopLeitsaetzeCopy(count: number) {
+  return String(fbs(
+    fbs.param('count', String(count)) + ' more were selected equally often.',
+    'Copy below tied guiding beliefs when more equally frequent beliefs exist than the card displays',
+  ));
+}
+
 export function observationCopy({ observation, statements }: {
   observation: AnalyticsObservation;
   statements: readonly BeliefStatement[];
@@ -182,11 +190,11 @@ export function observationCopy({ observation, statements }: {
 
 export function calendarDayAccessibilityLabel({
   date,
-  entries,
+  frequencies,
   locale,
 }: {
   date: Date;
-  entries: readonly { emotionId: Parameters<typeof emotionName>[0] }[];
+  frequencies: readonly CalendarEmotionFrequency[];
   locale: AppLocale;
 }) {
   const dateLabel = localeFormatter({
@@ -194,19 +202,22 @@ export function calendarDayAccessibilityLabel({
     german: germanCalendarDateFormatter,
     locale,
   }).format(date);
-  if (entries.length === 0) {
+  if (frequencies.length === 0) {
     return String(fbs(
       fbs.param('date', dateLabel) + '. No recorded moments.',
       'Accessibility label for an empty analytics calendar day',
     ));
   }
+  const momentCount = frequencies.reduce((total, frequency) => total + frequency.count, 0);
   return String(fbs(
     fbs.param('date', dateLabel)
       + '. '
-      + fbs.param('count', String(entries.length))
+      + fbs.param('count', String(momentCount))
       + ' recorded moments: '
-      + fbs.param('emotions', entries.map(({ emotionId }) => emotionName(emotionId)).join(', '))
+      + fbs.param('emotions', frequencies.map(({ count, emotionId }) => (
+        `${emotionName(emotionId)} ${count}`
+      )).join(', '))
       + '.',
-    'Accessibility label for an analytics calendar day with recorded emotions',
+    'Accessibility label for an analytics calendar day with ranked emotion counts',
   ));
 }
