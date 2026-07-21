@@ -30,6 +30,7 @@ import {
   guidingBeliefPlaceholder,
 } from './belief-system-copy';
 import { CheckInProgressHeader } from './check-in-progress';
+import { GuidingBeliefWritingHelp } from './guiding-belief-writing-help';
 import { palette, type } from './theme';
 
 type NavigationSnapshot = ReturnType<
@@ -244,72 +245,13 @@ export function GuidingBeliefScreen() {
               testID="guiding-belief-draft"
               value={snapshot.context.guidingBeliefStatementDraft}
             />
-            <PressableScale
-              accessibilityRole="button"
-              accessibilityState={{ expanded: snapshot.context.guidingHelpVisible }}
+            <GuidingBeliefWritingHelp
+              contentTestID="guiding-belief-help"
               disabled={saving}
-              onPress={_toggleHelp}
-              style={styles.helpButton}
-              testID="guiding-belief-help-toggle"
-            >
-              <Text style={styles.helpButtonText}>
-                {snapshot.context.guidingHelpVisible
-                  ? <fbt desc="Button hiding guiding belief writing help">Hide writing help</fbt>
-                  : <fbt desc="Button revealing guiding belief writing help">Need help writing this?</fbt>}
-              </Text>
-              <Text style={styles.helpButtonMark}>
-                {snapshot.context.guidingHelpVisible ? '−' : '+'}
-              </Text>
-            </PressableScale>
-            {snapshot.context.guidingHelpVisible ? (
-              <View style={styles.helpContent} testID="guiding-belief-help">
-                <View style={styles.reflectionCard}>
-                  <Text style={styles.reflectionTitle}>
-                    <fbt desc="Heading above reflection prompts for changing a harmful belief">
-                      Take a moment before rewriting it
-                    </fbt>
-                  </Text>
-                  <Text style={styles.prompt}>
-                    <Text style={styles.promptMark}>1 · </Text>
-                    <fbt desc="Prompt asking what a harmful belief once provided">
-                      What did this rule once help you gain or protect?
-                    </fbt>
-                  </Text>
-                  <Text style={styles.prompt}>
-                    <Text style={styles.promptMark}>2 · </Text>
-                    <fbt desc="Prompt asking where a harmful belief causes difficulty">
-                      Where does it make life harder for you or the people close to you today?
-                    </fbt>
-                  </Text>
-                  <Text style={styles.prompt}>
-                    <Text style={styles.promptMark}>3 · </Text>
-                    <fbt desc="Prompt imagining changed behavior under a positive guiding belief">
-                      What would you notice tomorrow if the new sentence already guided one small choice?
-                    </fbt>
-                  </Text>
-                </View>
-                <View style={styles.tips}>
-                  <Text style={styles.tip}>
-                    <Text style={styles.tipMark}>• </Text>
-                    <fbt desc="Tip to avoid absolute language in a positive guiding belief">
-                      Avoid absolutes such as always, must, never, or everything.
-                    </fbt>
-                  </Text>
-                  <Text style={styles.tip}>
-                    <Text style={styles.tipMark}>• </Text>
-                    <fbt desc="Tip to use positive new wording in a positive guiding belief">
-                      Use fresh, positive words instead of building the sentence around a negation.
-                    </fbt>
-                  </Text>
-                  <Text style={styles.tip}>
-                    <Text style={styles.tipMark}>• </Text>
-                    <fbt desc="Tip to keep a positive guiding belief memorable">
-                      Keep it short enough to remember when you need it.
-                    </fbt>
-                  </Text>
-                </View>
-              </View>
-            ) : null}
+              expanded={snapshot.context.guidingHelpVisible}
+              onToggle={_toggleHelp}
+              toggleTestID="guiding-belief-help-toggle"
+            />
             {statement?.guidingStatement && !guidingReady ? (
               <Text style={styles.removeHint}>
                 <fbt desc="Hint explaining that saving an empty guiding belief removes it">
@@ -407,28 +349,6 @@ const styles = StyleSheet.create({
     padding: 16,
     textAlignVertical: 'top',
   },
-  reflectionCard: {
-    borderRadius: 24,
-    borderCurve: 'continuous',
-    backgroundColor: '#EDF0EB',
-    padding: 20,
-    gap: 14,
-  },
-  reflectionTitle: {
-    fontFamily: type.semibold,
-    color: palette.moss,
-    fontSize: 16,
-  },
-  prompt: {
-    fontFamily: type.regular,
-    color: palette.ink,
-    fontSize: 14,
-    lineHeight: 21,
-  },
-  promptMark: {
-    fontFamily: type.semibold,
-    color: palette.moss,
-  },
   guidingInput: {
     minHeight: 120,
     borderRadius: 18,
@@ -441,28 +361,6 @@ const styles = StyleSheet.create({
     padding: 16,
     textAlignVertical: 'top',
   },
-  helpButton: {
-    minHeight: 44,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    borderTopWidth: 1,
-    borderColor: palette.hairline,
-    marginTop: 2,
-    paddingTop: 10,
-  },
-  helpButtonText: {
-    fontFamily: type.semibold,
-    color: palette.moss,
-    fontSize: 13,
-  },
-  helpButtonMark: {
-    fontFamily: type.medium,
-    color: palette.moss,
-    fontSize: 20,
-    lineHeight: 22,
-  },
-  helpContent: { gap: 14 },
   savedGuidingBelief: {
     borderRadius: 16,
     borderCurve: 'continuous',
@@ -482,14 +380,6 @@ const styles = StyleSheet.create({
     fontSize: 12,
     lineHeight: 18,
   },
-  tips: { gap: 8 },
-  tip: {
-    fontFamily: type.regular,
-    color: palette.inkMuted,
-    fontSize: 13,
-    lineHeight: 19,
-  },
-  tipMark: { color: palette.moss },
   removeHint: {
     fontFamily: type.regular,
     color: palette.inkMuted,

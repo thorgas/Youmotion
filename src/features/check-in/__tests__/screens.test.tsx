@@ -830,11 +830,19 @@ describe('check-in screens', () => {
     const library = await _renderLocalized(<BeliefLibraryScreen />);
     expect(library.getByText('Einstellungen')).toBeTruthy();
     expect(library.queryByText('‹ Einstellungen')).toBeNull();
-    await fireEvent.press(library.getByText('Leidsatz hinzufügen'));
+    expect(library.getByText('Eigenen Leidsatz hinzufügen')).toBeTruthy();
+    expect(library.getByText('Formuliere ihn in deinen eigenen Worten.')).toBeTruthy();
+    expect(library.getByText('+')).toBeTruthy();
+    await fireEvent.press(library.getByText('Eigenen Leidsatz hinzufügen'));
     expect(library.getByText('LEIDSATZ HINZUFÜGEN')).toBeTruthy();
     expect(library.getByText(
       'Benenne den Satz, der Leiden verursacht. Ein Leidsatz ist eine innere Regel, die dich in diesem Moment einengt. Oft enthalten Leidsätze Absolutismen wie “immer” und “alles” und “nie”. Du kannst direkt einen unterstützenden Leitsatz ergänzen oder das Feld leer lassen.',
     )).toBeTruthy();
+    expect(library.getByTestId('belief-library-harmful-card')).toBeTruthy();
+    expect(library.getByTestId('belief-library-guiding-card')).toBeTruthy();
+    expect(library.getByText('Brauchst du Schreibhilfe?')).toBeTruthy();
+    await fireEvent.press(library.getByTestId('belief-library-guiding-help-toggle'));
+    expect(library.getByText('Nimm dir einen Moment, bevor du ihn neu formulierst')).toBeTruthy();
     await fireEvent.press(library.getByTestId('belief-library-editor-cancel'));
     expect(library.getByText('LEIDSATZ · EINENGEND')).toBeTruthy();
     expect(library.getByText('LEITSATZ · UNTERSTÜTZEND')).toBeTruthy();
@@ -898,9 +906,15 @@ describe('check-in screens', () => {
     expect(library.getByText('GUIDING BELIEF · SUPPORTIVE')).toBeTruthy();
     expect(library.getByText('I must never need help.')).toBeTruthy();
     expect(library.getByText('I can ask for support.')).toBeTruthy();
+    expect(library.getByText('Add your own core belief')).toBeTruthy();
+    expect(library.getByText('Write it in your own words.')).toBeTruthy();
     await fireEvent.press(library.getByTestId('belief-library-create'));
     expect(mockActor.getSnapshot().matches(BELIEF_LIBRARY_STATES.EDITOR)).toBe(true);
     expect(library.getByText('ADD CORE BELIEF')).toBeTruthy();
+    expect(library.getByTestId('belief-library-harmful-card')).toBeTruthy();
+    expect(library.getByTestId('belief-library-guiding-card')).toBeTruthy();
+    await fireEvent.press(library.getByTestId('belief-library-guiding-help-toggle'));
+    expect(library.getByTestId('belief-library-guiding-help')).toBeTruthy();
     await fireEvent.changeText(
       library.getByTestId('belief-library-harmful-draft'),
       'I must always stay strong.',

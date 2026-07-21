@@ -24,6 +24,8 @@ import {
   beliefStatementForId,
   type CustomBeliefStatement,
 } from '@/features/check-in/domain/belief-statement';
+import { GuidingBeliefWritingHelp } from '@/features/check-in/ui/guiding-belief-writing-help';
+import { PersonalBeliefCreateButton } from '@/features/check-in/ui/personal-belief-create-button';
 import { palette, type } from '@/features/check-in/ui/theme';
 import { useAppNavigationActor } from '@/navigation/app-navigation.provider';
 import { confirmBeliefRemoval } from './belief-library-removal';
@@ -149,20 +151,12 @@ function BeliefLibraryList() {
               </fbt>
             </Text>
           ) : null}
-          <PressableScale
-            accessibilityRole="button"
-            accessibilityState={{ disabled: retiring }}
+          <PersonalBeliefCreateButton
             disabled={retiring}
             onPress={create}
-            style={styles.createButton}
+            style={styles.createButtonSpacing}
             testID="belief-library-create"
-          >
-            <Text style={styles.createText}>
-              <fbt desc="Button creating a personal core belief from its settings library">
-                Add core belief
-              </fbt>
-            </Text>
-          </PressableScale>
+          />
           {statements.length === 0 ? (
             <View style={styles.emptyCard} testID="belief-library-empty">
               <Text style={styles.emptyTitle}>
@@ -214,6 +208,9 @@ function BeliefLibraryEditor() {
   const guidingChanged = (statement: string) => actor.send({
     type: BELIEF_LIBRARY_EVENTS.GUIDING_DRAFT_CHANGED,
     statement,
+  });
+  const toggleGuidingHelp = () => actor.send({
+    type: BELIEF_LIBRARY_EVENTS.GUIDING_HELP_TOGGLED,
   });
   const save = () => actor.send({ type: BELIEF_LIBRARY_EVENTS.SAVE_REQUESTED });
   const backLabel = String(fbs(
@@ -268,7 +265,7 @@ function BeliefLibraryEditor() {
               </fbt>
             )}
           </Text>
-          <View style={styles.editorCard}>
+          <View style={styles.editorCard} testID="belief-library-harmful-card">
             <Text style={styles.fieldLabel}>
               <fbt desc="Input label for editing a personal harmful core belief">Core belief</fbt>
             </Text>
@@ -285,6 +282,8 @@ function BeliefLibraryEditor() {
               testID="belief-library-harmful-draft"
               value={snapshot.context.beliefLibraryHarmfulDraft}
             />
+          </View>
+          <View style={styles.editorCard} testID="belief-library-guiding-card">
             <Text style={styles.fieldLabel}>
               <fbt desc="Input label for editing a personal positive guiding belief">
                 Guiding belief
@@ -308,34 +307,41 @@ function BeliefLibraryEditor() {
               testID="belief-library-guiding-draft"
               value={snapshot.context.beliefLibraryGuidingDraft}
             />
-            {snapshot.context.error ? (
-              <Text style={styles.error}>
-                <fbt desc="Error shown when personal core-belief editing cannot be saved">
-                  Your change could not be saved.
-                </fbt>
-              </Text>
-            ) : null}
-            <PressableScale
-              accessibilityRole="button"
-              accessibilityState={{ disabled: saving || !harmfulReady }}
-              disabled={saving || !harmfulReady}
-              onPress={save}
-              style={[styles.saveButton, !harmfulReady && styles.saveButtonDisabled]}
-              testID="belief-library-save"
-            >
-              {saving ? <ActivityIndicator color="#FFFFFF" /> : (
-                <Text style={styles.saveText}>
-                  {creating ? (
-                    <fbt desc="Button saving a new personal core belief from settings">
-                      Add core belief
-                    </fbt>
-                  ) : (
-                    <fbt desc="Button saving changes to a personal core belief">Save changes</fbt>
-                  )}
-                </Text>
-              )}
-            </PressableScale>
+            <GuidingBeliefWritingHelp
+              contentTestID="belief-library-guiding-help"
+              disabled={saving}
+              expanded={snapshot.context.guidingHelpVisible}
+              onToggle={toggleGuidingHelp}
+              toggleTestID="belief-library-guiding-help-toggle"
+            />
           </View>
+          {snapshot.context.error ? (
+            <Text style={styles.error}>
+              <fbt desc="Error shown when personal core-belief editing cannot be saved">
+                Your change could not be saved.
+              </fbt>
+            </Text>
+          ) : null}
+          <PressableScale
+            accessibilityRole="button"
+            accessibilityState={{ disabled: saving || !harmfulReady }}
+            disabled={saving || !harmfulReady}
+            onPress={save}
+            style={[styles.saveButton, !harmfulReady && styles.saveButtonDisabled]}
+            testID="belief-library-save"
+          >
+            {saving ? <ActivityIndicator color="#FFFFFF" /> : (
+              <Text style={styles.saveText}>
+                {creating ? (
+                  <fbt desc="Button saving a new personal core belief from settings">
+                    Add core belief
+                  </fbt>
+                ) : (
+                  <fbt desc="Button saving changes to a personal core belief">Save changes</fbt>
+                )}
+              </Text>
+            )}
+          </PressableScale>
         </KeyboardAwareScrollView>
       </SafeAreaView>
     </View>
@@ -380,15 +386,7 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   list: { gap: 14 },
-  createButton: {
-    minHeight: 52,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: 16,
-    backgroundColor: palette.ink,
-    marginBottom: 16,
-  },
-  createText: { fontFamily: type.semibold, color: '#FFFFFF', fontSize: 15 },
+  createButtonSpacing: { marginBottom: 16 },
   beliefCard: {
     backgroundColor: palette.paperRaised,
     borderRadius: 24,
@@ -477,6 +475,7 @@ const styles = StyleSheet.create({
     borderColor: palette.hairline,
     padding: 20,
     gap: 10,
+    marginBottom: 16,
   },
   fieldLabel: { fontFamily: type.semibold, color: palette.ink, fontSize: 14, marginTop: 4 },
   input: {
@@ -496,7 +495,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     borderRadius: 16,
     backgroundColor: palette.ink,
-    marginTop: 8,
   },
   saveButtonDisabled: { opacity: 0.45 },
   saveText: { fontFamily: type.semibold, color: '#FFFFFF', fontSize: 15 },

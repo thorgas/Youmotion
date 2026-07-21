@@ -54,6 +54,7 @@ import {
   deleteMomentText,
 } from './check-in-deletion';
 import { CheckInProgressHeader } from './check-in-progress';
+import { PersonalBeliefCreateButton } from './personal-belief-create-button';
 import { reflectionResponsiveLayout } from './reflection-responsive-layout';
 import { palette, type } from './theme';
 
@@ -559,24 +560,11 @@ function BeliefSystemCatalogStep() {
               </fbt>
             </Text>
           </View>
-          <PressableScale
-            accessibilityRole="button"
+          <PersonalBeliefCreateButton
             onPress={_create}
-            style={styles.createBeliefButton}
+            style={styles.createBeliefButtonSpacing}
             testID="create-custom-belief"
-          >
-            <View style={styles.browseCopy}>
-              <Text style={styles.createBeliefTitle}>
-                <fbt desc="Button for adding a personal core belief">Add your own core belief</fbt>
-              </Text>
-              <Text style={styles.browseHelp}>
-                <fbt desc="Description below the button for adding a personal core belief">
-                  Write it in your own words.
-                </fbt>
-              </Text>
-            </View>
-            <Text style={styles.chevron}>+</Text>
-          </PressableScale>
+          />
           <View accessibilityRole="radiogroup" style={styles.catalogList}>
             <BeliefSystemOption
               disabled={false}
@@ -891,22 +879,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     paddingVertical: 10,
   },
-  createBeliefButton: {
-    minHeight: 64,
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: 22,
-    borderRadius: 18,
-    borderCurve: 'continuous',
-    borderWidth: 1,
-    borderColor: palette.moss,
-    backgroundColor: '#EDF0EB',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-  },
+  createBeliefButtonSpacing: { marginTop: 22 },
   browseCopy: { flex: 1 },
   browseTitle: { fontFamily: type.semibold, color: palette.ink, fontSize: 14 },
-  createBeliefTitle: { fontFamily: type.semibold, color: palette.moss, fontSize: 15 },
   browseHelp: { fontFamily: type.regular, color: palette.inkMuted, fontSize: 12, marginTop: 2 },
   guidingPreview: {
     fontFamily: type.regular,

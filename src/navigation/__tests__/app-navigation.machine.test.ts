@@ -253,6 +253,9 @@ describe('app navigation model', () => {
     const createdBeliefSystemId = actor.getSnapshot().context.beliefLibraryStatementId;
     expect(createdBeliefSystemId).not.toBeNull();
     expect(actor.getSnapshot().matches(BELIEF_LIBRARY_STATES.EDITOR)).toBe(true);
+    expect(actor.getSnapshot().context.guidingHelpVisible).toBe(false);
+    actor.send({ type: BELIEF_LIBRARY_EVENTS.GUIDING_HELP_TOGGLED });
+    expect(actor.getSnapshot().context.guidingHelpVisible).toBe(true);
     actor.send({
       type: BELIEF_LIBRARY_EVENTS.HARMFUL_DRAFT_CHANGED,
       statement: 'I must always stay strong.',

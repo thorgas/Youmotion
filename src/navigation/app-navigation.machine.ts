@@ -165,6 +165,7 @@ function beliefLibraryDrafts(statement: CustomBeliefStatement) {
     beliefLibraryStatementId: statement.beliefSystemId,
     beliefLibraryHarmfulDraft: statement.harmfulStatement,
     beliefLibraryGuidingDraft: statement.guidingStatement ?? '',
+    guidingHelpVisible: false,
     error: null,
   };
 }
@@ -356,6 +357,7 @@ export const appNavigationMachine = setup({
       [BELIEF_LIBRARY_EVENTS.GUIDING_DRAFT_CHANGED]: Schema.standardSchemaV1(
         Schema.Struct({ statement: Schema.String }),
       ),
+      [BELIEF_LIBRARY_EVENTS.GUIDING_HELP_TOGGLED]: EmptyEventSchema,
       [BELIEF_LIBRARY_EVENTS.SAVE_REQUESTED]: EmptyEventSchema,
       [BELIEF_LIBRARY_EVENTS.REMOVE_REQUESTED]: Schema.standardSchemaV1(
         Schema.Struct({ beliefSystemId: CustomBeliefSystemId }),
@@ -789,6 +791,7 @@ export const appNavigationMachine = setup({
                 beliefLibraryStatementId: null,
                 beliefLibraryHarmfulDraft: '',
                 beliefLibraryGuidingDraft: '',
+                guidingHelpVisible: false,
                 error: null,
               },
             },
@@ -804,6 +807,7 @@ export const appNavigationMachine = setup({
             beliefLibraryStatementId: null,
             beliefLibraryHarmfulDraft: '',
             beliefLibraryGuidingDraft: '',
+            guidingHelpVisible: false,
             error: null,
           },
         },
@@ -813,6 +817,7 @@ export const appNavigationMachine = setup({
             beliefLibraryStatementId: null,
             beliefLibraryHarmfulDraft: '',
             beliefLibraryGuidingDraft: '',
+            guidingHelpVisible: false,
             error: null,
           },
         },
@@ -825,6 +830,7 @@ export const appNavigationMachine = setup({
             }),
             beliefLibraryHarmfulDraft: '',
             beliefLibraryGuidingDraft: '',
+            guidingHelpVisible: false,
             error: null,
           },
         },
@@ -865,6 +871,7 @@ export const appNavigationMachine = setup({
             beliefLibraryStatementId: null,
             beliefLibraryHarmfulDraft: '',
             beliefLibraryGuidingDraft: '',
+            guidingHelpVisible: false,
             error: null,
           },
         },
@@ -874,6 +881,7 @@ export const appNavigationMachine = setup({
             beliefLibraryStatementId: null,
             beliefLibraryHarmfulDraft: '',
             beliefLibraryGuidingDraft: '',
+            guidingHelpVisible: false,
             error: null,
           },
         },
@@ -883,6 +891,7 @@ export const appNavigationMachine = setup({
             beliefLibraryStatementId: null,
             beliefLibraryHarmfulDraft: '',
             beliefLibraryGuidingDraft: '',
+            guidingHelpVisible: false,
             error: null,
           },
         },
@@ -891,6 +900,11 @@ export const appNavigationMachine = setup({
         },
         [BELIEF_LIBRARY_EVENTS.GUIDING_DRAFT_CHANGED]: {
           context: ({ event }) => ({ beliefLibraryGuidingDraft: event.statement }),
+        },
+        [BELIEF_LIBRARY_EVENTS.GUIDING_HELP_TOGGLED]: {
+          context: ({ context }) => ({
+            guidingHelpVisible: !context.guidingHelpVisible,
+          }),
         },
         [BELIEF_LIBRARY_EVENTS.SAVE_REQUESTED]: ({ context }) => (
           managedBeliefStatementFromDraft(context)
@@ -935,6 +949,7 @@ export const appNavigationMachine = setup({
             beliefLibraryStatementId: null,
             beliefLibraryHarmfulDraft: '',
             beliefLibraryGuidingDraft: '',
+            guidingHelpVisible: false,
             error: null,
           },
         }),

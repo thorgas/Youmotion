@@ -140,6 +140,7 @@ export const BELIEF_LIBRARY_EVENTS = Object.freeze({
   EDIT_CANCELLED: literal('beliefLibrary.editCancelled'),
   HARMFUL_DRAFT_CHANGED: literal('beliefLibrary.harmfulDraftChanged'),
   GUIDING_DRAFT_CHANGED: literal('beliefLibrary.guidingDraftChanged'),
+  GUIDING_HELP_TOGGLED: literal('beliefLibrary.guidingHelpToggled'),
   SAVE_REQUESTED: literal('beliefLibrary.saveRequested'),
   REMOVE_REQUESTED: literal('beliefLibrary.removeRequested'),
   STATEMENT_SAVED: literal('beliefLibrary.statementSaved'),
