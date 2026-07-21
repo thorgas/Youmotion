@@ -29,6 +29,10 @@ import {
   guidingBeliefAccessibilityLabel,
   guidingBeliefPlaceholder,
 } from './belief-system-copy';
+import {
+  GuidingBeliefCardLabel,
+  HarmfulBeliefCardLabel,
+} from './belief-card-label';
 import { CheckInProgressHeader } from './check-in-progress';
 import { GuidingBeliefWritingHelp } from './guiding-belief-writing-help';
 import { palette, type } from './theme';
@@ -190,11 +194,7 @@ export function GuidingBeliefScreen() {
             </Text>
           </View>
           <View style={styles.card}>
-            <Text style={styles.sectionLabel}>
-              <fbt desc="Label above the attached harmful belief on the guiding page">
-                Your core belief
-              </fbt>
-            </Text>
+            <HarmfulBeliefCardLabel />
             {custom ? (
               <TextInput
                 accessibilityLabel={customBeliefAccessibilityLabel()}
@@ -214,11 +214,7 @@ export function GuidingBeliefScreen() {
             )}
           </View>
           <View style={styles.card}>
-            <Text style={styles.sectionLabel}>
-              <fbt desc="Label above the new positive guiding belief input">
-                Your new guiding belief
-              </fbt>
-            </Text>
+            <GuidingBeliefCardLabel />
             {hasSavedGuidingBelief ? (
               <View style={styles.savedGuidingBelief} testID="saved-guiding-belief-reason">
                 <Text style={styles.savedGuidingBeliefTitle}>
@@ -323,13 +319,6 @@ const styles = StyleSheet.create({
     borderColor: palette.hairline,
     padding: 20,
     gap: 10,
-  },
-  sectionLabel: {
-    fontFamily: type.semibold,
-    color: palette.inkMuted,
-    fontSize: 11,
-    letterSpacing: 1,
-    textTransform: 'uppercase',
   },
   sourceText: {
     fontFamily: type.medium,

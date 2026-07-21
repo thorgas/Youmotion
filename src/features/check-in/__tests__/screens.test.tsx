@@ -840,6 +840,11 @@ describe('check-in screens', () => {
     )).toBeTruthy();
     expect(library.getByTestId('belief-library-harmful-card')).toBeTruthy();
     expect(library.getByTestId('belief-library-guiding-card')).toBeTruthy();
+    expect(library.getByText('Dein Leidsatz')).toBeTruthy();
+    expect(library.getByText('Dein neuer Leitsatz')).toBeTruthy();
+    expect(library.getByTestId('belief-library-guiding-draft').props['placeholder']).toBe(
+      'Schreibe hier deinen neuen Leitsatz auf, z. B.: Ich darf auch mal nicht funktionieren und werde trotzdem geliebt.',
+    );
     expect(library.getByText('Brauchst du Schreibhilfe?')).toBeTruthy();
     await fireEvent.press(library.getByTestId('belief-library-guiding-help-toggle'));
     expect(library.getByText('Nimm dir einen Moment, bevor du ihn neu formulierst')).toBeTruthy();
@@ -913,6 +918,11 @@ describe('check-in screens', () => {
     expect(library.getByText('ADD CORE BELIEF')).toBeTruthy();
     expect(library.getByTestId('belief-library-harmful-card')).toBeTruthy();
     expect(library.getByTestId('belief-library-guiding-card')).toBeTruthy();
+    expect(library.getByText('Your core belief')).toBeTruthy();
+    expect(library.getByText('Your new guiding belief')).toBeTruthy();
+    expect(library.getByTestId('belief-library-guiding-draft').props['placeholder']).toBe(
+      'Write your new guiding belief here, for example: I may not function sometimes and I am still loved.',
+    );
     await fireEvent.press(library.getByTestId('belief-library-guiding-help-toggle'));
     expect(library.getByTestId('belief-library-guiding-help')).toBeTruthy();
     await fireEvent.changeText(

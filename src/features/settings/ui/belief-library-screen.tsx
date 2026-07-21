@@ -24,6 +24,11 @@ import {
   beliefStatementForId,
   type CustomBeliefStatement,
 } from '@/features/check-in/domain/belief-statement';
+import { guidingBeliefPlaceholder } from '@/features/check-in/ui/belief-system-copy';
+import {
+  GuidingBeliefCardLabel,
+  HarmfulBeliefCardLabel,
+} from '@/features/check-in/ui/belief-card-label';
 import { GuidingBeliefWritingHelp } from '@/features/check-in/ui/guiding-belief-writing-help';
 import { PersonalBeliefCreateButton } from '@/features/check-in/ui/personal-belief-create-button';
 import { palette, type } from '@/features/check-in/ui/theme';
@@ -266,9 +271,7 @@ function BeliefLibraryEditor() {
             )}
           </Text>
           <View style={styles.editorCard} testID="belief-library-harmful-card">
-            <Text style={styles.fieldLabel}>
-              <fbt desc="Input label for editing a personal harmful core belief">Core belief</fbt>
-            </Text>
+            <HarmfulBeliefCardLabel />
             <TextInput
               accessibilityLabel={String(fbs(
                 'Personal core belief',
@@ -284,11 +287,7 @@ function BeliefLibraryEditor() {
             />
           </View>
           <View style={styles.editorCard} testID="belief-library-guiding-card">
-            <Text style={styles.fieldLabel}>
-              <fbt desc="Input label for editing a personal positive guiding belief">
-                Guiding belief
-              </fbt>
-            </Text>
+            <GuidingBeliefCardLabel />
             <TextInput
               accessibilityLabel={String(fbs(
                 'Personal guiding belief',
@@ -298,10 +297,7 @@ function BeliefLibraryEditor() {
               maxLength={MAX_BELIEF_STATEMENT_LENGTH}
               multiline
               onChangeText={guidingChanged}
-              placeholder={String(fbs(
-                'Optional',
-                'Placeholder for an optional positive guiding belief',
-              ))}
+              placeholder={guidingBeliefPlaceholder()}
               placeholderTextColor={palette.inkMuted}
               style={styles.input}
               testID="belief-library-guiding-draft"
@@ -477,7 +473,6 @@ const styles = StyleSheet.create({
     gap: 10,
     marginBottom: 16,
   },
-  fieldLabel: { fontFamily: type.semibold, color: palette.ink, fontSize: 14, marginTop: 4 },
   input: {
     minHeight: 112,
     borderRadius: 18,
