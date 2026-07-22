@@ -21,8 +21,8 @@ import {
   useAppNavigationActor,
 } from '@/navigation/app-navigation.provider';
 import {
+  handleNativeRouteRemoval,
   nativeRouteTransitionEnded,
-  preventUnavailableNativeBack,
 } from '@/navigation/app-router.adapter';
 
 const selectCanGoBack = (
@@ -34,7 +34,7 @@ function AppStack() {
   const canGoBack = useSelector(actor, selectCanGoBack);
   const screenListeners = ({ route }: { route: { name?: string } }) => {
     const beforeRemove = (event: { preventDefault: () => void }) => {
-      preventUnavailableNativeBack({ actor, event, routeName: route.name });
+      handleNativeRouteRemoval({ actor, event, routeName: route.name });
     };
     const transitionEnd = (event: { data: { closing: boolean } }) => {
       nativeRouteTransitionEnded({ actor, event, routeName: route.name });

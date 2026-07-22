@@ -148,7 +148,7 @@ export function inspectAppNavigation(event: InspectionEvent) {
   });
 }
 
-export function preventUnavailableNativeBack({
+export function handleNativeRouteRemoval({
   actor,
   event,
   routeName,
@@ -162,8 +162,13 @@ export function preventUnavailableNativeBack({
     route: routeForStateValue(snapshot.value),
     routeName,
   })) return;
-  if (snapshot.can({ type: NAVIGATION_EVENTS.BACK_REQUESTED })) return;
-  event.preventDefault();
+  if (!snapshot.can({ type: NAVIGATION_EVENTS.BACK_REQUESTED })) {
+    event.preventDefault();
+    return;
+  }
+
+  nativeDismissals.add(actor);
+  actor.send({ type: NAVIGATION_EVENTS.BACK_REQUESTED });
 }
 
 export function nativeRouteTransitionEnded({

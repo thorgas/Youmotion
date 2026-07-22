@@ -17,9 +17,9 @@ import {
 } from '@/test-utils/surrealdb.repository.mock';
 import { appNavigationMachine, routeForStateValue } from '../app-navigation.machine';
 import {
+  handleNativeRouteRemoval,
   inspectAppNavigation,
   nativeRouteTransitionEnded,
-  preventUnavailableNativeBack,
 } from '../app-router.adapter';
 
 jest.mock('expo-router', () => ({
@@ -107,7 +107,7 @@ describe('app router adapter', () => {
     const actor = startNavigationActor();
     const preventDefault = jest.fn();
 
-    preventUnavailableNativeBack({
+    handleNativeRouteRemoval({
       actor,
       event: { preventDefault },
       routeName: '(tabs)/today',
@@ -120,13 +120,46 @@ describe('app router adapter', () => {
     const actor = startNavigationActor();
     const preventDefault = jest.fn();
 
-    preventUnavailableNativeBack({
+    handleNativeRouteRemoval({
       actor,
       event: { preventDefault },
       routeName: 'index',
     });
 
     expect(preventDefault).not.toHaveBeenCalled();
+  });
+
+  it('synchronizes native back before Android removes the route', () => {
+    const actor = startNavigationActor();
+    actor.send({ type: CHECK_IN_EVENTS.TOUCH_STARTED });
+    actor.send({ type: CHECK_IN_EVENTS.SELECTION_CHANGED, selection });
+    actor.send({ type: CHECK_IN_EVENTS.SELECTION_RELEASED });
+    jest.clearAllMocks();
+
+    const preventDefault = jest.fn();
+    handleNativeRouteRemoval({
+      actor,
+      event: { preventDefault },
+      routeName: 'reflection',
+    });
+
+    expect(preventDefault).not.toHaveBeenCalled();
+    expect(routeForStateValue(actor.getSnapshot().value)).toBe(APP_ROUTES.TODAY);
+    expect(actor.getSnapshot().context.selection).toBeNull();
+    expect(mockRouter.dismissTo).not.toHaveBeenCalled();
+
+    actor.send({ type: CHECK_IN_EVENTS.TOUCH_STARTED });
+    actor.send({ type: CHECK_IN_EVENTS.SELECTION_CHANGED, selection });
+    actor.send({ type: CHECK_IN_EVENTS.SELECTION_RELEASED });
+    expect(mockRouter.push).toHaveBeenCalledWith(APP_ROUTES.REFLECTION);
+
+    handleNativeRouteRemoval({
+      actor,
+      event: { preventDefault },
+      routeName: 'reflection',
+    });
+    actor.send({ type: NAVIGATION_EVENTS.HISTORY_OPENED });
+    expect(mockRouter.replace).toHaveBeenCalledWith(APP_ROUTES.HISTORY);
   });
 
   it('ignores the closing transition from a machine-driven dismissal', () => {
