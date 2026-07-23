@@ -72,6 +72,7 @@ export function CheckInScreen() {
     actor.send({ type: CHECK_IN_EVENTS.SELECTION_CHANGED, selection });
   };
   const _selectionCancelled = () => actor.send({ type: CHECK_IN_EVENTS.SELECTION_CANCELLED });
+  const _emotionHelpToggled = () => actor.send({ type: CHECK_IN_EVENTS.EMOTION_HELP_TOGGLED });
   const _selectionReleased = () => {
     if (!_sameSelection({ current: publishedSelection.current, next: latestSelection.current })) {
       publishedSelection.current = latestSelection.current;
@@ -96,18 +97,15 @@ export function CheckInScreen() {
                 ? <fbt desc="Question shown while changing the feeling in an existing check-in">How did you feel then?</fbt>
                 : <fbt desc="Question asking the user about their current feeling">How are you feeling right now?</fbt>}
             </Text>
-            <Text style={styles.guidance}>
-              <fbt desc="Reassurance that emotion words can be chosen intuitively">
-                There is no right or wrong choice here. Follow your first impression and choose what feels right to you.
-              </fbt>
-            </Text>
           </View>
           <View style={styles.starCard} testID="today-pulse-card">
             <EmotionStar
               centerOrigin={centerOrigin}
               contentInset={20}
+              emotionHelpExpanded={snapshot.context.emotionHelpVisible}
               selection={snapshot.context.selection}
               onCancel={_selectionCancelled}
+              onEmotionHelpToggle={_emotionHelpToggled}
               onTouchStart={_touchStarted}
               onSelectionChange={_selectionChanged}
               onRelease={_selectionReleased}
@@ -158,14 +156,6 @@ const styles = StyleSheet.create({
     ...tabScreenTitleStyle,
     letterSpacing: -0.6,
     maxWidth: 330,
-  },
-  guidance: {
-    color: palette.inkMuted,
-    fontFamily: type.regular,
-    fontSize: 14,
-    lineHeight: 20,
-    marginTop: 10,
-    maxWidth: 390,
   },
   starCard: {
     alignItems: 'center',

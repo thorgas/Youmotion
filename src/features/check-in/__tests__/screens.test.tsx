@@ -195,15 +195,9 @@ describe('check-in screens', () => {
       lineHeight: 40,
     });
     expect(StyleSheet.flatten(title.props['style'])).not.toHaveProperty('textAlign');
-    const guidance = screen.getByText(
+    expect(screen.queryByText(
       'There is no right or wrong choice here. Follow your first impression and choose what feels right to you.',
-    );
-    expect(guidance).toHaveStyle({
-      color: palette.inkMuted,
-      fontSize: 14,
-      lineHeight: 20,
-    });
-    expect(StyleSheet.flatten(guidance.props['style'])).not.toHaveProperty('textAlign');
+    )).toBeNull();
     expect(screen.getByTestId('today-pulse-card')).toHaveStyle({
       backgroundColor: palette.paperRaised,
       borderColor: palette.hairline,
@@ -221,11 +215,32 @@ describe('check-in screens', () => {
       alignItems: 'center',
     });
     expect(screen.getByTestId('emotion-readout')).toHaveStyle({
-      marginBottom: -8,
+      marginBottom: -16,
     });
     expect(screen.getByTestId('base-emotion-emoji-freude')).toHaveTextContent('😊');
     expect(screen.getByTestId('base-emotion-emoji-liebe')).toHaveTextContent('❤️');
     expect(screen.getByText('The farther you move from the center, the more intense the feeling.')).toBeTruthy();
+    const emotionHelpToggle = screen.getByTestId('emotion-word-help-toggle');
+    expect(emotionHelpToggle.props['accessibilityState']).toEqual({ expanded: false });
+    expect(screen.getByText('What if I don’t know a word?')).toHaveStyle({
+      fontSize: 12,
+      lineHeight: 18,
+    });
+    expect(screen.queryByTestId('emotion-word-help-content')).toBeNull();
+
+    await act(() => fireEvent.press(emotionHelpToggle));
+
+    expect(screen.getByTestId('emotion-word-help-toggle').props['accessibilityState']).toEqual({
+      expanded: true,
+    });
+    expect(screen.getByTestId('emotion-word-help-content')).toBeTruthy();
+    expect(screen.getByText(
+      'There is no right or wrong choice here. Follow your first impression and choose what feels right to you.',
+    )).toHaveStyle({
+      fontSize: 12,
+      lineHeight: 18,
+      textAlign: 'left',
+    });
     expect(screen.getByLabelText('Emotion star. Drag outward from the center.')).toBeTruthy();
     expect(screen.getByTestId('base-state-ripples')).toHaveStyle({
       alignItems: 'center',
@@ -243,11 +258,16 @@ describe('check-in screens', () => {
     });
   });
 
-  it('reassures German readers that emotion words can be chosen intuitively', async () => {
+  it('offers German readers optional help for unfamiliar emotion words', async () => {
     await act(() => appSettingsStore.trigger.languageChanged({
       locale: APP_LOCALES.GERMAN,
     }));
     const screen = await _renderLocalized(<CheckInScreen />);
+
+    const emotionHelpToggle = screen.getByText('Was, wenn ich einen Begriff nicht kenne?');
+    expect(emotionHelpToggle).toBeTruthy();
+
+    await act(() => fireEvent.press(emotionHelpToggle));
 
     expect(screen.getByText(
       'Es gibt hier kein Richtig oder Falsch. Folge deinem ersten Eindruck und wähle, was sich für dich stimmig anfühlt.',

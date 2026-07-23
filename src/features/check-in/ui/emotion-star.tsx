@@ -1,4 +1,5 @@
 import { useSelector } from '@xstate/store-react';
+import { PressableScale } from 'pressto';
 import { PanResponder, StyleSheet, Text, useWindowDimensions, View, type StyleProp, type TextStyle } from 'react-native';
 import Animated, {
   FadeInDown,
@@ -33,9 +34,11 @@ type EmotionStarProps = {
   centerOrigin?: boolean;
   contentInset?: number;
   disabled?: boolean;
+  emotionHelpExpanded?: boolean;
   onTouchStart: () => void;
   onSelectionChange: (selection: EmotionSelection | null) => void;
   onCancel: () => void;
+  onEmotionHelpToggle?: () => void;
   onRelease: () => void;
 };
 
@@ -160,11 +163,13 @@ function EmotionField({
 export function EmotionStar({
   centerOrigin = false,
   contentInset = 0,
+  emotionHelpExpanded = false,
   selection,
   disabled,
   onTouchStart,
   onSelectionChange,
   onCancel,
+  onEmotionHelpToggle,
   onRelease,
 }: EmotionStarProps) {
   const labelMode = useSelector(appSettingsStore, _selectEmotionLabelMode);
@@ -248,6 +253,35 @@ export function EmotionStar({
       <Text style={styles.intensityHint}>
         <fbt desc="Explanation of how distance controls emotion intensity">The farther you move from the center, the more intense the feeling.</fbt>
       </Text>
+      {onEmotionHelpToggle ? (
+        <>
+          <PressableScale
+            accessibilityRole="button"
+            accessibilityState={{ expanded: emotionHelpExpanded }}
+            hitSlop={13}
+            onPress={onEmotionHelpToggle}
+            style={styles.emotionHelpButton}
+            testID="emotion-word-help-toggle">
+            <Text style={styles.emotionHelpButtonText}>
+              {emotionHelpExpanded
+                ? <fbt desc="Button hiding the explanation for unfamiliar emotion words">Hide explanation</fbt>
+                : <fbt desc="Button revealing help when an emotion word is unfamiliar">What if I don’t know a word?</fbt>}
+            </Text>
+            <Text accessibilityElementsHidden style={styles.emotionHelpButtonMark}>
+              {emotionHelpExpanded ? '−' : '+'}
+            </Text>
+          </PressableScale>
+          {emotionHelpExpanded ? (
+            <View style={styles.emotionHelpContent} testID="emotion-word-help-content">
+              <Text style={styles.emotionHelpCopy}>
+                <fbt desc="Reassurance that unfamiliar emotion words can be chosen intuitively">
+                  There is no right or wrong choice here. Follow your first impression and choose what feels right to you.
+                </fbt>
+              </Text>
+            </View>
+          ) : null}
+        </>
+      ) : null}
     </View>
   );
 }
@@ -269,7 +303,7 @@ const styles = StyleSheet.create({
   readout: {
     pointerEvents: 'none',
     width: 260,
-    marginBottom: -8,
+    marginBottom: -16,
   },
   readoutPrompt: {
     alignItems: 'center',
@@ -323,5 +357,39 @@ const styles = StyleSheet.create({
     maxWidth: 300,
     textAlign: 'center',
     marginTop: 4,
+  },
+  emotionHelpButton: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    gap: 4,
+    marginTop: 4,
+  },
+  emotionHelpButtonText: {
+    color: palette.moss,
+    fontFamily: type.semibold,
+    fontSize: 12,
+    lineHeight: 18,
+  },
+  emotionHelpButtonMark: {
+    color: palette.moss,
+    fontFamily: type.medium,
+    fontSize: 16,
+    lineHeight: 18,
+  },
+  emotionHelpContent: {
+    backgroundColor: '#EDF0EB',
+    borderCurve: 'continuous',
+    borderRadius: 16,
+    marginTop: 8,
+    maxWidth: 300,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+  },
+  emotionHelpCopy: {
+    color: palette.inkMuted,
+    fontFamily: type.regular,
+    fontSize: 12,
+    lineHeight: 18,
+    textAlign: 'left',
   },
 });

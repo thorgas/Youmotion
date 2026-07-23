@@ -1409,8 +1409,30 @@
       ],
       "types": []
     },
-    "HvYHIGZ3z4ilPmH95Etdpw==": {
-      "description": "Reassurance that emotion words can be chosen intuitively",
+    "a1nAzNg5XFgd8NTgdLKvDg==": {
+      "description": "Button hiding the explanation for unfamiliar emotion words",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Hinweis ausblenden",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "6LniTAiLbPnsZCIKpYYNVA==": {
+      "description": "Button revealing help when an emotion word is unfamiliar",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Was, wenn ich einen Begriff nicht kenne?",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "H/cVWqxSs7ABSpYTxpAaMg==": {
+      "description": "Reassurance that unfamiliar emotion words can be chosen intuitively",
       "tokens": [],
       "translations": [
         {
