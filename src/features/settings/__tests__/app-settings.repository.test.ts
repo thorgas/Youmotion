@@ -79,12 +79,12 @@ describe('app settings repository', () => {
 
     await expect(Effect.runPromise(loadAppSettings)).resolves.toEqual({
       locale: APP_LOCALES.GERMAN,
-      emotionLabelMode: EMOTION_LABEL_MODES.EMOJI,
+      emotionLabelMode: EMOTION_LABEL_MODES.BOTH,
       onboardingCompleted: false,
     });
     expect(storedSettings).toEqual({
       locale: APP_LOCALES.GERMAN,
-      emotionLabelMode: EMOTION_LABEL_MODES.EMOJI,
+      emotionLabelMode: EMOTION_LABEL_MODES.BOTH,
       onboardingCompleted: false,
     });
   });
@@ -97,12 +97,12 @@ describe('app settings repository', () => {
 
     await expect(Effect.runPromise(loadAppSettings)).resolves.toEqual({
       locale: APP_LOCALES.ENGLISH,
-      emotionLabelMode: EMOTION_LABEL_MODES.EMOJI,
+      emotionLabelMode: EMOTION_LABEL_MODES.BOTH,
       onboardingCompleted: false,
     });
     expect(storedSettings).toEqual({
       locale: APP_LOCALES.ENGLISH,
-      emotionLabelMode: EMOTION_LABEL_MODES.EMOJI,
+      emotionLabelMode: EMOTION_LABEL_MODES.BOTH,
       onboardingCompleted: false,
     });
   });

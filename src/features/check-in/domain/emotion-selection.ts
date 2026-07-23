@@ -16,6 +16,27 @@ export function emotionAngle(index: number) {
   return EMOTION_AXIS_START_ANGLE + index * EMOTION_AXIS_STEP;
 }
 
+export function pointConstrainedToRadius({
+  point,
+  center,
+  maxRadius,
+}: {
+  point: Point;
+  center: Point;
+  maxRadius: number;
+}) {
+  const dx = point.x - center.x;
+  const dy = point.y - center.y;
+  const distance = Math.hypot(dx, dy);
+  if (distance === 0 || distance <= maxRadius) return point;
+  const scale = maxRadius / distance;
+
+  return {
+    x: center.x + dx * scale,
+    y: center.y + dy * scale,
+  };
+}
+
 export function selectionFromPoint({
   point,
   center,

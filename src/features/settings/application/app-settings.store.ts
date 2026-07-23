@@ -15,7 +15,7 @@ const configuredGitCommit: unknown = Constants.expoConfig?.extra?.['gitCommit'];
 
 const initialContext = {
   locale: APP_LOCALES.ENGLISH,
-  emotionLabelMode: EMOTION_LABEL_MODES.EMOJI,
+  emotionLabelMode: EMOTION_LABEL_MODES.BOTH,
   onboardingCompleted: false,
   appVersion: Constants.expoConfig?.version ?? null,
   updateChannel: Updates.channel,

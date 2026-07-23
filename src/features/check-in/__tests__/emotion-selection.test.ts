@@ -1,4 +1,7 @@
-import { selectionFromPoint } from '../domain/emotion-selection';
+import {
+  pointConstrainedToRadius,
+  selectionFromPoint,
+} from '../domain/emotion-selection';
 
 describe('selectionFromPoint', () => {
   const center = { x: 100, y: 100 };
@@ -25,5 +28,34 @@ describe('selectionFromPoint', () => {
     const selection = selectionFromPoint({ point: { x: 400, y: -200 }, center, maxRadius: 80 });
     expect(selection?.intensity).toBe(1);
     expect(selection?.level).toBe(6);
+  });
+});
+
+describe('pointConstrainedToRadius', () => {
+  const center = { x: 100, y: 100 };
+
+  it('preserves a point inside the Pulse boundary', () => {
+    const point = { x: 140, y: 120 };
+
+    expect(pointConstrainedToRadius({ point, center, maxRadius: 80 })).toBe(point);
+  });
+
+  it('pins an outward drag to the Pulse boundary', () => {
+    expect(pointConstrainedToRadius({
+      point: { x: 400, y: 100 },
+      center,
+      maxRadius: 80,
+    })).toEqual({ x: 180, y: 100 });
+  });
+
+  it('preserves direction while pinning a diagonal drag', () => {
+    const point = pointConstrainedToRadius({
+      point: { x: 400, y: -200 },
+      center,
+      maxRadius: 80,
+    });
+
+    expect(Math.hypot(point.x - center.x, point.y - center.y)).toBeCloseTo(80);
+    expect(point.x - center.x).toBeCloseTo(center.y - point.y);
   });
 });

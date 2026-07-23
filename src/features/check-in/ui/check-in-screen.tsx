@@ -10,6 +10,10 @@ import {
   CHECK_IN_STATES,
   NAVIGATION_STATES,
 } from '@/constants';
+import {
+  tabScreenEyebrowStyle,
+  tabScreenTitleStyle,
+} from '@/components/ui/tab-screen-layout';
 import { useAppNavigationActor } from '@/navigation/app-navigation.provider';
 import type { EmotionSelection } from '../domain/check-in';
 import { selectionForCheckIn } from '../domain/emotion';
@@ -84,15 +88,19 @@ export function CheckInScreen() {
       <SafeAreaView edges={['top']} style={styles.safeArea}>
         <View style={styles.gestureRegion} testID="check-in-gesture-region">
           <View style={styles.header}>
+            <Text style={styles.eyebrow} testID="today-eyebrow">
+              <fbt desc="Today check-in screen eyebrow heading">TODAY</fbt>
+            </Text>
             <Text style={styles.title}>
               {editing
                 ? <fbt desc="Question shown while changing the feeling in an existing check-in">How did you feel then?</fbt>
                 : <fbt desc="Question asking the user about their current feeling">How are you feeling right now?</fbt>}
             </Text>
           </View>
-          <View style={styles.starStage}>
+          <View style={styles.starCard} testID="today-pulse-card">
             <EmotionStar
               centerOrigin={centerOrigin}
+              contentInset={20}
               selection={snapshot.context.selection}
               onCancel={_selectionCancelled}
               onTouchStart={_touchStarted}
@@ -139,9 +147,24 @@ const styles = StyleSheet.create({
   gestureRegion: { width: '100%', maxWidth: 520, alignSelf: 'center', paddingHorizontal: 16 },
   detailsScroll: { flex: 1, width: '100%', maxWidth: 520, alignSelf: 'center' },
   detailsContent: { flexGrow: 1, paddingHorizontal: 16, paddingBottom: 32 },
-  header: { marginTop: 34, alignItems: 'center', paddingHorizontal: 32 },
-  title: { fontFamily: type.semibold, color: palette.ink, fontSize: 30, lineHeight: 36, letterSpacing: -0.5, textAlign: 'center', opacity: 0.9 },
-  starStage: { marginTop: 24, alignItems: 'center' },
+  header: { marginTop: 18, paddingHorizontal: 6 },
+  eyebrow: tabScreenEyebrowStyle,
+  title: {
+    ...tabScreenTitleStyle,
+    letterSpacing: -0.6,
+    maxWidth: 330,
+  },
+  starCard: {
+    alignItems: 'center',
+    backgroundColor: palette.paperRaised,
+    borderColor: palette.hairline,
+    borderCurve: 'continuous',
+    borderRadius: 30,
+    borderWidth: 1,
+    marginTop: 20,
+    paddingBottom: 18,
+    paddingTop: 22,
+  },
   recent: { marginTop: 28 },
   sectionTitle: { fontFamily: type.medium, color: palette.ink, fontSize: 20, marginBottom: 10 },
   recentCard: { flexDirection: 'row', alignItems: 'center', borderTopWidth: 1, borderBottomWidth: 1, borderColor: palette.hairline, paddingVertical: 14 },

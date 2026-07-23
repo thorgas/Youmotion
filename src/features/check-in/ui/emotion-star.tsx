@@ -1,4 +1,3 @@
-import { useCallback, useMemo } from 'react';
 import { useSelector } from '@xstate/store-react';
 import { PanResponder, StyleSheet, Text, useWindowDimensions, View, type StyleProp, type TextStyle } from 'react-native';
 import Animated, {
@@ -15,7 +14,11 @@ import Svg, { Circle } from 'react-native-svg';
 import { MOTION_DURATION, MOTION_OFFSET } from '@/constants';
 import { appSettingsStore } from '@/features/settings/application/app-settings.store';
 import type { EmotionLabelMode } from '@/features/settings/domain/emotion-label-mode';
-import { emotionAngle, selectionFromPoint } from '../domain/emotion-selection';
+import {
+  emotionAngle,
+  pointConstrainedToRadius,
+  selectionFromPoint,
+} from '../domain/emotion-selection';
 import { emotions, type EmotionSelection } from '../domain/emotion';
 import {
   BaseStateRipples,
@@ -28,6 +31,7 @@ import { palette, textSize, type } from './theme';
 type EmotionStarProps = {
   selection: EmotionSelection | null;
   centerOrigin?: boolean;
+  contentInset?: number;
   disabled?: boolean;
   onTouchStart: () => void;
   onSelectionChange: (selection: EmotionSelection | null) => void;
@@ -155,6 +159,7 @@ function EmotionField({
 
 export function EmotionStar({
   centerOrigin = false,
+  contentInset = 0,
   selection,
   disabled,
   onTouchStart,
@@ -164,7 +169,7 @@ export function EmotionStar({
 }: EmotionStarProps) {
   const labelMode = useSelector(appSettingsStore, _selectEmotionLabelMode);
   const { width } = useWindowDimensions();
-  const size = Math.min(width - 32, 390);
+  const size = Math.min(width - 32 - contentInset, 390);
   const center = size / 2;
   const radius = size * 0.45;
   const rippleOffsetX = useSharedValue(0);
@@ -176,32 +181,37 @@ export function EmotionStar({
     }],
   }), [selection]);
 
-  const _updateSelection = useCallback(({ x, y }: { x: number; y: number }) => {
-    rippleOffsetX.set(x - center);
-    rippleOffsetY.set(y - center);
-    onSelectionChange(selectionFromPoint({
+  const _updateSelection = ({ x, y }: { x: number; y: number }) => {
+    const maxRadius = radius * 0.8;
+    const point = pointConstrainedToRadius({
       point: { x, y },
       center: { x: center, y: center },
-      maxRadius: radius * 0.8,
+      maxRadius,
+    });
+    rippleOffsetX.set(point.x - center);
+    rippleOffsetY.set(point.y - center);
+    onSelectionChange(selectionFromPoint({
+      point,
+      center: { x: center, y: center },
+      maxRadius,
     }));
-  }, [center, onSelectionChange, radius, rippleOffsetX, rippleOffsetY]);
+  };
 
-  const responder = useMemo(
-    () =>
-      PanResponder.create({
-        onStartShouldSetPanResponder: () => !disabled,
-        onMoveShouldSetPanResponder: () => !disabled,
-        onPanResponderGrant: (event) => {
-          onTouchStart();
-          _updateSelection({ x: event.nativeEvent.locationX, y: event.nativeEvent.locationY });
-        },
-        onPanResponderMove: (event) => _updateSelection({ x: event.nativeEvent.locationX, y: event.nativeEvent.locationY }),
-        onPanResponderTerminationRequest: () => false,
-        onPanResponderRelease: onRelease,
-        onPanResponderTerminate: onCancel,
-      }),
-    [_updateSelection, disabled, onCancel, onRelease, onTouchStart],
-  );
+  const responder = PanResponder.create({
+    onStartShouldSetPanResponder: () => !disabled,
+    onMoveShouldSetPanResponder: () => !disabled,
+    onPanResponderGrant: (event) => {
+      onTouchStart();
+      _updateSelection({ x: event.nativeEvent.locationX, y: event.nativeEvent.locationY });
+    },
+    onPanResponderMove: (event) => _updateSelection({
+      x: event.nativeEvent.locationX,
+      y: event.nativeEvent.locationY,
+    }),
+    onPanResponderTerminationRequest: () => false,
+    onPanResponderRelease: onRelease,
+    onPanResponderTerminate: onCancel,
+  });
 
   return (
     <View style={styles.frame} testID="emotion-star-frame">

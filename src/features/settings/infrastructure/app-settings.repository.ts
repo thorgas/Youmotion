@@ -50,7 +50,7 @@ function enqueueSettingsWrite(write: () => Promise<void>) {
 function defaultAppSettings(): AppSettings {
   return {
     locale: appLocaleForLanguageCodes(getLocales().map(({ languageCode }) => languageCode)),
-    emotionLabelMode: EMOTION_LABEL_MODES.EMOJI,
+    emotionLabelMode: EMOTION_LABEL_MODES.BOTH,
     onboardingCompleted: false,
   };
 }

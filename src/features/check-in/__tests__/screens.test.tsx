@@ -55,6 +55,7 @@ import {
   BaseStateRipples,
   CenteredBaseStateRipples,
 } from '../ui/base-state-ripples';
+import { palette } from '../ui/theme';
 
 let mockActor: Actor<typeof appNavigationMachine>;
 
@@ -187,7 +188,19 @@ describe('check-in screens', () => {
 
   it('renders the centered base-state ripple and emotion field', async () => {
     const screen = await _renderLocalized(<CheckInScreen />);
-    expect(screen.getByText('How are you feeling right now?')).toBeTruthy();
+    const title = screen.getByText('How are you feeling right now?');
+    expect(screen.getByTestId('today-eyebrow')).toHaveTextContent('TODAY');
+    expect(title).toHaveStyle({
+      fontSize: 34,
+      lineHeight: 40,
+    });
+    expect(StyleSheet.flatten(title.props['style'])).not.toHaveProperty('textAlign');
+    expect(screen.getByTestId('today-pulse-card')).toHaveStyle({
+      backgroundColor: palette.paperRaised,
+      borderColor: palette.hairline,
+      borderRadius: 30,
+      borderWidth: 1,
+    });
     expect(screen.getByText('Touch the point')).toBeTruthy();
     expect(screen.getByText('Touch the point')).toHaveStyle({
       fontSize: 16,

@@ -1431,6 +1431,17 @@
       ],
       "types": []
     },
+    "7KN+fd1fADkGuAF9FsG6yw==": {
+      "description": "Today check-in screen eyebrow heading",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "HEUTE",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
     "qAax2x7Q2nMs2SjmaDn6BQ==": {
       "description": "Title for editing an existing check-in",
       "tokens": [],
