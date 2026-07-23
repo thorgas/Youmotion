@@ -1,7 +1,7 @@
 import { useSelector } from '@xstate/store-react';
 import { PanResponder, StyleSheet, Text, useWindowDimensions, View, type StyleProp, type TextStyle } from 'react-native';
 import Animated, {
-  FadeInDown,
+  FadeIn,
   FadeOut,
   ReduceMotion,
   useAnimatedStyle,
@@ -11,7 +11,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import Svg, { Circle } from 'react-native-svg';
 
-import { MOTION_DURATION, MOTION_OFFSET } from '@/constants';
+import { MOTION_DURATION } from '@/constants';
 import { appSettingsStore } from '@/features/settings/application/app-settings.store';
 import type { EmotionLabelMode } from '@/features/settings/domain/emotion-label-mode';
 import {
@@ -60,13 +60,9 @@ const _selectEmotionLabelMode = (state: ReturnType<typeof appSettingsStore.getSn
   state.context.emotionLabelMode
 );
 
-const readoutEntering = FadeInDown
-  .duration(MOTION_DURATION.STATE)
-  .reduceMotion(ReduceMotion.System)
-  .withInitialValues({
-    opacity: 0,
-    transform: [{ translateY: MOTION_OFFSET.STATE }],
-  });
+const readoutEntering = FadeIn
+  .duration(MOTION_DURATION.MICRO)
+  .reduceMotion(ReduceMotion.System);
 const readoutExiting = FadeOut
   .duration(MOTION_DURATION.MICRO)
   .reduceMotion(ReduceMotion.System);
@@ -176,9 +172,6 @@ export function EmotionStar({
   const rippleOffsetY = useSharedValue(0);
   const promptStyle = useAnimatedStyle(() => ({
     opacity: withTiming(selection ? 0 : 1, stateAnimation),
-    transform: [{
-      translateY: withTiming(selection ? -MOTION_OFFSET.STATE : 0, stateAnimation),
-    }],
   }), [selection]);
 
   const _updateSelection = ({ x, y }: { x: number; y: number }) => {
@@ -281,6 +274,7 @@ const styles = StyleSheet.create({
   },
   readoutPrompt: {
     alignItems: 'center',
+    justifyContent: 'center',
   },
   selectedReadout: {
     position: 'absolute',
@@ -289,6 +283,7 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     alignItems: 'center',
+    justifyContent: 'center',
   },
   revealLine: {
     flexDirection: 'row',
