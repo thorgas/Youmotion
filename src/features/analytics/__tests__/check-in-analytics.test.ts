@@ -21,7 +21,7 @@ import {
 import {
   analyticsDateRange,
   entriesForAnalyticsTimeframe,
-  topLeitsaetzeForPreviousWeek,
+  topLeitsaetzeForTimeframe,
 } from '../domain/analytics-timeframe';
 
 function checkIn({ beliefSystemId, day, emotionId, guidingStatementSnapshot, id }: {
@@ -157,7 +157,7 @@ describe('check-in analytics', () => {
       }),
     ];
 
-    const result = topLeitsaetzeForPreviousWeek({
+    const result = topLeitsaetzeForTimeframe({
       entries,
       now: new Date(2026, 6, 21, 12),
       statements: [{
@@ -165,6 +165,7 @@ describe('check-in analytics', () => {
         beliefSystemId: BELIEF_SYSTEM_IDS.NO_MISTAKES,
         guidingStatement: 'Mistakes help me learn.',
       }],
+      timeframe: ANALYTICS_TIMEFRAMES.LAST_WEEK,
     });
 
     expect(result?.leitsaetze[0]).toMatchObject({
@@ -192,10 +193,11 @@ describe('check-in analytics', () => {
       }),
     ];
 
-    const result = topLeitsaetzeForPreviousWeek({
+    const result = topLeitsaetzeForTimeframe({
       entries,
       now: new Date(2026, 6, 21, 12),
       statements: [],
+      timeframe: ANALYTICS_TIMEFRAMES.LAST_WEEK,
     });
 
     expect(result?.additionalCount).toBe(0);
@@ -204,6 +206,55 @@ describe('check-in analytics', () => {
       'I may learn.',
       'I may pause.',
     ]);
+  });
+
+  it('recalculates the top Leitsatz for each selected timeframe', () => {
+    const lastWeekEntries = [
+      checkIn({
+        beliefSystemId: BELIEF_SYSTEM_IDS.ALWAYS_FUNCTIONING,
+        day: 18,
+        emotionId: EMOTION_IDS.FEAR,
+        guidingStatementSnapshot: 'I may pause.',
+        id: 'pause-1',
+      }),
+      checkIn({
+        beliefSystemId: BELIEF_SYSTEM_IDS.ALWAYS_FUNCTIONING,
+        day: 19,
+        emotionId: EMOTION_IDS.FEAR,
+        guidingStatementSnapshot: 'I may pause.',
+        id: 'pause-2',
+      }),
+    ];
+    const earlierEntries = [1, 2, 3].map((index) => checkIn({
+      beliefSystemId: BELIEF_SYSTEM_IDS.NO_MISTAKES,
+      day: index,
+      emotionId: EMOTION_IDS.SHAME,
+      guidingStatementSnapshot: 'I may learn.',
+      id: `learn-${String(index)}`,
+    }));
+    const entries = earlierEntries.concat(lastWeekEntries);
+    const now = new Date(2026, 6, 21, 12);
+
+    const lastWeek = topLeitsaetzeForTimeframe({
+      entries,
+      now,
+      statements: [],
+      timeframe: ANALYTICS_TIMEFRAMES.LAST_WEEK,
+    });
+    const lastFourWeeks = topLeitsaetzeForTimeframe({
+      entries,
+      now,
+      statements: [],
+      timeframe: ANALYTICS_TIMEFRAMES.LAST_FOUR_WEEKS,
+    });
+
+    expect(lastWeek?.leitsaetze[0]?.beliefSystemId).toBe(
+      BELIEF_SYSTEM_IDS.ALWAYS_FUNCTIONING,
+    );
+    expect(lastFourWeeks?.leitsaetze[0]?.beliefSystemId).toBe(
+      BELIEF_SYSTEM_IDS.NO_MISTAKES,
+    );
+    expect(lastFourWeeks?.timeframe).toBe(ANALYTICS_TIMEFRAMES.LAST_FOUR_WEEKS);
   });
 
   it('returns at most three factual observations without comparing intensities', () => {

@@ -116,22 +116,62 @@ export function analyticsTimeframeRangeLabel({
 export function topLeitsatzEvidenceCopy({
   leitsatz,
   locale,
+  range,
+  timeframe,
 }: {
   leitsatz: TopLeitsatz;
   locale: AppLocale;
+  range: AnalyticsDateRange;
+  timeframe: AnalyticsTimeframe;
 }) {
-  const range = analyticsDateRangeLabel({
-    end: leitsatz.weekEndsAt,
-    locale,
-    start: leitsatz.weekStartsAt,
-  });
+  const rangeLabel = analyticsTimeframeRangeLabel({ locale, range, timeframe });
   return String(fbs(
     'Selected '
       + fbs.param('count', String(leitsatz.count))
       + ' times · '
-      + fbs.param('range', range),
-    'Evidence below the most frequently selected guiding belief last week',
+      + fbs.param('range', rangeLabel),
+    'Evidence below the most frequently selected guiding belief in the selected analytics timeframe',
   ));
+}
+
+export function topLeitsatzLabel({
+  multiple,
+  timeframe,
+}: {
+  multiple: boolean;
+  timeframe: AnalyticsTimeframe;
+}) {
+  if (timeframe === ANALYTICS_TIMEFRAMES.LAST_WEEK) {
+    return multiple
+      ? String(fbs(
+        "LAST WEEK'S GUIDING BELIEFS",
+        'Label for equally most frequently selected positive guiding statements last week',
+      ))
+      : String(fbs(
+        "LAST WEEK'S GUIDING BELIEF",
+        'Label for the most frequently selected positive guiding statement last week',
+      ));
+  }
+  if (timeframe === ANALYTICS_TIMEFRAMES.LAST_FOUR_WEEKS) {
+    return multiple
+      ? String(fbs(
+        "LAST 4 WEEKS' GUIDING BELIEFS",
+        'Label for equally most frequently selected positive guiding statements in the last four weeks',
+      ))
+      : String(fbs(
+        "LAST 4 WEEKS' GUIDING BELIEF",
+        'Label for the most frequently selected positive guiding statement in the last four weeks',
+      ));
+  }
+  return multiple
+    ? String(fbs(
+      'ALL-TIME GUIDING BELIEFS',
+      'Label for equally most frequently selected positive guiding statements across all recorded moments',
+    ))
+    : String(fbs(
+      'ALL-TIME GUIDING BELIEF',
+      'Label for the most frequently selected positive guiding statement across all recorded moments',
+    ));
 }
 
 export function additionalTopLeitsaetzeCopy(count: number) {

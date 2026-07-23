@@ -20,13 +20,13 @@ export const TopLeitsatzSchema = Schema.Struct({
   beliefSystemId: BeliefSystemId,
   guidingStatement: BeliefStatementText,
   count: Schema.Int.pipe(Schema.positive()),
-  weekStartsAt: Schema.DateFromSelf,
-  weekEndsAt: Schema.DateFromSelf,
 });
 export type TopLeitsatz = typeof TopLeitsatzSchema.Type;
 export type TopLeitsatzGroup = Readonly<{
   additionalCount: number;
   leitsaetze: readonly TopLeitsatz[];
+  range: AnalyticsDateRange;
+  timeframe: AnalyticsTimeframe;
 }>;
 
 export type AnalyticsDateRange = Readonly<{ start: Date | null; end: Date }>;
@@ -95,24 +95,24 @@ function rankLeitsatzFrequencies(items: readonly LeitsatzFrequency[]) {
   }, []);
 }
 
-export function topLeitsaetzeForPreviousWeek({
+export function topLeitsaetzeForTimeframe({
   entries,
   now,
   statements,
+  timeframe,
 }: {
   entries: readonly CheckIn[];
   now: Date;
   statements: readonly BeliefStatement[];
+  timeframe: AnalyticsTimeframe;
 }): TopLeitsatzGroup | null {
-  const range = analyticsDateRange({ now, timeframe: ANALYTICS_TIMEFRAMES.LAST_WEEK });
-  if (range.start === null) return null;
-  const weekStartsAt = range.start;
-  const weeklyEntries = entriesForAnalyticsTimeframe({
+  const range = analyticsDateRange({ now, timeframe });
+  const timeframeEntries = entriesForAnalyticsTimeframe({
     entries,
     now,
-    timeframe: ANALYTICS_TIMEFRAMES.LAST_WEEK,
+    timeframe,
   });
-  const frequencies = weeklyEntries.reduce<readonly LeitsatzFrequency[]>((items, entry) => {
+  const frequencies = timeframeEntries.reduce<readonly LeitsatzFrequency[]>((items, entry) => {
     if (!entry.beliefSystemId) return items;
     const statement = beliefStatementForId({
       beliefSystemId: entry.beliefSystemId,
@@ -147,11 +147,11 @@ export function topLeitsaetzeForPreviousWeek({
       beliefSystemId: leader.beliefSystemId,
       guidingStatement: leader.guidingStatement,
       count: leader.count,
-      weekStartsAt,
-      weekEndsAt: daysBefore({ date: range.end, dayCount: 1 }),
     }));
   return {
     additionalCount: coLeaders.length - visibleLeitsaetze.length,
     leitsaetze: visibleLeitsaetze,
+    range,
+    timeframe,
   };
 }

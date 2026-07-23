@@ -51,7 +51,7 @@ import {
 import {
   analyticsDateRange,
   entriesForAnalyticsTimeframe,
-  topLeitsaetzeForPreviousWeek,
+  topLeitsaetzeForTimeframe,
   type AnalyticsTimeframe,
 } from '../domain/analytics-timeframe';
 import {
@@ -62,6 +62,7 @@ import {
   calendarDayAccessibilityLabel,
   observationCopy,
   topLeitsatzEvidenceCopy,
+  topLeitsatzLabel,
 } from './analytics-copy';
 import { AnalyticsTimeframeSelector } from './analytics-timeframe-selector';
 import { EmotionRadarChart } from './emotion-radar-chart';
@@ -105,49 +106,60 @@ const leitsatzEntering = FadeInDown
     transform: [{ translateY: MOTION_OFFSET.STATE }],
   });
 
-function LastWeekLeitsatz({
+function TopLeitsatz({
   entries,
   locale,
   now,
   statements,
+  timeframe,
 }: {
   entries: readonly CheckIn[];
   locale: AppLocale;
   now: Date;
   statements: readonly BeliefStatement[];
+  timeframe: AnalyticsTimeframe;
 }) {
-  const group = topLeitsaetzeForPreviousWeek({ entries, now, statements });
+  const group = topLeitsaetzeForTimeframe({ entries, now, statements, timeframe });
   if (!group) return null;
   const multiple = group.leitsaetze.length > 1 || group.additionalCount > 0;
+  const label = topLeitsatzLabel({ multiple, timeframe: group.timeframe });
   return (
     <Animated.View
       entering={leitsatzEntering}
       style={styles.leitsatzCard}
-      testID="analytics-last-week-leitsatz"
+      testID="analytics-top-leitsatz"
     >
-      <Text style={styles.leitsatzLabel}>
-        {multiple ? (
-          <fbt desc="Label for equally most frequently selected positive guiding statements last week">
-            LAST WEEK&apos;S GUIDING BELIEFS
-          </fbt>
-        ) : (
-          <fbt desc="Label for the most frequently selected positive guiding statement last week">
-            LAST WEEK&apos;S GUIDING BELIEF
-          </fbt>
-        )}
+      <Text
+        accessibilityLabel={label}
+        style={styles.leitsatzLabel}
+        testID="analytics-top-leitsatz-label"
+      >
+        {label}
       </Text>
-      {group.leitsaetze.map((leitsatz, index) => (
-        <View
-          key={leitsatz.beliefSystemId}
-          style={index === 0 ? undefined : styles.leitsatzTie}
-          testID={`analytics-last-week-leitsatz-${leitsatz.beliefSystemId}`}
-        >
-          <Text style={styles.leitsatzText}>“{leitsatz.guidingStatement}”</Text>
-          <Text style={styles.leitsatzEvidence}>
-            {topLeitsatzEvidenceCopy({ leitsatz, locale })}
-          </Text>
-        </View>
-      ))}
+      {group.leitsaetze.map((leitsatz, index) => {
+        const evidence = topLeitsatzEvidenceCopy({
+          leitsatz,
+          locale,
+          range: group.range,
+          timeframe: group.timeframe,
+        });
+        return (
+          <View
+            key={leitsatz.beliefSystemId}
+            style={index === 0 ? undefined : styles.leitsatzTie}
+            testID={`analytics-top-leitsatz-${leitsatz.beliefSystemId}`}
+          >
+            <Text style={styles.leitsatzText}>“{leitsatz.guidingStatement}”</Text>
+            <Text
+              accessibilityLabel={evidence}
+              style={styles.leitsatzEvidence}
+              testID={`analytics-top-leitsatz-evidence-${leitsatz.beliefSystemId}`}
+            >
+              {evidence}
+            </Text>
+          </View>
+        );
+      })}
       {group.additionalCount > 0 ? (
         <Text style={styles.leitsatzAdditional}>
           {additionalTopLeitsaetzeCopy(group.additionalCount)}
@@ -178,13 +190,17 @@ function observationKey(observation: AnalyticsObservation) {
   return observation.kind;
 }
 
-function ObservationCard({ index, observation, statements }: {
+export function ObservationCard({ index, observation, statements }: {
   index: number;
   observation: AnalyticsObservation;
   statements: readonly BeliefStatement[];
 }) {
   return (
-    <View style={styles.observation} testID={`analytics-observation-${index}`}>
+    <View
+      collapsable={false}
+      style={styles.observation}
+      testID={`analytics-observation-${index}`}
+    >
       <View style={styles.observationRule} />
       <View style={styles.observationCopy}>
         <Text style={styles.observationLabel}>{observationLabel(observation)}</Text>
@@ -465,11 +481,12 @@ export function AnalyticsContent({ entries, locale, now, statements }: {
             onLastWeekPress={_selectLastWeek}
             timeframe={analytics.timeframe}
           />
-          <LastWeekLeitsatz
+          <TopLeitsatz
             entries={entries}
             locale={locale}
             now={now}
             statements={statements}
+            timeframe={analytics.timeframe}
           />
           {scopedEntries.length === 0 ? (
             <View style={styles.empty}>
@@ -605,7 +622,7 @@ const styles = StyleSheet.create({
     padding: 17,
   },
   observationRule: { width: 3, borderRadius: 2, backgroundColor: palette.moss, marginRight: 13 },
-  observationCopy: { flex: 1 },
+  observationCopy: { flex: 1, minWidth: 0 },
   observationLabel: {
     fontFamily: type.semibold,
     color: palette.moss,
@@ -613,7 +630,14 @@ const styles = StyleSheet.create({
     letterSpacing: 1,
     textTransform: 'uppercase',
   },
-  observationText: { fontFamily: type.medium, color: palette.ink, fontSize: 15, lineHeight: 22, marginTop: 5 },
+  observationText: {
+    flexShrink: 1,
+    fontFamily: type.medium,
+    color: palette.ink,
+    fontSize: 15,
+    lineHeight: 22,
+    marginTop: 5,
+  },
   calendarHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   calendarActions: { flexDirection: 'row', gap: 8, marginLeft: 12 },
   monthButton: {

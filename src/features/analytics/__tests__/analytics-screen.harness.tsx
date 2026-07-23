@@ -1,9 +1,18 @@
-import { screen } from '@react-native-harness/ui';
-import { describe, expect, render, test } from 'react-native-harness';
+import { screen, userEvent } from '@react-native-harness/ui';
+import {
+  afterEach,
+  describe,
+  expect,
+  render,
+  test,
+  waitUntil,
+} from 'react-native-harness';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { StyleSheet } from 'react-native';
 
 import {
+  ANALYTICS_EVENTS,
+  ANALYTICS_TIMEFRAMES,
   APP_LOCALES,
   BELIEF_SYSTEM_IDS,
   EMOTION_IDS,
@@ -13,6 +22,7 @@ import {
   CheckInTimestamp,
   type CheckIn,
 } from '@/features/check-in/domain/check-in';
+import { analyticsStore } from '../application/analytics.store';
 import { analyticsObservations } from '../domain/check-in-analytics';
 import { AnalyticsContent } from '../ui/analytics-screen';
 
@@ -54,6 +64,7 @@ function checkInsForBelief({
   day,
   emotionId,
   guidingStatementSnapshot,
+  month = 6,
   prefix,
 }: {
   beliefSystemId: CheckIn['beliefSystemId'];
@@ -61,13 +72,14 @@ function checkInsForBelief({
   day: number;
   emotionId: CheckIn['emotionId'];
   guidingStatementSnapshot: string;
+  month?: number;
   prefix: string;
 }): readonly CheckIn[] {
   return Array.from({ length: count }, (_, index) => ({
     id: CheckInId.make(`${prefix}-${String(index + 1)}`),
     beliefSystemId,
     createdAt: CheckInTimestamp.make(
-      new Date(2026, 6, day, 10, index).toISOString(),
+      new Date(2026, month, day, 10, index).toISOString(),
     ),
     emotionId,
     guidingStatementSnapshot,
@@ -120,6 +132,48 @@ const tiedScreenshotShape = [
   }),
 ] satisfies readonly CheckIn[];
 
+const timeframeLeitsatzEntries = [
+  ...checkInsForBelief({
+    beliefSystemId: BELIEF_SYSTEM_IDS.ALWAYS_FUNCTIONING,
+    count: 2,
+    day: 18,
+    emotionId: EMOTION_IDS.FEAR,
+    guidingStatementSnapshot: 'I may pause and still be worthy.',
+    prefix: 'last-week-pause',
+  }),
+  ...checkInsForBelief({
+    beliefSystemId: BELIEF_SYSTEM_IDS.NO_MISTAKES,
+    count: 1,
+    day: 18,
+    emotionId: EMOTION_IDS.SHAME,
+    guidingStatementSnapshot: 'Mistakes help me learn.',
+    prefix: 'last-week-learn',
+  }),
+  ...checkInsForBelief({
+    beliefSystemId: BELIEF_SYSTEM_IDS.NO_MISTAKES,
+    count: 3,
+    day: 2,
+    emotionId: EMOTION_IDS.SHAME,
+    guidingStatementSnapshot: 'Mistakes help me learn.',
+    prefix: 'four-weeks-learn',
+  }),
+  ...checkInsForBelief({
+    beliefSystemId: BELIEF_SYSTEM_IDS.LOVE_REQUIRES_HELPING,
+    count: 5,
+    day: 1,
+    emotionId: EMOTION_IDS.LOVE,
+    guidingStatementSnapshot: 'I am loved without earning it.',
+    month: 4,
+    prefix: 'all-time-love',
+  }),
+] satisfies readonly CheckIn[];
+
+afterEach(() => {
+  analyticsStore.trigger[ANALYTICS_EVENTS.TIMEFRAME_SELECTED]({
+    timeframe: ANALYTICS_TIMEFRAMES.LAST_WEEK,
+  });
+});
+
 describe('analytics on the device runtime', () => {
   test('renders the populated constellation on the device runtime', async () => {
     expect(analyticsObservations(entries)).toHaveLength(3);
@@ -160,14 +214,59 @@ describe('analytics on the device runtime', () => {
 
     expect(
       await screen.findByTestId(
-        `analytics-last-week-leitsatz-${BELIEF_SYSTEM_IDS.ALWAYS_FUNCTIONING}`,
+        `analytics-top-leitsatz-${BELIEF_SYSTEM_IDS.ALWAYS_FUNCTIONING}`,
       ),
     ).not.toBeNull();
     expect(
       await screen.findByTestId(
-        `analytics-last-week-leitsatz-${BELIEF_SYSTEM_IDS.LOVE_REQUIRES_HELPING}`,
+        `analytics-top-leitsatz-${BELIEF_SYSTEM_IDS.LOVE_REQUIRES_HELPING}`,
       ),
     ).not.toBeNull();
+  });
+
+  test('recalculates the top Leitsatz when the selected timeframe changes', async () => {
+    analyticsStore.trigger[ANALYTICS_EVENTS.TIMEFRAME_SELECTED]({
+      timeframe: ANALYTICS_TIMEFRAMES.LAST_WEEK,
+    });
+    await render(
+      <GestureHandlerRootView style={styles.root}>
+        <AnalyticsContent
+          entries={timeframeLeitsatzEntries}
+          locale={APP_LOCALES.ENGLISH}
+          now={FIXED_NOW}
+          statements={[]}
+        />
+      </GestureHandlerRootView>,
+    );
+
+    expect(await screen.findByTestId(
+      `analytics-top-leitsatz-${BELIEF_SYSTEM_IDS.ALWAYS_FUNCTIONING}`,
+    )).not.toBeNull();
+    expect(await screen.findByAccessibilityLabel(
+      "LAST WEEK'S GUIDING BELIEF",
+    )).not.toBeNull();
+
+    await userEvent.press(await screen.findByTestId('analytics-timeframe-four-weeks'));
+    expect(await screen.findByTestId(
+      `analytics-top-leitsatz-${BELIEF_SYSTEM_IDS.NO_MISTAKES}`,
+    )).not.toBeNull();
+    expect(await screen.findByAccessibilityLabel(
+      "LAST 4 WEEKS' GUIDING BELIEF",
+    )).not.toBeNull();
+    await waitUntil(() => screen.queryByTestId(
+      `analytics-top-leitsatz-${BELIEF_SYSTEM_IDS.ALWAYS_FUNCTIONING}`,
+    ) === null);
+
+    await userEvent.press(await screen.findByTestId('analytics-timeframe-all'));
+    expect(await screen.findByTestId(
+      `analytics-top-leitsatz-${BELIEF_SYSTEM_IDS.LOVE_REQUIRES_HELPING}`,
+    )).not.toBeNull();
+    expect(await screen.findByAccessibilityLabel(
+      'ALL-TIME GUIDING BELIEF',
+    )).not.toBeNull();
+    expect(await screen.findByAccessibilityLabel(
+      'Selected 5 times · All recorded moments',
+    )).not.toBeNull();
   });
 });
 

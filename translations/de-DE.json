@@ -3402,18 +3402,6 @@
       ],
       "types": []
     },
-    "3J/J8iV66RsJq+TU5U2rDA==": {
-      "description": "Evidence below the most frequently selected guiding belief last week",
-      "status": "new",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "{count}-mal gewählt · {range}",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
     "UQxRUu3PsKeWa8EzlirzmQ==": {
       "description": "Copy below tied guiding beliefs when more equally frequent beliefs exist than the card displays",
       "status": "new",
@@ -3469,30 +3457,6 @@
       "translations": [
         {
           "translation": "Gesamt",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "ECBM+iQ4vOCfbDTRqsqfWw==": {
-      "description": "Label for the most frequently selected positive guiding statement last week",
-      "status": "new",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "LEITSATZ DER LETZTEN WOCHE",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "dLsinq8CmHsKM0M4rEng7g==": {
-      "description": "Label for equally most frequently selected positive guiding statements last week",
-      "status": "new",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "LEITSÄTZE DER LETZTEN WOCHE",
           "variations": {}
         }
       ],
@@ -3601,6 +3565,90 @@
       "translations": [
         {
           "translation": "Wähle einen anderen Zeitraum, um mehr von deinem Verlauf zu sehen.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "+16xw5cn/N/sFCmClpjt9w==": {
+      "description": "Evidence below the most frequently selected guiding belief in the selected analytics timeframe",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "{count}-mal gewählt · {range}",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "dLsinq8CmHsKM0M4rEng7g==": {
+      "description": "Label for equally most frequently selected positive guiding statements last week",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "LEITSÄTZE DER LETZTEN WOCHE",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "ECBM+iQ4vOCfbDTRqsqfWw==": {
+      "description": "Label for the most frequently selected positive guiding statement last week",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "LEITSATZ DER LETZTEN WOCHE",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "h0MnupC1DVFoJ17PXsavPg==": {
+      "description": "Label for equally most frequently selected positive guiding statements in the last four weeks",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "LEITSÄTZE DER LETZTEN 4 WOCHEN",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "lklvTj71iZizJ5P3utZn5g==": {
+      "description": "Label for the most frequently selected positive guiding statement in the last four weeks",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "LEITSATZ DER LETZTEN 4 WOCHEN",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "497cvKdOt0kXO7y+WOxZIA==": {
+      "description": "Label for equally most frequently selected positive guiding statements across all recorded moments",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "MEISTGEWÄHLTE LEITSÄTZE INSGESAMT",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "2v7e9RijGjqoRXgfRYyxLw==": {
+      "description": "Label for the most frequently selected positive guiding statement across all recorded moments",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "MEISTGEWÄHLTER LEITSATZ INSGESAMT",
           "variations": {}
         }
       ],

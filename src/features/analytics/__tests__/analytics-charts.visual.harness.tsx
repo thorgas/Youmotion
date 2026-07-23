@@ -6,6 +6,7 @@ import { Platform, StyleSheet, View } from 'react-native';
 import {
   APP_LOCALES,
   BELIEF_SYSTEM_IDS,
+  EMOTION_LABEL_MODES,
   EMOTION_IDS,
 } from '@/constants';
 import {
@@ -14,14 +15,17 @@ import {
   type CheckIn,
 } from '@/features/check-in/domain/check-in';
 import { emotions } from '@/features/check-in/domain/emotion';
+import { appSettingsStore } from '@/features/settings/application/app-settings.store';
+import { AppLocaleProvider } from '@/localization/app-locale-provider';
 import type { EmotionFrequency } from '../domain/check-in-analytics';
-import { AnalyticsContent } from '../ui/analytics-screen';
+import { AnalyticsContent, ObservationCard } from '../ui/analytics-screen';
 import { EmotionRadarChart } from '../ui/emotion-radar-chart';
 
 const FIXED_NOW = new Date(2026, 6, 21, 12);
 const LABELS = ['Joy', 'Love', 'Shame', 'Disgust', 'Sadness', 'Anger', 'Fear'];
 const COLORS = emotions.map(({ color }) => color);
 const visualTest = Platform.OS === 'android' ? test : test.skip;
+const iosVisualTest = Platform.OS === 'ios' ? test : test.skip;
 
 function frequencies(counts: readonly number[]) {
   return emotions.map(({ id }, index) => ({
@@ -148,6 +152,34 @@ const tiedLeitsatzEntries = [
 ] satisfies readonly CheckIn[];
 
 describe('analytics chart visual regression', () => {
+  iosVisualTest('lets a long German observation grow the card', async () => {
+    appSettingsStore.trigger.hydrated({
+      settings: {
+        emotionLabelMode: EMOTION_LABEL_MODES.EMOJI,
+        locale: APP_LOCALES.GERMAN,
+        onboardingCompleted: true,
+      },
+    });
+    await render(
+      <GestureHandlerRootView style={styles.root}>
+        <AppLocaleProvider>
+          <View style={styles.observationFixture}>
+            <ObservationCard
+              index={2}
+              observation={{ kind: 'notes', count: 40, momentCount: 40 }}
+              statements={[]}
+            />
+          </View>
+        </AppLocaleProvider>
+      </GestureHandlerRootView>,
+    );
+
+    await expectImageSnapshot({
+      name: 'analytics-long-german-observation',
+      testID: 'analytics-observation-2',
+    });
+  });
+
   visualTest('keeps the zero-data chart labels and neutral geometry stable', async () => {
     await renderRadar([0, 0, 0, 0, 0, 0, 0]);
     await expectImageSnapshot({
@@ -186,7 +218,7 @@ describe('analytics chart visual regression', () => {
 
     await expectImageSnapshot({
       name: 'analytics-tied-top-leitsaetze',
-      testID: 'analytics-last-week-leitsatz',
+      testID: 'analytics-top-leitsatz',
     });
   });
 
@@ -225,5 +257,9 @@ const styles = StyleSheet.create({
     height: 316,
     justifyContent: 'center',
     width: 360,
+  },
+  observationFixture: {
+    padding: 22,
+    width: 390,
   },
 });
