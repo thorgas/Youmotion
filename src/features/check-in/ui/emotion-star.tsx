@@ -274,7 +274,7 @@ const styles = StyleSheet.create({
   },
   readoutPrompt: {
     alignItems: 'center',
-    justifyContent: 'center',
+    justifyContent: 'flex-start',
   },
   selectedReadout: {
     position: 'absolute',
@@ -283,7 +283,7 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     alignItems: 'center',
-    justifyContent: 'center',
+    justifyContent: 'flex-start',
   },
   revealLine: {
     flexDirection: 'row',

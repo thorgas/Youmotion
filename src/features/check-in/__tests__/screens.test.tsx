@@ -311,6 +311,7 @@ describe('check-in screens', () => {
     expect(StyleSheet.flatten(screen.getByTestId('emotion-star').props['style'])).toEqual(baseStarStyle);
     expect(screen.getByTestId('emotion-readout-prompt', { includeHiddenElements: true })).toHaveStyle({
       alignItems: 'center',
+      justifyContent: 'flex-start',
       opacity: 0,
     });
     expect(
@@ -326,7 +327,7 @@ describe('check-in screens', () => {
       right: 0,
       bottom: 0,
       left: 0,
-      justifyContent: 'center',
+      justifyContent: 'flex-start',
     });
     expect(screen.queryByTestId('base-emotion-emoji-freude')).toBeNull();
     expect(screen.getByTestId('base-emotion-label-freude')).toBeTruthy();
