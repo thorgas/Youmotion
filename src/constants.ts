@@ -36,7 +36,6 @@ export const BELIEF_SYSTEM_IDS = Object.freeze({
 });
 
 export const CHECK_IN_EVENTS = Object.freeze({
-  EMOTION_HELP_TOGGLED: literal('emotion.helpToggled'),
   TOUCH_STARTED: literal('touch.started'),
   SELECTION_CHANGED: literal('selection.changed'),
   SELECTION_CANCELLED: literal('selection.cancelled'),

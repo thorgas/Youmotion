@@ -390,23 +390,6 @@ describe('app navigation model', () => {
     expect(actor.getSnapshot().matches(CHECK_IN_STATES.SAVING)).toBe(true);
   });
 
-  it('toggles emotion help and collapses it when the star interaction starts', () => {
-    const actor = createActor(appNavigationMachine).start();
-
-    expect(actor.getSnapshot().context.emotionHelpVisible).toBe(false);
-    actor.send({ type: CHECK_IN_EVENTS.EMOTION_HELP_TOGGLED });
-    expect(actor.getSnapshot().context.emotionHelpVisible).toBe(true);
-
-    actor.send({ type: CHECK_IN_EVENTS.TOUCH_STARTED });
-
-    expect(actor.getSnapshot().context.emotionHelpVisible).toBe(false);
-    expect(actor.getSnapshot().matches({
-      [NAVIGATION_STATES.TABS]: {
-        [NAVIGATION_STATES.TODAY]: CHECK_IN_STATES.EXPLORING,
-      },
-    })).toBe(true);
-  });
-
   it('cancels an interrupted drag without selecting its preview', () => {
     const actor = createActor(appNavigationMachine).start();
     actor.send({ type: CHECK_IN_EVENTS.TOUCH_STARTED });

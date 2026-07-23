@@ -91,7 +91,6 @@ const AppContextSchema = Schema.Struct({
   saved: Schema.NullOr(CheckInSchema),
   editing: Schema.NullOr(CheckInSchema),
   error: Schema.NullOr(Schema.String),
-  emotionHelpVisible: Schema.Boolean,
   guidingHelpVisible: Schema.Boolean,
 });
 
@@ -269,7 +268,6 @@ export const appNavigationMachine = setup({
       [ONBOARDING_EVENTS.SELECTION_CANCELLED]: EmptyEventSchema,
       [ONBOARDING_EVENTS.SELECTION_RELEASED]: EmptyEventSchema,
       [ONBOARDING_EVENTS.EXAMPLE_REQUESTED]: EmptyEventSchema,
-      [CHECK_IN_EVENTS.EMOTION_HELP_TOGGLED]: EmptyEventSchema,
       [CHECK_IN_EVENTS.TOUCH_STARTED]: EmptyEventSchema,
       [CHECK_IN_EVENTS.SELECTION_CHANGED]: Schema.standardSchemaV1(
         Schema.Struct({ selection: Schema.NullOr(EmotionSelectionSchema) }),
@@ -400,7 +398,6 @@ export const appNavigationMachine = setup({
     saved: null,
     editing: null,
     error: null,
-    emotionHelpVisible: false,
     guidingHelpVisible: false,
   },
   entry: ({ self }, enq) => {
@@ -706,7 +703,6 @@ export const appNavigationMachine = setup({
             saved: null,
             editing: null,
             error: null,
-            emotionHelpVisible: false,
           },
         },
         [NAVIGATION_EVENTS.HISTORY_OPENED]: {
@@ -718,7 +714,6 @@ export const appNavigationMachine = setup({
             saved: null,
             editing: null,
             error: null,
-            emotionHelpVisible: false,
           },
         },
         [NAVIGATION_EVENTS.ANALYTICS_OPENED]: {
@@ -730,7 +725,6 @@ export const appNavigationMachine = setup({
             saved: null,
             editing: null,
             error: null,
-            emotionHelpVisible: false,
           },
         },
         [NAVIGATION_EVENTS.SETTINGS_OPENED]: {
@@ -742,7 +736,6 @@ export const appNavigationMachine = setup({
             saved: null,
             editing: null,
             error: null,
-            emotionHelpVisible: false,
           },
         },
         [CHECK_IN_EVENTS.EDIT_REQUESTED]: ({ event }) => ({
@@ -763,15 +756,7 @@ export const appNavigationMachine = setup({
           states: {
             [CHECK_IN_STATES.IDLE]: {
               on: {
-                [CHECK_IN_EVENTS.EMOTION_HELP_TOGGLED]: {
-                  context: ({ context }) => ({
-                    emotionHelpVisible: !context.emotionHelpVisible,
-                  }),
-                },
-                [CHECK_IN_EVENTS.TOUCH_STARTED]: {
-                  target: CHECK_IN_STATES.EXPLORING,
-                  context: { emotionHelpVisible: false },
-                },
+                [CHECK_IN_EVENTS.TOUCH_STARTED]: { target: CHECK_IN_STATES.EXPLORING },
                 [CHECK_IN_EVENTS.SELECTION_CHANGED]: ({ context, event }, enq) => {
                   if (event.selection && event.selection.level !== context.selection?.level) {
                     enq(() => { void Haptics.selectionAsync(); });

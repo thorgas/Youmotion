@@ -210,7 +210,9 @@ describe('check-in screens', () => {
       letterSpacing: 0.3,
     });
     expect(screen.getByText('and move your finger.')).toBeTruthy();
-    expect(screen.getByText('Release your finger to select the feeling.')).toBeTruthy();
+    expect(screen.getByText(
+      'Choose the feeling that feels right to you, then release your finger.',
+    )).toBeTruthy();
     expect(screen.getByTestId('emotion-readout-prompt')).toHaveStyle({
       alignItems: 'center',
     });
@@ -220,27 +222,8 @@ describe('check-in screens', () => {
     expect(screen.getByTestId('base-emotion-emoji-freude')).toHaveTextContent('😊');
     expect(screen.getByTestId('base-emotion-emoji-liebe')).toHaveTextContent('❤️');
     expect(screen.getByText('The farther you move from the center, the more intense the feeling.')).toBeTruthy();
-    const emotionHelpToggle = screen.getByTestId('emotion-word-help-toggle');
-    expect(emotionHelpToggle.props['accessibilityState']).toEqual({ expanded: false });
-    expect(screen.getByText('What if I don’t know a word?')).toHaveStyle({
-      fontSize: 12,
-      lineHeight: 18,
-    });
+    expect(screen.queryByTestId('emotion-word-help-toggle')).toBeNull();
     expect(screen.queryByTestId('emotion-word-help-content')).toBeNull();
-
-    await act(() => fireEvent.press(emotionHelpToggle));
-
-    expect(screen.getByTestId('emotion-word-help-toggle').props['accessibilityState']).toEqual({
-      expanded: true,
-    });
-    expect(screen.getByTestId('emotion-word-help-content')).toBeTruthy();
-    expect(screen.getByText(
-      'There is no right or wrong choice here. Follow your first impression and choose what feels right to you.',
-    )).toHaveStyle({
-      fontSize: 12,
-      lineHeight: 18,
-      textAlign: 'left',
-    });
     expect(screen.getByLabelText('Emotion star. Drag outward from the center.')).toBeTruthy();
     expect(screen.getByTestId('base-state-ripples')).toHaveStyle({
       alignItems: 'center',
@@ -258,19 +241,14 @@ describe('check-in screens', () => {
     });
   });
 
-  it('offers German readers optional help for unfamiliar emotion words', async () => {
+  it('asks German readers to choose the feeling that feels right to them', async () => {
     await act(() => appSettingsStore.trigger.languageChanged({
       locale: APP_LOCALES.GERMAN,
     }));
     const screen = await _renderLocalized(<CheckInScreen />);
 
-    const emotionHelpToggle = screen.getByText('Was, wenn ich einen Begriff nicht kenne?');
-    expect(emotionHelpToggle).toBeTruthy();
-
-    await act(() => fireEvent.press(emotionHelpToggle));
-
     expect(screen.getByText(
-      'Es gibt hier kein Richtig oder Falsch. Folge deinem ersten Eindruck und wähle, was sich für dich stimmig anfühlt.',
+      'Wähle das Gefühl aus, das sich für dich stimmig anfühlt, und lasse deinen Finger los.',
     )).toBeTruthy();
   });
 

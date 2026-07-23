@@ -1409,39 +1409,6 @@
       ],
       "types": []
     },
-    "a1nAzNg5XFgd8NTgdLKvDg==": {
-      "description": "Button hiding the explanation for unfamiliar emotion words",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "Hinweis ausblenden",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "6LniTAiLbPnsZCIKpYYNVA==": {
-      "description": "Button revealing help when an emotion word is unfamiliar",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "Was, wenn ich einen Begriff nicht kenne?",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "H/cVWqxSs7ABSpYTxpAaMg==": {
-      "description": "Reassurance that unfamiliar emotion words can be chosen intuitively",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "Es gibt hier kein Richtig oder Falsch. Folge deinem ersten Eindruck und wähle, was sich für dich stimmig anfühlt.",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
     "DqLfANWwCFHSqr8meE32MA==": {
       "description": "Second line of the emotion star gesture prompt",
       "tokens": [],
@@ -1519,12 +1486,12 @@
       ],
       "types": []
     },
-    "6EV0v4A13WCxh58rfpXCRg==": {
-      "description": "Third line explaining how to confirm an emotion selection",
+    "xm9LiL9kIyqiuOnMfovzqQ==": {
+      "description": "Third line asking the user to intuitively choose and confirm an emotion",
       "tokens": [],
       "translations": [
         {
-          "translation": "Lass deinen Finger los, um das Gefühl auszuwählen.",
+          "translation": "Wähle das Gefühl aus, das sich für dich stimmig anfühlt, und lasse deinen Finger los.",
           "variations": {}
         }
       ],

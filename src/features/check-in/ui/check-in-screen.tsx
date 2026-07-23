@@ -72,7 +72,6 @@ export function CheckInScreen() {
     actor.send({ type: CHECK_IN_EVENTS.SELECTION_CHANGED, selection });
   };
   const _selectionCancelled = () => actor.send({ type: CHECK_IN_EVENTS.SELECTION_CANCELLED });
-  const _emotionHelpToggled = () => actor.send({ type: CHECK_IN_EVENTS.EMOTION_HELP_TOGGLED });
   const _selectionReleased = () => {
     if (!_sameSelection({ current: publishedSelection.current, next: latestSelection.current })) {
       publishedSelection.current = latestSelection.current;
@@ -102,10 +101,8 @@ export function CheckInScreen() {
             <EmotionStar
               centerOrigin={centerOrigin}
               contentInset={20}
-              emotionHelpExpanded={snapshot.context.emotionHelpVisible}
               selection={snapshot.context.selection}
               onCancel={_selectionCancelled}
-              onEmotionHelpToggle={_emotionHelpToggled}
               onTouchStart={_touchStarted}
               onSelectionChange={_selectionChanged}
               onRelease={_selectionReleased}
