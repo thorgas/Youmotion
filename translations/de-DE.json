@@ -1409,6 +1409,17 @@
       ],
       "types": []
     },
+    "HvYHIGZ3z4ilPmH95Etdpw==": {
+      "description": "Reassurance that emotion words can be chosen intuitively",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Es gibt hier kein Richtig oder Falsch. Folge deinem ersten Eindruck und wähle, was sich für dich stimmig anfühlt.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
     "DqLfANWwCFHSqr8meE32MA==": {
       "description": "Second line of the emotion star gesture prompt",
       "tokens": [],

@@ -269,7 +269,7 @@ const styles = StyleSheet.create({
   readout: {
     pointerEvents: 'none',
     width: 260,
-    marginBottom: 8,
+    marginBottom: -8,
   },
   readoutPrompt: {
     alignItems: 'center',

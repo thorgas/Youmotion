@@ -96,6 +96,11 @@ export function CheckInScreen() {
                 ? <fbt desc="Question shown while changing the feeling in an existing check-in">How did you feel then?</fbt>
                 : <fbt desc="Question asking the user about their current feeling">How are you feeling right now?</fbt>}
             </Text>
+            <Text style={styles.guidance}>
+              <fbt desc="Reassurance that emotion words can be chosen intuitively">
+                There is no right or wrong choice here. Follow your first impression and choose what feels right to you.
+              </fbt>
+            </Text>
           </View>
           <View style={styles.starCard} testID="today-pulse-card">
             <EmotionStar
@@ -153,6 +158,14 @@ const styles = StyleSheet.create({
     ...tabScreenTitleStyle,
     letterSpacing: -0.6,
     maxWidth: 330,
+  },
+  guidance: {
+    color: palette.inkMuted,
+    fontFamily: type.regular,
+    fontSize: 14,
+    lineHeight: 20,
+    marginTop: 10,
+    maxWidth: 390,
   },
   starCard: {
     alignItems: 'center',

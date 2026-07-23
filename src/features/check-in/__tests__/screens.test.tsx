@@ -195,6 +195,15 @@ describe('check-in screens', () => {
       lineHeight: 40,
     });
     expect(StyleSheet.flatten(title.props['style'])).not.toHaveProperty('textAlign');
+    const guidance = screen.getByText(
+      'There is no right or wrong choice here. Follow your first impression and choose what feels right to you.',
+    );
+    expect(guidance).toHaveStyle({
+      color: palette.inkMuted,
+      fontSize: 14,
+      lineHeight: 20,
+    });
+    expect(StyleSheet.flatten(guidance.props['style'])).not.toHaveProperty('textAlign');
     expect(screen.getByTestId('today-pulse-card')).toHaveStyle({
       backgroundColor: palette.paperRaised,
       borderColor: palette.hairline,
@@ -210,6 +219,9 @@ describe('check-in screens', () => {
     expect(screen.getByText('Release your finger to select the feeling.')).toBeTruthy();
     expect(screen.getByTestId('emotion-readout-prompt')).toHaveStyle({
       alignItems: 'center',
+    });
+    expect(screen.getByTestId('emotion-readout')).toHaveStyle({
+      marginBottom: -8,
     });
     expect(screen.getByTestId('base-emotion-emoji-freude')).toHaveTextContent('😊');
     expect(screen.getByTestId('base-emotion-emoji-liebe')).toHaveTextContent('❤️');
@@ -229,6 +241,17 @@ describe('check-in screens', () => {
       height: 72,
       borderRadius: 36,
     });
+  });
+
+  it('reassures German readers that emotion words can be chosen intuitively', async () => {
+    await act(() => appSettingsStore.trigger.languageChanged({
+      locale: APP_LOCALES.GERMAN,
+    }));
+    const screen = await _renderLocalized(<CheckInScreen />);
+
+    expect(screen.getByText(
+      'Es gibt hier kein Richtig oder Falsch. Folge deinem ersten Eindruck und wähle, was sich für dich stimmig anfühlt.',
+    )).toBeTruthy();
   });
 
   it('keeps the star frame and reserved prompt layout stable while selecting an emotion', async () => {
