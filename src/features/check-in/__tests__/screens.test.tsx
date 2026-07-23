@@ -1,4 +1,5 @@
 import { act, fireEvent, render, waitFor, within } from '@testing-library/react-native';
+import { useFocusEffect } from 'expo-router';
 import type { ReactElement } from 'react';
 import { Alert, StyleSheet } from 'react-native';
 import { useSharedValue } from 'react-native-reanimated';
@@ -44,6 +45,7 @@ import { CheckInScreen } from '../ui/check-in-screen';
 import { selectionFromPoint } from '../domain/emotion-selection';
 import { EmotionStar } from '../ui/emotion-star';
 import { HistoryScreen } from '../ui/history-screen';
+import { beginReflectionInputSession } from '../ui/reflection-input-session';
 import { ReflectionScreen } from '../ui/reflection-screen';
 import { reflectionResponsiveLayout } from '../ui/reflection-responsive-layout';
 import { GuidingBeliefScreen } from '../ui/guiding-belief-screen';
@@ -61,6 +63,10 @@ let mockActor: Actor<typeof appNavigationMachine>;
 
 jest.mock('@/navigation/app-navigation.provider', () => ({
   useAppNavigationActor: () => mockActor,
+}));
+
+jest.mock('expo-router', () => ({
+  useFocusEffect: jest.fn(),
 }));
 
 jest.mock('expo-constants', () => ({
@@ -158,6 +164,24 @@ describe('reflection responsive layout', () => {
   });
 });
 
+describe('reflection input focus lifecycle', () => {
+  it('focuses a new input session and blurs it when the step ends', () => {
+    const input = {
+      blur: jest.fn(),
+      focus: jest.fn(),
+    };
+
+    const endSession = beginReflectionInputSession(input);
+
+    expect(input.focus).toHaveBeenCalledTimes(1);
+    expect(input.blur).not.toHaveBeenCalled();
+
+    endSession();
+
+    expect(input.blur).toHaveBeenCalledTimes(1);
+  });
+});
+
 function RippleOriginHarness({ centered }: { centered: boolean }) {
   const offsetX = useSharedValue(55);
   const offsetY = useSharedValue(-75);
@@ -167,6 +191,7 @@ function RippleOriginHarness({ centered }: { centered: boolean }) {
 
 describe('check-in screens', () => {
   beforeEach(() => {
+    jest.mocked(useFocusEffect).mockClear();
     resetSurrealDatabaseMock();
     checkInHistoryStore.trigger.hydrated({ entries: [] });
     historyTimeframeStore.trigger[HISTORY_EVENTS.TIMEFRAME_SELECTED]({
@@ -487,7 +512,8 @@ describe('check-in screens', () => {
     expect(screen.getByText(
       "Next, you can add or change this moment's core belief and guiding belief. Both steps are optional.",
     )).toBeTruthy();
-    expect(screen.getByLabelText('Optional note about the feeling').props['autoFocus']).toBe(true);
+    expect(useFocusEffect).toHaveBeenCalledTimes(1);
+    expect(screen.getByLabelText('Optional note about the feeling').props['autoFocus']).toBeUndefined();
     expect(screen.getByText('Cheerfulness')).toBeTruthy();
     expect(screen.queryByText(/50%/)).toBeNull();
     expect(screen.getByTestId('reflection-keyboard-scroll').props).toMatchObject({
@@ -1106,7 +1132,8 @@ describe('check-in screens', () => {
     expect(reflection.getByText('Save and continue')).toBeTruthy();
     expect(reflection.getByText('Change feeling')).toBeTruthy();
     expect(reflection.getByTestId('delete-edited-moment')).toBeTruthy();
-    expect(reflection.getByDisplayValue('Before').props['autoFocus']).toBe(true);
+    expect(useFocusEffect).toHaveBeenCalledTimes(1);
+    expect(reflection.getByDisplayValue('Before').props['autoFocus']).toBeUndefined();
   });
 
   it('confirms and deletes a captured moment by long-pressing its history row', async () => {

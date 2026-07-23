@@ -1,7 +1,9 @@
 import { useSelector } from '@xstate/react';
 import { useSelector as useStoreSelector } from '@xstate/store-react';
+import { useFocusEffect } from 'expo-router';
 import { fbs } from 'fbtee';
 import { PressableScale } from 'pressto';
+import { useRef } from 'react';
 import {
   ActivityIndicator,
   Platform,
@@ -55,6 +57,7 @@ import {
 } from './check-in-deletion';
 import { CheckInProgressHeader } from './check-in-progress';
 import { PersonalBeliefCreateButton } from './personal-belief-create-button';
+import { beginReflectionInputSession } from './reflection-input-session';
 import { reflectionResponsiveLayout } from './reflection-responsive-layout';
 import { palette, type } from './theme';
 
@@ -173,10 +176,10 @@ function SelectionSummary({
   );
 }
 
-/* oxlint-disable jsx-a11y/no-autofocus -- Reflection is an explicit writing step; create and edit modes have regression coverage. */
 function ReflectionNoteStep() {
   const actor = useAppNavigationActor();
   const snapshot = useSelector(actor, _selectSnapshot);
+  const input = useRef<TextInput>(null);
   const window = useWindowDimensions();
   const keyboard = useKeyboardState((state) => ({
     height: state.height,
@@ -207,6 +210,8 @@ function ReflectionNoteStep() {
     }
   };
   const _confirmDelete = () => confirmCheckInDeletion(_delete);
+  const _focusInput = () => beginReflectionInputSession(input.current);
+  useFocusEffect(_focusInput);
 
   if (!selection) return null;
 
@@ -293,7 +298,6 @@ function ReflectionNoteStep() {
             </PressableScale>
             <TextInput
               accessibilityLabel={optionalNoteAccessibilityLabel()}
-              autoFocus
               editable={!saving}
               maxLength={240}
               multiline
@@ -301,6 +305,7 @@ function ReflectionNoteStep() {
               placeholder={optionalNotePlaceholder()}
               placeholderTextColor={palette.inkMuted}
               returnKeyType="done"
+              ref={input}
               style={[styles.input, { minHeight: responsive.inputMinHeight }]}
               submitBehavior="blurAndSubmit"
               testID="reflection-note-input"
@@ -361,7 +366,6 @@ function ReflectionNoteStep() {
     </View>
   );
 }
-/* oxlint-enable jsx-a11y/no-autofocus */
 
 function BeliefSystemStep() {
   const actor = useAppNavigationActor();
