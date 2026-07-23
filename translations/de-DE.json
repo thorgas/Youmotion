@@ -1409,17 +1409,6 @@
       ],
       "types": []
     },
-    "DqLfANWwCFHSqr8meE32MA==": {
-      "description": "Second line of the emotion star gesture prompt",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "und bewege deinen Finger.",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
     "zKESnhsAv6zPMV0BVfNExA==": {
       "description": "Explanation of how distance controls emotion intensity",
       "tokens": [],
@@ -1475,19 +1464,19 @@
       ],
       "types": []
     },
-    "8c84c2QASHn6IlkM9iVP6w==": {
-      "description": "Prompt above the emotion star before touching",
+    "vUJ2M8KqsBpzXsBY62aX2Q==": {
+      "description": "Primary instruction above the emotion star",
       "tokens": [],
       "translations": [
         {
-          "translation": "Berühre den Punkt",
+          "translation": "Berühre den Punkt und bewege deinen Finger.",
           "variations": {}
         }
       ],
       "types": []
     },
-    "xm9LiL9kIyqiuOnMfovzqQ==": {
-      "description": "Third line asking the user to intuitively choose and confirm an emotion",
+    "+BCHCTVYTZu3FpJJbDacvg==": {
+      "description": "Supporting instruction asking the user to intuitively choose and confirm an emotion",
       "tokens": [],
       "translations": [
         {

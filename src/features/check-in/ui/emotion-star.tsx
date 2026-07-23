@@ -96,12 +96,12 @@ function EmotionReadout({ selection }: { selection: EmotionSelection }) {
       style={styles.selectedReadout}
       testID="emotion-readout-selection">
       <ReadoutText
-        style={[styles.readoutEmotion, styles.readoutEmotionSelected]}
+        style={styles.selectedNuance}
         testID="emotion-nuance-reveal"
         text={emotionNuance(selection)}
       />
       <ReadoutText
-        style={styles.readoutNuance}
+        style={styles.selectedEmotionName}
         testID="emotion-name-reveal"
         text={emotionName(selection.emotionId)}
       />
@@ -221,10 +221,13 @@ export function EmotionStar({
           importantForAccessibility={selection ? 'no-hide-descendants' : 'auto'}
           style={[styles.readoutPrompt, promptStyle]}
           testID="emotion-readout-prompt">
-          <Text style={styles.readoutEmotion}><fbt desc="Prompt above the emotion star before touching">Touch the point</fbt></Text>
-          <Text style={styles.readoutNuance}><fbt desc="Second line of the emotion star gesture prompt">and move your finger.</fbt></Text>
-          <Text style={styles.readoutRelease}>
-            <fbt desc="Third line asking the user to intuitively choose and confirm an emotion">
+          <Text style={styles.promptLead}>
+            <fbt desc="Primary instruction above the emotion star">
+              Touch the point and move your finger.
+            </fbt>
+          </Text>
+          <Text style={styles.promptSupport}>
+            <fbt desc="Supporting instruction asking the user to intuitively choose and confirm an emotion">
               Choose the feeling that feels right to you, then release your finger.
             </fbt>
           </Text>
@@ -272,7 +275,8 @@ const styles = StyleSheet.create({
   },
   readout: {
     pointerEvents: 'none',
-    width: 260,
+    maxWidth: 300,
+    width: '100%',
     marginBottom: -16,
   },
   readoutPrompt: {
@@ -289,34 +293,39 @@ const styles = StyleSheet.create({
   revealLine: {
     flexDirection: 'row',
     justifyContent: 'center',
-    width: 260,
+    width: '100%',
   },
-  readoutEmotion: {
+  promptLead: {
     color: palette.ink,
     fontFamily: type.medium,
     fontSize: textSize.emphasis,
     letterSpacing: 0.3,
+    lineHeight: 20,
     opacity: 0.82,
+    textAlign: 'center',
   },
-  readoutEmotionSelected: {
+  promptSupport: {
+    color: palette.inkMuted,
+    fontFamily: type.regular,
+    fontSize: textSize.metadata,
+    letterSpacing: 0.3,
+    lineHeight: 18,
+    marginTop: 4,
+    textAlign: 'center',
+  },
+  selectedNuance: {
+    color: palette.ink,
+    fontFamily: type.medium,
     fontSize: textSize.section,
     letterSpacing: 0.7,
     opacity: 0.92,
   },
-  readoutNuance: {
+  selectedEmotionName: {
     color: palette.inkMuted,
     fontFamily: type.regular,
     fontSize: textSize.caption,
     letterSpacing: 0.8,
     marginTop: 7,
-    textAlign: 'center',
-  },
-  readoutRelease: {
-    color: palette.inkMuted,
-    fontFamily: type.regular,
-    fontSize: textSize.metadata,
-    letterSpacing: 0.3,
-    marginTop: 4,
     textAlign: 'center',
   },
   intensityHint: {

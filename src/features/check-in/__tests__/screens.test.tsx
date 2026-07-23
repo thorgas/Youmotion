@@ -204,15 +204,19 @@ describe('check-in screens', () => {
       borderRadius: 30,
       borderWidth: 1,
     });
-    expect(screen.getByText('Touch the point')).toBeTruthy();
-    expect(screen.getByText('Touch the point')).toHaveStyle({
+    expect(screen.getByText('Touch the point and move your finger.')).toHaveStyle({
       fontSize: 16,
       letterSpacing: 0.3,
+      lineHeight: 20,
     });
-    expect(screen.getByText('and move your finger.')).toBeTruthy();
     expect(screen.getByText(
       'Choose the feeling that feels right to you, then release your finger.',
-    )).toBeTruthy();
+    )).toHaveStyle({
+      fontSize: 12,
+      letterSpacing: 0.3,
+      lineHeight: 18,
+      marginTop: 4,
+    });
     expect(screen.getByTestId('emotion-readout-prompt')).toHaveStyle({
       alignItems: 'center',
     });
@@ -247,6 +251,9 @@ describe('check-in screens', () => {
     }));
     const screen = await _renderLocalized(<CheckInScreen />);
 
+    expect(screen.getByText(
+      'Berühre den Punkt und bewege deinen Finger.',
+    )).toBeTruthy();
     expect(screen.getByText(
       'Wähle das Gefühl aus, das sich für dich stimmig anfühlt, und lasse deinen Finger los.',
     )).toBeTruthy();
