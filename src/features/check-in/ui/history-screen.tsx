@@ -77,12 +77,29 @@ function HistoryBelief({
   });
 
   if (!guidingStatement) {
-    return <Text style={styles.beliefSystem}>{harmfulStatement}</Text>;
+    return (
+      <View style={styles.beliefGroup}>
+        <Text
+          style={styles.beliefLabel}
+          testID={`history-harmful-belief-label-${entry.id}`}
+        >
+          <fbt desc="Label for an unreframed harmful core belief in check-in history">
+            Core belief
+          </fbt>
+        </Text>
+        <Text
+          style={styles.beliefSystem}
+          testID={`history-harmful-belief-${entry.id}`}
+        >
+          {harmfulStatement}
+        </Text>
+      </View>
+    );
   }
 
   return (
-    <View style={styles.beliefTransition} testID={`history-belief-transition-${entry.id}`}>
-      <Text style={styles.releasedBeliefLabel}>
+    <View style={styles.beliefGroup} testID={`history-belief-transition-${entry.id}`}>
+      <Text style={styles.beliefLabel}>
         <fbt desc="Label for a harmful core belief that was reframed in check-in history">
           Released core belief
         </fbt>
@@ -226,14 +243,19 @@ const styles = StyleSheet.create({
   emotion: { fontFamily: type.semibold, color: palette.ink, fontSize: 15 },
   date: { fontFamily: type.regular, color: palette.inkMuted, fontSize: 12, marginTop: 2 },
   note: { fontFamily: type.regular, color: palette.ink, fontSize: 13, lineHeight: 19, marginTop: 8 },
-  beliefSystem: { fontFamily: type.medium, color: palette.danger, fontSize: 12, lineHeight: 18, marginTop: 8 },
-  beliefTransition: { gap: 7, marginTop: 11 },
-  releasedBeliefLabel: {
+  beliefGroup: { gap: 7, marginTop: 11 },
+  beliefLabel: {
     fontFamily: type.semibold,
     color: palette.releasedInk,
     fontSize: 9,
     letterSpacing: 1,
     textTransform: 'uppercase',
+  },
+  beliefSystem: {
+    fontFamily: type.regular,
+    color: palette.inkMuted,
+    fontSize: 12,
+    lineHeight: 18,
   },
   releasedBelief: {
     fontFamily: type.regular,

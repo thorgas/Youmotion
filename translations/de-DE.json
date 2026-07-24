@@ -2179,6 +2179,17 @@
       ],
       "types": []
     },
+    "cEYtvI1Ov7VK0P35tgZBOg==": {
+      "description": "Label for an unreframed harmful core belief in check-in history",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Leidsatz",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
     "SDGchp/tebnaGjkgc7ulgg==": {
       "description": "Label for a harmful core belief that was reframed in check-in history",
       "tokens": [],

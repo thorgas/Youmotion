@@ -971,7 +971,10 @@ describe('check-in screens', () => {
     expect(history.getByTestId('history-moment-history-previous-week')).toBeTruthy();
   });
 
-  it('renders an unreframed harmful belief in the danger color', async () => {
+  it('labels an unreframed harmful belief and renders it as muted text', async () => {
+    await act(() => appSettingsStore.trigger.languageChanged({
+      locale: APP_LOCALES.GERMAN,
+    }));
     checkInHistoryStore.trigger.hydrated({
       entries: [{
         id: CheckInId.make('history-harmful-belief'),
@@ -986,8 +989,24 @@ describe('check-in screens', () => {
 
     const history = await _renderLocalized(<HistoryScreen />);
 
-    expect(history.getByText('I always have to function.')).toHaveStyle({
-      color: palette.danger,
+    expect(history.getByTestId(
+      'history-harmful-belief-label-history-harmful-belief',
+    )).toHaveTextContent('Leidsatz');
+    expect(history.getByTestId(
+      'history-harmful-belief-label-history-harmful-belief',
+    )).toHaveStyle({
+      color: palette.releasedInk,
+      textTransform: 'uppercase',
+    });
+    expect(history.getByTestId(
+      'history-harmful-belief-history-harmful-belief',
+    )).toHaveTextContent('Ich muss immer funktionieren.');
+    expect(history.getByTestId(
+      'history-harmful-belief-history-harmful-belief',
+    )).toHaveStyle({
+      color: palette.inkMuted,
+      fontFamily: 'InstrumentSans_400Regular',
+      fontSize: 12,
     });
   });
 
