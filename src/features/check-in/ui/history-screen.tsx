@@ -226,7 +226,7 @@ const styles = StyleSheet.create({
   emotion: { fontFamily: type.semibold, color: palette.ink, fontSize: 15 },
   date: { fontFamily: type.regular, color: palette.inkMuted, fontSize: 12, marginTop: 2 },
   note: { fontFamily: type.regular, color: palette.ink, fontSize: 13, lineHeight: 19, marginTop: 8 },
-  beliefSystem: { fontFamily: type.medium, color: palette.moss, fontSize: 12, lineHeight: 18, marginTop: 8 },
+  beliefSystem: { fontFamily: type.medium, color: palette.danger, fontSize: 12, lineHeight: 18, marginTop: 8 },
   beliefTransition: { gap: 7, marginTop: 11 },
   releasedBeliefLabel: {
     fontFamily: type.semibold,

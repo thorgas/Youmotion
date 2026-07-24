@@ -971,6 +971,26 @@ describe('check-in screens', () => {
     expect(history.getByTestId('history-moment-history-previous-week')).toBeTruthy();
   });
 
+  it('renders an unreframed harmful belief in the danger color', async () => {
+    checkInHistoryStore.trigger.hydrated({
+      entries: [{
+        id: CheckInId.make('history-harmful-belief'),
+        createdAt: CheckInTimestamp.make(new Date(2026, 6, 21, 12).toISOString()),
+        emotionId: EMOTION_IDS.SADNESS,
+        intensity: 0.5,
+        level: 2,
+        note: 'A difficult moment.',
+        beliefSystemId: BELIEF_SYSTEM_IDS.ALWAYS_FUNCTIONING,
+      }],
+    });
+
+    const history = await _renderLocalized(<HistoryScreen />);
+
+    expect(history.getByText('I always have to function.')).toHaveStyle({
+      color: palette.danger,
+    });
+  });
+
   it('renders success, history, and settings destinations', async () => {
     await act(_reachReflection);
     await act(() => mockActor.send({ type: CHECK_IN_EVENTS.CONFIRMED }));
