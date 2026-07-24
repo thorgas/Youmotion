@@ -227,6 +227,14 @@ The rule suite lives beside the plugin and should be extended whenever a new inv
 - Screen tests render the painterly star and exercise reflection, built-in and custom Leidsatz selection, the dedicated guiding-belief page, Leitsatz display, persistence, history deletion, success, and settings.
 - Harness tests exercise custom Leidsatz persistence through the separate guiding-belief state and verify emotion-label SVG nodes on the native React Native runtime.
 - Maestro tests exercise tab navigation, reflection cancellation, a persisted check-in save-and-delete journey, and language switching through the installed development app.
+- The pre-release Android locale gate builds and clean-installs the release APK, then verifies first-launch onboarding before and after an app-process restart. Run both cases on dedicated emulators configured through Android Settings:
+
+  ```bash
+  pnpm test:e2e:release:android:locale:de
+  pnpm test:e2e:release:android:locale:en
+  ```
+
+  Start exactly one disposable Android emulator first, or set `ANDROID_SERIAL` to its `emulator-*` identifier. The German command requires German (`de-DE`) as the active system locale, and the English command requires English (`en-US`); the runner fails before installation if the emulator configuration does not match. Set `E2E_RELEASE_SKIP_BUILD=true` to exercise an existing APK, or `E2E_RELEASE_APK` to select a release APK at another path.
 - React Native Harness is configured for web, iOS, and Android device-level component testing.
 
 The current Jest coverage gate is enforced globally and must not be lowered.

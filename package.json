@@ -160,6 +160,8 @@
     "test:coverage": "jest --coverage --runInBand --no-watchman",
     "test:maestro": "maestro test .maestro",
     "test:maestro:smoke": "maestro test .maestro --include-tags=smoke",
+    "test:e2e:release:android:locale:de": "E2E_EXPECTED_LOCALE=de-DE node scripts/run-android-release-locale-e2e.mjs",
+    "test:e2e:release:android:locale:en": "E2E_EXPECTED_LOCALE=en-US node scripts/run-android-release-locale-e2e.mjs",
     "test:harness": "harness --config jest.harness.config.mjs --no-watchman",
     "test:harness:android": "node scripts/run-android-harness.mjs android 8084",
     "test:harness:android:pixel": "node scripts/run-android-harness.mjs android-pixel-6a 8084",
