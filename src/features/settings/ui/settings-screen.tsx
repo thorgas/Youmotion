@@ -92,10 +92,12 @@ function AppReleaseInfoCard({
   appVersion,
   updateChannel,
   gitCommit,
+  showTechnicalDetails,
 }: {
   appVersion: string | null;
   updateChannel: string | null;
   gitCommit: string | null;
+  showTechnicalDetails: boolean;
 }) {
   const shortGitCommit = gitCommit?.slice(0, 7);
 
@@ -107,14 +109,18 @@ function AppReleaseInfoCard({
           <Text style={styles.releaseInfoLabel}><fbt desc="App version information label">App</fbt></Text>
           <Text selectable style={styles.releaseInfoValue}>{appVersion ?? <fbt desc="Unavailable app version value">Not available</fbt>}</Text>
         </View>
-        <View style={styles.releaseInfoRow}>
-          <Text style={styles.releaseInfoLabel}><fbt desc="EAS Update channel information label">Channel</fbt></Text>
-          <Text selectable style={styles.releaseInfoValue}>{updateChannel ?? <fbt desc="Unavailable EAS Update channel value">Not available</fbt>}</Text>
-        </View>
-        <View style={styles.releaseInfoRow}>
-          <Text style={styles.releaseInfoLabel}><fbt desc="Git commit information label">Git</fbt></Text>
-          <Text selectable style={styles.releaseInfoValue}>{shortGitCommit ?? <fbt desc="Unavailable Git commit value">Not available</fbt>}</Text>
-        </View>
+        {showTechnicalDetails ? (
+          <>
+            <View style={styles.releaseInfoRow}>
+              <Text style={styles.releaseInfoLabel}><fbt desc="EAS Update channel information label">Channel</fbt></Text>
+              <Text selectable style={styles.releaseInfoValue}>{updateChannel ?? <fbt desc="Unavailable EAS Update channel value">Not available</fbt>}</Text>
+            </View>
+            <View style={styles.releaseInfoRow}>
+              <Text style={styles.releaseInfoLabel}><fbt desc="Git commit information label">Git</fbt></Text>
+              <Text selectable style={styles.releaseInfoValue}>{shortGitCommit ?? <fbt desc="Unavailable Git commit value">Not available</fbt>}</Text>
+            </View>
+          </>
+        ) : null}
       </View>
     </View>
   );
@@ -150,7 +156,11 @@ function SettingsActionRow({
   );
 }
 
-export function SettingsScreen() {
+export function SettingsScreen({
+  showTechnicalDetails = __DEV__,
+}: {
+  showTechnicalDetails?: boolean;
+} = {}) {
   const actor = useAppNavigationActor();
   const {
     locale,
@@ -291,6 +301,7 @@ export function SettingsScreen() {
         <AppReleaseInfoCard
           appVersion={appVersion}
           gitCommit={gitCommit}
+          showTechnicalDetails={showTechnicalDetails}
           updateChannel={updateChannel}
         />
         </ScrollView>

@@ -1001,6 +1001,19 @@ describe('check-in screens', () => {
     await waitFor(() => expect(settings.getByText('Private by design')).toBeTruthy());
   });
 
+  it('hides technical release details from production settings', async () => {
+    const settings = await _renderLocalized(
+      <SettingsScreen showTechnicalDetails={false} />,
+    );
+
+    expect(settings.getByText('App information')).toBeTruthy();
+    expect(settings.getByText('1.0.0')).toBeTruthy();
+    expect(settings.queryByText('Channel')).toBeNull();
+    expect(settings.queryByText('development')).toBeNull();
+    expect(settings.queryByText('Git')).toBeNull();
+    expect(settings.queryByText('f4610f7')).toBeNull();
+  });
+
   it('edits and removes personal beliefs from the settings library', async () => {
     const alert = jest.spyOn(Alert, 'alert');
     const beliefSystemId = CustomBeliefSystemId.make('custom-settings-library');

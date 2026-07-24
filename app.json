@@ -20,6 +20,11 @@
     "android": {
       "icon": "./assets/images/app-icon-android.png",
       "package": "com.youmotion.mobile",
+      "blockedPermissions": [
+        "android.permission.READ_EXTERNAL_STORAGE",
+        "android.permission.SYSTEM_ALERT_WINDOW",
+        "android.permission.WRITE_EXTERNAL_STORAGE"
+      ],
       "predictiveBackGestureEnabled": true
     },
     "web": {
