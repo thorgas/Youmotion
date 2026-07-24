@@ -17,6 +17,8 @@ The copy is intentionally factual. It does not claim clinical benefits, diagnosi
 - `screenshot-plan.md`: capture order, headlines, device requirements, and upload mapping.
 - `launch-readiness.md`: launch blockers and recommended improvements.
 - `privacy-data-safety.md`: release-binary privacy inventory and draft store declarations.
+- `privacy-policy-draft.md`: publication-ready policy body with owner/contact placeholders.
+- `support-page-draft.md`: support-page copy and launch FAQ with a contact placeholder.
 - `aso-research.md`: dated public-listing research and the limits of the available keyword evidence.
 - `screenshots/`: full-resolution, unframed Release-build Apple and Google Play screenshots.
 - `assets/google-play-feature-graphic.png`: 1024 × 500, flattened Play feature graphic.
@@ -26,8 +28,9 @@ The copy is intentionally factual. It does not claim clinical benefits, diagnosi
 
 Do not submit until these are supplied and published:
 
-- Public privacy-policy URL
-- Public support URL and support email
+- Legal owner/controller name and address for the privacy policy
+- Support/privacy email
+- Public URLs for the prepared privacy-policy and support-page drafts
 - App Store copyright owner
 - App Review contact details
 - Final primary and secondary App Store categories
