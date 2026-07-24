@@ -1,34 +1,43 @@
 import { createStore } from '@xstate/store';
 import * as Schema from 'effect/Schema';
 import Constants from 'expo-constants';
+import { getLocales } from 'expo-localization';
 import * as Updates from 'expo-updates';
 
 import {
-  APP_LOCALES,
   EMOTION_LABEL_MODES,
 } from '@/constants';
-import { AppLocaleSchema } from '../domain/app-locale';
+import {
+  appLocaleForLanguageCodes,
+  AppLocaleSchema,
+} from '../domain/app-locale';
 import { AppSettingsSchema, type AppSettings } from '../domain/app-settings';
 import { EmotionLabelModeSchema } from '../domain/emotion-label-mode';
 
 const configuredGitCommit: unknown = Constants.expoConfig?.extra?.['gitCommit'];
 
-const initialContext = {
-  locale: APP_LOCALES.ENGLISH,
-  emotionLabelMode: EMOTION_LABEL_MODES.BOTH,
-  onboardingCompleted: false,
-  appVersion: Constants.expoConfig?.version ?? null,
-  updateChannel: Updates.channel,
-  gitCommit: typeof configuredGitCommit === 'string' ? configuredGitCommit : null,
-  hydrated: false,
-  error: null,
-} satisfies AppSettings & {
-  appVersion: string | null;
-  updateChannel: string | null;
-  gitCommit: string | null;
-  hydrated: boolean;
-  error: string | null;
-};
+export function initialAppSettingsContext() {
+  return {
+    locale: appLocaleForLanguageCodes(
+      getLocales().map(({ languageCode }) => languageCode),
+    ),
+    emotionLabelMode: EMOTION_LABEL_MODES.BOTH,
+    onboardingCompleted: false,
+    appVersion: Constants.expoConfig?.version ?? null,
+    updateChannel: Updates.channel,
+    gitCommit: typeof configuredGitCommit === 'string' ? configuredGitCommit : null,
+    hydrated: false,
+    error: null,
+  } satisfies AppSettings & {
+    appVersion: string | null;
+    updateChannel: string | null;
+    gitCommit: string | null;
+    hydrated: boolean;
+    error: string | null;
+  };
+}
+
+const initialContext = initialAppSettingsContext();
 
 export const appSettingsStore = createStore({
   schemas: {
