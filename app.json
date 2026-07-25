@@ -8,6 +8,7 @@
     "scheme": "youmotion",
     "userInterfaceStyle": "light",
     "backgroundColor": "#F4F0E8",
+    "buildCacheProvider": "eas",
     "ios": {
       "icon": "./assets/images/app-icon-ios.png",
       "bundleIdentifier": "com.youmotion.mobile",
