@@ -1,6 +1,13 @@
 {
   "version": 1,
   "skills": {
+    "agent-device": {
+      "source": "callstack/agent-device",
+      "ref": "56b72c5cf7be473177ff16e6c5a7f4e421391a64",
+      "sourceType": "github",
+      "skillPath": "skills/agent-device/SKILL.md",
+      "computedHash": "d657c8afba370ee63a838f53b066bbb3d7f113d818c7087f54e818986c8940fc"
+    },
     "argent-android-emulator-setup": {
       "source": "software-mansion/argent",
       "ref": "v0.16.0",
@@ -98,6 +105,69 @@
       "sourceType": "github",
       "skillPath": "packages/skills/skills/argent-tv-interact/SKILL.md",
       "computedHash": "4a4a1916dab5e7d98478b5daeb4978c5ba9b8446959d45428abd0af1d862417d"
+    },
+    "continuity": {
+      "source": "peterpme/skills",
+      "ref": "a031863b9dd1ab45afd6d0fb0b0a81ec96f373c5",
+      "sourceType": "github",
+      "skillPath": "skills/engineering/continuity/SKILL.md",
+      "computedHash": "4034bd84b1e778f15629ff77805ee8e1061d2f2d54b4b026ef7d37c3a3dee517"
+    },
+    "diagnose": {
+      "source": "LegendApp/legend-skills",
+      "ref": "5a4be517989496d0bc59520a93976360dd1bff51",
+      "sourceType": "github",
+      "skillPath": "diagnose/SKILL.md",
+      "computedHash": "bb6f2f6537dd9ac1ae9d987088a36671782d1fa864f4a4d9b1212eb351760f40"
+    },
+    "diagnose-fix-loop": {
+      "source": "LegendApp/legend-skills",
+      "ref": "5a4be517989496d0bc59520a93976360dd1bff51",
+      "sourceType": "github",
+      "skillPath": "diagnose-fix-loop/SKILL.md",
+      "computedHash": "c7854d200bcc853aee1843f8b05f02181596f3ceb0df398c45745de7fed3a73b"
+    },
+    "domain-modeling": {
+      "source": "mattpocock/skills",
+      "ref": "ed37663cc5fbef691ddfecd080dff42f7e7e350d",
+      "sourceType": "github",
+      "skillPath": "skills/engineering/domain-modeling/SKILL.md",
+      "computedHash": "363cb0f53b0b431e7c00086ad1f823500b7e1b70b5616ee969c979f0934e9e6e"
+    },
+    "prototype": {
+      "source": "mattpocock/skills",
+      "ref": "ed37663cc5fbef691ddfecd080dff42f7e7e350d",
+      "sourceType": "github",
+      "skillPath": "skills/engineering/prototype/SKILL.md",
+      "computedHash": "faba901c53a6ca245174c4ba5db3929d14253232b3050fdbd46539720adf1ab8"
+    },
+    "react-coding-style": {
+      "source": "LegendApp/legend-skills",
+      "ref": "5a4be517989496d0bc59520a93976360dd1bff51",
+      "sourceType": "github",
+      "skillPath": "react-coding-style/SKILL.md",
+      "computedHash": "0b5629a19a73cad9d0ee56dd77acd41031ab7e2275df056b2288a6f1583d6e68"
+    },
+    "react-native-testing": {
+      "source": "callstack/react-native-testing-library",
+      "ref": "219adbd9c5bcb6ba62e56c8e2b900e888a745610",
+      "sourceType": "github",
+      "skillPath": "skills/react-native-testing/SKILL.md",
+      "computedHash": "bb30ad4660a42c71178c91d7a3f2e88556add9dba2213ee26f099dbe352fd649"
+    },
+    "simplify": {
+      "source": "LegendApp/legend-skills",
+      "ref": "5a4be517989496d0bc59520a93976360dd1bff51",
+      "sourceType": "github",
+      "skillPath": "simplify/SKILL.md",
+      "computedHash": "bfbefa03b417407210f6fd35a008ec8b4edf1f34bd7e656e54a93d586c45c59e"
+    },
+    "tdd": {
+      "source": "mattpocock/skills",
+      "ref": "ed37663cc5fbef691ddfecd080dff42f7e7e350d",
+      "sourceType": "github",
+      "skillPath": "skills/engineering/tdd/SKILL.md",
+      "computedHash": "81eca2a5b53a63f481c0849be7a663a8cd43d5cf53f32b644ec0a2f50cf91aa2"
     }
   }
 }

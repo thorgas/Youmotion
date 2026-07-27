@@ -211,7 +211,14 @@ pnpm perf:stability
 
 React Doctor is available through `pnpm doctor:react`. Cali is available through `pnpm cali:review`; its device QA and performance review roles additionally require a built app artifact, provider credentials, and the relevant local device tooling.
 
-Later TODO: evaluate `callstackincubator/eas-agent-device` after an EAS preview-build and secrets strategy exists. It is intentionally not installed or configured yet.
+The [AI skill evaluation](docs/ai-skills-evaluation.md) selected and pinned the
+base `callstack/agent-device` skill for connected physical-device validation,
+alongside Argent for simulator/emulator work. The matching CLI is installed
+locally; use `pnpm exec agent-device doctor` to inspect the host setup before a
+real-device session. Skillgym is available through `pnpm exec skillgym` for
+rerunning retained skill evaluations. The separate
+`callstackincubator/eas-agent-device` cloud workflow remains a later TODO after
+an EAS preview-build and secrets strategy exists.
 
 ## Enforced code boundaries
 
