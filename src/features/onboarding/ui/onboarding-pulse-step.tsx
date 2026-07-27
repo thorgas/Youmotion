@@ -1,7 +1,12 @@
 import { useSelector } from '@xstate/react';
 import { fbs } from 'fbtee';
 import { useRef } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import {
+  StyleSheet,
+  Text,
+  useWindowDimensions,
+  View,
+} from 'react-native';
 
 import {
   ONBOARDING_EVENTS,
@@ -11,6 +16,7 @@ import type { EmotionSelection } from '@/features/check-in/domain/check-in';
 import { EmotionStar } from '@/features/check-in/ui/emotion-star';
 import { palette, type } from '@/features/check-in/ui/theme';
 import { useAppNavigationActor } from '@/navigation/app-navigation.provider';
+import { onboardingPulseResponsiveLayout } from './onboarding-pulse-responsive-layout';
 import { OnboardingStepShell } from './onboarding-step-shell';
 
 const _selectOnboardingSelection = (
@@ -43,6 +49,8 @@ const _sameSelection = ({
 export function OnboardingPulseStep() {
   const actor = useAppNavigationActor();
   const selection = useSelector(actor, _selectOnboardingSelection);
+  const window = useWindowDimensions();
+  const responsive = onboardingPulseResponsiveLayout(window);
   const latestSelection = useRef(selection);
   const publishedSelection = useRef(selection);
   const _back = () => actor.send({ type: ONBOARDING_EVENTS.BACK_REQUESTED });
@@ -104,8 +112,13 @@ export function OnboardingPulseStep() {
           <fbt desc="Onboarding Pulse practice scenario">Imagine your chest tightens before a difficult meeting.</fbt>
         </Text>
       </View>
-      <View style={styles.starCard}>
+      <View
+        style={[
+          styles.starCard,
+          responsive.compact && styles.starCardCompact,
+        ]}>
         <EmotionStar
+          contentInset={responsive.starContentInset}
           onCancel={_selectionCancelled}
           onRelease={_selectionReleased}
           onSelectionChange={_selectionChanged}
@@ -113,7 +126,11 @@ export function OnboardingPulseStep() {
           selection={selection}
         />
       </View>
-      <View style={styles.explanation}>
+      <View
+        style={[
+          styles.explanation,
+          responsive.compact && styles.explanationCompact,
+        ]}>
         <Text style={styles.explanationTitle}>
           <fbt desc="Explanation of the emotion star dimensions">Direction names the emotion. Distance shows how strongly it is present.</fbt>
         </Text>
@@ -151,12 +168,19 @@ const styles = StyleSheet.create({
     marginHorizontal: -14,
     marginTop: 18,
   },
+  starCardCompact: {
+    marginTop: 8,
+  },
   explanation: {
     backgroundColor: '#F2EFEA',
     borderCurve: 'continuous',
     borderRadius: 18,
     marginTop: 12,
     padding: 16,
+  },
+  explanationCompact: {
+    marginTop: 8,
+    padding: 12,
   },
   explanationTitle: {
     color: palette.ink,

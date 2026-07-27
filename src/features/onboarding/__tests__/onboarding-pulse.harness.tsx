@@ -14,6 +14,7 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 import {
   APP_LOCALES,
+  EMOTION_IDS,
   EMOTION_LABEL_MODES,
   NAVIGATION_EVENTS,
   NAVIGATION_STATES,
@@ -71,12 +72,20 @@ describe('onboarding Pulse on the device runtime', () => {
     );
     await userEvent.press(await screen.findByTestId('onboarding-primary-action'));
     await screen.findByTestId('emotion-star');
+    currentActor().send({
+      type: ONBOARDING_EVENTS.SELECTION_CHANGED,
+      selection: {
+        emotionId: EMOTION_IDS.JOY,
+        intensity: 0.42,
+        level: 2,
+        color: '#E7AD32',
+      },
+    });
+    await screen.findByAccessibilityLabel('Joy · Cheerfulness');
     await userEvent.press(await screen.findByTestId('onboarding-primary-action'));
 
-    expect(currentActor().getSnapshot().context.onboardingSelection).not.toBeNull();
-    await screen.findByAccessibilityLabel('Fear · Worry');
-    await userEvent.press(await screen.findByTestId('onboarding-primary-action'));
     await screen.findByTestId('onboarding-example-step');
+    await screen.findByAccessibilityLabel('Worry · Fear');
     await screen.findByAccessibilityLabel('Core belief · what limits you');
     await screen.findByAccessibilityLabel('Guiding belief · what supports you');
     await userEvent.press(await screen.findByTestId('onboarding-skip'));

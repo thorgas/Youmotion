@@ -9,6 +9,7 @@ import { createActor, type Actor } from 'xstate';
 import {
   APP_LOCALES,
   APP_ROUTES,
+  EMOTION_IDS,
   EMOTION_LABEL_MODES,
   NAVIGATION_EVENTS,
   NAVIGATION_STATES,
@@ -123,12 +124,14 @@ describe('explanation onboarding screen', () => {
     }));
     await fireEvent(star, 'responderMove', _panEvent({
       timestamp: 2,
-      x: 122,
-      y: 122,
+      x: 260,
+      y: 130,
     }));
     await fireEvent(star, 'responderRelease');
 
-    expect(mockActor.getSnapshot().context.onboardingSelection).not.toBeNull();
+    expect(mockActor.getSnapshot().context.onboardingSelection?.emotionId).toBe(
+      EMOTION_IDS.JOY,
+    );
     expect(screen.getByText('This is a practice example. It is not saved to your history.')).toBeTruthy();
     expect(checkInHistoryStore.getSnapshot().context.entries).toEqual([]);
 
@@ -136,7 +139,11 @@ describe('explanation onboarding screen', () => {
     expect(mockActor.getSnapshot().matches({
       [NAVIGATION_STATES.ONBOARDING]: ONBOARDING_STATES.EXAMPLE,
     })).toBe(true);
+    expect(mockActor.getSnapshot().context.onboardingSelection?.emotionId).toBe(
+      EMOTION_IDS.FEAR,
+    );
     expect(screen.getByLabelText('Step 3 of 3')).toBeTruthy();
+    expect(screen.getByText('Worry · Fear')).toBeTruthy();
     expect(screen.getByText('“My chest tightened before the meeting.”')).toBeTruthy();
     expect(screen.getByText(/Going deeper is always optional/)).toBeTruthy();
 

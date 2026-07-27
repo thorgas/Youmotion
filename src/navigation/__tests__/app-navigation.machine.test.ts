@@ -142,15 +142,21 @@ describe('app navigation model', () => {
     expect(actor.getSnapshot().matches({
       [NAVIGATION_STATES.ONBOARDING]: ONBOARDING_STATES.PULSE,
     })).toBe(true);
-    actor.send({ type: ONBOARDING_EVENTS.EXAMPLE_REQUESTED });
-    expect(actor.getSnapshot().context.onboardingSelection).toMatchObject({
-      emotionId: EMOTION_IDS.FEAR,
-      level: 3,
+    actor.send({
+      type: ONBOARDING_EVENTS.SELECTION_CHANGED,
+      selection,
     });
+    expect(actor.getSnapshot().context.onboardingSelection?.emotionId).toBe(
+      EMOTION_IDS.JOY,
+    );
     actor.send({ type: ONBOARDING_EVENTS.NEXT_REQUESTED });
     expect(actor.getSnapshot().matches({
       [NAVIGATION_STATES.ONBOARDING]: ONBOARDING_STATES.EXAMPLE,
     })).toBe(true);
+    expect(actor.getSnapshot().context.onboardingSelection).toMatchObject({
+      emotionId: EMOTION_IDS.FEAR,
+      level: 3,
+    });
 
     actor.send({ type: ONBOARDING_EVENTS.FINISHED });
 

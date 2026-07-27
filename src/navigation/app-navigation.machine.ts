@@ -674,7 +674,10 @@ export const appNavigationMachine = setup({
             },
             [ONBOARDING_EVENTS.NEXT_REQUESTED]: ({ context }) => (
               context.onboardingSelection
-                ? { target: ONBOARDING_STATES.EXAMPLE }
+                ? {
+                    target: ONBOARDING_STATES.EXAMPLE,
+                    context: { onboardingSelection: onboardingExampleSelection },
+                  }
                 : undefined
             ),
           },

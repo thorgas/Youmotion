@@ -1,4 +1,3 @@
-import { useSelector } from '@xstate/react';
 import { fbs } from 'fbtee';
 import { StyleSheet, Text, View } from 'react-native';
 
@@ -12,14 +11,9 @@ import { useAppNavigationActor } from '@/navigation/app-navigation.provider';
 import { onboardingExampleSelection } from '../domain/onboarding';
 import { OnboardingStepShell } from './onboarding-step-shell';
 
-const _selectOnboardingSelection = (
-  snapshot: ReturnType<ReturnType<typeof useAppNavigationActor>['getSnapshot']>,
-) => snapshot.context.onboardingSelection;
-
 export function OnboardingExampleStep() {
   const actor = useAppNavigationActor();
-  const selection = useSelector(actor, _selectOnboardingSelection)
-    ?? onboardingExampleSelection;
+  const selection = onboardingExampleSelection;
   const _back = () => actor.send({ type: ONBOARDING_EVENTS.BACK_REQUESTED });
   const _finish = () => actor.send({ type: ONBOARDING_EVENTS.FINISHED });
   const _skip = () => actor.send({ type: ONBOARDING_EVENTS.SKIPPED });
