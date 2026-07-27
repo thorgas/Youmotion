@@ -12,14 +12,14 @@ describe('onboarding Pulse responsive layout', () => {
     });
   });
 
-  it('preserves the full-size Pulse on a tall phone', () => {
+  it('limits width-driven growth on the photographed tall phone size', () => {
     expect(onboardingPulseResponsiveLayout({
       fontScale: 1,
       height: 932,
       width: 430,
     })).toEqual({
-      compact: false,
-      starContentInset: 0,
+      compact: true,
+      starContentInset: 29,
     });
   });
 

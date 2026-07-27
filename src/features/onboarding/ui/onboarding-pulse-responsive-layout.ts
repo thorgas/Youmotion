@@ -1,4 +1,5 @@
 const REFERENCE_PHONE_HEIGHT = 900;
+const REFERENCE_STAR_SIZE = 361;
 const MINIMUM_STAR_SIZE = 248;
 const STAR_HORIZONTAL_INSET = 32;
 const MAXIMUM_STAR_SIZE = 390;
@@ -32,11 +33,15 @@ export function onboardingPulseResponsiveLayout({
     0,
     REFERENCE_PHONE_HEIGHT - height,
   ) * HEIGHT_DEFICIT_RATIO;
+  const widthContentInset = Math.max(
+    0,
+    fullStarSize - REFERENCE_STAR_SIZE,
+  );
   const fontContentInset = Math.max(0, fontScale - 1) * FONT_SCALE_INSET;
   const starContentInset = Math.round(clamp({
     maximum: maximumContentInset,
     minimum: 0,
-    value: heightContentInset + fontContentInset,
+    value: heightContentInset + widthContentInset + fontContentInset,
   }));
 
   return {
