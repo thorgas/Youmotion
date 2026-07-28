@@ -645,6 +645,41 @@ describe('check-in screens', () => {
     );
   });
 
+  it('submits a reflection from the native keyboard before offering the optional core belief step', async () => {
+    await act(_reachReflection);
+    const screen = await _renderLocalized(<ReflectionScreen />);
+    const noteInput = screen.getByLabelText('Optional note about the feeling');
+
+    await fireEvent.changeText(noteInput, 'Ein heller Moment.');
+    await fireEvent(noteInput, 'submitEditing', {
+      nativeEvent: { text: 'Ein heller Moment.' },
+    });
+
+    await waitFor(() => expect(
+      mockActor.getSnapshot().matches(CHECK_IN_STATES.BELIEF_SYSTEM),
+    ).toBe(true));
+    expect(mockActor.getSnapshot().context.saved?.note).toBe('Ein heller Moment.');
+    expect(await screen.findByText(
+      'A core belief is an inner rule that limits you in this moment.',
+    )).toBeTruthy();
+  });
+
+  it('starts the reflection placeholder with concrete examples in English and German', async () => {
+    await act(_reachReflection);
+    const screen = await _renderLocalized(<ReflectionScreen />);
+    expect(screen.getByPlaceholderText(
+      'A behavior, a thought, a body sensation, a situation…',
+    )).toBeTruthy();
+
+    await act(() => appSettingsStore.trigger.languageChanged({
+      locale: APP_LOCALES.GERMAN,
+    }));
+
+    expect(screen.getByPlaceholderText(
+      'Ein Verhalten, ein Gedanke, ein Körpergefühl, eine Situation …',
+    )).toBeTruthy();
+  });
+
   it('restores the released and guiding belief hierarchy after cold hydration', async () => {
     const checkInId = CheckInId.make('cold-history-belief');
     const createdAt = CheckInTimestamp.make('2026-07-19T01:06:00.000Z');

@@ -302,6 +302,7 @@ function ReflectionNoteStep() {
               maxLength={240}
               multiline
               onChangeText={_noteChanged}
+              onSubmitEditing={_submit}
               placeholder={optionalNotePlaceholder()}
               placeholderTextColor={palette.inkMuted}
               returnKeyType="done"

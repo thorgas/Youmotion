@@ -160,6 +160,6 @@ export const optionalNoteAccessibilityLabel = () => String(fbs(
 ));
 
 export const optionalNotePlaceholder = () => String(fbs(
-  'What happened? A thought, a body sensation, a situation…',
+  'A behavior, a thought, a body sensation, a situation…',
   'Placeholder for the optional reflection note',
 ));
