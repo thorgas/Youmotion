@@ -1,4 +1,5 @@
 import { act, fireEvent, render, waitFor } from '@testing-library/react-native';
+import { Platform } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { APP_LOCALES, FEEDBACK_KINDS } from '@/constants';
@@ -58,6 +59,16 @@ describe('global feedback UI', () => {
     await fireEvent.press(screen.getByTestId('feedback-cancel'));
     expect(screen.queryByTestId('feedback-dialog')).toBeNull();
     expect(screen.getByTestId('feedback-button')).toBeTruthy();
+  });
+
+  it('does not occupy the iOS native modal presentation slot', async () => {
+    expect(Platform.OS).toBe('ios');
+    const screen = await renderFeedbackOverlay();
+
+    await fireEvent.press(screen.getByTestId('feedback-button'));
+
+    expect(JSON.stringify(screen.toJSON())).not.toContain('RCTModalHostView');
+    expect(screen.getByTestId('feedback-dialog')).toBeTruthy();
   });
 
   it('asks for separate screenshot consent and can continue without capture', async () => {
