@@ -14,6 +14,7 @@ import { PressFeedbackProvider } from '@/components/ui/press-feedback-provider';
 import { NAVIGATION_EVENTS, SPLASH_BACKGROUND_COLOR } from '@/constants';
 import { DevelopmentRoot } from '@/development/development-root';
 import { AnimatedSplashScreen } from '@/features/startup/ui/animated-splash-screen';
+import { FeedbackOverlay } from '@/features/feedback/ui/feedback-screen';
 import { AppLocaleProvider } from '@/localization/app-locale-provider';
 import {
   AppNavigationProvider,
@@ -73,6 +74,7 @@ export default function RootLayout() {
                 <PressFeedbackProvider>
                   <StatusBar style="dark" />
                   <AppStack />
+                  <FeedbackOverlay />
                 </PressFeedbackProvider>
               </GestureHandlerRootView>
             </DevelopmentRoot>
