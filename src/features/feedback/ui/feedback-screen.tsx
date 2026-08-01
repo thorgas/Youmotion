@@ -59,7 +59,13 @@ function FeedbackDialog({
   visible: boolean;
 }>) {
   const content = (
-    <View style={styles.backdrop} testID="feedback-dialog">
+    <View style={styles.overlay} testID="feedback-dialog">
+      <Pressable
+        accessible={false}
+        onPress={onRequestClose}
+        style={styles.backdrop}
+        testID="feedback-backdrop"
+      />
       <View accessibilityViewIsModal style={styles.dialog}>
         {children}
       </View>
@@ -220,23 +226,26 @@ const styles = StyleSheet.create({
     height: 40,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: palette.paperRaised,
-    borderColor: palette.hairline,
-    borderCurve: 'continuous',
-    borderRadius: 20,
-    borderWidth: 1,
+    backgroundColor: palette.paper,
   },
-  backdrop: {
+  overlay: {
     alignItems: 'center',
     bottom: 0,
     justifyContent: 'center',
     left: 0,
-    backgroundColor: 'rgba(42, 39, 34, 0.36)',
     padding: 24,
     position: 'absolute',
     right: 0,
     top: 0,
     zIndex: 30,
+  },
+  backdrop: {
+    backgroundColor: 'rgba(42, 39, 34, 0.36)',
+    bottom: 0,
+    left: 0,
+    position: 'absolute',
+    right: 0,
+    top: 0,
   },
   dialog: {
     width: '100%',
