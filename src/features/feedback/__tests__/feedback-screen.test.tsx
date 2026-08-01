@@ -71,6 +71,16 @@ describe('global feedback UI', () => {
     expect(screen.getByTestId('feedback-dialog')).toBeTruthy();
   });
 
+  it('closes when the user presses outside the dialog', async () => {
+    const screen = await renderFeedbackOverlay();
+
+    await fireEvent.press(screen.getByTestId('feedback-button'));
+    await fireEvent.press(screen.getByTestId('feedback-backdrop', { includeHiddenElements: true }));
+
+    expect(screen.queryByTestId('feedback-dialog')).toBeNull();
+    expect(screen.getByTestId('feedback-button')).toBeTruthy();
+  });
+
   it('asks for separate screenshot consent and can continue without capture', async () => {
     const screen = await renderFeedbackOverlay();
 
