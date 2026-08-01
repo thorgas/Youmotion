@@ -30,6 +30,7 @@
     "plugins": [
       "expo-router",
       "expo-localization",
+      "expo-mail-composer",
       [
         "expo-dev-client",
         {

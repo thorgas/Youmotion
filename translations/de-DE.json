@@ -1,6 +1,114 @@
 {
   "fb-locale": "de-DE",
   "translations": {
+    "vAPmS1vO40flK/nnHOlT6w==": {
+      "description": "Accessibility label for the global feedback button",
+      "tokens": [],
+      "translations": [{ "translation": "Frage stellen oder Feedback senden", "variations": {} }],
+      "types": []
+    },
+    "r3gSMVlkvMv21pJt6VcLUw==": {
+      "description": "Feedback choice dialog title",
+      "tokens": [],
+      "translations": [{ "translation": "Wie können wir helfen?", "variations": {} }],
+      "types": []
+    },
+    "NxBgxKjJ9BdY48vphyW3NQ==": {
+      "description": "Feedback choice dialog explanation",
+      "tokens": [],
+      "translations": [{ "translation": "Deine E-Mail-App wird geöffnet, damit du die Nachricht selbst prüfen und senden kannst.", "variations": {} }],
+      "types": []
+    },
+    "gEBpEg2mTLD+VJRPm1Id3g==": {
+      "description": "Button starting a support question email",
+      "tokens": [],
+      "translations": [{ "translation": "Eine Frage stellen", "variations": {} }],
+      "types": []
+    },
+    "avYWzAbJ/RwtfHFJMGIN4w==": {
+      "description": "Button starting a feedback email",
+      "tokens": [],
+      "translations": [{ "translation": "Feedback senden", "variations": {} }],
+      "types": []
+    },
+    "QPlYKYECjkHpuOa3zUIwkg==": {
+      "description": "Button cancelling the feedback flow",
+      "tokens": [],
+      "translations": [{ "translation": "Abbrechen", "variations": {} }],
+      "types": []
+    },
+    "M2rZQvuU4120EgfFRgX83Q==": {
+      "description": "Screenshot consent dialog title",
+      "tokens": [],
+      "translations": [{ "translation": "Diesen Bildschirm anhängen?", "variations": {} }],
+      "types": []
+    },
+    "t7dV2ghlQhb2hs0iK/yl7A==": {
+      "description": "Screenshot consent privacy explanation",
+      "tokens": [],
+      "translations": [{ "translation": "Ein Screenshot kann persönliche Gefühle oder Reflexionen enthalten. Er wird nur aufgenommen und angehängt, wenn du „Screenshot anhängen“ wählst.", "variations": {} }],
+      "types": []
+    },
+    "rHHfX7As3xyJmYm4D9BmCQ==": {
+      "description": "Button consenting to capture and attach the current app screen",
+      "tokens": [],
+      "translations": [{ "translation": "Screenshot anhängen", "variations": {} }],
+      "types": []
+    },
+    "1q9Y3xmmz/65i0Gx+EPNWg==": {
+      "description": "Button opening feedback email without a screenshot",
+      "tokens": [],
+      "translations": [{ "translation": "Ohne Screenshot fortfahren", "variations": {} }],
+      "types": []
+    },
+    "rmSc3keDLLbwAylr0wJnOQ==": {
+      "description": "Button cancelling screenshot consent and feedback",
+      "tokens": [],
+      "translations": [{ "translation": "Abbrechen", "variations": {} }],
+      "types": []
+    },
+    "m5jtDLb1LbCaZUYOrIxbPw==": {
+      "description": "Email composer opening progress message",
+      "tokens": [],
+      "translations": [{ "translation": "Deine E-Mail-App wird geöffnet…", "variations": {} }],
+      "types": []
+    },
+    "ESDq99SENXaG7P6gSENS1w==": {
+      "description": "Feedback flow failure dialog title",
+      "tokens": [],
+      "translations": [{ "translation": "Das hat nicht funktioniert.", "variations": {} }],
+      "types": []
+    },
+    "Ks2Y0t44LNfJCdFJ1cu6/g==": {
+      "description": "Feedback screenshot failure explanation",
+      "tokens": [],
+      "translations": [{ "translation": "Der Screenshot konnte nicht erstellt werden.", "variations": {} }],
+      "types": []
+    },
+    "YmsJGDBYzf+9eE7+209wfg==": {
+      "description": "Feedback email unavailable explanation",
+      "tokens": [],
+      "translations": [{ "translation": "Auf diesem Gerät ist keine E-Mail-App eingerichtet.", "variations": {} }],
+      "types": []
+    },
+    "RAoBh/AQVYs26Lw2J3fuUQ==": {
+      "description": "Feedback email composition failure explanation",
+      "tokens": [],
+      "translations": [{ "translation": "Das E-Mail-Fenster konnte nicht geöffnet werden.", "variations": {} }],
+      "types": []
+    },
+    "bCbdW3Kvg0d1TM8ZiPECjA==": {
+      "description": "Button retrying screenshot capture or email composition",
+      "tokens": [],
+      "translations": [{ "translation": "Erneut versuchen", "variations": {} }],
+      "types": []
+    },
+    "M8/Z4V/V0YqH7xpI4k33eQ==": {
+      "description": "Button closing a feedback error",
+      "tokens": [],
+      "translations": [{ "translation": "Abbrechen", "variations": {} }],
+      "types": []
+    },
     "R0lvfChJ/UgnfwIU39Jbow==": {
       "description": "Button cancelling check-in deletion",
       "tokens": [],

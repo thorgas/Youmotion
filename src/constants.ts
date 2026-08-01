@@ -150,6 +150,38 @@ export const SETTINGS_EVENTS = Object.freeze({
   APP_SETTINGS_PERSISTENCE_FAILED: literal('settings.appSettingsPersistenceFailed'),
 });
 
+export const FEEDBACK_KINDS = Object.freeze({
+  QUESTION: literal('question'),
+  FEEDBACK: literal('feedback'),
+});
+
+export const FEEDBACK_EVENTS = Object.freeze({
+  OPENED: literal('feedback.opened'),
+  KIND_SELECTED: literal('feedback.kindSelected'),
+  SCREENSHOT_INCLUDED: literal('feedback.screenshotIncluded'),
+  SCREENSHOT_SKIPPED: literal('feedback.screenshotSkipped'),
+  SCREENSHOT_CAPTURED: literal('feedback.screenshotCaptured'),
+  OPERATION_FAILED: literal('feedback.operationFailed'),
+  COMPLETED: literal('feedback.completed'),
+  RETRIED: literal('feedback.retried'),
+  CANCELLED: literal('feedback.cancelled'),
+});
+
+export const FEEDBACK_STATES = Object.freeze({
+  IDLE: literal('idle'),
+  CHOOSING_KIND: literal('choosingKind'),
+  CHOOSING_SCREENSHOT: literal('choosingScreenshot'),
+  CAPTURING_SCREENSHOT: literal('capturingScreenshot'),
+  COMPOSING_EMAIL: literal('composingEmail'),
+  FAILURE: literal('failure'),
+});
+
+export const FEEDBACK_FAILURE_REASONS = Object.freeze({
+  SCREENSHOT: literal('screenshot'),
+  EMAIL_UNAVAILABLE: literal('emailUnavailable'),
+  EMAIL_COMPOSE: literal('emailCompose'),
+});
+
 export const BELIEF_LIBRARY_EVENTS = Object.freeze({
   OPENED: literal('beliefLibrary.opened'),
   CLOSED: literal('beliefLibrary.closed'),
@@ -245,6 +277,7 @@ export const CHECK_IN_TABLE = 'check_in';
 export const BELIEF_STATEMENT_TABLE = 'belief_statement';
 export const APP_SETTINGS_TABLE = 'app_settings';
 export const APP_SETTINGS_RECORD_ID = 'current';
+export const FEEDBACK_EMAIL_RECIPIENT = 'youmotion@thorgas.com';
 export const MAX_NOTE_LENGTH = 240;
 export const MAX_BELIEF_STATEMENT_LENGTH = 240;
 export const CUSTOM_BELIEF_SYSTEM_ID_PREFIX = 'custom-';
