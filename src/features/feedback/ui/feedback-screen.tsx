@@ -4,12 +4,14 @@ import { useMachine } from '@xstate/react';
 import {
   ActivityIndicator,
   Modal,
+  Platform,
   Pressable,
   StyleSheet,
   Text,
   View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import type { PropsWithChildren } from 'react';
 
 import {
   FEEDBACK_EVENTS,
@@ -45,6 +47,34 @@ function FeedbackAction({
       testID={testID}>
       <Text style={[styles.actionText, primary && styles.primaryActionText]}>{label}</Text>
     </Pressable>
+  );
+}
+
+function FeedbackDialog({
+  children,
+  onRequestClose,
+  visible,
+}: PropsWithChildren<{
+  onRequestClose: () => void;
+  visible: boolean;
+}>) {
+  const content = (
+    <View style={styles.backdrop} testID="feedback-dialog">
+      <View accessibilityViewIsModal style={styles.dialog}>
+        {children}
+      </View>
+    </View>
+  );
+
+  if (Platform.OS !== 'android') return visible ? content : null;
+  return (
+    <Modal
+      animationType="fade"
+      onRequestClose={onRequestClose}
+      transparent
+      visible={visible}>
+      {content}
+    </Modal>
   );
 }
 
@@ -91,13 +121,7 @@ export function FeedbackOverlay() {
           />
         </Pressable>
       ) : null}
-      <Modal
-        animationType="fade"
-        onRequestClose={_cancel}
-        transparent
-        visible={dialogVisible}>
-        <View style={styles.backdrop} testID="feedback-dialog">
-          <View accessibilityViewIsModal style={styles.dialog}>
+      <FeedbackDialog onRequestClose={_cancel} visible={dialogVisible}>
             {choosingKind ? (
               <>
                 <Text style={styles.title}><fbt desc="Feedback choice dialog title">How can we help?</fbt></Text>
@@ -181,9 +205,7 @@ export function FeedbackOverlay() {
                 </View>
               </>
             ) : null}
-          </View>
-        </View>
-      </Modal>
+      </FeedbackDialog>
       {capturing ? <View pointerEvents="none" testID="feedback-capturing" /> : null}
     </>
   );
@@ -205,11 +227,16 @@ const styles = StyleSheet.create({
     borderWidth: 1,
   },
   backdrop: {
-    flex: 1,
     alignItems: 'center',
+    bottom: 0,
     justifyContent: 'center',
+    left: 0,
     backgroundColor: 'rgba(42, 39, 34, 0.36)',
     padding: 24,
+    position: 'absolute',
+    right: 0,
+    top: 0,
+    zIndex: 30,
   },
   dialog: {
     width: '100%',
