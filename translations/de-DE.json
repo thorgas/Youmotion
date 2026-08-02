@@ -1156,17 +1156,6 @@
       ],
       "types": []
     },
-    "9MyAGNeWk4AqOx0D3sBwPw==": {
-      "description": "Button returning from reflection to the emotion star",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "Zurück",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
     "5lNc0hmffJcO2eFcs5QYkg==": {
       "description": "Successful check-in title",
       "tokens": [],
@@ -1415,17 +1404,6 @@
       "translations": [
         {
           "translation": "Wie hast du dich damals gefühlt?",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "jLru9zhsQoa3iCsMUGnO/w==": {
-      "description": "Button for changing the feeling of an existing check-in",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "Gefühl ändern",
           "variations": {}
         }
       ],
@@ -2179,89 +2157,12 @@
       ],
       "types": []
     },
-    "wPFrKot+8fGc7NQa4aSqeg==": {
-      "description": "Label below an optional check-in progress step",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "Optional",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "2V+mujw4ZLItB1lrDaVyWA==": {
-      "description": "Moment step in check-in progress",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "Moment",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "CEJMoNtpzKm7+WaPhyGgoQ==": {
-      "description": "Harmful core belief step in check-in progress",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "Leidsatz",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "62egImaxgKU0ca0LNKQ73Q==": {
-      "description": "Positive guiding belief step in check-in progress",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "Leitsatz",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "0F9q2jZ3kHxTGwWB39UBeg==": {
-      "description": "Dedicated positive guiding belief step label",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "04 · NEUE RICHTUNG",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
     "v77XkAy4rXjsqwiytOiFIQ==": {
       "description": "Label for editing an existing check-in",
       "tokens": [],
       "translations": [
         {
           "translation": "MOMENT BEARBEITEN",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "cwUthFJdCgV42WV4iwhplg==": {
-      "description": "Second step label for reflecting on a feeling",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "02 · REFLEKTIEREN",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "rauWej/jBwd+RU+rrtuwGw==": {
-      "description": "Optional core belief step label",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "03 · LEIDSATZ",
           "variations": {}
         }
       ],
@@ -3802,54 +3703,6 @@
       ],
       "types": []
     },
-    "dLNpzoDOGAq1VSaJp9OzXw==": {
-      "description": "Concrete benefit of adding a short reflection",
-      "status": "new",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "Ein paar Worte helfen dir, dich daran zu erinnern, was dieses Gefühl geprägt hat, und spätere Muster leichter zu verstehen. Meist dauert das etwa 30 Sekunden.",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "9+3LQJhzq6j24RPwSYStSw==": {
-      "description": "Explanation of the guided belief step after reflection",
-      "status": "new",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "Erkunde weiter, was unter diesem Moment liegen könnte. Du kannst abschließen, ohne einen Glaubenssatz hinzuzufügen.",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "YlbMQLixGzNj4LTwcffn1w==": {
-      "description": "Button saving a reflection and continuing to its underlying belief",
-      "status": "new",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "Weiter zu dem, was darunterliegt",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "gAmzYF0FQ8X18OyK3M+hQA==": {
-      "description": "Button saving only the selected feeling without further reflection",
-      "status": "new",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "Für jetzt speichern",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
     "ugAFdVoT9cLgDi2S7FCkkA==": {
       "description": "History banner explaining that one evidence moment for a selected insight is visible",
       "status": "new",
@@ -4049,6 +3902,162 @@
       "translations": [
         {
           "translation": "Entferne alle Momente und persönlichen Glaubenssätze. Deine Einstellungen bleiben erhalten.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "L+QTdr11ljrrWaWibbWV1w==": {
+      "description": "Optional core belief step label",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "VERSTEHEN · OPTIONAL",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "8/y0R8khZUOgJPOnHQxIFA==": {
+      "description": "Dedicated positive guiding belief step label",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "NEUE RICHTUNG · OPTIONAL",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "oczlQLiH++2r1sTbPInEfQ==": {
+      "description": "Second step label for reflecting on a feeling",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "REFLEKTIEREN",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "nNq0nBoTqm0JEFCAhpTw7g==": {
+      "description": "Button returning from reflection to the emotion star",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "‹ Zurück",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "n+nXwvOK3aAXr2b4dmdCvQ==": {
+      "description": "Button for changing the feeling of an existing check-in",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Ändern",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "hOktp6UVSxUf1j+emEJxGA==": {
+      "description": "Concrete benefit of adding a short reflection",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Ein paar Worte helfen dir, dich später an diesen Moment zu erinnern – und geben künftigen Einblicken eine echte Grundlage.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "FAk4znZ/4kAh07BEZazV5w==": {
+      "description": "Optional reflection note field label",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "EINE NOTIZ FÜR SPÄTER",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "l9BUwR4XtU51F0v/vgZQUA==": {
+      "description": "Typical duration of the guided reflection",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "ETWA 30 SEK.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "DpfXf55mkLsLpY1ReoNf1A==": {
+      "description": "Label introducing the next guided reflection step",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "ALS NÄCHSTES",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "bY8d7gxItrH5GgtY5ukKVQ==": {
+      "description": "Explanation of the guided belief step after reflection",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Erkunde behutsam, was darunterliegen könnte. Du kannst jederzeit aufhören.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "1f88sn2hASbPQf+2wXHzBQ==": {
+      "description": "Button saving changes to an existing moment",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Änderungen speichern",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "FQ6MEtPliqVwZjIwJkc8Tw==": {
+      "description": "Button saving a reflection and continuing to its underlying belief",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Weiter reflektieren",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "1g2MT4zNqXJolFSIYfDzTA==": {
+      "description": "Button saving only the selected feeling without further reflection",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Diesen Moment speichern und abschließen",
           "variations": {}
         }
       ],

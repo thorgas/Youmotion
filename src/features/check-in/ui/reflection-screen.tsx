@@ -176,6 +176,72 @@ function SelectionSummary({
   );
 }
 
+function ReflectionEditorActions({
+  editing,
+  failed,
+  onConfirmDelete,
+  onSave,
+  onSaveForNow,
+  saveForNowVisible,
+  saving,
+}: {
+  editing: boolean;
+  failed: boolean;
+  onConfirmDelete: () => void;
+  onSave: () => void;
+  onSaveForNow: () => void;
+  saveForNowVisible: boolean;
+  saving: boolean;
+}) {
+  return (
+    <>
+      <PressableScale
+        accessibilityRole="button"
+        disabled={saving}
+        onPress={onSave}
+        style={styles.primaryButton}
+        testID="reflection-save"
+      >
+        {saving ? <ActivityIndicator color="#FFFFFF" /> : (
+          <Text style={styles.primaryText}>
+            {failed
+              ? <fbt desc="Button retrying a failed reflection save">Try again</fbt>
+              : editing
+                ? <fbt desc="Button saving changes to an existing moment">Save changes</fbt>
+                : <fbt desc="Button saving a reflection and continuing to its underlying belief">Continue reflection</fbt>}
+          </Text>
+        )}
+      </PressableScale>
+      {saveForNowVisible ? (
+        <PressableScale
+          accessibilityRole="button"
+          onPress={onSaveForNow}
+          style={styles.saveForNowButton}
+          testID="reflection-save-for-now"
+        >
+          <Text style={styles.saveForNowText}>
+            <fbt desc="Button saving only the selected feeling without further reflection">Save this moment and finish</fbt>
+          </Text>
+        </PressableScale>
+      ) : null}
+      {editing ? (
+        <View style={styles.deleteSection}>
+          <PressableScale
+            accessibilityLabel={deleteMomentAccessibilityLabel()}
+            accessibilityRole="button"
+            disabled={saving}
+            onPress={onConfirmDelete}
+            style={styles.deleteMomentButton}
+            testID="delete-edited-moment"
+          >
+            <Text style={styles.deleteMomentText}>{deleteMomentText()}</Text>
+          </PressableScale>
+        </View>
+      ) : null}
+    </>
+  );
+}
+
 function ReflectionNoteStep() {
   const actor = useAppNavigationActor();
   const snapshot = useSelector(actor, _selectSnapshot);
@@ -242,7 +308,36 @@ function ReflectionNoteStep() {
           style={styles.scroll}
           testID="reflection-keyboard-scroll"
         >
-          <View>
+          <View style={styles.reflectionHeading}>
+            <PressableScale
+              accessibilityRole="button"
+              disabled={saving}
+              onPress={_back}
+              style={styles.inlineBack}
+              testID="reflection-back"
+            >
+              <Text style={styles.inlineBackText}>
+                <fbt desc="Button returning from reflection to the emotion star">‹ Back</fbt>
+              </Text>
+            </PressableScale>
+            <PressableScale
+              accessibilityRole={editing ? 'button' : undefined}
+              disabled={!editing || saving}
+              onPress={_editSelection}
+              style={styles.selectionPill}
+            >
+              <View style={[styles.dot, { backgroundColor: selection.color }]} />
+              <Text style={styles.selectionPillText}>
+                {emotionName(selection.emotionId)} · {emotionNuance(selection)}
+              </Text>
+              {editing ? (
+                <Text style={styles.changeSelection}>
+                  <fbt desc="Button for changing the feeling of an existing check-in">
+                    Change
+                  </fbt>
+                </Text>
+              ) : null}
+            </PressableScale>
             <Text
               style={[
                 styles.title,
@@ -258,46 +353,27 @@ function ReflectionNoteStep() {
             </Text>
             <Text style={styles.copy}>
               <fbt desc="Concrete benefit of adding a short reflection">
-                A few words help you remember what shaped this feeling and make later patterns easier to understand. It usually takes about 30 seconds.
-              </fbt>
-            </Text>
-            <Text style={styles.continuationHint}>
-              <fbt desc="Explanation of the guided belief step after reflection">
-                Continue to explore what may be underneath this moment. You can finish without adding a core belief.
+                A few words make this moment easier to remember—and give future insights something real to work with.
               </fbt>
             </Text>
           </View>
           <View
             style={[
-              styles.card,
+              styles.reflectionEditor,
               {
                 marginTop: responsive.cardMarginTop,
                 padding: responsive.cardPadding,
               },
             ]}
           >
-            <PressableScale
-              accessibilityRole={editing ? 'button' : undefined}
-              disabled={!editing || saving}
-              onPress={_editSelection}
-              style={[
-                styles.selectionRow,
-                { marginBottom: responsive.selectionMarginBottom },
-              ]}
-            >
-              <View style={[styles.dot, { backgroundColor: selection.color }]} />
-              <View style={styles.selectionCopy}>
-                <Text style={styles.emotion}>{emotionName(selection.emotionId)}</Text>
-                <Text style={styles.nuance}>{emotionNuance(selection)}</Text>
-              </View>
-              {editing ? (
-                <Text style={styles.changeSelection}>
-                  <fbt desc="Button for changing the feeling of an existing check-in">
-                    Change feeling
-                  </fbt>
-                </Text>
-              ) : null}
-            </PressableScale>
+            <View style={styles.noteLabelRow}>
+              <Text style={styles.noteLabel}>
+                <fbt desc="Optional reflection note field label">A NOTE FOR LATER</fbt>
+              </Text>
+              <Text style={styles.noteDuration}>
+                <fbt desc="Typical duration of the guided reflection">ABOUT 30 SEC</fbt>
+              </Text>
+            </View>
             <TextInput
               accessibilityLabel={optionalNoteAccessibilityLabel()}
               editable={!saving}
@@ -321,60 +397,27 @@ function ReflectionNoteStep() {
                 </fbt>
               </Text>
             ) : null}
-            <View style={styles.actions}>
-              <PressableScale
-                accessibilityRole="button"
-                disabled={saving}
-                onPress={_back}
-                style={styles.secondaryButton}
-                testID="reflection-back"
-              >
-                <Text style={styles.secondaryText}>
-                  <fbt desc="Button returning from reflection to the emotion star">Back</fbt>
+            {!editing ? (
+              <View style={styles.nextStep}>
+                <Text style={styles.nextStepLabel}>
+                  <fbt desc="Label introducing the next guided reflection step">UP NEXT</fbt>
                 </Text>
-              </PressableScale>
-              <PressableScale
-                accessibilityRole="button"
-                disabled={saving}
-                onPress={_submit}
-                style={styles.primaryButton}
-                testID="reflection-save"
-              >
-                {saving ? <ActivityIndicator color="#FFFFFF" /> : (
-                  <Text style={styles.primaryText}>
-                    {failed
-                      ? <fbt desc="Button retrying a failed reflection save">Try again</fbt>
-                      : <fbt desc="Button saving a reflection and continuing to its underlying belief">Continue to what is underneath</fbt>}
-                  </Text>
-                )}
-              </PressableScale>
-            </View>
-            {saveForNowVisible ? (
-              <PressableScale
-                accessibilityRole="button"
-                onPress={_saveForNow}
-                style={styles.saveForNowButton}
-                testID="reflection-save-for-now"
-              >
-                <Text style={styles.saveForNowText}>
-                  <fbt desc="Button saving only the selected feeling without further reflection">Save for now</fbt>
+                <Text style={styles.nextStepCopy}>
+                  <fbt desc="Explanation of the guided belief step after reflection">
+                    Gently explore what may be underneath. You can stop at any time.
+                  </fbt>
                 </Text>
-              </PressableScale>
-            ) : null}
-            {editing ? (
-              <View style={styles.deleteSection}>
-                <PressableScale
-                  accessibilityLabel={deleteMomentAccessibilityLabel()}
-                  accessibilityRole="button"
-                  disabled={saving}
-                  onPress={_confirmDelete}
-                  style={styles.deleteMomentButton}
-                  testID="delete-edited-moment"
-                >
-                  <Text style={styles.deleteMomentText}>{deleteMomentText()}</Text>
-                </PressableScale>
               </View>
             ) : null}
+            <ReflectionEditorActions
+              editing={editing}
+              failed={failed}
+              onConfirmDelete={_confirmDelete}
+              onSave={_submit}
+              onSaveForNow={_saveForNow}
+              saveForNowVisible={saveForNowVisible}
+              saving={saving}
+            />
           </View>
         </KeyboardAwareScrollView>
       </SafeAreaView>
@@ -771,6 +814,14 @@ const styles = StyleSheet.create({
     paddingBottom: 32,
   },
   flowContent: { paddingTop: 8 },
+  reflectionHeading: { gap: 0 },
+  inlineBack: {
+    alignSelf: 'flex-start',
+    justifyContent: 'center',
+    minHeight: 36,
+    paddingRight: 12,
+  },
+  inlineBackText: { color: palette.inkMuted, fontFamily: type.medium, fontSize: 13 },
   catalogHeader: { marginTop: 8 },
   eyebrow: {
     fontFamily: type.semibold,
@@ -786,13 +837,18 @@ const styles = StyleSheet.create({
     lineHeight: 22,
     marginTop: 10,
   },
-  continuationHint: {
-    fontFamily: type.medium,
-    color: palette.moss,
-    fontSize: 13,
-    lineHeight: 19,
-    marginTop: 12,
+  selectionPill: {
+    alignItems: 'center',
+    alignSelf: 'flex-start',
+    backgroundColor: '#EDF0EB',
+    borderCurve: 'continuous',
+    borderRadius: 999,
+    flexDirection: 'row',
+    marginBottom: 14,
+    minHeight: 34,
+    paddingHorizontal: 12,
   },
+  selectionPillText: { color: palette.ink, fontFamily: type.medium, fontSize: 12 },
   card: {
     marginTop: 28,
     padding: 20,
@@ -800,6 +856,31 @@ const styles = StyleSheet.create({
     backgroundColor: palette.paperRaised,
     borderWidth: 1,
     borderColor: palette.hairline,
+  },
+  reflectionEditor: {
+    backgroundColor: palette.paperRaised,
+    borderColor: palette.hairline,
+    borderCurve: 'continuous',
+    borderRadius: 24,
+    borderWidth: 1,
+  },
+  noteLabelRow: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 10,
+  },
+  noteLabel: {
+    color: palette.inkMuted,
+    fontFamily: type.semibold,
+    fontSize: 10,
+    letterSpacing: 1.05,
+  },
+  noteDuration: {
+    color: palette.inkMuted,
+    fontFamily: type.medium,
+    fontSize: 9,
+    letterSpacing: 0.65,
   },
   selectionRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 18 },
   selectionCopy: { flex: 1 },
@@ -810,7 +891,10 @@ const styles = StyleSheet.create({
   input: {
     minHeight: 150,
     borderRadius: 18,
-    backgroundColor: '#F0EAE0',
+    backgroundColor: '#F4F0E9',
+    borderColor: palette.hairline,
+    borderCurve: 'continuous',
+    borderWidth: 1,
     padding: 16,
     fontFamily: type.regular,
     color: palette.ink,
@@ -967,13 +1051,27 @@ const styles = StyleSheet.create({
   },
   deleteMomentText: { fontFamily: type.semibold, color: palette.danger, fontSize: 14 },
   actions: { flexDirection: 'row', gap: 10, marginTop: 16 },
+  nextStep: {
+    borderTopColor: palette.hairline,
+    borderTopWidth: 1,
+    gap: 4,
+    marginTop: 16,
+    paddingTop: 14,
+  },
+  nextStepLabel: {
+    color: palette.moss,
+    fontFamily: type.semibold,
+    fontSize: 9,
+    letterSpacing: 1,
+  },
+  nextStepCopy: { color: palette.inkMuted, fontFamily: type.regular, fontSize: 12, lineHeight: 18 },
   primaryButton: {
     minHeight: 50,
-    flex: 1,
     backgroundColor: palette.ink,
     borderRadius: 16,
     alignItems: 'center',
     justifyContent: 'center',
+    marginTop: 14,
     paddingHorizontal: 16,
   },
   primaryText: { fontFamily: type.semibold, color: '#FFFFFF', fontSize: 14 },
@@ -991,12 +1089,11 @@ const styles = StyleSheet.create({
     minHeight: 44,
     alignItems: 'center',
     justifyContent: 'center',
-    marginTop: 6,
+    marginTop: 4,
   },
   saveForNowText: {
     fontFamily: type.medium,
     color: palette.inkMuted,
     fontSize: 13,
-    textDecorationLine: 'underline',
   },
 });

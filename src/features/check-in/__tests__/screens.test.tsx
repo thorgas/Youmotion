@@ -528,17 +528,17 @@ describe('check-in screens', () => {
       accessibilityRole: 'progressbar',
       accessibilityValue: { min: 1, max: 3, now: 1 },
     });
-    expect(within(screen.getByTestId('check-in-progress')).getAllByText('Optional')).toHaveLength(2);
+    expect(within(screen.getByTestId('check-in-progress')).queryByText('Optional')).toBeNull();
     expect(screen.getByText(
-      'Continue to explore what may be underneath this moment. You can finish without adding a core belief.',
+      'Gently explore what may be underneath. You can stop at any time.',
     )).toBeTruthy();
     expect(screen.getByText(
-      'A few words help you remember what shaped this feeling and make later patterns easier to understand. It usually takes about 30 seconds.',
+      'A few words make this moment easier to remember—and give future insights something real to work with.',
     )).toBeTruthy();
     expect(screen.getByTestId('reflection-save-for-now')).toBeTruthy();
     expect(useFocusEffect).toHaveBeenCalledTimes(1);
     expect(screen.getByLabelText('Optional note about the feeling').props['autoFocus']).toBeUndefined();
-    expect(screen.getByText('Cheerfulness')).toBeTruthy();
+    expect(screen.getByText('Joy · Cheerfulness')).toBeTruthy();
     expect(screen.queryByText(/50%/)).toBeNull();
     expect(screen.getByTestId('reflection-keyboard-scroll').props).toMatchObject({
       keyboardDismissMode: 'interactive',
@@ -549,7 +549,7 @@ describe('check-in screens', () => {
     )).toBeNull();
     expect(screen.queryByText('Does a core belief fit this moment?')).toBeNull();
     await fireEvent.changeText(screen.getByLabelText('Optional note about the feeling'), 'Ein heller Moment.');
-    await fireEvent.press(screen.getByText('Continue to what is underneath'));
+    await fireEvent.press(screen.getByText('Continue reflection'));
 
     await waitFor(() => expect(
       mockActor.getSnapshot().matches(CHECK_IN_STATES.BELIEF_SYSTEM),
@@ -935,12 +935,14 @@ describe('check-in screens', () => {
     await screen.rerender(
       <AppLocaleProvider><GuidingBeliefScreen /></AppLocaleProvider>,
     );
-    expect(screen.getByText('04 · NEUE RICHTUNG')).toBeTruthy();
+    expect(screen.getByText('NEUE RICHTUNG · OPTIONAL')).toBeTruthy();
     const progress = within(screen.getByTestId('check-in-progress'));
-    expect(progress.getByText('Moment')).toBeTruthy();
-    expect(progress.getByText('Leidsatz')).toBeTruthy();
-    expect(progress.getByText('Leitsatz')).toBeTruthy();
-    expect(progress.getAllByText('Optional')).toHaveLength(2);
+    expect(progress.queryByText('Moment')).toBeNull();
+    expect(progress.queryByText('Leidsatz')).toBeNull();
+    expect(progress.queryByText('Leitsatz')).toBeNull();
+    expect(screen.getByTestId('check-in-progress').props['accessibilityValue']).toMatchObject({
+      now: 3,
+    });
     expect(screen.getByText(/Zurück/)).toBeTruthy();
     expect(screen.getByText('Was würde dich stattdessen unterstützen?')).toBeTruthy();
     expect(screen.getByText(
@@ -1333,12 +1335,12 @@ describe('check-in screens', () => {
     expect(mockActor.getSnapshot().matches(NAVIGATION_STATES.REFLECTION)).toBe(true);
     const reflection = await _renderLocalized(<ReflectionScreen />);
     expect(reflection.getByText('Edit this moment.')).toBeTruthy();
-    expect(reflection.getByText(
-      'Continue to explore what may be underneath this moment. You can finish without adding a core belief.',
-    )).toBeTruthy();
-    expect(reflection.getByText('Continue to what is underneath')).toBeTruthy();
+    expect(reflection.queryByText(
+      'Gently explore what may be underneath. You can stop at any time.',
+    )).toBeNull();
+    expect(reflection.getByText('Save changes')).toBeTruthy();
     expect(reflection.queryByTestId('reflection-save-for-now')).toBeNull();
-    expect(reflection.getByText('Change feeling')).toBeTruthy();
+    expect(reflection.getByText('Change')).toBeTruthy();
     expect(reflection.getByTestId('delete-edited-moment')).toBeTruthy();
     expect(useFocusEffect).toHaveBeenCalledTimes(1);
     expect(reflection.getByDisplayValue('Before').props['autoFocus']).toBeUndefined();
