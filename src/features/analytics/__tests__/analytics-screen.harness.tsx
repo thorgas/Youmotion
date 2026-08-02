@@ -8,7 +8,6 @@ import {
   render,
   resetModules,
   test,
-  waitUntil,
 } from 'react-native-harness';
 import * as Effect from 'effect/Effect';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
@@ -28,7 +27,6 @@ import {
   type CheckIn,
 } from '@/features/check-in/domain/check-in';
 import { analyticsStore } from '../application/analytics.store';
-import { analyticsObservations } from '../domain/check-in-analytics';
 
 type AnalyticsContentComponent = typeof import('../ui/analytics-screen')['AnalyticsContent'];
 let AnalyticsContent: AnalyticsContentComponent;
@@ -61,15 +59,6 @@ function checkIn({ day, emotionId, id, note = '' }: {
       : undefined,
   };
 }
-
-const entries = [
-  checkIn({ day: 2, emotionId: EMOTION_IDS.FEAR, id: 'fear-1' }),
-  checkIn({ day: 8, emotionId: EMOTION_IDS.FEAR, id: 'fear-2' }),
-  checkIn({ day: 15, emotionId: EMOTION_IDS.FEAR, id: 'fear-3', note: 'A demanding day.' }),
-  checkIn({ day: 15, emotionId: EMOTION_IDS.JOY, id: 'joy-1' }),
-  checkIn({ day: 19, emotionId: EMOTION_IDS.JOY, id: 'joy-2', note: 'Time with friends.' }),
-  checkIn({ day: 21, emotionId: EMOTION_IDS.SADNESS, id: 'sadness-1' }),
-] satisfies readonly CheckIn[];
 
 function checkInsForBelief({
   beliefSystemId,
@@ -119,69 +108,32 @@ const tiedScreenshotShape = [
     guidingStatementSnapshot: 'I may pause and still be worthy.',
     prefix: 'previous-sunday-pause',
   }),
+] satisfies readonly CheckIn[];
+
+const competingInsightEntries = [
+  ...checkInsForBelief({
+    beliefSystemId: BELIEF_SYSTEM_IDS.ALWAYS_FUNCTIONING,
+    count: 11,
+    day: 18,
+    emotionId: EMOTION_IDS.FEAR,
+    guidingStatementSnapshot: 'Ich darf auch mal nicht funktionieren und werde trotzdem geliebt.',
+    prefix: 'dominant-guiding-belief',
+  }),
   ...checkInsForBelief({
     beliefSystemId: BELIEF_SYSTEM_IDS.NO_MISTAKES,
-    count: 1,
+    count: 4,
     day: 19,
     emotionId: EMOTION_IDS.SHAME,
     guidingStatementSnapshot: 'Mistakes help me learn.',
-    prefix: 'previous-sunday-learn',
+    prefix: 'competing-belief-pattern',
   }),
-  ...checkInsForBelief({
-    beliefSystemId: BELIEF_SYSTEM_IDS.NO_MISTAKES,
-    count: 9,
-    day: 20,
-    emotionId: EMOTION_IDS.LOVE,
-    guidingStatementSnapshot: 'Mistakes help me learn.',
-    prefix: 'current-monday',
-  }),
-  ...checkInsForBelief({
-    beliefSystemId: BELIEF_SYSTEM_IDS.ALWAYS_FUNCTIONING,
-    count: 7,
-    day: 21,
-    emotionId: EMOTION_IDS.JOY,
-    guidingStatementSnapshot: 'I may pause and still be worthy.',
-    prefix: 'current-tuesday',
-  }),
-] satisfies readonly CheckIn[];
-
-const timeframeLeitsatzEntries = [
-  ...checkInsForBelief({
-    beliefSystemId: BELIEF_SYSTEM_IDS.ALWAYS_FUNCTIONING,
-    count: 2,
-    day: 18,
-    emotionId: EMOTION_IDS.FEAR,
-    guidingStatementSnapshot: 'I may pause and still be worthy.',
-    prefix: 'last-week-pause',
-  }),
-  ...checkInsForBelief({
-    beliefSystemId: BELIEF_SYSTEM_IDS.NO_MISTAKES,
-    count: 1,
-    day: 18,
-    emotionId: EMOTION_IDS.SHAME,
-    guidingStatementSnapshot: 'Mistakes help me learn.',
-    prefix: 'last-week-learn',
-  }),
-  ...checkInsForBelief({
-    beliefSystemId: BELIEF_SYSTEM_IDS.NO_MISTAKES,
-    count: 3,
-    day: 2,
-    emotionId: EMOTION_IDS.SHAME,
-    guidingStatementSnapshot: 'Mistakes help me learn.',
-    prefix: 'four-weeks-learn',
-  }),
-  ...checkInsForBelief({
-    beliefSystemId: BELIEF_SYSTEM_IDS.LOVE_REQUIRES_HELPING,
-    count: 5,
-    day: 1,
-    emotionId: EMOTION_IDS.LOVE,
-    guidingStatementSnapshot: 'I am loved without earning it.',
-    month: 4,
-    prefix: 'all-time-love',
-  }),
+  checkIn({ day: 17, emotionId: EMOTION_IDS.JOY, id: 'competing-joy' }),
 ] satisfies readonly CheckIn[];
 
 beforeEach(() => {
+  mock('@/features/analytics/ui/analytics-timeframe-selector', () => ({
+    AnalyticsTimeframeSelector: () => null,
+  }));
   mock('@/features/data-safety/infrastructure/data-archive.repository', () => ({
     deleteAllJournalData: () => Effect.succeed(undefined),
     exportDataArchive: () => Effect.succeed(undefined),
@@ -204,36 +156,12 @@ afterEach(() => {
 });
 
 describe('analytics on the device runtime', () => {
-  test('renders the populated constellation on the device runtime', async () => {
-    expect(analyticsObservations(entries)).toHaveLength(3);
+  test('shows one hero with named tabs when Leitsatz and pattern analytics coexist', async () => {
     await render(
       <GestureHandlerRootView style={styles.root}>
         <AnalyticsContent
-          entries={entries}
-          locale={APP_LOCALES.ENGLISH}
-          now={FIXED_NOW}
-          statements={[{
-            kind: 'built-in',
-            beliefSystemId: BELIEF_SYSTEM_IDS.ALWAYS_FUNCTIONING,
-            guidingStatement: 'I may pause and still be worthy.',
-          }]}
-        />
-      </GestureHandlerRootView>,
-    );
-
-    expect(
-      await screen.findByAccessibilityLabel(
-        'July 15, 2026. 2 recorded moments: Joy 1, Fear 1.',
-      ),
-    ).not.toBeNull();
-  });
-
-  test('opens exact evidence and can dismiss and restore the primary insight', async () => {
-    await render(
-      <GestureHandlerRootView style={styles.root}>
-        <AnalyticsContent
-          entries={entries}
-          locale={APP_LOCALES.ENGLISH}
+          entries={competingInsightEntries}
+          locale={APP_LOCALES.GERMAN}
           now={FIXED_NOW}
           onEvidencePress={_captureEvidence}
           statements={[]}
@@ -241,16 +169,46 @@ describe('analytics on the device runtime', () => {
       </GestureHandlerRootView>,
     );
 
+    expect(await screen.findByTestId('analytics-insight-tabs')).not.toBeNull();
+    expect(await screen.findByTestId(
+      `analytics-insight-guiding-belief-${BELIEF_SYSTEM_IDS.ALWAYS_FUNCTIONING}`,
+    )).not.toBeNull();
+    expect(screen.queryByTestId('analytics-insight-pattern')).toBeNull();
+    const guidingBeliefScreenshot = await screen.screenshot(
+      await screen.findByTestId('analytics-primary-insight'),
+    );
+    if (!guidingBeliefScreenshot) throw new Error('The guiding-belief hero screenshot is required.');
+    await expect(guidingBeliefScreenshot).toMatchImageSnapshot({
+      name: 'analytics-competing-insights-guiding-belief',
+      comparisonMethod: 'ssim',
+      ssimThreshold: 0.98,
+    });
     await userEvent.press(await screen.findByTestId('analytics-insight-evidence'));
-    expect(capturedEvidenceCount).toBe(2);
+    expect(capturedEvidenceCount).toBe(11);
+    await userEvent.press(await screen.findByTestId('analytics-insight-tab-pattern'));
+    expect(await screen.findByTestId('analytics-insight-pattern')).not.toBeNull();
+    expect(screen.queryByTestId(
+      `analytics-insight-guiding-belief-${BELIEF_SYSTEM_IDS.ALWAYS_FUNCTIONING}`,
+    )).toBeNull();
+    const patternScreenshot = await screen.screenshot(
+      await screen.findByTestId('analytics-primary-insight'),
+    );
+    if (!patternScreenshot) throw new Error('The pattern hero screenshot is required.');
+    await expect(patternScreenshot).toMatchImageSnapshot({
+      name: 'analytics-competing-insights-pattern',
+      comparisonMethod: 'ssim',
+      ssimThreshold: 0.98,
+    });
+    await userEvent.press(await screen.findByTestId('analytics-insight-evidence'));
+    expect(capturedEvidenceCount).toBe(11);
     await userEvent.press(await screen.findByTestId('analytics-insight-dismiss'));
     expect(await screen.findByTestId('analytics-insight-hidden')).not.toBeNull();
     await userEvent.press(await screen.findByTestId('analytics-insight-restore'));
     expect(await screen.findByTestId('analytics-primary-insight')).not.toBeNull();
   });
 
-  test('renders every tied top Leitsatz instead of hiding the card', async () => {
-    expect(tiedScreenshotShape).toHaveLength(31);
+  test('keeps tied guiding beliefs inside one hero', async () => {
+    expect(tiedScreenshotShape).toHaveLength(14);
     await render(
       <GestureHandlerRootView style={styles.root}>
         <AnalyticsContent
@@ -262,62 +220,13 @@ describe('analytics on the device runtime', () => {
       </GestureHandlerRootView>,
     );
 
-    expect(
-      await screen.findByTestId(
-        `analytics-top-leitsatz-${BELIEF_SYSTEM_IDS.ALWAYS_FUNCTIONING}`,
-      ),
-    ).not.toBeNull();
-    expect(
-      await screen.findByTestId(
-        `analytics-top-leitsatz-${BELIEF_SYSTEM_IDS.LOVE_REQUIRES_HELPING}`,
-      ),
-    ).not.toBeNull();
+    expect(await screen.findByTestId('analytics-primary-insight')).not.toBeNull();
+    expect(await screen.findByTestId(
+      `analytics-insight-guiding-belief-${BELIEF_SYSTEM_IDS.ALWAYS_FUNCTIONING}`,
+    )).not.toBeNull();
+    expect(screen.queryByTestId('analytics-top-leitsatz')).toBeNull();
   });
 
-  test('recalculates the top Leitsatz when the selected timeframe changes', async () => {
-    analyticsStore.trigger[ANALYTICS_EVENTS.TIMEFRAME_SELECTED]({
-      timeframe: ANALYTICS_TIMEFRAMES.LAST_WEEK,
-    });
-    await render(
-      <GestureHandlerRootView style={styles.root}>
-        <AnalyticsContent
-          entries={timeframeLeitsatzEntries}
-          locale={APP_LOCALES.ENGLISH}
-          now={FIXED_NOW}
-          statements={[]}
-        />
-      </GestureHandlerRootView>,
-    );
-
-    expect(await screen.findByTestId(
-      `analytics-top-leitsatz-${BELIEF_SYSTEM_IDS.ALWAYS_FUNCTIONING}`,
-    )).not.toBeNull();
-    expect(await screen.findByAccessibilityLabel(
-      "LAST WEEK'S GUIDING BELIEF",
-    )).not.toBeNull();
-
-    await userEvent.press(await screen.findByTestId('analytics-timeframe-four-weeks'));
-    expect(await screen.findByTestId(
-      `analytics-top-leitsatz-${BELIEF_SYSTEM_IDS.NO_MISTAKES}`,
-    )).not.toBeNull();
-    expect(await screen.findByAccessibilityLabel(
-      "LAST 4 WEEKS' GUIDING BELIEF",
-    )).not.toBeNull();
-    await waitUntil(() => screen.queryByTestId(
-      `analytics-top-leitsatz-${BELIEF_SYSTEM_IDS.ALWAYS_FUNCTIONING}`,
-    ) === null);
-
-    await userEvent.press(await screen.findByTestId('analytics-timeframe-all'));
-    expect(await screen.findByTestId(
-      `analytics-top-leitsatz-${BELIEF_SYSTEM_IDS.LOVE_REQUIRES_HELPING}`,
-    )).not.toBeNull();
-    expect(await screen.findByAccessibilityLabel(
-      'ALL-TIME GUIDING BELIEF',
-    )).not.toBeNull();
-    expect(await screen.findByAccessibilityLabel(
-      'Selected 5 times · All recorded moments',
-    )).not.toBeNull();
-  });
 });
 
 const styles = StyleSheet.create({

@@ -205,11 +205,12 @@ export function observationCopy({ observation, statements }: {
     ));
   }
   if (observation.kind === 'belief') {
+    const belief = beliefSystemText({
+      id: observation.beliefSystemId,
+      statements,
+    }).replace(/[.!?]+$/u, '');
     return String(fbs(
-      fbs.param('belief', beliefSystemText({
-        id: observation.beliefSystemId,
-        statements,
-      }))
+      fbs.param('belief', `“${belief}”`)
         + ' appeared alongside '
         + fbs.param('emotion', emotionName(observation.emotionId))
         + ' in '

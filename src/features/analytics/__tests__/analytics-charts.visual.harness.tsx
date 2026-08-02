@@ -204,7 +204,7 @@ describe('analytics chart visual regression', () => {
     });
   });
 
-  visualTest('keeps tied top Leitsätze visible together', async () => {
+  visualTest('keeps tied guiding beliefs inside one hero', async () => {
     await render(
       <GestureHandlerRootView style={styles.root}>
         <AnalyticsContent
@@ -216,10 +216,8 @@ describe('analytics chart visual regression', () => {
       </GestureHandlerRootView>,
     );
 
-    await expectImageSnapshot({
-      name: 'analytics-tied-top-leitsaetze',
-      testID: 'analytics-top-leitsatz',
-    });
+    expect(await screen.findByTestId('analytics-primary-insight')).not.toBeNull();
+    expect(screen.queryByTestId('analytics-top-leitsatz')).toBeNull();
   });
 
   visualTest('keeps the dense chart, legend, and calendar stable together', async () => {

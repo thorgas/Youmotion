@@ -4158,6 +4158,41 @@
       "tokens": [],
       "translations": [{ "translation": "Probiere eine andere Suche, einen anderen Filter oder Zeitraum.", "variations": {} }],
       "types": []
+    },
+    "s+uf+Xas1dsC78DEuPrr/w==": {
+      "description": "Analytics hero tab for the most selected guiding belief",
+      "status": "new",
+      "tokens": [],
+      "translations": [{ "translation": "Leitsatz", "variations": {} }],
+      "types": []
+    },
+    "srKUIzj1i9m5u6jqU7XZhw==": {
+      "description": "Analytics hero tab for a recurring pattern",
+      "status": "new",
+      "tokens": [],
+      "translations": [{ "translation": "Muster", "variations": {} }],
+      "types": []
+    },
+    "c48gjdaop7eMhj/RYhVGig==": {
+      "description": "Copy when one other guiding belief ties the one shown in the Analytics hero",
+      "status": "new",
+      "tokens": [],
+      "translations": [{ "translation": "1 weiterer Leitsatz wurde ebenso oft gewählt.", "variations": {} }],
+      "types": []
+    },
+    "UWIQsfdGvouK186A5oTxRg==": {
+      "description": "Copy when multiple guiding beliefs tie the one shown in the Analytics hero",
+      "status": "new",
+      "tokens": ["count"],
+      "translations": [{ "translation": "{count} weitere Leitsätze wurden ebenso oft gewählt.", "variations": {} }],
+      "types": []
+    },
+    "2FO4ZSsxGB8b6yJY3o5rTQ==": {
+      "description": "Button opening the moments supporting an analytics insight",
+      "status": "new",
+      "tokens": [],
+      "translations": [{ "translation": "Passende Momente ansehen", "variations": {} }],
+      "types": []
     }
   }
 }
