@@ -197,12 +197,14 @@ function ReflectionNoteStep() {
   const failed = snapshot.matches(CHECK_IN_STATES.FAILURE);
   const editingEntry = snapshot.context.editing;
   const editing = editingEntry !== null;
+  const saveForNowVisible = ![editing, saving, failed].includes(true);
 
   const _noteChanged = (note: string) => actor.send({ type: CHECK_IN_EVENTS.NOTE_CHANGED, note });
   const _back = () => actor.send({ type: CHECK_IN_EVENTS.REFLECTION_CANCELLED });
   const _submit = () => actor.send({
     type: failed ? CHECK_IN_EVENTS.RETRIED : CHECK_IN_EVENTS.CONFIRMED,
   });
+  const _saveForNow = () => actor.send({ type: CHECK_IN_EVENTS.SAVE_FOR_NOW_REQUESTED });
   const _editSelection = () => actor.send({ type: CHECK_IN_EVENTS.EDIT_SELECTION_REQUESTED });
   const _delete = () => {
     if (editingEntry) {
@@ -255,13 +257,13 @@ function ReflectionNoteStep() {
                 : <fbt desc="Reflection screen question">What is present right now?</fbt>}
             </Text>
             <Text style={styles.copy}>
-              <fbt desc="Gentle instructions for the optional reflection">
-                You do not have to explain anything. A few words can help hold onto the moment.
+              <fbt desc="Concrete benefit of adding a short reflection">
+                A few words help you remember what shaped this feeling and make later patterns easier to understand. It usually takes about 30 seconds.
               </fbt>
             </Text>
             <Text style={styles.continuationHint}>
-              <fbt desc="Explanation of the optional values available after saving a reflection">
-                Next, you can add or change this moment's core belief and guiding belief. Both steps are optional.
+              <fbt desc="Explanation of the guided belief step after reflection">
+                Continue to explore what may be underneath this moment. You can finish without adding a core belief.
               </fbt>
             </Text>
           </View>
@@ -342,11 +344,23 @@ function ReflectionNoteStep() {
                   <Text style={styles.primaryText}>
                     {failed
                       ? <fbt desc="Button retrying a failed reflection save">Try again</fbt>
-                      : <fbt desc="Button saving reflection and continuing to optional values">Save and continue</fbt>}
+                      : <fbt desc="Button saving a reflection and continuing to its underlying belief">Continue to what is underneath</fbt>}
                   </Text>
                 )}
               </PressableScale>
             </View>
+            {saveForNowVisible ? (
+              <PressableScale
+                accessibilityRole="button"
+                onPress={_saveForNow}
+                style={styles.saveForNowButton}
+                testID="reflection-save-for-now"
+              >
+                <Text style={styles.saveForNowText}>
+                  <fbt desc="Button saving only the selected feeling without further reflection">Save for now</fbt>
+                </Text>
+              </PressableScale>
+            ) : null}
             {editing ? (
               <View style={styles.deleteSection}>
                 <PressableScale
@@ -973,4 +987,16 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   secondaryText: { fontFamily: type.semibold, color: palette.ink, fontSize: 14 },
+  saveForNowButton: {
+    minHeight: 44,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 6,
+  },
+  saveForNowText: {
+    fontFamily: type.medium,
+    color: palette.inkMuted,
+    fontSize: 13,
+    textDecorationLine: 'underline',
+  },
 });

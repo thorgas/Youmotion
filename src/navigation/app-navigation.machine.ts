@@ -16,6 +16,7 @@ import {
   CHECK_IN_EVENTS,
   CHECK_IN_DELETE_FAILURE_MESSAGE,
   CHECK_IN_FAILURE_MESSAGE,
+  CHECK_IN_SAVE_DESTINATIONS,
   CHECK_IN_STATES,
   DATA_ARCHIVE_FAILURE_MESSAGE,
   DATA_DELETE_ALL_FAILURE_MESSAGE,
@@ -95,6 +96,7 @@ const AppContextSchema = Schema.Struct({
   onboardingSelection: OnboardingSelectionSchema,
   onboardingEntryPoint: Schema.NullOr(OnboardingEntryPointSchema),
   note: Schema.String,
+  saveDestination: Schema.Literal(...Object.values(CHECK_IN_SAVE_DESTINATIONS)),
   beliefSystemId: Schema.NullOr(BeliefSystemId),
   beliefStatements: BeliefStatementListSchema,
   beliefStatementDraft: Schema.String,
@@ -303,6 +305,7 @@ export const appNavigationMachine = setup({
       [CHECK_IN_EVENTS.SELECTION_CANCELLED]: EmptyEventSchema,
       [CHECK_IN_EVENTS.SELECTION_RELEASED]: EmptyEventSchema,
       [CHECK_IN_EVENTS.NOTE_CHANGED]: Schema.standardSchemaV1(Schema.Struct({ note: Schema.String })),
+      [CHECK_IN_EVENTS.SAVE_FOR_NOW_REQUESTED]: EmptyEventSchema,
       [CHECK_IN_EVENTS.BELIEF_SYSTEM_CHANGED]: Schema.standardSchemaV1(
         Schema.Struct({ beliefSystemId: Schema.NullOr(BeliefSystemId) }),
       ),
@@ -435,6 +438,7 @@ export const appNavigationMachine = setup({
     onboardingSelection: null,
     onboardingEntryPoint: null,
     note: '',
+    saveDestination: CHECK_IN_SAVE_DESTINATIONS.BELIEF_SYSTEM,
     beliefSystemId: null,
     beliefStatements: [],
     beliefStatementDraft: '',
@@ -753,6 +757,7 @@ export const appNavigationMachine = setup({
           context: {
             selection: null,
             note: '',
+            saveDestination: CHECK_IN_SAVE_DESTINATIONS.BELIEF_SYSTEM,
             beliefSystemId: null,
             saved: null,
             editing: null,
@@ -767,6 +772,7 @@ export const appNavigationMachine = setup({
           context: {
             selection: null,
             note: '',
+            saveDestination: CHECK_IN_SAVE_DESTINATIONS.BELIEF_SYSTEM,
             beliefSystemId: null,
             saved: null,
             editing: null,
@@ -1337,7 +1343,20 @@ export const appNavigationMachine = setup({
           },
         }),
         [CHECK_IN_EVENTS.CONFIRMED]: ({ context }) => (
-          context.selection ? { target: CHECK_IN_STATES.SAVING } : undefined
+          context.selection
+            ? {
+                target: CHECK_IN_STATES.SAVING,
+                context: { saveDestination: CHECK_IN_SAVE_DESTINATIONS.BELIEF_SYSTEM },
+              }
+            : undefined
+        ),
+        [CHECK_IN_EVENTS.SAVE_FOR_NOW_REQUESTED]: ({ context }) => (
+          context.selection
+            ? {
+                target: CHECK_IN_STATES.SAVING,
+                context: { saveDestination: CHECK_IN_SAVE_DESTINATIONS.COMPLETE },
+              }
+            : undefined
         ),
       },
     },
@@ -1365,7 +1384,9 @@ export const appNavigationMachine = setup({
         [CHECK_IN_EVENTS.PERSISTED]: ({ context, event }, enq) => {
           enq(() => checkInHistoryStore.trigger.recorded({ entry: event.saved }));
           return {
-            target: CHECK_IN_STATES.BELIEF_SYSTEM,
+            target: context.saveDestination === CHECK_IN_SAVE_DESTINATIONS.COMPLETE
+              ? CHECK_IN_STATES.SUCCESS
+              : CHECK_IN_STATES.BELIEF_SYSTEM,
             context: { ...context, saved: event.saved, error: null },
           };
         },
@@ -1871,6 +1892,7 @@ export const appNavigationMachine = setup({
           context: {
             selection: null,
             note: '',
+            saveDestination: CHECK_IN_SAVE_DESTINATIONS.BELIEF_SYSTEM,
             beliefSystemId: null,
             saved: null,
             editing: null,
@@ -1882,6 +1904,7 @@ export const appNavigationMachine = setup({
           context: {
             selection: null,
             note: '',
+            saveDestination: CHECK_IN_SAVE_DESTINATIONS.BELIEF_SYSTEM,
             beliefSystemId: null,
             saved: null,
             editing: null,

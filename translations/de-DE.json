@@ -1156,17 +1156,6 @@
       ],
       "types": []
     },
-    "oOaTGRq0KpgPJyKgreHQuA==": {
-      "description": "Gentle instructions for the optional reflection",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "Du musst nichts erklären. Ein paar Worte können helfen, den Moment festzuhalten.",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
     "3vMdMEOpdoi7uGgoaFzeXA==": {
       "description": "Accessibility label for the reflection note input",
       "tokens": [],
@@ -2284,28 +2273,6 @@
       "translations": [
         {
           "translation": "02 · REFLEKTIEREN",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "+uDTq5kRWGkxxTSuod6JJQ==": {
-      "description": "Explanation of the optional values available after saving a reflection",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "Danach kannst du Leidsatz und Leitsatz dieses Moments ergänzen oder ändern. Beide Schritte sind optional.",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "j0ph5m3mWUCGDM2D50m9zg==": {
-      "description": "Button saving reflection and continuing to optional values",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "Speichern & weiter",
           "variations": {}
         }
       ],
@@ -3888,6 +3855,54 @@
       "translations": [
         {
           "translation": "Youmotion hat kein Konto und lädt dein Journal nicht hoch. Eine Sicherung verlässt die App nur, wenn du auswählst, wo du sie speichern oder teilen möchtest.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "dLNpzoDOGAq1VSaJp9OzXw==": {
+      "description": "Concrete benefit of adding a short reflection",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Ein paar Worte helfen dir, dich daran zu erinnern, was dieses Gefühl geprägt hat, und spätere Muster leichter zu verstehen. Meist dauert das etwa 30 Sekunden.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "9+3LQJhzq6j24RPwSYStSw==": {
+      "description": "Explanation of the guided belief step after reflection",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Erkunde weiter, was unter diesem Moment liegen könnte. Du kannst abschließen, ohne einen Glaubenssatz hinzuzufügen.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "YlbMQLixGzNj4LTwcffn1w==": {
+      "description": "Button saving a reflection and continuing to its underlying belief",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Weiter zu dem, was darunterliegt",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "gAmzYF0FQ8X18OyK3M+hQA==": {
+      "description": "Button saving only the selected feeling without further reflection",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Für jetzt speichern",
           "variations": {}
         }
       ],

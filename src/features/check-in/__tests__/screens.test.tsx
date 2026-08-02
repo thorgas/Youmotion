@@ -519,8 +519,12 @@ describe('check-in screens', () => {
     });
     expect(within(screen.getByTestId('check-in-progress')).getAllByText('Optional')).toHaveLength(2);
     expect(screen.getByText(
-      "Next, you can add or change this moment's core belief and guiding belief. Both steps are optional.",
+      'Continue to explore what may be underneath this moment. You can finish without adding a core belief.',
     )).toBeTruthy();
+    expect(screen.getByText(
+      'A few words help you remember what shaped this feeling and make later patterns easier to understand. It usually takes about 30 seconds.',
+    )).toBeTruthy();
+    expect(screen.getByTestId('reflection-save-for-now')).toBeTruthy();
     expect(useFocusEffect).toHaveBeenCalledTimes(1);
     expect(screen.getByLabelText('Optional note about the feeling').props['autoFocus']).toBeUndefined();
     expect(screen.getByText('Cheerfulness')).toBeTruthy();
@@ -534,7 +538,7 @@ describe('check-in screens', () => {
     )).toBeNull();
     expect(screen.queryByText('Does a core belief fit this moment?')).toBeNull();
     await fireEvent.changeText(screen.getByLabelText('Optional note about the feeling'), 'Ein heller Moment.');
-    await fireEvent.press(screen.getByText('Save and continue'));
+    await fireEvent.press(screen.getByText('Continue to what is underneath'));
 
     await waitFor(() => expect(
       mockActor.getSnapshot().matches(CHECK_IN_STATES.BELIEF_SYSTEM),
@@ -643,6 +647,26 @@ describe('check-in screens', () => {
     expect(history.getByTestId(`history-guiding-belief-${saved.id}`)).toHaveTextContent(
       'I may pause and I am still loved.',
     );
+  });
+
+  it('keeps guided reflection primary while allowing a pressure-free early save', async () => {
+    await act(_reachReflection);
+    const screen = await _renderLocalized(<ReflectionScreen />);
+
+    await fireEvent.changeText(
+      screen.getByLabelText('Optional note about the feeling'),
+      'Enough for today.',
+    );
+    await fireEvent.press(screen.getByTestId('reflection-save-for-now'));
+
+    await waitFor(() => expect(
+      mockActor.getSnapshot().matches(CHECK_IN_STATES.SUCCESS),
+    ).toBe(true));
+    expect(mockActor.getSnapshot().context.saved).toMatchObject({
+      emotionId: selection.emotionId,
+      intensity: selection.intensity,
+      note: 'Enough for today.',
+    });
   });
 
   it('submits a reflection from the native keyboard before offering the optional core belief step', async () => {
@@ -1225,9 +1249,10 @@ describe('check-in screens', () => {
     const reflection = await _renderLocalized(<ReflectionScreen />);
     expect(reflection.getByText('Edit this moment.')).toBeTruthy();
     expect(reflection.getByText(
-      "Next, you can add or change this moment's core belief and guiding belief. Both steps are optional.",
+      'Continue to explore what may be underneath this moment. You can finish without adding a core belief.',
     )).toBeTruthy();
-    expect(reflection.getByText('Save and continue')).toBeTruthy();
+    expect(reflection.getByText('Continue to what is underneath')).toBeTruthy();
+    expect(reflection.queryByTestId('reflection-save-for-now')).toBeNull();
     expect(reflection.getByText('Change feeling')).toBeTruthy();
     expect(reflection.getByTestId('delete-edited-moment')).toBeTruthy();
     expect(useFocusEffect).toHaveBeenCalledTimes(1);

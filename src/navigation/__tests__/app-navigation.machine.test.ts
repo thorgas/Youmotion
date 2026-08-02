@@ -524,6 +524,28 @@ describe('app navigation model', () => {
     expect(actor.getSnapshot().matches(CHECK_IN_STATES.SAVING)).toBe(true);
   });
 
+  it('persists the same selected moment when the user saves reflection for now', async () => {
+    const actor = createActor(appNavigationMachine).start();
+    actor.send({ type: CHECK_IN_EVENTS.TOUCH_STARTED });
+    actor.send({ type: CHECK_IN_EVENTS.SELECTION_CHANGED, selection });
+    actor.send({ type: CHECK_IN_EVENTS.SELECTION_RELEASED });
+    actor.send({ type: CHECK_IN_EVENTS.NOTE_CHANGED, note: 'Enough for today.' });
+    actor.send({ type: CHECK_IN_EVENTS.SAVE_FOR_NOW_REQUESTED });
+
+    const completed = await waitFor(
+      actor,
+      (candidate) => candidate.matches(CHECK_IN_STATES.SUCCESS),
+      { timeout: 1_000 },
+    );
+
+    expect(completed.context.saved).toMatchObject({
+      emotionId: selection.emotionId,
+      intensity: selection.intensity,
+      note: 'Enough for today.',
+    });
+    expect(routeForStateValue(completed.value)).toBe(APP_ROUTES.SUCCESS);
+  });
+
   it('cancels an interrupted drag without selecting its preview', () => {
     const actor = createActor(appNavigationMachine).start();
     actor.send({ type: CHECK_IN_EVENTS.TOUCH_STARTED });
@@ -801,6 +823,29 @@ describe('app navigation model', () => {
     const snapshot = await finishWithoutBeliefSystem(actor);
 
     expect(snapshot.context.error).toBeNull();
+  });
+
+  it('retries an early save without redirecting the user into belief work', async () => {
+    failNextSurrealUpsert(new Error('storage unavailable'));
+    const actor = createActor(appNavigationMachine).start();
+    actor.send({ type: CHECK_IN_EVENTS.TOUCH_STARTED });
+    actor.send({ type: CHECK_IN_EVENTS.SELECTION_CHANGED, selection });
+    actor.send({ type: CHECK_IN_EVENTS.SELECTION_RELEASED });
+    actor.send({ type: CHECK_IN_EVENTS.SAVE_FOR_NOW_REQUESTED });
+
+    await waitFor(
+      actor,
+      (candidate) => candidate.matches(CHECK_IN_STATES.FAILURE),
+      { timeout: 1_000 },
+    );
+    actor.send({ type: CHECK_IN_EVENTS.RETRIED });
+    const completed = await waitFor(
+      actor,
+      (candidate) => candidate.matches(CHECK_IN_STATES.SUCCESS),
+      { timeout: 1_000 },
+    );
+
+    expect(completed.context.error).toBeNull();
   });
 
   it('keeps the saved reflection when core belief attachment needs a retry', async () => {

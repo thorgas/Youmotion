@@ -41,6 +41,7 @@ export const CHECK_IN_EVENTS = Object.freeze({
   SELECTION_CANCELLED: literal('selection.cancelled'),
   SELECTION_RELEASED: literal('selection.released'),
   NOTE_CHANGED: literal('note.changed'),
+  SAVE_FOR_NOW_REQUESTED: literal('checkIn.saveForNowRequested'),
   BELIEF_SYSTEM_CHANGED: literal('beliefSystem.changed'),
   BELIEF_SYSTEM_BACK_REQUESTED: literal('beliefSystem.backRequested'),
   BELIEF_SYSTEM_CATALOG_REQUESTED: literal('beliefSystem.catalogRequested'),
@@ -72,6 +73,11 @@ export const CHECK_IN_EVENTS = Object.freeze({
   RETRIED: literal('checkIn.retried'),
   RESTARTED: literal('checkIn.restarted'),
   REFLECTION_CANCELLED: literal('reflection.cancelled'),
+});
+
+export const CHECK_IN_SAVE_DESTINATIONS = Object.freeze({
+  BELIEF_SYSTEM: literal('beliefSystem'),
+  COMPLETE: literal('complete'),
 });
 
 export const CHECK_IN_STATES = Object.freeze({
