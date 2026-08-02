@@ -1169,7 +1169,7 @@ describe('check-in screens', () => {
     expect(history.getByText(/Joy · Cheerfulness/)).toBeTruthy();
 
     const settings = await _renderLocalized(<SettingsScreen />);
-    expect(settings.getByText('Private by design')).toBeTruthy();
+    expect(settings.getByText('Your journal belongs to you.')).toBeTruthy();
     expect(settings.getByText('App information')).toBeTruthy();
     expect(settings.getByText('App')).toBeTruthy();
     expect(settings.getByText('Channel')).toBeTruthy();
@@ -1178,10 +1178,10 @@ describe('check-in screens', () => {
     expect(settings.getByText('development')).toBeTruthy();
     expect(settings.getByText('f4610f7')).toBeTruthy();
     await fireEvent.press(settings.getByText('German'));
-    await waitFor(() => expect(settings.getByText('Von Anfang an privat')).toBeTruthy());
+    await waitFor(() => expect(settings.getByText('Dein Journal gehört dir.')).toBeTruthy());
     expect(settings.getByText('App-Informationen')).toBeTruthy();
     await fireEvent.press(settings.getByText('Englisch'));
-    await waitFor(() => expect(settings.getByText('Private by design')).toBeTruthy());
+    await waitFor(() => expect(settings.getByText('Your journal belongs to you.')).toBeTruthy());
   });
 
   it('makes backup controls visible and requires confirmation before deleting moments', async () => {

@@ -281,11 +281,6 @@ export function SettingsScreen() {
         <DataSafetyControls locale={locale} />
         <View style={styles.infoGroup}>
           <View style={styles.infoRow}>
-            <Text style={styles.infoTitle}><fbt desc="Local privacy setting title">Private by design</fbt></Text>
-            <Text style={styles.infoCopy}><fbt desc="Local privacy explanation">Your check-ins are currently stored exclusively on this device.</fbt></Text>
-          </View>
-          <View style={styles.actionDivider} />
-          <View style={styles.infoRow}>
             <Text style={styles.infoTitle}><fbt desc="About the emotion star setting title">About the emotion star</fbt></Text>
             <Text style={styles.infoCopy}><fbt desc="Explanation of the emotion star source and purpose">The seven basic directions are based on the German therapeutic material “Der Gefühlsstern.” The app supports self-reflection, not diagnosis.</fbt></Text>
           </View>
@@ -368,7 +363,6 @@ const styles = StyleSheet.create({
     lineHeight: 18,
     marginTop: 3,
   },
-  actionDivider: { height: 1, backgroundColor: palette.hairline },
   actionCount: {
     minWidth: 28,
     minHeight: 28,

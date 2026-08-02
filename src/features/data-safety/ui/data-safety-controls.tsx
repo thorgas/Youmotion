@@ -1,4 +1,5 @@
 import { useSelector } from '@xstate/react';
+import { PressableScale } from 'pressto';
 import { ActivityIndicator, Pressable, StyleSheet, Text, View } from 'react-native';
 
 import {
@@ -90,12 +91,12 @@ function DataAction({
   title: React.ReactNode;
 }) {
   return (
-    <Pressable
+    <PressableScale
       accessibilityRole="button"
       accessibilityState={{ busy, disabled }}
       disabled={disabled}
       onPress={onPress}
-      style={styles.action}
+      style={[styles.action, destructive ? styles.destructiveAction : null]}
       testID={testID}
     >
       <View style={styles.actionCopy}>
@@ -107,7 +108,7 @@ function DataAction({
       {busy ? <ActivityIndicator color={palette.inkMuted} /> : (
         <Text accessibilityElementsHidden style={styles.chevron}>›</Text>
       )}
-    </Pressable>
+    </PressableScale>
   );
 }
 
@@ -221,6 +222,21 @@ export function DataSafetyControls({ locale }: { locale: string }) {
 
   return (
     <View testID="data-safety-controls">
+      <View style={styles.localSummary}>
+        <View style={styles.localStatus}>
+          <View style={styles.localStatusDot} />
+          <Text style={styles.localStatusText}>
+            <fbt desc="Local journal storage status">ONLY ON THIS DEVICE</fbt>
+          </Text>
+        </View>
+        <Text style={styles.localTitle}>
+          <fbt desc="Local data privacy note heading">Your journal belongs to you.</fbt>
+        </Text>
+        <Text style={styles.localCopy}>
+          <fbt desc="Local data privacy note">Youmotion has no account and does not upload your journal. Create a portable backup whenever you want one.</fbt>
+        </Text>
+      </View>
+
       <View style={styles.actionGroup}>
         <DataAction
           busy={view.exporting}
@@ -239,10 +255,12 @@ export function DataSafetyControls({ locale }: { locale: string }) {
           testID="restore-data-archive"
           title={<Text><fbt desc="Button title for restoring app data">Restore from a backup</fbt></Text>}
         />
-        <View style={styles.divider} />
+      </View>
+
+      <View style={styles.dangerGroup}>
         <DataAction
           busy={view.deleting}
-          description={<Text><fbt desc="Explanation of delete all journal data action">Remove every moment and personal belief. Preferences stay on this device.</fbt></Text>}
+          description={<Text><fbt desc="Explanation of delete all journal data action">Remove every moment and personal belief. Your preferences stay.</fbt></Text>}
           destructive
           disabled={view.busy}
           onPress={_delete}
@@ -255,23 +273,55 @@ export function DataSafetyControls({ locale }: { locale: string }) {
       {view.deleteConfirmation ? <DeleteConfirmationCard onCancel={_cancelDelete} onConfirm={_confirmDelete} /> : null}
       <DataSafetyMessage error={view.error} notice={view.notice} onDismiss={_dismissNotice} />
 
-      <View style={styles.privacyNote}>
-        <Text style={styles.privacyTitle}><fbt desc="Local data privacy note heading">Local and under your control</fbt></Text>
-        <Text style={styles.privacyCopy}><fbt desc="Local data privacy note">Youmotion has no account and does not upload your journal. A backup leaves the app only when you choose where to save or share it.</fbt></Text>
-      </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  actionGroup: { borderTopWidth: 1, borderBottomWidth: 1, borderColor: palette.hairline },
-  action: { minHeight: 78, flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 14 },
+  localSummary: {
+    backgroundColor: '#EDF0EB',
+    borderColor: 'rgba(94, 111, 97, 0.22)',
+    borderCurve: 'continuous',
+    borderRadius: 24,
+    borderWidth: 1,
+    gap: 7,
+    padding: 20,
+  },
+  localStatus: { alignItems: 'center', flexDirection: 'row', gap: 7 },
+  localStatusDot: { backgroundColor: palette.moss, borderRadius: 4, height: 8, width: 8 },
+  localStatusText: {
+    color: palette.moss,
+    fontFamily: type.semibold,
+    fontSize: 10,
+    letterSpacing: 1.15,
+  },
+  localTitle: { color: palette.ink, fontFamily: type.semibold, fontSize: 20, lineHeight: 26 },
+  localCopy: { color: palette.inkMuted, fontFamily: type.regular, fontSize: 13, lineHeight: 20 },
+  actionGroup: {
+    backgroundColor: palette.paperRaised,
+    borderColor: palette.hairline,
+    borderCurve: 'continuous',
+    borderRadius: 22,
+    borderWidth: 1,
+    marginTop: 12,
+    overflow: 'hidden',
+  },
+  dangerGroup: {
+    borderColor: 'rgba(157, 78, 66, 0.20)',
+    borderCurve: 'continuous',
+    borderRadius: 18,
+    borderWidth: 1,
+    marginTop: 12,
+    overflow: 'hidden',
+  },
+  action: { minHeight: 76, flexDirection: 'row', alignItems: 'center', gap: 12, paddingHorizontal: 17, paddingVertical: 14 },
+  destructiveAction: { backgroundColor: '#FBF4F1' },
   actionCopy: { flex: 1 },
   actionTitle: { fontFamily: type.semibold, color: palette.ink, fontSize: 15 },
   destructiveText: { color: '#8A3D35' },
   actionDescription: { fontFamily: type.regular, color: palette.inkMuted, fontSize: 12, lineHeight: 18, marginTop: 3 },
   chevron: { fontFamily: type.regular, color: palette.inkMuted, fontSize: 24, lineHeight: 24 },
-  divider: { height: 1, backgroundColor: palette.hairline },
+  divider: { height: 1, backgroundColor: palette.hairline, marginLeft: 17 },
   confirmation: { backgroundColor: palette.paperRaised, borderColor: palette.hairline, borderCurve: 'continuous', borderRadius: 20, borderWidth: 1, marginTop: 14, padding: 18 },
   confirmationTitle: { fontFamily: type.semibold, color: palette.ink, fontSize: 17 },
   confirmationCopy: { fontFamily: type.regular, color: palette.inkMuted, fontSize: 13, lineHeight: 20, marginTop: 7 },
@@ -288,7 +338,4 @@ const styles = StyleSheet.create({
   notice: { backgroundColor: '#EDF0EB', borderRadius: 14, marginTop: 14, padding: 14 },
   errorNotice: { backgroundColor: '#F5E8E5' },
   noticeText: { fontFamily: type.medium, color: palette.ink, fontSize: 13, lineHeight: 19 },
-  privacyNote: { backgroundColor: '#F2EFEA', borderRadius: 20, borderCurve: 'continuous', marginBottom: 24, marginTop: 16, padding: 18 },
-  privacyTitle: { fontFamily: type.semibold, color: palette.ink, fontSize: 14 },
-  privacyCopy: { fontFamily: type.regular, color: palette.inkMuted, fontSize: 12, lineHeight: 18, marginTop: 4 },
 });

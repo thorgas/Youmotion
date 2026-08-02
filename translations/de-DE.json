@@ -408,28 +408,6 @@
       ],
       "types": []
     },
-    "k2Qq3egAT2sB1r3VozmiFA==": {
-      "description": "Local privacy setting title",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "Von Anfang an privat",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "Xdi0knLLJphcj5voFGjUGw==": {
-      "description": "Local privacy explanation",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "Deine Check-ins bleiben auf diesem Gerät und werden nicht hochgeladen.",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
     "TiL26KMpEl+SOXn11xtWcQ==": {
       "description": "About the emotion star setting title",
       "tokens": [],
@@ -3812,18 +3790,6 @@
       ],
       "types": []
     },
-    "L1PXo4zwvyIOG+qxyS0Svg==": {
-      "description": "Explanation of delete all journal data action",
-      "status": "new",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "Entferne alle Momente und persönlichen Glaubenssätze. Einstellungen bleiben auf diesem Gerät.",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
     "SxdbhkWAt8f0lGzUrtQwCA==": {
       "description": "Button title for deleting all journal data",
       "status": "new",
@@ -3831,30 +3797,6 @@
       "translations": [
         {
           "translation": "Alle Momente löschen",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "mxyxjwj3UCS5Sbpy9sVBAA==": {
-      "description": "Local data privacy note heading",
-      "status": "new",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "Lokal und unter deiner Kontrolle",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "Mr55y9bg0im2J5C3cFGS7g==": {
-      "description": "Local data privacy note",
-      "status": "new",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "Youmotion hat kein Konto und lädt dein Journal nicht hoch. Eine Sicherung verlässt die App nur, wenn du auswählst, wo du sie speichern oder teilen möchtest.",
           "variations": {}
         }
       ],
@@ -4059,6 +4001,54 @@
       "translations": [
         {
           "translation": "Vorerst ausblenden",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "5cbCEzZMIB4TRU4ToPLclQ==": {
+      "description": "Local journal storage status",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "NUR AUF DIESEM GERÄT",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "Q6TjZCfriekTTvmjYitWXg==": {
+      "description": "Local data privacy note heading",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Dein Journal gehört dir.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "CKuRMhkHvCDkeXNmh5zHvQ==": {
+      "description": "Local data privacy note",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Youmotion hat kein Konto und lädt dein Journal nicht hoch. Erstelle eine portable Sicherung, wann immer du möchtest.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "0i6e3A+BY/19BohFO6SrqA==": {
+      "description": "Explanation of delete all journal data action",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Entferne alle Momente und persönlichen Glaubenssätze. Deine Einstellungen bleiben erhalten.",
           "variations": {}
         }
       ],
