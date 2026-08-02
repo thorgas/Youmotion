@@ -2,7 +2,7 @@ import { useSelector as useActorSelector } from '@xstate/react';
 import { useSelector } from '@xstate/store-react';
 import { fbs } from 'fbtee';
 import { PressableScale } from 'pressto';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { formatHistoryDate } from '@/localization/date-copy';
@@ -10,6 +10,8 @@ import { useAppLocale } from '@/localization/app-locale-provider';
 import {
   ANALYTICS_TIMEFRAMES,
   CHECK_IN_EVENTS,
+  EMOTION_IDS,
+  HISTORY_CONTENT_FILTERS,
   HISTORY_EVENTS,
 } from '@/constants';
 import {
@@ -21,11 +23,12 @@ import { AnalyticsTimeframeSelector } from '@/features/analytics/ui/analytics-ti
 import { entriesForAnalyticsTimeframe } from '@/features/analytics/domain/analytics-timeframe';
 import { useAppNavigationActor } from '@/navigation/app-navigation.provider';
 import { checkInHistoryStore } from '../application/check-in-history.store';
+import { filterHistoryEntries } from '../application/history-filter';
 import { historyTimeframeStore } from '../application/history-timeframe.store';
-import type { CheckIn } from '../domain/check-in';
+import type { CheckIn, EmotionId } from '../domain/check-in';
 import { selectionForCheckIn } from '../domain/emotion';
 import type { BeliefStatement } from '../domain/belief-statement';
-import { emotionSummary } from './emotion-copy';
+import { emotionName, emotionSummary } from './emotion-copy';
 import {
   beliefSystemText,
   guidingBeliefSystemText,
@@ -58,23 +61,106 @@ const _selectAllTime = () => {
     timeframe: ANALYTICS_TIMEFRAMES.ALL_TIME,
   });
 };
-const _clearEvidence = () => {
-  historyTimeframeStore.trigger[HISTORY_EVENTS.EVIDENCE_CLEARED]({});
+const _changeQuery = (query: string) => {
+  historyTimeframeStore.trigger[HISTORY_EVENTS.QUERY_CHANGED]({ query });
 };
+const _toggleFilters = () => historyTimeframeStore.trigger[HISTORY_EVENTS.FILTERS_TOGGLED]({});
+const _clearFilters = () => historyTimeframeStore.trigger[HISTORY_EVENTS.FILTERS_CLEARED]({});
 
-function evidenceFilterCopy(count: number) {
-  if (count === 1) {
-    return String(fbs(
-      'Showing 1 moment supporting this insight.',
-      'History banner explaining that one evidence moment for a selected insight is visible',
-    ));
+function EmotionFilterChip({ emotionId, selected }: { emotionId: EmotionId | null; selected: boolean }) {
+  const _select = () => {
+    historyTimeframeStore.trigger[HISTORY_EVENTS.EMOTION_FILTER_SELECTED]({ emotionId });
+  };
+  const label = emotionId === null
+    ? String(fbs('All', 'History emotion filter showing every emotion'))
+    : emotionName(emotionId);
+  return (
+    <PressableScale
+      accessibilityRole="button"
+      accessibilityState={{ selected }}
+      onPress={_select}
+      style={[styles.filterChip, selected ? styles.filterChipSelected : null]}
+      testID={`history-emotion-filter-${emotionId ?? 'all'}`}
+    >
+      <Text style={[styles.filterChipText, selected ? styles.filterChipTextSelected : null]}>
+        {label}
+      </Text>
+    </PressableScale>
+  );
+}
+
+type HistoryContent = typeof HISTORY_CONTENT_FILTERS[keyof typeof HISTORY_CONTENT_FILTERS];
+
+function contentFilterLabel(content: HistoryContent) {
+  if (content === HISTORY_CONTENT_FILTERS.NOTES) {
+    return String(fbs('Reflections', 'History content filter for moments with written reflections'));
   }
-  return String(fbs(
-    'Showing '
-      + fbs.param('count', String(count))
-      + ' moments supporting this insight.',
-    'History banner explaining that only evidence for a selected insight is visible',
-  ));
+  if (content === HISTORY_CONTENT_FILTERS.BELIEFS) {
+    return String(fbs('Beliefs', 'History content filter for moments with beliefs'));
+  }
+  return String(fbs('All', 'History content filter showing every kind of moment'));
+}
+
+function ContentFilterChip({ content, selected }: { content: HistoryContent; selected: boolean }) {
+  const _select = () => {
+    historyTimeframeStore.trigger[HISTORY_EVENTS.CONTENT_FILTER_SELECTED]({ content });
+  };
+  return (
+    <PressableScale
+      accessibilityRole="button"
+      accessibilityState={{ selected }}
+      onPress={_select}
+      style={[styles.filterChip, selected ? styles.filterChipSelected : null]}
+      testID={`history-content-filter-${content}`}
+    >
+      <Text style={[styles.filterChipText, selected ? styles.filterChipTextSelected : null]}>
+        {contentFilterLabel(content)}
+      </Text>
+    </PressableScale>
+  );
+}
+
+type HistorySelection = ReturnType<typeof historyTimeframeStore.getSnapshot>['context'];
+
+function HistoryFilterSheet({ activeFilterCount, selection }: {
+  activeFilterCount: number;
+  selection: HistorySelection;
+}) {
+  if (!selection.filtersOpen) return null;
+
+  return (
+    <View style={styles.filterPanel} testID="history-filter-panel">
+      <Text style={styles.filterLabel}><fbt desc="History filter group label">EMOTION</fbt></Text>
+      <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+        <View style={styles.filterChips}>
+          <EmotionFilterChip emotionId={null} selected={selection.emotionId === null} />
+          <EmotionFilterChip emotionId={EMOTION_IDS.JOY} selected={selection.emotionId === EMOTION_IDS.JOY} />
+          <EmotionFilterChip emotionId={EMOTION_IDS.LOVE} selected={selection.emotionId === EMOTION_IDS.LOVE} />
+          <EmotionFilterChip emotionId={EMOTION_IDS.SHAME} selected={selection.emotionId === EMOTION_IDS.SHAME} />
+          <EmotionFilterChip emotionId={EMOTION_IDS.DISGUST} selected={selection.emotionId === EMOTION_IDS.DISGUST} />
+          <EmotionFilterChip emotionId={EMOTION_IDS.SADNESS} selected={selection.emotionId === EMOTION_IDS.SADNESS} />
+          <EmotionFilterChip emotionId={EMOTION_IDS.ANGER} selected={selection.emotionId === EMOTION_IDS.ANGER} />
+          <EmotionFilterChip emotionId={EMOTION_IDS.FEAR} selected={selection.emotionId === EMOTION_IDS.FEAR} />
+        </View>
+      </ScrollView>
+      <Text style={styles.filterLabel}><fbt desc="History filter group label">CONTENT</fbt></Text>
+      <View style={styles.filterChips}>
+        <ContentFilterChip content={HISTORY_CONTENT_FILTERS.ALL} selected={selection.content === HISTORY_CONTENT_FILTERS.ALL} />
+        <ContentFilterChip content={HISTORY_CONTENT_FILTERS.NOTES} selected={selection.content === HISTORY_CONTENT_FILTERS.NOTES} />
+        <ContentFilterChip content={HISTORY_CONTENT_FILTERS.BELIEFS} selected={selection.content === HISTORY_CONTENT_FILTERS.BELIEFS} />
+      </View>
+      {activeFilterCount > 0 || selection.query !== '' ? (
+        <PressableScale
+          accessibilityRole="button"
+          onPress={_clearFilters}
+          style={styles.clearFilters}
+          testID="history-filters-clear"
+        >
+          <Text style={styles.clearFiltersText}><fbt desc="Button clearing all History filters">Clear filters</fbt></Text>
+        </PressableScale>
+      ) : null}
+    </View>
+  );
 }
 
 function HistoryBelief({
@@ -185,6 +271,8 @@ function MomentRow({ entry, locale }: { entry: CheckIn; locale: string }) {
 }
 
 export function HistoryScreen({ now }: { now?: Date }) {
+  const actor = useAppNavigationActor();
+  const beliefStatements = useActorSelector(actor, _selectBeliefStatements);
   const history = useSelector(checkInHistoryStore, _selectHistory);
   const selection = useSelector(historyTimeframeStore, _selectTimeframe);
   const locale = useAppLocale();
@@ -194,10 +282,23 @@ export function HistoryScreen({ now }: { now?: Date }) {
     now: currentDate,
     timeframe: selection.timeframe,
   });
-  const evidenceIds = new Set(selection.evidenceIds);
-  const displayedEntries = evidenceIds.size === 0
-    ? scopedEntries
-    : scopedEntries.filter((entry) => evidenceIds.has(entry.id));
+  const displayedEntries = filterHistoryEntries({
+    entries: scopedEntries,
+    filters: selection,
+    searchableText: (entry) => [
+      emotionSummary(entry),
+      entry.note,
+      entry.beliefSystemId === undefined
+        ? ''
+        : beliefSystemText({ id: entry.beliefSystemId, statements: beliefStatements }),
+      entry.beliefSystemId === undefined
+        ? ''
+        : guidingBeliefSystemText({ id: entry.beliefSystemId, statements: beliefStatements }) ?? '',
+    ].join(' '),
+  });
+  const activeFilterCount = Number(selection.emotionId !== null)
+    + Number(selection.content !== HISTORY_CONTENT_FILTERS.ALL)
+    + Number(selection.beliefSystemId !== null);
 
   return (
     <View style={styles.page} testID="history-screen">
@@ -217,26 +318,32 @@ export function HistoryScreen({ now }: { now?: Date }) {
             onLastWeekPress={_selectLastWeek}
             timeframe={selection.timeframe}
           />
-          {evidenceIds.size > 0 ? (
-            <View style={styles.evidenceFilter} testID="history-evidence-filter">
-              <Text style={styles.evidenceFilterLabel}>
-                <fbt desc="Label for moments supporting a selected analytics insight">SUPPORTING EVIDENCE</fbt>
+          <View style={styles.searchRow}>
+            <TextInput
+              accessibilityLabel={String(fbs('Search history', 'Accessibility label for History search input'))}
+              autoCapitalize="none"
+              onChangeText={_changeQuery}
+              placeholder={String(fbs('Search your moments', 'Placeholder for History search input'))}
+              placeholderTextColor={palette.inkMuted}
+              returnKeyType="search"
+              style={styles.searchInput}
+              testID="history-search-input"
+              value={selection.query}
+            />
+            <PressableScale
+              accessibilityRole="button"
+              accessibilityState={{ expanded: selection.filtersOpen }}
+              onPress={_toggleFilters}
+              style={[styles.filterToggle, activeFilterCount > 0 ? styles.filterToggleActive : null]}
+              testID="history-filters-toggle"
+            >
+              <Text style={styles.filterToggleText}>
+                <fbt desc="Button opening History filters">Filters</fbt>
+                {activeFilterCount > 0 ? ` · ${activeFilterCount}` : ''}
               </Text>
-              <Text style={styles.evidenceFilterText}>
-                {evidenceFilterCopy(displayedEntries.length)}
-              </Text>
-              <PressableScale
-                accessibilityRole="button"
-                onPress={_clearEvidence}
-                style={styles.evidenceClear}
-                testID="history-evidence-clear"
-              >
-                <Text style={styles.evidenceClearText}>
-                  <fbt desc="Button clearing an insight evidence filter in History">Show all moments</fbt>
-                </Text>
-              </PressableScale>
-            </View>
-          ) : null}
+            </PressableScale>
+          </View>
+          <HistoryFilterSheet activeFilterCount={activeFilterCount} selection={selection} />
           <View style={styles.results}>
             {history.error ? (
               <Text style={styles.error}>
@@ -251,11 +358,11 @@ export function HistoryScreen({ now }: { now?: Date }) {
             ) : displayedEntries.length === 0 ? (
               <View style={styles.empty}>
                 <Text style={styles.emptyTitle}>
-                  <fbt desc="Empty filtered check-in history title">No moments in this period.</fbt>
+                  <fbt desc="Empty filtered check-in history title">No matching moments.</fbt>
                 </Text>
                 <Text style={styles.emptyCopy}>
                   <fbt desc="Empty filtered check-in history explanation">
-                    Choose another timeframe to see more of your history.
+                    Try another search, filter, or timeframe.
                   </fbt>
                 </Text>
               </View>
@@ -283,30 +390,50 @@ const styles = StyleSheet.create({
   localStatus: { flexDirection: 'row', alignItems: 'center', gap: 7, marginTop: 11 },
   localStatusDot: { width: 6, height: 6, borderRadius: 3, backgroundColor: palette.moss },
   intro: { fontFamily: type.regular, color: palette.inkMuted, fontSize: 13, lineHeight: 19 },
-  evidenceFilter: {
-    gap: 7,
-    marginTop: 20,
-    padding: 17,
+  searchRow: { flexDirection: 'row', gap: 9, marginTop: 18 },
+  searchInput: {
+    flex: 1,
+    minHeight: 46,
+    borderRadius: 15,
+    borderCurve: 'continuous',
+    borderWidth: 1,
+    borderColor: palette.hairline,
+    backgroundColor: palette.paperRaised,
+    color: palette.ink,
+    fontFamily: type.regular,
+    fontSize: 14,
+    paddingHorizontal: 15,
+  },
+  filterToggle: {
+    minHeight: 46,
+    justifyContent: 'center',
+    paddingHorizontal: 15,
+    borderRadius: 15,
+    borderCurve: 'continuous',
+    borderWidth: 1,
+    borderColor: palette.hairline,
+    backgroundColor: palette.paperRaised,
+  },
+  filterToggleActive: { borderColor: palette.moss, backgroundColor: '#F0F2ED' },
+  filterToggleText: { fontFamily: type.semibold, color: palette.ink, fontSize: 13 },
+  filterPanel: {
+    gap: 10,
+    marginTop: 10,
+    padding: 15,
     borderRadius: 18,
     borderCurve: 'continuous',
     borderWidth: 1,
-    borderColor: 'rgba(94, 111, 97, 0.24)',
-    backgroundColor: '#F0F2ED',
+    borderColor: palette.hairline,
+    backgroundColor: palette.paperRaised,
   },
-  evidenceFilterLabel: {
-    fontFamily: type.semibold,
-    color: palette.moss,
-    fontSize: 9,
-    letterSpacing: 1.1,
-  },
-  evidenceFilterText: {
-    fontFamily: type.medium,
-    color: palette.ink,
-    fontSize: 13,
-    lineHeight: 19,
-  },
-  evidenceClear: { alignSelf: 'flex-start', minHeight: 34, justifyContent: 'center' },
-  evidenceClearText: { fontFamily: type.semibold, color: palette.moss, fontSize: 12 },
+  filterLabel: { fontFamily: type.semibold, color: palette.inkMuted, fontSize: 9, letterSpacing: 1.1, marginTop: 2 },
+  filterChips: { flexDirection: 'row', flexWrap: 'wrap', gap: 7 },
+  filterChip: { minHeight: 34, justifyContent: 'center', paddingHorizontal: 12, borderRadius: 17, backgroundColor: palette.paper, borderWidth: 1, borderColor: palette.hairline },
+  filterChipSelected: { backgroundColor: palette.ink, borderColor: palette.ink },
+  filterChipText: { fontFamily: type.medium, color: palette.inkMuted, fontSize: 12 },
+  filterChipTextSelected: { color: palette.paperRaised },
+  clearFilters: { alignSelf: 'flex-start', minHeight: 34, justifyContent: 'center' },
+  clearFiltersText: { fontFamily: type.semibold, color: palette.moss, fontSize: 12 },
   results: {
     backgroundColor: palette.paperRaised,
     borderColor: palette.hairline,

@@ -106,7 +106,7 @@ const _restoreInsight = () => {
   analyticsStore.trigger[ANALYTICS_EVENTS.INSIGHT_RESTORED]({});
 };
 type InsightEvidenceSelection = Readonly<{
-  ids: PrimaryAnalyticsInsight['supportingIds'];
+  insight: PrimaryAnalyticsInsight;
   timeframe: AnalyticsTimeframe;
 }>;
 
@@ -137,7 +137,7 @@ function PrimaryInsightSection({
     }
   };
   const _openEvidence = () => {
-    if (insight && onEvidencePress) onEvidencePress({ ids: insight.supportingIds, timeframe });
+    if (insight && onEvidencePress) onEvidencePress({ insight, timeframe });
   };
 
   if (entries.length < 3) {
@@ -644,10 +644,19 @@ export function AnalyticsScreen({ now }: { now?: Date }) {
   const locale = useAppLocale();
   const currentDate = now ?? new Date();
   const _openEvidence = (selection: InsightEvidenceSelection) => {
-    historyTimeframeStore.trigger[HISTORY_EVENTS.EVIDENCE_SELECTED]({
-      ids: selection.ids,
-      timeframe: selection.timeframe,
-    });
+    if (selection.insight.kind === 'belief') {
+      historyTimeframeStore.trigger[HISTORY_EVENTS.BELIEF_FILTER_SELECTED]({
+        beliefSystemId: selection.insight.beliefSystemId,
+        timeframe: selection.timeframe,
+      });
+    } else {
+      historyTimeframeStore.trigger[HISTORY_EVENTS.TIMEFRAME_SELECTED]({
+        timeframe: selection.timeframe,
+      });
+      historyTimeframeStore.trigger[HISTORY_EVENTS.EMOTION_FILTER_SELECTED]({
+        emotionId: selection.insight.emotionId,
+      });
+    }
     actor.send({ type: NAVIGATION_EVENTS.HISTORY_OPENED });
   };
   return (

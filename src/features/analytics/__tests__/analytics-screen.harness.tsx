@@ -38,7 +38,7 @@ let capturedEvidenceCount = 0;
 const _captureEvidence: NonNullable<
   ComponentProps<AnalyticsContentComponent>['onEvidencePress']
 > = (selection) => {
-  capturedEvidenceCount = selection.ids.length;
+  capturedEvidenceCount = selection.insight.supportingIds.length;
 };
 function checkIn({ day, emotionId, id, note = '' }: {
   day: number;

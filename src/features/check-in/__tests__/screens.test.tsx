@@ -22,6 +22,7 @@ import {
   ONBOARDING_EVENTS,
   ONBOARDING_STATES,
   HISTORY_EVENTS,
+  HISTORY_CONTENT_FILTERS,
 } from '@/constants';
 import { AppLocaleProvider } from '@/localization/app-locale-provider';
 import { appNavigationMachine } from '@/navigation/app-navigation.machine';
@@ -201,9 +202,7 @@ describe('check-in screens', () => {
     jest.mocked(useFocusEffect).mockClear();
     resetSurrealDatabaseMock();
     checkInHistoryStore.trigger.hydrated({ entries: [] });
-    historyTimeframeStore.trigger[HISTORY_EVENTS.TIMEFRAME_SELECTED]({
-      timeframe: ANALYTICS_TIMEFRAMES.ALL_TIME,
-    });
+    historyTimeframeStore.trigger[HISTORY_EVENTS.FILTERS_CLEARED]({});
     analyticsStore.trigger[ANALYTICS_EVENTS.TIMEFRAME_SELECTED]({
       timeframe: ANALYTICS_TIMEFRAMES.LAST_WEEK,
     });
@@ -1043,10 +1042,9 @@ describe('check-in screens', () => {
     expect(history.getByTestId('history-moment-history-previous-week')).toBeTruthy();
   });
 
-  it('shows only insight evidence and lets the user return to the full history', async () => {
-    const evidenceMatchId = CheckInId.make('evidence-match');
+  it('searches moments and combines the query with ordinary filters', async () => {
     const moments = [{
-      id: evidenceMatchId,
+      id: CheckInId.make('evidence-match'),
       createdAt: CheckInTimestamp.make(new Date(2026, 6, 19, 12).toISOString()),
       emotionId: EMOTION_IDS.FEAR,
       intensity: 0.5,
@@ -1059,24 +1057,22 @@ describe('check-in screens', () => {
       note: 'Another moment',
     }] satisfies readonly CheckIn[];
     checkInHistoryStore.trigger.hydrated({ entries: moments });
-    historyTimeframeStore.trigger[HISTORY_EVENTS.EVIDENCE_SELECTED]({
-      ids: [evidenceMatchId],
-      timeframe: ANALYTICS_TIMEFRAMES.LAST_WEEK,
-    });
 
     const history = await _renderLocalized(
       <HistoryScreen now={new Date(2026, 6, 21, 12)} />,
     );
-    expect(history.getByText('Showing 1 moment supporting this insight.')).toBeTruthy();
+    await fireEvent.changeText(history.getByTestId('history-search-input'), 'Supporting');
     expect(history.getByTestId('history-moment-evidence-match')).toBeTruthy();
     expect(history.queryByTestId('history-moment-evidence-other')).toBeNull();
 
-    await fireEvent.press(history.getByTestId('history-evidence-clear'));
-    expect(history.queryByTestId('history-evidence-filter')).toBeNull();
+    await fireEvent.press(history.getByTestId('history-filters-toggle'));
+    await fireEvent.press(history.getByTestId(`history-emotion-filter-${EMOTION_IDS.JOY}`));
+    expect(history.queryByTestId('history-moment-evidence-match')).toBeNull();
+    await fireEvent.press(history.getByTestId('history-filters-clear'));
     expect(history.getByTestId('history-moment-evidence-other')).toBeTruthy();
   });
 
-  it('opens exact supporting History moments from the primary insight', async () => {
+  it('opens History with ordinary filters matching the primary insight', async () => {
     const firstFearId = CheckInId.make('insight-fear-1');
     const secondFearId = CheckInId.make('insight-fear-2');
     const moments = [{
@@ -1112,7 +1108,11 @@ describe('check-in screens', () => {
       [NAVIGATION_STATES.TABS]: NAVIGATION_STATES.HISTORY,
     })).toBe(true);
     expect(historyTimeframeStore.getSnapshot().context).toEqual({
-      evidenceIds: [firstFearId, secondFearId],
+      beliefSystemId: BELIEF_SYSTEM_IDS.ALWAYS_FUNCTIONING,
+      content: HISTORY_CONTENT_FILTERS.BELIEFS,
+      emotionId: null,
+      filtersOpen: true,
+      query: '',
       timeframe: ANALYTICS_TIMEFRAMES.LAST_WEEK,
     });
   });

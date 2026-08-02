@@ -124,8 +124,18 @@ export const ANALYTICS_TIMEFRAMES = Object.freeze({
 
 export const HISTORY_EVENTS = Object.freeze({
   TIMEFRAME_SELECTED: literal('history.timeframeSelected'),
-  EVIDENCE_SELECTED: literal('history.evidenceSelected'),
-  EVIDENCE_CLEARED: literal('history.evidenceCleared'),
+  QUERY_CHANGED: literal('history.queryChanged'),
+  FILTERS_TOGGLED: literal('history.filtersToggled'),
+  EMOTION_FILTER_SELECTED: literal('history.emotionFilterSelected'),
+  CONTENT_FILTER_SELECTED: literal('history.contentFilterSelected'),
+  BELIEF_FILTER_SELECTED: literal('history.beliefFilterSelected'),
+  FILTERS_CLEARED: literal('history.filtersCleared'),
+});
+
+export const HISTORY_CONTENT_FILTERS = Object.freeze({
+  ALL: literal('all'),
+  NOTES: literal('notes'),
+  BELIEFS: literal('beliefs'),
 });
 
 export const ONBOARDING_EVENTS = Object.freeze({
