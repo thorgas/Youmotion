@@ -33,6 +33,7 @@ import {
 } from '@/components/ui/tab-screen-layout';
 import { activeCustomBeliefStatements } from '@/features/check-in/domain/belief-statement';
 import { palette, type } from '@/features/check-in/ui/theme';
+import { DataSafetyControls } from '@/features/data-safety/ui/data-safety-controls';
 import { useAppNavigationActor } from '@/navigation/app-navigation.provider';
 import { appSettingsStore } from '../application/app-settings.store';
 
@@ -277,6 +278,7 @@ export function SettingsScreen() {
         <Text style={styles.sectionHeading}>
           <fbt desc="Heading grouping data and product information in settings">YOUR DATA</fbt>
         </Text>
+        <DataSafetyControls locale={locale} />
         <View style={styles.infoGroup}>
           <View style={styles.infoRow}>
             <Text style={styles.infoTitle}><fbt desc="Local privacy setting title">Private by design</fbt></Text>

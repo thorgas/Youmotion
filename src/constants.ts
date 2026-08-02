@@ -150,6 +150,33 @@ export const SETTINGS_EVENTS = Object.freeze({
   APP_SETTINGS_PERSISTENCE_FAILED: literal('settings.appSettingsPersistenceFailed'),
 });
 
+export const DATA_SAFETY_EVENTS = Object.freeze({
+  EXPORT_REQUESTED: literal('dataSafety.exportRequested'),
+  EXPORT_SUCCEEDED: literal('dataSafety.exportSucceeded'),
+  RESTORE_REQUESTED: literal('dataSafety.restoreRequested'),
+  ARCHIVE_PICKED: literal('dataSafety.archivePicked'),
+  PICK_CANCELLED: literal('dataSafety.pickCancelled'),
+  RESTORE_CONFIRMED: literal('dataSafety.restoreConfirmed'),
+  RESTORE_CANCELLED: literal('dataSafety.restoreCancelled'),
+  RESTORE_SUCCEEDED: literal('dataSafety.restoreSucceeded'),
+  DELETE_REQUESTED: literal('dataSafety.deleteRequested'),
+  DELETE_CONFIRMED: literal('dataSafety.deleteConfirmed'),
+  DELETE_CANCELLED: literal('dataSafety.deleteCancelled'),
+  DELETE_SUCCEEDED: literal('dataSafety.deleteSucceeded'),
+  OPERATION_FAILED: literal('dataSafety.operationFailed'),
+  NOTICE_DISMISSED: literal('dataSafety.noticeDismissed'),
+});
+
+export const DATA_SAFETY_STATES = Object.freeze({
+  IDLE: literal('dataSafetyIdle'),
+  EXPORTING: literal('exportingData'),
+  PICKING_ARCHIVE: literal('pickingDataArchive'),
+  RESTORE_PREVIEW: literal('restorePreview'),
+  RESTORING: literal('restoringData'),
+  DELETE_CONFIRMATION: literal('deleteDataConfirmation'),
+  DELETING: literal('deletingData'),
+});
+
 export const BELIEF_LIBRARY_EVENTS = Object.freeze({
   OPENED: literal('beliefLibrary.opened'),
   CLOSED: literal('beliefLibrary.closed'),
@@ -253,6 +280,10 @@ export const BELIEF_SYSTEM_FAILURE_MESSAGE = 'Your core belief could not be atta
 export const BELIEF_STATEMENT_FAILURE_MESSAGE = 'Your belief could not be saved.';
 export const CHECK_IN_DELETE_FAILURE_MESSAGE = 'Your check-in could not be deleted.';
 export const SETTINGS_FAILURE_MESSAGE = 'Your preference could not be saved.';
+export const DATA_EXPORT_FAILURE_MESSAGE = 'Your backup could not be created.';
+export const DATA_ARCHIVE_FAILURE_MESSAGE = 'That backup could not be opened.';
+export const DATA_RESTORE_FAILURE_MESSAGE = 'Your data was not changed because the backup could not be restored.';
+export const DATA_DELETE_ALL_FAILURE_MESSAGE = 'Your moments could not be deleted.';
 export const EMOTION_AXIS_START_ANGLE = -Math.PI / 4;
 export const EMOTION_AXIS_STEP = Math.PI / 4;
 export const BASE_RIPPLE_DURATION = 2800;

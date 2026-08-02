@@ -1075,6 +1075,21 @@ describe('check-in screens', () => {
     await waitFor(() => expect(settings.getByText('Private by design')).toBeTruthy());
   });
 
+  it('makes backup controls visible and requires confirmation before deleting moments', async () => {
+    await act(() => mockActor.send({ type: NAVIGATION_EVENTS.SETTINGS_OPENED }));
+    const settings = await _renderLocalized(<SettingsScreen />);
+
+    expect(settings.getByRole('button', { name: /Export a backup/ })).toBeEnabled();
+    expect(settings.getByRole('button', { name: /Restore from a backup/ })).toBeEnabled();
+    await fireEvent.press(settings.getByRole('button', { name: /Delete all moments/ }));
+
+    expect(settings.getByRole('alert')).toHaveTextContent('Delete every moment?');
+    expect(settings.getByRole('button', { name: 'Delete moments' })).toBeEnabled();
+    await fireEvent.press(settings.getByRole('button', { name: 'Cancel' }));
+
+    expect(settings.queryByText('Delete every moment?')).not.toBeOnTheScreen();
+  });
+
   it('edits and removes personal beliefs from the settings library', async () => {
     const alert = jest.spyOn(Alert, 'alert');
     const beliefSystemId = CustomBeliefSystemId.make('custom-settings-library');

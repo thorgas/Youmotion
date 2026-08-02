@@ -3664,6 +3664,234 @@
         }
       ],
       "types": []
+    },
+    "FjHb+Tuiy3jQJO/fhOSa2w==": {
+      "description": "Restore backup preview heading",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Daten auf diesem Gerät ersetzen?",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "cm6nmJINoUrD1TNcbQeLNg==": {
+      "description": "Backup preview moment count label",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Momente",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "M1qA5SJlERAiFPlJKz4hLg==": {
+      "description": "Backup preview belief count label",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Gespeicherte Glaubenssätze",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "Pw6Zv4ffu8mmsu4VfNpo3w==": {
+      "description": "Backup preview date label",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Erstellt",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "b8uQPQXba71Tlsx5JSe4Fw==": {
+      "description": "Restore backup validation explanation",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Die aktuellen Daten werden erst ersetzt, nachdem die gesamte Sicherung geprüft wurde.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "TUOiWouthpXcbTw+L/6U3Q==": {
+      "description": "Cancel data restore button",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Abbrechen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "tbhZus6vXU/kWKu0NM1CiQ==": {
+      "description": "Confirm replacing data from a backup",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Daten ersetzen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "QrBRMxbeSfzvnAAckc3zOw==": {
+      "description": "Delete all journal data confirmation heading",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Alle Momente löschen?",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "U5n0KxIwtR8Uj2dr2us2Ug==": {
+      "description": "Delete all journal data confirmation explanation",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Dies kann nur rückgängig gemacht werden, wenn du zuvor eine Sicherung exportiert hast. Sprache und Anzeigeeinstellungen bleiben erhalten.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "q7Veiir65C/2X20f5DNmFA==": {
+      "description": "Cancel delete all data button",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Abbrechen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "lUByYFI1xNyQzW4okYZksA==": {
+      "description": "Confirm delete all journal data button",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Momente löschen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "GxPmS6aEmI3vB85S0ziSmg==": {
+      "description": "Explanation of local backup export",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Speichere eine vollständige Kopie, die du kontrollierst, als JSON-Datei.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "ttC7AVfzG7zGmx/4HyR7gA==": {
+      "description": "Button title for exporting all app data",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Sicherung exportieren",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "pV0pGW6NAUdTpIHjSwxCPQ==": {
+      "description": "Explanation of local backup restore",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Sieh dir eine Youmotion-Sicherung an, bevor sie die Daten auf diesem Gerät ersetzt.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "sJYQ9afP+DmqWzRTtUzXmA==": {
+      "description": "Button title for restoring app data",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Aus einer Sicherung wiederherstellen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "L1PXo4zwvyIOG+qxyS0Svg==": {
+      "description": "Explanation of delete all journal data action",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Entferne alle Momente und persönlichen Glaubenssätze. Einstellungen bleiben auf diesem Gerät.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "SxdbhkWAt8f0lGzUrtQwCA==": {
+      "description": "Button title for deleting all journal data",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Alle Momente löschen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "mxyxjwj3UCS5Sbpy9sVBAA==": {
+      "description": "Local data privacy note heading",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Lokal und unter deiner Kontrolle",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "Mr55y9bg0im2J5C3cFGS7g==": {
+      "description": "Local data privacy note",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Youmotion hat kein Konto und lädt dein Journal nicht hoch. Eine Sicherung verlässt die App nur, wenn du auswählst, wo du sie speichern oder teilen möchtest.",
+          "variations": {}
+        }
+      ],
+      "types": []
     }
   }
 }

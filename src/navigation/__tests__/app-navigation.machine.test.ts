@@ -1,4 +1,5 @@
 import { createActor, waitFor, type Actor } from 'xstate';
+import * as Effect from 'effect/Effect';
 
 import {
   APP_ROUTES,
@@ -7,6 +8,8 @@ import {
   BELIEF_LIBRARY_STATES,
   CHECK_IN_EVENTS,
   CHECK_IN_STATES,
+  DATA_SAFETY_EVENTS,
+  DATA_SAFETY_STATES,
   EMOTION_LABEL_MODES,
   EMOTION_IDS,
   BELIEF_SYSTEM_IDS,
@@ -30,6 +33,12 @@ import {
 import { checkInHistoryStore } from '@/features/check-in/application/check-in-history.store';
 import { appSettingsStore } from '@/features/settings/application/app-settings.store';
 import {
+  DataArchiveSchema,
+  DataArchiveTimestamp,
+} from '@/features/data-safety/domain/data-archive';
+import * as dataArchiveRepository from '@/features/data-safety/infrastructure/data-archive.repository';
+import { DataArchiveStorageError } from '@/features/data-safety/infrastructure/data-archive.repository';
+import {
   failNextSurrealDelete,
   failNextSurrealUpsert,
   mockSurrealDatabase,
@@ -41,6 +50,24 @@ import { appNavigationMachine, routeForStateValue } from '../app-navigation.mach
 jest.mock('@/features/check-in/infrastructure/surrealdb.database', () => ({
   getDatabase: jest.fn(() => Promise.resolve(mockSurrealDatabase)),
 }));
+
+jest.mock('@/features/data-safety/infrastructure/data-archive.repository', () => {
+  const actual = jest.requireActual<typeof import('@/features/data-safety/infrastructure/data-archive.repository')>(
+    '@/features/data-safety/infrastructure/data-archive.repository',
+  );
+  return {
+    ...actual,
+    exportDataArchive: jest.fn(),
+    pickDataArchive: jest.fn(),
+    restoreDataArchive: jest.fn(),
+    deleteAllJournalData: jest.fn(),
+  };
+});
+
+const mockExportDataArchive = jest.mocked(dataArchiveRepository.exportDataArchive);
+const mockPickDataArchive = jest.mocked(dataArchiveRepository.pickDataArchive);
+const mockRestoreDataArchive = jest.mocked(dataArchiveRepository.restoreDataArchive);
+const mockDeleteAllJournalData = jest.mocked(dataArchiveRepository.deleteAllJournalData);
 
 const selection = {
   emotionId: EMOTION_IDS.JOY,
@@ -56,6 +83,25 @@ const hydrationSentinel = {
   intensity: 0.5,
   note: '',
 } satisfies CheckIn;
+
+const dataArchive = DataArchiveSchema.make({
+  version: 1,
+  exportedAt: DataArchiveTimestamp.make('2026-08-02T08:00:00.000Z'),
+  checkIns: [{
+    ...hydrationSentinel,
+    id: CheckInId.make('restored-moment'),
+  }],
+  beliefStatements: [{
+    kind: 'built-in',
+    beliefSystemId: BELIEF_SYSTEM_IDS.ALWAYS_FUNCTIONING,
+    guidingStatement: 'I may pause.',
+  }],
+  settings: {
+    locale: APP_LOCALES.GERMAN,
+    emotionLabelMode: EMOTION_LABEL_MODES.TEXT,
+    onboardingCompleted: true,
+  },
+});
 
 async function startAfterInitialHistoryHydration() {
   checkInHistoryStore.trigger.hydrated({ entries: [hydrationSentinel] });
@@ -93,6 +139,88 @@ describe('app navigation model', () => {
         onboardingCompleted: true,
       },
     });
+    mockExportDataArchive.mockReset();
+    mockPickDataArchive.mockReset();
+    mockRestoreDataArchive.mockReset();
+    mockDeleteAllJournalData.mockReset();
+    mockExportDataArchive.mockReturnValue(Effect.succeed(undefined));
+    mockPickDataArchive.mockReturnValue(Effect.succeed(null));
+    mockRestoreDataArchive.mockReturnValue(Effect.succeed(undefined));
+    mockDeleteAllJournalData.mockReturnValue(Effect.succeed(undefined));
+  });
+
+  it('exports a local backup from an explicit Settings model path', async () => {
+    const actor = createActor(appNavigationMachine).start();
+    actor.send({ type: NAVIGATION_EVENTS.SETTINGS_OPENED });
+    actor.send({ type: DATA_SAFETY_EVENTS.EXPORT_REQUESTED });
+
+    expect(actor.getSnapshot().matches({
+      [NAVIGATION_STATES.TABS]: {
+        [NAVIGATION_STATES.SETTINGS]: DATA_SAFETY_STATES.EXPORTING,
+      },
+    })).toBe(true);
+    await waitFor(actor, (snapshot) => snapshot.context.dataSafetyNotice !== null);
+
+    expect(mockExportDataArchive).toHaveBeenCalledTimes(1);
+    expect(routeForStateValue(actor.getSnapshot().value)).toBe(APP_ROUTES.SETTINGS);
+  });
+
+  it('previews a decoded archive before atomically replacing current data', async () => {
+    mockPickDataArchive.mockReturnValue(Effect.succeed(dataArchive));
+    const actor = createActor(appNavigationMachine).start();
+    actor.send({ type: NAVIGATION_EVENTS.SETTINGS_OPENED });
+    actor.send({ type: DATA_SAFETY_EVENTS.RESTORE_REQUESTED });
+    await waitFor(actor, (snapshot) => snapshot.matches({
+      [NAVIGATION_STATES.TABS]: {
+        [NAVIGATION_STATES.SETTINGS]: DATA_SAFETY_STATES.RESTORE_PREVIEW,
+      },
+    }));
+
+    expect(checkInHistoryStore.getSnapshot().context.entries).not.toEqual(dataArchive.checkIns);
+    actor.send({ type: DATA_SAFETY_EVENTS.RESTORE_CONFIRMED });
+    await waitFor(actor, (snapshot) => snapshot.context.dataSafetyNotice !== null);
+
+    expect(mockRestoreDataArchive).toHaveBeenCalledWith(dataArchive);
+    expect(checkInHistoryStore.getSnapshot().context.entries).toEqual(dataArchive.checkIns);
+    expect(appSettingsStore.getSnapshot().context.locale).toBe(APP_LOCALES.GERMAN);
+    expect(actor.getSnapshot().context.beliefStatements).toEqual(dataArchive.beliefStatements);
+  });
+
+  it('preserves current in-memory data when restore fails', async () => {
+    checkInHistoryStore.trigger.hydrated({ entries: [hydrationSentinel] });
+    mockPickDataArchive.mockReturnValue(Effect.succeed(dataArchive));
+    mockRestoreDataArchive.mockReturnValue(Effect.fail(DataArchiveStorageError.make({
+      operation: 'restore',
+      cause: new Error('restore failed'),
+    })));
+    const actor = createActor(appNavigationMachine).start();
+    actor.send({ type: NAVIGATION_EVENTS.SETTINGS_OPENED });
+    actor.send({ type: DATA_SAFETY_EVENTS.RESTORE_REQUESTED });
+    await waitFor(actor, (snapshot) => snapshot.context.dataArchive !== null);
+    actor.send({ type: DATA_SAFETY_EVENTS.RESTORE_CONFIRMED });
+    await waitFor(actor, (snapshot) => snapshot.context.dataSafetyError !== null);
+
+    expect(checkInHistoryStore.getSnapshot().context.entries).toEqual([hydrationSentinel]);
+    expect(actor.getSnapshot().context.dataArchive).toBeNull();
+  });
+
+  it('requires confirmation before deleting journal data and keeps preferences', async () => {
+    checkInHistoryStore.trigger.hydrated({ entries: [hydrationSentinel] });
+    const actor = createActor(appNavigationMachine).start();
+    actor.send({ type: NAVIGATION_EVENTS.SETTINGS_OPENED });
+    actor.send({ type: DATA_SAFETY_EVENTS.DELETE_REQUESTED });
+
+    expect(mockDeleteAllJournalData).not.toHaveBeenCalled();
+    expect(actor.getSnapshot().matches({
+      [NAVIGATION_STATES.TABS]: {
+        [NAVIGATION_STATES.SETTINGS]: DATA_SAFETY_STATES.DELETE_CONFIRMATION,
+      },
+    })).toBe(true);
+    actor.send({ type: DATA_SAFETY_EVENTS.DELETE_CONFIRMED });
+    await waitFor(actor, (snapshot) => snapshot.context.dataSafetyNotice !== null);
+
+    expect(checkInHistoryStore.getSnapshot().context.entries).toEqual([]);
+    expect(appSettingsStore.getSnapshot().context.locale).toBe(APP_LOCALES.ENGLISH);
   });
 
   it('makes tab navigation an explicit state graph', () => {

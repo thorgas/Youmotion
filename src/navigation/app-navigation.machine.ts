@@ -17,6 +17,12 @@ import {
   CHECK_IN_DELETE_FAILURE_MESSAGE,
   CHECK_IN_FAILURE_MESSAGE,
   CHECK_IN_STATES,
+  DATA_ARCHIVE_FAILURE_MESSAGE,
+  DATA_DELETE_ALL_FAILURE_MESSAGE,
+  DATA_EXPORT_FAILURE_MESSAGE,
+  DATA_RESTORE_FAILURE_MESSAGE,
+  DATA_SAFETY_EVENTS,
+  DATA_SAFETY_STATES,
   MAX_NOTE_LENGTH,
   NAVIGATION_EVENTS,
   NAVIGATION_STATES,
@@ -61,6 +67,15 @@ import {
   retireCustomBeliefStatement,
 } from '@/features/check-in/infrastructure/belief-statement.repository';
 import { checkInHistoryStore } from '@/features/check-in/application/check-in-history.store';
+import {
+  DataArchiveSchema,
+} from '@/features/data-safety/domain/data-archive';
+import {
+  deleteAllJournalData,
+  exportDataArchive,
+  pickDataArchive,
+  restoreDataArchive,
+} from '@/features/data-safety/infrastructure/data-archive.repository';
 import { appSettingsStore } from '@/features/settings/application/app-settings.store';
 import { AppLocaleSchema } from '@/features/settings/domain/app-locale';
 import { AppSettingsSchema } from '@/features/settings/domain/app-settings';
@@ -92,6 +107,9 @@ const AppContextSchema = Schema.Struct({
   editing: Schema.NullOr(CheckInSchema),
   error: Schema.NullOr(Schema.String),
   guidingHelpVisible: Schema.Boolean,
+  dataArchive: Schema.NullOr(DataArchiveSchema),
+  dataSafetyError: Schema.NullOr(Schema.String),
+  dataSafetyNotice: Schema.NullOr(Schema.String),
 });
 
 const EmptyEventSchema = Schema.standardSchemaV1(Schema.Struct({}));
@@ -226,7 +244,17 @@ export const appNavigationMachine = setup({
         },
         [NAVIGATION_STATES.HISTORY]: {},
         [NAVIGATION_STATES.ANALYTICS]: {},
-        [NAVIGATION_STATES.SETTINGS]: {},
+        [NAVIGATION_STATES.SETTINGS]: {
+          states: {
+            [DATA_SAFETY_STATES.IDLE]: {},
+            [DATA_SAFETY_STATES.EXPORTING]: {},
+            [DATA_SAFETY_STATES.PICKING_ARCHIVE]: {},
+            [DATA_SAFETY_STATES.RESTORE_PREVIEW]: {},
+            [DATA_SAFETY_STATES.RESTORING]: {},
+            [DATA_SAFETY_STATES.DELETE_CONFIRMATION]: {},
+            [DATA_SAFETY_STATES.DELETING]: {},
+          },
+        },
       },
     },
     [NAVIGATION_STATES.REFLECTION]: {},
@@ -347,6 +375,26 @@ export const appNavigationMachine = setup({
       [SETTINGS_EVENTS.APP_SETTINGS_PERSISTENCE_FAILED]: Schema.standardSchemaV1(
         Schema.Struct({ message: Schema.String }),
       ),
+      [DATA_SAFETY_EVENTS.EXPORT_REQUESTED]: EmptyEventSchema,
+      [DATA_SAFETY_EVENTS.EXPORT_SUCCEEDED]: EmptyEventSchema,
+      [DATA_SAFETY_EVENTS.RESTORE_REQUESTED]: EmptyEventSchema,
+      [DATA_SAFETY_EVENTS.ARCHIVE_PICKED]: Schema.standardSchemaV1(
+        Schema.Struct({ archive: DataArchiveSchema }),
+      ),
+      [DATA_SAFETY_EVENTS.PICK_CANCELLED]: EmptyEventSchema,
+      [DATA_SAFETY_EVENTS.RESTORE_CONFIRMED]: EmptyEventSchema,
+      [DATA_SAFETY_EVENTS.RESTORE_CANCELLED]: EmptyEventSchema,
+      [DATA_SAFETY_EVENTS.RESTORE_SUCCEEDED]: Schema.standardSchemaV1(
+        Schema.Struct({ archive: DataArchiveSchema }),
+      ),
+      [DATA_SAFETY_EVENTS.DELETE_REQUESTED]: EmptyEventSchema,
+      [DATA_SAFETY_EVENTS.DELETE_CONFIRMED]: EmptyEventSchema,
+      [DATA_SAFETY_EVENTS.DELETE_CANCELLED]: EmptyEventSchema,
+      [DATA_SAFETY_EVENTS.DELETE_SUCCEEDED]: EmptyEventSchema,
+      [DATA_SAFETY_EVENTS.OPERATION_FAILED]: Schema.standardSchemaV1(
+        Schema.Struct({ message: Schema.String }),
+      ),
+      [DATA_SAFETY_EVENTS.NOTICE_DISMISSED]: EmptyEventSchema,
       [BELIEF_LIBRARY_EVENTS.OPENED]: EmptyEventSchema,
       [BELIEF_LIBRARY_EVENTS.CLOSED]: EmptyEventSchema,
       [BELIEF_LIBRARY_EVENTS.CREATE_REQUESTED]: EmptyEventSchema,
@@ -399,6 +447,9 @@ export const appNavigationMachine = setup({
     editing: null,
     error: null,
     guidingHelpVisible: false,
+    dataArchive: null,
+    dataSafetyError: null,
+    dataSafetyNotice: null,
   },
   entry: ({ self }, enq) => {
     enq(() => {
@@ -706,6 +757,9 @@ export const appNavigationMachine = setup({
             saved: null,
             editing: null,
             error: null,
+            dataArchive: null,
+            dataSafetyError: null,
+            dataSafetyNotice: null,
           },
         },
         [NAVIGATION_EVENTS.HISTORY_OPENED]: {
@@ -717,6 +771,9 @@ export const appNavigationMachine = setup({
             saved: null,
             editing: null,
             error: null,
+            dataArchive: null,
+            dataSafetyError: null,
+            dataSafetyNotice: null,
           },
         },
         [NAVIGATION_EVENTS.ANALYTICS_OPENED]: {
@@ -728,6 +785,9 @@ export const appNavigationMachine = setup({
             saved: null,
             editing: null,
             error: null,
+            dataArchive: null,
+            dataSafetyError: null,
+            dataSafetyNotice: null,
           },
         },
         [NAVIGATION_EVENTS.SETTINGS_OPENED]: {
@@ -739,6 +799,9 @@ export const appNavigationMachine = setup({
             saved: null,
             editing: null,
             error: null,
+            dataArchive: null,
+            dataSafetyError: null,
+            dataSafetyNotice: null,
           },
         },
         [CHECK_IN_EVENTS.EDIT_REQUESTED]: ({ event }) => ({
@@ -794,12 +857,16 @@ export const appNavigationMachine = setup({
         [NAVIGATION_STATES.HISTORY]: {},
         [NAVIGATION_STATES.ANALYTICS]: {},
         [NAVIGATION_STATES.SETTINGS]: {
+          initial: DATA_SAFETY_STATES.IDLE,
           on: {
             [ONBOARDING_EVENTS.OPENED]: {
               target: `#appNavigation.${NAVIGATION_STATES.ONBOARDING}.${ONBOARDING_STATES.WELCOME}`,
               context: {
                 onboardingEntryPoint: ONBOARDING_ENTRY_POINTS.SETTINGS,
                 onboardingSelection: null,
+                dataArchive: null,
+                dataSafetyError: null,
+                dataSafetyNotice: null,
                 error: null,
               },
             },
@@ -810,7 +877,201 @@ export const appNavigationMachine = setup({
                 beliefLibraryHarmfulDraft: '',
                 beliefLibraryGuidingDraft: '',
                 guidingHelpVisible: false,
+                dataArchive: null,
+                dataSafetyError: null,
+                dataSafetyNotice: null,
                 error: null,
+              },
+            },
+          },
+          states: {
+            [DATA_SAFETY_STATES.IDLE]: {
+              on: {
+                [DATA_SAFETY_EVENTS.EXPORT_REQUESTED]: {
+                  target: DATA_SAFETY_STATES.EXPORTING,
+                  context: { dataSafetyError: null, dataSafetyNotice: null },
+                },
+                [DATA_SAFETY_EVENTS.RESTORE_REQUESTED]: {
+                  target: DATA_SAFETY_STATES.PICKING_ARCHIVE,
+                  context: {
+                    dataArchive: null,
+                    dataSafetyError: null,
+                    dataSafetyNotice: null,
+                  },
+                },
+                [DATA_SAFETY_EVENTS.DELETE_REQUESTED]: {
+                  target: DATA_SAFETY_STATES.DELETE_CONFIRMATION,
+                  context: { dataSafetyError: null, dataSafetyNotice: null },
+                },
+                [DATA_SAFETY_EVENTS.NOTICE_DISMISSED]: {
+                  context: { dataSafetyError: null, dataSafetyNotice: null },
+                },
+              },
+            },
+            [DATA_SAFETY_STATES.EXPORTING]: {
+              entry: ({ self }, enq) => {
+                enq(() => {
+                  void Effect.runPromise(exportDataArchive()).then(
+                    () => self.send({ type: DATA_SAFETY_EVENTS.EXPORT_SUCCEEDED }),
+                    () => self.send({
+                      type: DATA_SAFETY_EVENTS.OPERATION_FAILED,
+                      message: DATA_EXPORT_FAILURE_MESSAGE,
+                    }),
+                  );
+                });
+              },
+              on: {
+                [NAVIGATION_EVENTS.TODAY_OPENED]: {},
+                [NAVIGATION_EVENTS.HISTORY_OPENED]: {},
+                [NAVIGATION_EVENTS.ANALYTICS_OPENED]: {},
+                [DATA_SAFETY_EVENTS.EXPORT_SUCCEEDED]: {
+                  target: DATA_SAFETY_STATES.IDLE,
+                  context: {
+                    dataSafetyError: null,
+                    dataSafetyNotice: 'Your backup is ready.',
+                  },
+                },
+                [DATA_SAFETY_EVENTS.OPERATION_FAILED]: ({ event }) => ({
+                  target: DATA_SAFETY_STATES.IDLE,
+                  context: { dataSafetyError: event.message, dataSafetyNotice: null },
+                }),
+              },
+            },
+            [DATA_SAFETY_STATES.PICKING_ARCHIVE]: {
+              entry: ({ self }, enq) => {
+                enq(() => {
+                  void Effect.runPromise(pickDataArchive()).then(
+                    (archive) => self.send(archive
+                      ? { type: DATA_SAFETY_EVENTS.ARCHIVE_PICKED, archive }
+                      : { type: DATA_SAFETY_EVENTS.PICK_CANCELLED }),
+                    () => self.send({
+                      type: DATA_SAFETY_EVENTS.OPERATION_FAILED,
+                      message: DATA_ARCHIVE_FAILURE_MESSAGE,
+                    }),
+                  );
+                });
+              },
+              on: {
+                [NAVIGATION_EVENTS.TODAY_OPENED]: {},
+                [NAVIGATION_EVENTS.HISTORY_OPENED]: {},
+                [NAVIGATION_EVENTS.ANALYTICS_OPENED]: {},
+                [DATA_SAFETY_EVENTS.ARCHIVE_PICKED]: {
+                  target: DATA_SAFETY_STATES.RESTORE_PREVIEW,
+                  context: ({ event }) => ({ dataArchive: event.archive }),
+                },
+                [DATA_SAFETY_EVENTS.PICK_CANCELLED]: {
+                  target: DATA_SAFETY_STATES.IDLE,
+                },
+                [DATA_SAFETY_EVENTS.OPERATION_FAILED]: ({ event }) => ({
+                  target: DATA_SAFETY_STATES.IDLE,
+                  context: { dataSafetyError: event.message, dataSafetyNotice: null },
+                }),
+              },
+            },
+            [DATA_SAFETY_STATES.RESTORE_PREVIEW]: {
+              on: {
+                [DATA_SAFETY_EVENTS.RESTORE_CONFIRMED]: {
+                  target: DATA_SAFETY_STATES.RESTORING,
+                },
+                [DATA_SAFETY_EVENTS.RESTORE_CANCELLED]: {
+                  target: DATA_SAFETY_STATES.IDLE,
+                  context: { dataArchive: null },
+                },
+              },
+            },
+            [DATA_SAFETY_STATES.RESTORING]: {
+              entry: ({ context, self }, enq) => {
+                enq(() => {
+                  const archive = context.dataArchive;
+                  if (!archive) {
+                    self.send({
+                      type: DATA_SAFETY_EVENTS.OPERATION_FAILED,
+                      message: DATA_RESTORE_FAILURE_MESSAGE,
+                    });
+                    return;
+                  }
+                  void Effect.runPromise(restoreDataArchive(archive)).then(
+                    () => self.send({
+                      type: DATA_SAFETY_EVENTS.RESTORE_SUCCEEDED,
+                      archive,
+                    }),
+                    () => self.send({
+                      type: DATA_SAFETY_EVENTS.OPERATION_FAILED,
+                      message: DATA_RESTORE_FAILURE_MESSAGE,
+                    }),
+                  );
+                });
+              },
+              on: {
+                [NAVIGATION_EVENTS.TODAY_OPENED]: {},
+                [NAVIGATION_EVENTS.HISTORY_OPENED]: {},
+                [NAVIGATION_EVENTS.ANALYTICS_OPENED]: {},
+                [DATA_SAFETY_EVENTS.RESTORE_SUCCEEDED]: ({ event }, enq) => {
+                  enq(() => {
+                    checkInHistoryStore.trigger.hydrated({ entries: event.archive.checkIns });
+                    appSettingsStore.trigger.hydrated({ settings: event.archive.settings });
+                  });
+                  return {
+                    target: DATA_SAFETY_STATES.IDLE,
+                    context: {
+                      beliefStatements: event.archive.beliefStatements,
+                      dataArchive: null,
+                      dataSafetyError: null,
+                      dataSafetyNotice: 'Your backup replaced the data on this device.',
+                    },
+                  };
+                },
+                [DATA_SAFETY_EVENTS.OPERATION_FAILED]: ({ event }) => ({
+                  target: DATA_SAFETY_STATES.IDLE,
+                  context: {
+                    dataArchive: null,
+                    dataSafetyError: event.message,
+                    dataSafetyNotice: null,
+                  },
+                }),
+              },
+            },
+            [DATA_SAFETY_STATES.DELETE_CONFIRMATION]: {
+              on: {
+                [DATA_SAFETY_EVENTS.DELETE_CONFIRMED]: {
+                  target: DATA_SAFETY_STATES.DELETING,
+                },
+                [DATA_SAFETY_EVENTS.DELETE_CANCELLED]: {
+                  target: DATA_SAFETY_STATES.IDLE,
+                },
+              },
+            },
+            [DATA_SAFETY_STATES.DELETING]: {
+              entry: ({ self }, enq) => {
+                enq(() => {
+                  void Effect.runPromise(deleteAllJournalData()).then(
+                    () => self.send({ type: DATA_SAFETY_EVENTS.DELETE_SUCCEEDED }),
+                    () => self.send({
+                      type: DATA_SAFETY_EVENTS.OPERATION_FAILED,
+                      message: DATA_DELETE_ALL_FAILURE_MESSAGE,
+                    }),
+                  );
+                });
+              },
+              on: {
+                [NAVIGATION_EVENTS.TODAY_OPENED]: {},
+                [NAVIGATION_EVENTS.HISTORY_OPENED]: {},
+                [NAVIGATION_EVENTS.ANALYTICS_OPENED]: {},
+                [DATA_SAFETY_EVENTS.DELETE_SUCCEEDED]: (_args, enq) => {
+                  enq(() => checkInHistoryStore.trigger.hydrated({ entries: [] }));
+                  return {
+                    target: DATA_SAFETY_STATES.IDLE,
+                    context: {
+                      beliefStatements: [],
+                      dataSafetyError: null,
+                      dataSafetyNotice: 'Your moments and personal beliefs were deleted.',
+                    },
+                  };
+                },
+                [DATA_SAFETY_EVENTS.OPERATION_FAILED]: ({ event }) => ({
+                  target: DATA_SAFETY_STATES.IDLE,
+                  context: { dataSafetyError: event.message, dataSafetyNotice: null },
+                }),
               },
             },
           },
