@@ -112,6 +112,8 @@ export const ANALYTICS_EVENTS = Object.freeze({
   NEXT_MONTH_REQUESTED: literal('analytics.nextMonthRequested'),
   CURRENT_MONTH_REQUESTED: literal('analytics.currentMonthRequested'),
   TIMEFRAME_SELECTED: literal('analytics.timeframeSelected'),
+  INSIGHT_DISMISSED: literal('analytics.insightDismissed'),
+  INSIGHT_RESTORED: literal('analytics.insightRestored'),
 });
 
 export const ANALYTICS_TIMEFRAMES = Object.freeze({
@@ -122,6 +124,8 @@ export const ANALYTICS_TIMEFRAMES = Object.freeze({
 
 export const HISTORY_EVENTS = Object.freeze({
   TIMEFRAME_SELECTED: literal('history.timeframeSelected'),
+  EVIDENCE_SELECTED: literal('history.evidenceSelected'),
+  EVIDENCE_CLEARED: literal('history.evidenceCleared'),
 });
 
 export const ONBOARDING_EVENTS = Object.freeze({

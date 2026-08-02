@@ -9,8 +9,10 @@ import {
   type CheckIn,
 } from '@/features/check-in/domain/check-in';
 import {
+  analyticsInsightKey,
   analyticsObservations,
   emotionFrequencies,
+  primaryAnalyticsInsight,
 } from '../domain/check-in-analytics';
 import {
   calendarEmotionFrequencies,
@@ -273,12 +275,34 @@ describe('check-in analytics', () => {
       kind: 'emotion',
       emotionId: EMOTION_IDS.FEAR,
       count: 3,
+      supportingIds: ['fear-1', 'fear-2', 'fear-3'],
     });
     expect(observations[2]).toEqual({
       kind: 'belief',
       beliefSystemId: BELIEF_SYSTEM_IDS.ALWAYS_FUNCTIONING,
       emotionId: EMOTION_IDS.FEAR,
       count: 3,
+      supportingIds: ['fear-1', 'fear-2', 'fear-3'],
     });
+  });
+
+  it('requires three moments and prefers a recurring belief pair as the primary insight', () => {
+    const entries = [
+      checkIn({ beliefSystemId: BELIEF_SYSTEM_IDS.ALWAYS_FUNCTIONING, day: 1, emotionId: EMOTION_IDS.FEAR, id: 'fear-1' }),
+      checkIn({ beliefSystemId: BELIEF_SYSTEM_IDS.ALWAYS_FUNCTIONING, day: 2, emotionId: EMOTION_IDS.FEAR, id: 'fear-2' }),
+      checkIn({ day: 3, emotionId: EMOTION_IDS.FEAR, id: 'fear-3' }),
+    ];
+
+    expect(primaryAnalyticsInsight(entries.slice(0, 2))).toBeNull();
+    const insight = primaryAnalyticsInsight(entries);
+    expect(insight).toEqual({
+      kind: 'belief',
+      beliefSystemId: BELIEF_SYSTEM_IDS.ALWAYS_FUNCTIONING,
+      emotionId: EMOTION_IDS.FEAR,
+      count: 2,
+      supportingIds: ['fear-1', 'fear-2'],
+    });
+    if (!insight) throw new Error('Three recurring moments must produce an insight.');
+    expect(analyticsInsightKey(insight)).toBe('belief:fear-1:fear-2');
   });
 });

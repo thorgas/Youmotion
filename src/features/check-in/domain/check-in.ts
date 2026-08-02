@@ -41,4 +41,5 @@ export const CheckInSchema = Schema.Struct({
 export type CheckIn = typeof CheckInSchema.Type;
 
 export const CheckInListSchema = Schema.Array(CheckInSchema);
+export const CheckInIdListSchema = Schema.Array(CheckInId);
 export const CheckInListFromJson = Schema.parseJson(CheckInListSchema);

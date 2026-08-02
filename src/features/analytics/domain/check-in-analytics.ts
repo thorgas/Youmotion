@@ -9,12 +9,18 @@ export type EmotionFrequency = Readonly<{
 
 export type AnalyticsObservation =
   | Readonly<{ kind: 'history'; dayCount: number; momentCount: number }>
-  | Readonly<{ kind: 'emotion'; emotionId: CheckIn['emotionId']; count: number }>
+  | Readonly<{
+    kind: 'emotion';
+    emotionId: CheckIn['emotionId'];
+    count: number;
+    supportingIds: readonly CheckIn['id'][];
+  }>
   | Readonly<{
     kind: 'belief';
     beliefSystemId: BeliefSystemId;
     emotionId: CheckIn['emotionId'];
     count: number;
+    supportingIds: readonly CheckIn['id'][];
   }>
   | Readonly<{ kind: 'notes'; count: number; momentCount: number }>;
 
@@ -54,6 +60,9 @@ function uniqueMostFrequentEmotion(entries: readonly CheckIn[]) {
     kind: 'emotion',
     emotionId: first.emotionId,
     count: first.count,
+    supportingIds: entries.flatMap((entry) => (
+      entry.emotionId === first.emotionId ? [entry.id] : []
+    )),
   } satisfies AnalyticsObservation;
 }
 
@@ -79,7 +88,16 @@ function recurringBelief(entries: readonly CheckIn[]) {
   }, []);
   const { first, second } = twoHighestCounts(frequencies);
   if (!first || first.count < 2 || first.count === second?.count) return null;
-  return { kind: 'belief', ...first } satisfies AnalyticsObservation;
+  return {
+    kind: 'belief',
+    ...first,
+    supportingIds: entries.flatMap((entry) => (
+      (
+        entry.beliefSystemId === first.beliefSystemId
+        && entry.emotionId === first.emotionId
+      ) ? [entry.id] : []
+    )),
+  } satisfies AnalyticsObservation;
 }
 
 function noteObservation(entries: readonly CheckIn[]) {
@@ -106,4 +124,24 @@ export function analyticsObservations(entries: readonly CheckIn[]) {
   const notes = noteObservation(entries);
   if (observations.length < 3 && notes) observations.push(notes);
   return observations.slice(0, 3);
+}
+
+export type PrimaryAnalyticsInsight = Extract<
+  AnalyticsObservation,
+  Readonly<{ kind: 'belief' | 'emotion' }>
+>;
+
+export function primaryAnalyticsInsight(
+  entries: readonly CheckIn[],
+): PrimaryAnalyticsInsight | null {
+  if (entries.length < 3) return null;
+  const observations = analyticsObservations(entries);
+  const belief = observations.find((observation) => observation.kind === 'belief');
+  if (belief?.kind === 'belief') return belief;
+  const emotion = observations.find((observation) => observation.kind === 'emotion');
+  return emotion?.kind === 'emotion' ? emotion : null;
+}
+
+export function analyticsInsightKey(insight: PrimaryAnalyticsInsight) {
+  return [insight.kind, ...insight.supportingIds].join(':');
 }

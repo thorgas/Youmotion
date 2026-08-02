@@ -18,8 +18,10 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import {
   ANALYTICS_EVENTS,
   ANALYTICS_TIMEFRAMES,
+  HISTORY_EVENTS,
   MOTION_DURATION,
   MOTION_OFFSET,
+  NAVIGATION_EVENTS,
 } from '@/constants';
 import {
   tabScreenContentStyle,
@@ -27,6 +29,7 @@ import {
   tabScreenTitleStyle,
 } from '@/components/ui/tab-screen-layout';
 import { checkInHistoryStore } from '@/features/check-in/application/check-in-history.store';
+import { historyTimeframeStore } from '@/features/check-in/application/history-timeframe.store';
 import type { CheckIn } from '@/features/check-in/domain/check-in';
 import { emotions } from '@/features/check-in/domain/emotion';
 import type { BeliefStatement } from '@/features/check-in/domain/belief-statement';
@@ -38,7 +41,10 @@ import { useAppNavigationActor } from '@/navigation/app-navigation.provider';
 import { analyticsStore } from '../application/analytics.store';
 import {
   analyticsObservations,
+  analyticsInsightKey,
   emotionFrequencies,
+  primaryAnalyticsInsight,
+  type PrimaryAnalyticsInsight,
   type AnalyticsObservation,
   type EmotionFrequency,
 } from '../domain/check-in-analytics';
@@ -61,6 +67,9 @@ import {
   analyticsWeekdayLabel,
   calendarDayAccessibilityLabel,
   observationCopy,
+  insightEvidenceCopy,
+  insightLearningCopy,
+  insightNoPatternCopy,
   topLeitsatzEvidenceCopy,
   topLeitsatzLabel,
 } from './analytics-copy';
@@ -98,6 +107,9 @@ const _selectAllTime = () => {
     timeframe: ANALYTICS_TIMEFRAMES.ALL_TIME,
   });
 };
+const _restoreInsight = () => {
+  analyticsStore.trigger[ANALYTICS_EVENTS.INSIGHT_RESTORED]({});
+};
 const leitsatzEntering = FadeInDown
   .duration(MOTION_DURATION.ENTER)
   .reduceMotion(ReduceMotion.System)
@@ -105,6 +117,106 @@ const leitsatzEntering = FadeInDown
     opacity: 0,
     transform: [{ translateY: MOTION_OFFSET.STATE }],
   });
+
+type InsightEvidenceSelection = Readonly<{
+  ids: PrimaryAnalyticsInsight['supportingIds'];
+  timeframe: AnalyticsTimeframe;
+}>;
+
+function PrimaryInsightSection({
+  entries,
+  locale,
+  now,
+  onEvidencePress,
+  statements,
+  timeframe,
+}: {
+  entries: readonly CheckIn[];
+  locale: AppLocale;
+  now: Date;
+  onEvidencePress: ((selection: InsightEvidenceSelection) => void) | undefined;
+  statements: readonly BeliefStatement[];
+  timeframe: AnalyticsTimeframe;
+}) {
+  const analytics = useSelector(analyticsStore, _selectCalendar);
+  const insight = primaryAnalyticsInsight(entries);
+  const range = analyticsDateRange({ now, timeframe });
+  const rangeLabel = analyticsTimeframeRangeLabel({ locale, range, timeframe });
+  const insightKey = insight ? analyticsInsightKey(insight) : null;
+  const dismissed = insightKey !== null && analytics.dismissedInsightKey === insightKey;
+  const _dismiss = () => {
+    if (insightKey) {
+      analyticsStore.trigger[ANALYTICS_EVENTS.INSIGHT_DISMISSED]({ key: insightKey });
+    }
+  };
+  const _openEvidence = () => {
+    if (insight && onEvidencePress) onEvidencePress({ ids: insight.supportingIds, timeframe });
+  };
+
+  if (entries.length < 3) {
+    return (
+      <View style={styles.insightLearning} testID="analytics-insight-learning">
+        <Text style={styles.insightEyebrow}><fbt desc="Primary insight learning state label">STILL LEARNING</fbt></Text>
+        <Text style={styles.insightLearningText}>{insightLearningCopy(3 - entries.length)}</Text>
+      </View>
+    );
+  }
+  if (!insight) {
+    return (
+      <View style={styles.insightLearning} testID="analytics-insight-no-pattern">
+        <Text style={styles.insightEyebrow}><fbt desc="Primary insight no-pattern state label">WHAT STANDS OUT</fbt></Text>
+        <Text style={styles.insightLearningText}>
+          {insightNoPatternCopy({ momentCount: entries.length, rangeLabel })}
+        </Text>
+      </View>
+    );
+  }
+  if (dismissed) {
+    return (
+      <View style={styles.insightHidden} testID="analytics-insight-hidden">
+        <Text style={styles.insightHiddenText}>
+          <fbt desc="Confirmation that the current primary insight is hidden">This insight is hidden for now.</fbt>
+        </Text>
+        <Pressable accessibilityRole="button" onPress={_restoreInsight} testID="analytics-insight-restore">
+          <Text style={styles.insightRestoreText}><fbt desc="Button restoring a dismissed primary insight">Show insight</fbt></Text>
+        </Pressable>
+      </View>
+    );
+  }
+  return (
+    <View style={styles.insightCard} testID="analytics-primary-insight">
+      <Text style={styles.insightEyebrow}><fbt desc="Primary evidence-linked insight label">ONE PATTERN</fbt></Text>
+      <Text style={styles.insightText}>{observationCopy({ observation: insight, statements })}</Text>
+      <Text style={styles.insightEvidence}>
+        {insightEvidenceCopy({
+          momentCount: entries.length,
+          rangeLabel,
+          supportingCount: insight.supportingIds.length,
+        })}
+      </Text>
+      <View style={styles.insightActions}>
+        <Pressable
+          accessibilityRole="button"
+          onPress={_openEvidence}
+          style={styles.insightEvidenceButton}
+          testID="analytics-insight-evidence"
+        >
+          <Text style={styles.insightEvidenceButtonText}>
+            <fbt desc="Button opening the moments supporting an analytics insight">See supporting moments</fbt>
+          </Text>
+        </Pressable>
+        <Pressable
+          accessibilityRole="button"
+          onPress={_dismiss}
+          style={styles.insightDismissButton}
+          testID="analytics-insight-dismiss"
+        >
+          <Text style={styles.insightDismissText}><fbt desc="Button dismissing the current primary insight">Hide for now</fbt></Text>
+        </Pressable>
+      </View>
+    </View>
+  );
+}
 
 function TopLeitsatz({
   entries,
@@ -442,10 +554,11 @@ function CalendarSection({ entries, locale, now }: {
   );
 }
 
-export function AnalyticsContent({ entries, locale, now, statements }: {
+export function AnalyticsContent({ entries, locale, now, onEvidencePress, statements }: {
   entries: readonly CheckIn[];
   locale: AppLocale;
   now: Date;
+  onEvidencePress?: (selection: InsightEvidenceSelection) => void;
   statements: readonly BeliefStatement[];
 }) {
   const analytics = useSelector(analyticsStore, _selectCalendar);
@@ -479,6 +592,14 @@ export function AnalyticsContent({ entries, locale, now, statements }: {
             onAllTimePress={_selectAllTime}
             onFourWeeksPress={_selectLastFourWeeks}
             onLastWeekPress={_selectLastWeek}
+            timeframe={analytics.timeframe}
+          />
+          <PrimaryInsightSection
+            entries={scopedEntries}
+            locale={locale}
+            now={now}
+            onEvidencePress={onEvidencePress}
+            statements={statements}
             timeframe={analytics.timeframe}
           />
           <TopLeitsatz
@@ -533,11 +654,19 @@ export function AnalyticsScreen({ now }: { now?: Date }) {
   const history = useSelector(checkInHistoryStore, _selectHistory);
   const locale = useAppLocale();
   const currentDate = now ?? new Date();
+  const _openEvidence = (selection: InsightEvidenceSelection) => {
+    historyTimeframeStore.trigger[HISTORY_EVENTS.EVIDENCE_SELECTED]({
+      ids: selection.ids,
+      timeframe: selection.timeframe,
+    });
+    actor.send({ type: NAVIGATION_EVENTS.HISTORY_OPENED });
+  };
   return (
     <AnalyticsContent
       entries={history.entries}
       locale={locale}
       now={currentDate}
+      onEvidencePress={_openEvidence}
       statements={statements}
     />
   );
@@ -550,6 +679,49 @@ const styles = StyleSheet.create({
   eyebrow: tabScreenEyebrowStyle,
   title: tabScreenTitleStyle,
   intro: { fontFamily: type.regular, color: palette.inkMuted, fontSize: 14, lineHeight: 21, marginTop: 10 },
+  insightCard: {
+    marginTop: 24,
+    padding: 21,
+    borderRadius: 22,
+    borderWidth: 1,
+    borderColor: 'rgba(94, 111, 97, 0.32)',
+    backgroundColor: '#EDF0EB',
+  },
+  insightLearning: {
+    marginTop: 24,
+    padding: 19,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: palette.hairline,
+    backgroundColor: palette.paperRaised,
+  },
+  insightHidden: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: 12,
+    marginTop: 20,
+    paddingVertical: 12,
+  },
+  insightEyebrow: { fontFamily: type.semibold, color: palette.moss, fontSize: 10, letterSpacing: 1.05 },
+  insightText: { fontFamily: type.medium, color: palette.ink, fontSize: 21, lineHeight: 29, marginTop: 10 },
+  insightEvidence: { fontFamily: type.regular, color: palette.inkMuted, fontSize: 12, lineHeight: 18, marginTop: 11 },
+  insightLearningText: { fontFamily: type.medium, color: palette.ink, fontSize: 15, lineHeight: 22, marginTop: 7 },
+  insightHiddenText: { flex: 1, fontFamily: type.regular, color: palette.inkMuted, fontSize: 13 },
+  insightRestoreText: { fontFamily: type.semibold, color: palette.moss, fontSize: 12 },
+  insightActions: { flexDirection: 'row', alignItems: 'center', gap: 12, marginTop: 17 },
+  insightEvidenceButton: {
+    minHeight: 44,
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 14,
+    backgroundColor: palette.ink,
+    paddingHorizontal: 13,
+  },
+  insightEvidenceButtonText: { fontFamily: type.semibold, color: '#FFFFFF', fontSize: 13 },
+  insightDismissButton: { minHeight: 44, justifyContent: 'center', paddingHorizontal: 4 },
+  insightDismissText: { fontFamily: type.medium, color: palette.inkMuted, fontSize: 12 },
   leitsatzCard: {
     marginTop: 26,
     padding: 21,

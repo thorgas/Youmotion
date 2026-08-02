@@ -13,6 +13,7 @@ const AnalyticsTimeframeSchema = Schema.Literal(
 );
 
 const initialContext = {
+  dismissedInsightKey: null,
   monthOffset: 0,
   timeframe: ANALYTICS_TIMEFRAMES.LAST_WEEK,
 };
@@ -20,6 +21,7 @@ const initialContext = {
 export const analyticsStore = createStore({
   schemas: {
     context: Schema.standardSchemaV1(Schema.Struct({
+      dismissedInsightKey: Schema.NullOr(Schema.String),
       monthOffset: Schema.Int,
       timeframe: AnalyticsTimeframeSchema,
     })),
@@ -30,6 +32,10 @@ export const analyticsStore = createStore({
       [ANALYTICS_EVENTS.TIMEFRAME_SELECTED]: Schema.standardSchemaV1(Schema.Struct({
         timeframe: AnalyticsTimeframeSchema,
       })),
+      [ANALYTICS_EVENTS.INSIGHT_DISMISSED]: Schema.standardSchemaV1(Schema.Struct({
+        key: Schema.String,
+      })),
+      [ANALYTICS_EVENTS.INSIGHT_RESTORED]: Schema.standardSchemaV1(Schema.Struct({})),
     },
   },
   context: initialContext,
@@ -50,6 +56,14 @@ export const analyticsStore = createStore({
       ...context,
       monthOffset: 0,
       timeframe: event.timeframe,
+    }),
+    [ANALYTICS_EVENTS.INSIGHT_DISMISSED]: (context, event) => ({
+      ...context,
+      dismissedInsightKey: event.key,
+    }),
+    [ANALYTICS_EVENTS.INSIGHT_RESTORED]: (context) => ({
+      ...context,
+      dismissedInsightKey: null,
     }),
   },
 });

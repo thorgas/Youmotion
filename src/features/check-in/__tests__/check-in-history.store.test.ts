@@ -51,4 +51,20 @@ describe('check-in history store', () => {
       ANALYTICS_TIMEFRAMES.LAST_WEEK,
     );
   });
+
+  it('keeps an explicit evidence filter until the user clears or changes timeframe', () => {
+    const first = entry(1);
+    const second = entry(2);
+    historyTimeframeStore.trigger[HISTORY_EVENTS.EVIDENCE_SELECTED]({
+      ids: [first.id, second.id],
+      timeframe: ANALYTICS_TIMEFRAMES.LAST_WEEK,
+    });
+
+    expect(historyTimeframeStore.getSnapshot().context).toEqual({
+      evidenceIds: [first.id, second.id],
+      timeframe: ANALYTICS_TIMEFRAMES.LAST_WEEK,
+    });
+    historyTimeframeStore.trigger[HISTORY_EVENTS.EVIDENCE_CLEARED]({});
+    expect(historyTimeframeStore.getSnapshot().context.evidenceIds).toEqual([]);
+  });
 });

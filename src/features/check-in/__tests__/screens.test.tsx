@@ -8,6 +8,7 @@ import { NONE } from 'react-native-surrealdb';
 
 import {
   APP_LOCALES,
+  ANALYTICS_EVENTS,
   ANALYTICS_TIMEFRAMES,
   BELIEF_LIBRARY_EVENTS,
   BELIEF_LIBRARY_STATES,
@@ -51,6 +52,8 @@ import { reflectionResponsiveLayout } from '../ui/reflection-responsive-layout';
 import { GuidingBeliefScreen } from '../ui/guiding-belief-screen';
 import { SuccessScreen } from '../ui/success-screen';
 import { SettingsScreen } from '@/features/settings/ui/settings-screen';
+import { analyticsStore } from '@/features/analytics/application/analytics.store';
+import { AnalyticsScreen } from '@/features/analytics/ui/analytics-screen';
 import { BeliefLibraryScreen } from '@/features/settings/ui/belief-library-screen';
 import { appSettingsStore } from '@/features/settings/application/app-settings.store';
 import {
@@ -63,6 +66,10 @@ let mockActor: Actor<typeof appNavigationMachine>;
 
 jest.mock('@/navigation/app-navigation.provider', () => ({
   useAppNavigationActor: () => mockActor,
+}));
+
+jest.mock('@/features/analytics/ui/emotion-radar-chart', () => ({
+  EmotionRadarChart: () => null,
 }));
 
 jest.mock('expo-router', () => ({
@@ -197,6 +204,10 @@ describe('check-in screens', () => {
     historyTimeframeStore.trigger[HISTORY_EVENTS.TIMEFRAME_SELECTED]({
       timeframe: ANALYTICS_TIMEFRAMES.ALL_TIME,
     });
+    analyticsStore.trigger[ANALYTICS_EVENTS.TIMEFRAME_SELECTED]({
+      timeframe: ANALYTICS_TIMEFRAMES.LAST_WEEK,
+    });
+    analyticsStore.trigger[ANALYTICS_EVENTS.INSIGHT_RESTORED]({});
     appSettingsStore.trigger.hydrated({
       settings: {
         locale: APP_LOCALES.ENGLISH,
@@ -1028,6 +1039,80 @@ describe('check-in screens', () => {
       history.queryByTestId('history-moment-history-current-week'),
     ).toBeNull());
     expect(history.getByTestId('history-moment-history-previous-week')).toBeTruthy();
+  });
+
+  it('shows only insight evidence and lets the user return to the full history', async () => {
+    const evidenceMatchId = CheckInId.make('evidence-match');
+    const moments = [{
+      id: evidenceMatchId,
+      createdAt: CheckInTimestamp.make(new Date(2026, 6, 19, 12).toISOString()),
+      emotionId: EMOTION_IDS.FEAR,
+      intensity: 0.5,
+      note: 'Supporting moment',
+    }, {
+      id: CheckInId.make('evidence-other'),
+      createdAt: CheckInTimestamp.make(new Date(2026, 6, 18, 12).toISOString()),
+      emotionId: EMOTION_IDS.JOY,
+      intensity: 0.5,
+      note: 'Another moment',
+    }] satisfies readonly CheckIn[];
+    checkInHistoryStore.trigger.hydrated({ entries: moments });
+    historyTimeframeStore.trigger[HISTORY_EVENTS.EVIDENCE_SELECTED]({
+      ids: [evidenceMatchId],
+      timeframe: ANALYTICS_TIMEFRAMES.LAST_WEEK,
+    });
+
+    const history = await _renderLocalized(
+      <HistoryScreen now={new Date(2026, 6, 21, 12)} />,
+    );
+    expect(history.getByText('Showing 1 moment supporting this insight.')).toBeTruthy();
+    expect(history.getByTestId('history-moment-evidence-match')).toBeTruthy();
+    expect(history.queryByTestId('history-moment-evidence-other')).toBeNull();
+
+    await fireEvent.press(history.getByTestId('history-evidence-clear'));
+    expect(history.queryByTestId('history-evidence-filter')).toBeNull();
+    expect(history.getByTestId('history-moment-evidence-other')).toBeTruthy();
+  });
+
+  it('opens exact supporting History moments from the primary insight', async () => {
+    const firstFearId = CheckInId.make('insight-fear-1');
+    const secondFearId = CheckInId.make('insight-fear-2');
+    const moments = [{
+      id: firstFearId,
+      createdAt: CheckInTimestamp.make(new Date(2026, 6, 18, 12).toISOString()),
+      emotionId: EMOTION_IDS.FEAR,
+      intensity: 0.5,
+      note: '',
+      beliefSystemId: BELIEF_SYSTEM_IDS.ALWAYS_FUNCTIONING,
+    }, {
+      id: secondFearId,
+      createdAt: CheckInTimestamp.make(new Date(2026, 6, 19, 12).toISOString()),
+      emotionId: EMOTION_IDS.FEAR,
+      intensity: 0.5,
+      note: '',
+      beliefSystemId: BELIEF_SYSTEM_IDS.ALWAYS_FUNCTIONING,
+    }, {
+      id: CheckInId.make('insight-joy'),
+      createdAt: CheckInTimestamp.make(new Date(2026, 6, 17, 12).toISOString()),
+      emotionId: EMOTION_IDS.JOY,
+      intensity: 0.5,
+      note: '',
+    }] satisfies readonly CheckIn[];
+    checkInHistoryStore.trigger.hydrated({ entries: moments });
+    await act(() => mockActor.send({ type: NAVIGATION_EVENTS.ANALYTICS_OPENED }));
+    const analytics = await _renderLocalized(
+      <AnalyticsScreen now={new Date(2026, 6, 21, 12)} />,
+    );
+
+    await fireEvent.press(analytics.getByTestId('analytics-insight-evidence'));
+
+    expect(mockActor.getSnapshot().matches({
+      [NAVIGATION_STATES.TABS]: NAVIGATION_STATES.HISTORY,
+    })).toBe(true);
+    expect(historyTimeframeStore.getSnapshot().context).toEqual({
+      evidenceIds: [firstFearId, secondFearId],
+      timeframe: ANALYTICS_TIMEFRAMES.LAST_WEEK,
+    });
   });
 
   it('labels an unreframed harmful belief and renders it as muted text', async () => {

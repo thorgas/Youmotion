@@ -1,5 +1,6 @@
 import { useSelector as useActorSelector } from '@xstate/react';
 import { useSelector } from '@xstate/store-react';
+import { fbs } from 'fbtee';
 import { PressableScale } from 'pressto';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -57,6 +58,24 @@ const _selectAllTime = () => {
     timeframe: ANALYTICS_TIMEFRAMES.ALL_TIME,
   });
 };
+const _clearEvidence = () => {
+  historyTimeframeStore.trigger[HISTORY_EVENTS.EVIDENCE_CLEARED]({});
+};
+
+function evidenceFilterCopy(count: number) {
+  if (count === 1) {
+    return String(fbs(
+      'Showing 1 moment supporting this insight.',
+      'History banner explaining that one evidence moment for a selected insight is visible',
+    ));
+  }
+  return String(fbs(
+    'Showing '
+      + fbs.param('count', String(count))
+      + ' moments supporting this insight.',
+    'History banner explaining that only evidence for a selected insight is visible',
+  ));
+}
 
 function HistoryBelief({
   entry,
@@ -175,6 +194,10 @@ export function HistoryScreen({ now }: { now?: Date }) {
     now: currentDate,
     timeframe: selection.timeframe,
   });
+  const evidenceIds = new Set(selection.evidenceIds);
+  const displayedEntries = evidenceIds.size === 0
+    ? scopedEntries
+    : scopedEntries.filter((entry) => evidenceIds.has(entry.id));
 
   return (
     <View style={styles.page} testID="history-screen">
@@ -191,6 +214,23 @@ export function HistoryScreen({ now }: { now?: Date }) {
             onLastWeekPress={_selectLastWeek}
             timeframe={selection.timeframe}
           />
+          {evidenceIds.size > 0 ? (
+            <View style={styles.evidenceFilter} testID="history-evidence-filter">
+              <Text style={styles.evidenceFilterText}>
+                {evidenceFilterCopy(displayedEntries.length)}
+              </Text>
+              <PressableScale
+                accessibilityRole="button"
+                onPress={_clearEvidence}
+                style={styles.evidenceClear}
+                testID="history-evidence-clear"
+              >
+                <Text style={styles.evidenceClearText}>
+                  <fbt desc="Button clearing an insight evidence filter in History">Show all moments</fbt>
+                </Text>
+              </PressableScale>
+            </View>
+          ) : null}
           <View style={styles.results}>
             {history.error ? (
               <Text style={styles.error}>
@@ -202,7 +242,7 @@ export function HistoryScreen({ now }: { now?: Date }) {
                 <Text style={styles.emptyTitle}><fbt desc="Empty check-in history title">Still quiet here.</fbt></Text>
                 <Text style={styles.emptyCopy}><fbt desc="Empty check-in history explanation">After your first check-in, a gentle history will appear here.</fbt></Text>
               </View>
-            ) : scopedEntries.length === 0 ? (
+            ) : displayedEntries.length === 0 ? (
               <View style={styles.empty}>
                 <Text style={styles.emptyTitle}>
                   <fbt desc="Empty filtered check-in history title">No moments in this period.</fbt>
@@ -213,7 +253,7 @@ export function HistoryScreen({ now }: { now?: Date }) {
                   </fbt>
                 </Text>
               </View>
-            ) : scopedEntries.map((entry) => (
+            ) : displayedEntries.map((entry) => (
               <MomentRow key={entry.id} entry={entry} locale={locale} />
             ))}
           </View>
@@ -230,6 +270,23 @@ const styles = StyleSheet.create({
   eyebrow: tabScreenEyebrowStyle,
   title: tabScreenTitleStyle,
   intro: { fontFamily: type.regular, color: palette.inkMuted, fontSize: 14, lineHeight: 21, marginTop: 10 },
+  evidenceFilter: {
+    gap: 10,
+    marginTop: 18,
+    padding: 15,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: 'rgba(94, 111, 97, 0.32)',
+    backgroundColor: '#EDF0EB',
+  },
+  evidenceFilterText: {
+    fontFamily: type.medium,
+    color: palette.ink,
+    fontSize: 13,
+    lineHeight: 19,
+  },
+  evidenceClear: { alignSelf: 'flex-start', minHeight: 32, justifyContent: 'center' },
+  evidenceClearText: { fontFamily: type.semibold, color: palette.moss, fontSize: 12 },
   results: { marginTop: 28 },
   empty: { borderRadius: 26, backgroundColor: palette.paperRaised, borderWidth: 1, borderColor: palette.hairline, padding: 26 },
   emptyTitle: { fontFamily: type.medium, color: palette.ink, fontSize: 22 },

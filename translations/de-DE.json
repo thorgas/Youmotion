@@ -3907,6 +3907,162 @@
         }
       ],
       "types": []
+    },
+    "ugAFdVoT9cLgDi2S7FCkkA==": {
+      "description": "History banner explaining that one evidence moment for a selected insight is visible",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "1 Moment unterstützt diese Erkenntnis.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "eVi00zTgsAfoilJHVb77jw==": {
+      "description": "History banner explaining that only evidence for a selected insight is visible",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "{count} Momente unterstützen diese Erkenntnis.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "fOsWsa4exxWfBb/M6RhYww==": {
+      "description": "Button clearing an insight evidence filter in History",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Alle Momente anzeigen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "sj1bMWp7YtE6tveL2N7u5Q==": {
+      "description": "Evidence count and comparison period below the primary analytics insight",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Basierend auf {supportingCount} von {momentCount} Momenten · {range}",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "Ff44c4OFAdxm5IWII/GSmQ==": {
+      "description": "Analytics learning state before enough moments exist for an insight",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Erfasse in diesem Zeitraum noch {remainingCount} Momente, um ein Muster mit sichtbaren Belegen zu erkennen.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "1VocIAEdZaNFeK0KiXjnvw==": {
+      "description": "Honest analytics state when enough data exists but no unique pattern stands out",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Unter {momentCount} Momenten sticht kein einzelnes wiederkehrendes Muster hervor · {range}. Auch das ist eine hilfreiche Erkenntnis.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "Lfz5rmhbLf5405o7uawa1Q==": {
+      "description": "Primary insight learning state label",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "LERNPHASE",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "hTqkH3GaDH6P6bW9UcIT9w==": {
+      "description": "Primary insight no-pattern state label",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "WAS AUFFÄLLT",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "rjGFVS6W4cdhan93FLYxYA==": {
+      "description": "Confirmation that the current primary insight is hidden",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Diese Erkenntnis ist vorerst ausgeblendet.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "ZUPBjcl2I+r1tgIcfw2HMQ==": {
+      "description": "Button restoring a dismissed primary insight",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Erkenntnis anzeigen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "f8p8koRibhpauWtTJ9vnHg==": {
+      "description": "Primary evidence-linked insight label",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "EIN MUSTER",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "e34DClwZwMxU9gVFqSq0uQ==": {
+      "description": "Button opening the moments supporting an analytics insight",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Unterstützende Momente ansehen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "Hs//3szfDSk0zA7JrlwkiQ==": {
+      "description": "Button dismissing the current primary insight",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Vorerst ausblenden",
+          "variations": {}
+        }
+      ],
+      "types": []
     }
   }
 }

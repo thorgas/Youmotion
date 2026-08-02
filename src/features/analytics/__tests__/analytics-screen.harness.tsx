@@ -1,14 +1,19 @@
 import { screen, userEvent } from '@react-native-harness/ui';
 import {
   afterEach,
+  beforeEach,
   describe,
   expect,
+  mock,
   render,
+  resetModules,
   test,
   waitUntil,
 } from 'react-native-harness';
+import * as Effect from 'effect/Effect';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { StyleSheet } from 'react-native';
+import type { ComponentProps } from 'react';
 
 import {
   ANALYTICS_EVENTS,
@@ -24,9 +29,17 @@ import {
 } from '@/features/check-in/domain/check-in';
 import { analyticsStore } from '../application/analytics.store';
 import { analyticsObservations } from '../domain/check-in-analytics';
-import { AnalyticsContent } from '../ui/analytics-screen';
+
+type AnalyticsContentComponent = typeof import('../ui/analytics-screen')['AnalyticsContent'];
+let AnalyticsContent: AnalyticsContentComponent;
 
 const FIXED_NOW = new Date(2026, 6, 21, 12);
+let capturedEvidenceCount = 0;
+const _captureEvidence: NonNullable<
+  ComponentProps<AnalyticsContentComponent>['onEvidencePress']
+> = (selection) => {
+  capturedEvidenceCount = selection.ids.length;
+};
 function checkIn({ day, emotionId, id, note = '' }: {
   day: number;
   emotionId: CheckIn['emotionId'];
@@ -168,10 +181,26 @@ const timeframeLeitsatzEntries = [
   }),
 ] satisfies readonly CheckIn[];
 
+beforeEach(() => {
+  mock('@/features/data-safety/infrastructure/data-archive.repository', () => ({
+    deleteAllJournalData: () => Effect.succeed(undefined),
+    exportDataArchive: () => Effect.succeed(undefined),
+    pickDataArchive: () => Effect.succeed(null),
+    restoreDataArchive: () => Effect.succeed(undefined),
+  }));
+  const analyticsModule: typeof import('../ui/analytics-screen') = require(
+    '../ui/analytics-screen',
+  );
+  AnalyticsContent = analyticsModule.AnalyticsContent;
+});
+
 afterEach(() => {
+  capturedEvidenceCount = 0;
+  analyticsStore.trigger[ANALYTICS_EVENTS.INSIGHT_RESTORED]({});
   analyticsStore.trigger[ANALYTICS_EVENTS.TIMEFRAME_SELECTED]({
     timeframe: ANALYTICS_TIMEFRAMES.LAST_WEEK,
   });
+  resetModules();
 });
 
 describe('analytics on the device runtime', () => {
@@ -197,6 +226,27 @@ describe('analytics on the device runtime', () => {
         'July 15, 2026. 2 recorded moments: Joy 1, Fear 1.',
       ),
     ).not.toBeNull();
+  });
+
+  test('opens exact evidence and can dismiss and restore the primary insight', async () => {
+    await render(
+      <GestureHandlerRootView style={styles.root}>
+        <AnalyticsContent
+          entries={entries}
+          locale={APP_LOCALES.ENGLISH}
+          now={FIXED_NOW}
+          onEvidencePress={_captureEvidence}
+          statements={[]}
+        />
+      </GestureHandlerRootView>,
+    );
+
+    await userEvent.press(await screen.findByTestId('analytics-insight-evidence'));
+    expect(capturedEvidenceCount).toBe(2);
+    await userEvent.press(await screen.findByTestId('analytics-insight-dismiss'));
+    expect(await screen.findByTestId('analytics-insight-hidden')).not.toBeNull();
+    await userEvent.press(await screen.findByTestId('analytics-insight-restore'));
+    expect(await screen.findByTestId('analytics-primary-insight')).not.toBeNull();
   });
 
   test('renders every tied top Leitsatz instead of hiding the card', async () => {
