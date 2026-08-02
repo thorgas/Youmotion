@@ -1,5 +1,6 @@
 import { fbs } from 'fbtee';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { PressableScale } from 'pressto';
+import { StyleSheet, Text, View } from 'react-native';
 
 import {
   ANALYTICS_TIMEFRAMES,
@@ -24,7 +25,7 @@ function TimeframeOption({
   testID: string;
 }) {
   return (
-    <Pressable
+    <PressableScale
       accessibilityRole="button"
       accessibilityState={{ selected }}
       onPress={onPress}
@@ -34,7 +35,7 @@ function TimeframeOption({
       <Text style={[styles.optionText, selected ? styles.optionTextSelected : null]}>
         {label}
       </Text>
-    </Pressable>
+    </PressableScale>
   );
 }
 
@@ -87,7 +88,7 @@ export function AnalyticsTimeframeSelector({
 }
 
 const styles = StyleSheet.create({
-  section: { marginTop: 24 },
+  section: { marginTop: 22 },
   label: {
     fontFamily: type.semibold,
     color: palette.inkMuted,
@@ -100,7 +101,7 @@ const styles = StyleSheet.create({
     marginTop: 9,
     padding: 4,
     borderRadius: 16,
-    backgroundColor: 'rgba(42, 39, 34, 0.055)',
+    backgroundColor: 'rgba(42, 39, 34, 0.06)',
   },
   option: {
     flex: 1,
@@ -114,6 +115,10 @@ const styles = StyleSheet.create({
     backgroundColor: palette.paperRaised,
     borderWidth: 1,
     borderColor: palette.hairline,
+    shadowColor: palette.ink,
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 2,
   },
   optionText: {
     fontFamily: type.medium,

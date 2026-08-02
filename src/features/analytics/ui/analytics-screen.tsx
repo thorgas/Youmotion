@@ -1,6 +1,7 @@
 import { useSelector as useActorSelector } from '@xstate/react';
 import { useSelector } from '@xstate/store-react';
 import { fbs } from 'fbtee';
+import { PressableScale } from 'pressto';
 import {
   Pressable,
   ScrollView,
@@ -9,18 +10,12 @@ import {
   useWindowDimensions,
   View,
 } from 'react-native';
-import Animated, {
-  FadeInDown,
-  ReduceMotion,
-} from 'react-native-reanimated';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import {
   ANALYTICS_EVENTS,
   ANALYTICS_TIMEFRAMES,
   HISTORY_EVENTS,
-  MOTION_DURATION,
-  MOTION_OFFSET,
   NAVIGATION_EVENTS,
 } from '@/constants';
 import {
@@ -110,14 +105,6 @@ const _selectAllTime = () => {
 const _restoreInsight = () => {
   analyticsStore.trigger[ANALYTICS_EVENTS.INSIGHT_RESTORED]({});
 };
-const leitsatzEntering = FadeInDown
-  .duration(MOTION_DURATION.ENTER)
-  .reduceMotion(ReduceMotion.System)
-  .withInitialValues({
-    opacity: 0,
-    transform: [{ translateY: MOTION_OFFSET.STATE }],
-  });
-
 type InsightEvidenceSelection = Readonly<{
   ids: PrimaryAnalyticsInsight['supportingIds'];
   timeframe: AnalyticsTimeframe;
@@ -177,25 +164,30 @@ function PrimaryInsightSection({
         <Text style={styles.insightHiddenText}>
           <fbt desc="Confirmation that the current primary insight is hidden">This insight is hidden for now.</fbt>
         </Text>
-        <Pressable accessibilityRole="button" onPress={_restoreInsight} testID="analytics-insight-restore">
+        <PressableScale accessibilityRole="button" onPress={_restoreInsight} testID="analytics-insight-restore">
           <Text style={styles.insightRestoreText}><fbt desc="Button restoring a dismissed primary insight">Show insight</fbt></Text>
-        </Pressable>
+        </PressableScale>
       </View>
     );
   }
   return (
     <View style={styles.insightCard} testID="analytics-primary-insight">
-      <Text style={styles.insightEyebrow}><fbt desc="Primary evidence-linked insight label">ONE PATTERN</fbt></Text>
+      <View style={styles.insightHeading}>
+        <View style={styles.insightMarker} />
+        <Text style={styles.insightEyebrow}><fbt desc="Primary evidence-linked insight label">ONE PATTERN</fbt></Text>
+      </View>
       <Text style={styles.insightText}>{observationCopy({ observation: insight, statements })}</Text>
-      <Text style={styles.insightEvidence}>
-        {insightEvidenceCopy({
-          momentCount: entries.length,
-          rangeLabel,
-          supportingCount: insight.supportingIds.length,
-        })}
-      </Text>
+      <View style={styles.insightEvidenceSummary}>
+        <Text style={styles.insightEvidence}>
+          {insightEvidenceCopy({
+            momentCount: entries.length,
+            rangeLabel,
+            supportingCount: insight.supportingIds.length,
+          })}
+        </Text>
+      </View>
       <View style={styles.insightActions}>
-        <Pressable
+        <PressableScale
           accessibilityRole="button"
           onPress={_openEvidence}
           style={styles.insightEvidenceButton}
@@ -204,15 +196,16 @@ function PrimaryInsightSection({
           <Text style={styles.insightEvidenceButtonText}>
             <fbt desc="Button opening the moments supporting an analytics insight">See supporting moments</fbt>
           </Text>
-        </Pressable>
-        <Pressable
+          <Text accessibilityElementsHidden style={styles.insightDisclosure}>›</Text>
+        </PressableScale>
+        <PressableScale
           accessibilityRole="button"
           onPress={_dismiss}
           style={styles.insightDismissButton}
           testID="analytics-insight-dismiss"
         >
           <Text style={styles.insightDismissText}><fbt desc="Button dismissing the current primary insight">Hide for now</fbt></Text>
-        </Pressable>
+        </PressableScale>
       </View>
     </View>
   );
@@ -236,11 +229,7 @@ function TopLeitsatz({
   const multiple = group.leitsaetze.length > 1 || group.additionalCount > 0;
   const label = topLeitsatzLabel({ multiple, timeframe: group.timeframe });
   return (
-    <Animated.View
-      entering={leitsatzEntering}
-      style={styles.leitsatzCard}
-      testID="analytics-top-leitsatz"
-    >
+    <View style={styles.leitsatzCard} testID="analytics-top-leitsatz">
       <Text
         accessibilityLabel={label}
         style={styles.leitsatzLabel}
@@ -277,7 +266,7 @@ function TopLeitsatz({
           {additionalTopLeitsaetzeCopy(group.additionalCount)}
         </Text>
       ) : null}
-    </Animated.View>
+    </View>
   );
 }
 
@@ -677,15 +666,21 @@ const styles = StyleSheet.create({
   safeArea: { flex: 1 },
   content: tabScreenContentStyle,
   eyebrow: tabScreenEyebrowStyle,
-  title: tabScreenTitleStyle,
+  title: {
+    ...tabScreenTitleStyle,
+    fontSize: 27,
+    lineHeight: 33,
+    marginTop: 6,
+  },
   intro: { fontFamily: type.regular, color: palette.inkMuted, fontSize: 14, lineHeight: 21, marginTop: 10 },
   insightCard: {
     marginTop: 24,
-    padding: 21,
-    borderRadius: 22,
+    padding: 22,
+    borderRadius: 24,
+    borderCurve: 'continuous',
     borderWidth: 1,
-    borderColor: 'rgba(94, 111, 97, 0.32)',
-    backgroundColor: '#EDF0EB',
+    borderColor: 'rgba(94, 111, 97, 0.24)',
+    backgroundColor: '#F0F2ED',
   },
   insightLearning: {
     marginTop: 24,
@@ -703,24 +698,35 @@ const styles = StyleSheet.create({
     marginTop: 20,
     paddingVertical: 12,
   },
+  insightHeading: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  insightMarker: { width: 7, height: 7, borderRadius: 4, backgroundColor: palette.moss },
   insightEyebrow: { fontFamily: type.semibold, color: palette.moss, fontSize: 10, letterSpacing: 1.05 },
-  insightText: { fontFamily: type.medium, color: palette.ink, fontSize: 21, lineHeight: 29, marginTop: 10 },
-  insightEvidence: { fontFamily: type.regular, color: palette.inkMuted, fontSize: 12, lineHeight: 18, marginTop: 11 },
+  insightText: { fontFamily: type.medium, color: palette.ink, fontSize: 20, lineHeight: 28, marginTop: 13 },
+  insightEvidenceSummary: {
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(94, 111, 97, 0.18)',
+    marginTop: 18,
+    paddingTop: 14,
+  },
+  insightEvidence: { fontFamily: type.regular, color: palette.inkMuted, fontSize: 12, lineHeight: 18 },
   insightLearningText: { fontFamily: type.medium, color: palette.ink, fontSize: 15, lineHeight: 22, marginTop: 7 },
   insightHiddenText: { flex: 1, fontFamily: type.regular, color: palette.inkMuted, fontSize: 13 },
   insightRestoreText: { fontFamily: type.semibold, color: palette.moss, fontSize: 12 },
-  insightActions: { flexDirection: 'row', alignItems: 'center', gap: 12, marginTop: 17 },
+  insightActions: { gap: 6, marginTop: 16 },
   insightEvidenceButton: {
     minHeight: 44,
-    flex: 1,
+    flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: 14,
-    backgroundColor: palette.ink,
-    paddingHorizontal: 13,
+    justifyContent: 'space-between',
+    borderRadius: 15,
+    backgroundColor: palette.paperRaised,
+    borderWidth: 1,
+    borderColor: 'rgba(94, 111, 97, 0.18)',
+    paddingHorizontal: 15,
   },
-  insightEvidenceButtonText: { fontFamily: type.semibold, color: '#FFFFFF', fontSize: 13 },
-  insightDismissButton: { minHeight: 44, justifyContent: 'center', paddingHorizontal: 4 },
+  insightEvidenceButtonText: { flex: 1, fontFamily: type.semibold, color: palette.ink, fontSize: 13 },
+  insightDisclosure: { fontFamily: type.regular, color: palette.inkMuted, fontSize: 22, lineHeight: 22 },
+  insightDismissButton: { minHeight: 38, alignSelf: 'center', justifyContent: 'center', paddingHorizontal: 12 },
   insightDismissText: { fontFamily: type.medium, color: palette.inkMuted, fontSize: 12 },
   leitsatzCard: {
     marginTop: 26,

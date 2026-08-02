@@ -4062,6 +4062,18 @@
         }
       ],
       "types": []
+    },
+    "IDoJEksiE6KKY0Ot8c4cJg==": {
+      "description": "Label for moments supporting a selected analytics insight",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "BELEGE FÜR DIESEN EINBLICK",
+          "variations": {}
+        }
+      ],
+      "types": []
     }
   }
 }

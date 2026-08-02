@@ -205,7 +205,10 @@ export function HistoryScreen({ now }: { now?: Date }) {
         <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
           <Text style={styles.eyebrow} testID="history-eyebrow"><fbt desc="Check-in history eyebrow heading">YOUR HISTORY</fbt></Text>
           <Text style={styles.title}><fbt desc="Check-in history title">Moments you noticed.</fbt></Text>
-          <Text style={styles.intro}><fbt desc="Privacy note above check-in history">Your check-ins stay locally on this device.</fbt></Text>
+          <View style={styles.localStatus}>
+            <View style={styles.localStatusDot} />
+            <Text style={styles.intro}><fbt desc="Privacy note above check-in history">Your check-ins stay locally on this device.</fbt></Text>
+          </View>
           <AnalyticsTimeframeSelector
             locale={locale}
             now={currentDate}
@@ -216,6 +219,9 @@ export function HistoryScreen({ now }: { now?: Date }) {
           />
           {evidenceIds.size > 0 ? (
             <View style={styles.evidenceFilter} testID="history-evidence-filter">
+              <Text style={styles.evidenceFilterLabel}>
+                <fbt desc="Label for moments supporting a selected analytics insight">SUPPORTING EVIDENCE</fbt>
+              </Text>
               <Text style={styles.evidenceFilterText}>
                 {evidenceFilterCopy(displayedEntries.length)}
               </Text>
@@ -268,16 +274,30 @@ const styles = StyleSheet.create({
   safeArea: { flex: 1 },
   content: tabScreenContentStyle,
   eyebrow: tabScreenEyebrowStyle,
-  title: tabScreenTitleStyle,
-  intro: { fontFamily: type.regular, color: palette.inkMuted, fontSize: 14, lineHeight: 21, marginTop: 10 },
+  title: {
+    ...tabScreenTitleStyle,
+    fontSize: 27,
+    lineHeight: 33,
+    marginTop: 6,
+  },
+  localStatus: { flexDirection: 'row', alignItems: 'center', gap: 7, marginTop: 11 },
+  localStatusDot: { width: 6, height: 6, borderRadius: 3, backgroundColor: palette.moss },
+  intro: { fontFamily: type.regular, color: palette.inkMuted, fontSize: 13, lineHeight: 19 },
   evidenceFilter: {
-    gap: 10,
-    marginTop: 18,
-    padding: 15,
-    borderRadius: 16,
+    gap: 7,
+    marginTop: 20,
+    padding: 17,
+    borderRadius: 18,
+    borderCurve: 'continuous',
     borderWidth: 1,
-    borderColor: 'rgba(94, 111, 97, 0.32)',
-    backgroundColor: '#EDF0EB',
+    borderColor: 'rgba(94, 111, 97, 0.24)',
+    backgroundColor: '#F0F2ED',
+  },
+  evidenceFilterLabel: {
+    fontFamily: type.semibold,
+    color: palette.moss,
+    fontSize: 9,
+    letterSpacing: 1.1,
   },
   evidenceFilterText: {
     fontFamily: type.medium,
@@ -285,15 +305,29 @@ const styles = StyleSheet.create({
     fontSize: 13,
     lineHeight: 19,
   },
-  evidenceClear: { alignSelf: 'flex-start', minHeight: 32, justifyContent: 'center' },
+  evidenceClear: { alignSelf: 'flex-start', minHeight: 34, justifyContent: 'center' },
   evidenceClearText: { fontFamily: type.semibold, color: palette.moss, fontSize: 12 },
-  results: { marginTop: 28 },
+  results: {
+    backgroundColor: palette.paperRaised,
+    borderColor: palette.hairline,
+    borderRadius: 22,
+    borderCurve: 'continuous',
+    borderWidth: 1,
+    marginTop: 24,
+    overflow: 'hidden',
+  },
   empty: { borderRadius: 26, backgroundColor: palette.paperRaised, borderWidth: 1, borderColor: palette.hairline, padding: 26 },
   emptyTitle: { fontFamily: type.medium, color: palette.ink, fontSize: 22 },
   emptyCopy: { fontFamily: type.regular, color: palette.inkMuted, fontSize: 14, lineHeight: 21, marginTop: 8 },
   error: { fontFamily: type.medium, color: palette.danger, fontSize: 12, lineHeight: 18, paddingBottom: 12 },
-  row: { flexDirection: 'row', alignItems: 'center', borderTopWidth: 1, borderColor: palette.hairline },
-  rowMain: { flex: 1, flexDirection: 'row', alignItems: 'flex-start', paddingVertical: 17, paddingRight: 10 },
+  row: { flexDirection: 'row', alignItems: 'center', borderBottomWidth: 1, borderColor: palette.hairline },
+  rowMain: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    paddingHorizontal: 17,
+    paddingVertical: 17,
+  },
   dot: { width: 10, height: 10, borderRadius: 5, marginTop: 5, marginRight: 12 },
   rowCopy: { flex: 1 },
   disclosure: { fontFamily: type.regular, color: palette.inkMuted, fontSize: 24, lineHeight: 24 },
