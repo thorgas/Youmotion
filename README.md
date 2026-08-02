@@ -2,7 +2,7 @@
 
 Build, internal distribution, TestFlight, Google Play, and App Store release instructions are in [BUILD.md](./BUILD.md). Database setup, persisted schema, migration behavior, and native SurrealDB packaging are documented in [DB.md](./DB.md).
 
-Youmotion is a private, local-first Expo app for noticing and recording emotions with a seven-direction German `Gefühlsstern`. Dragging from the center chooses an emotion; distance chooses nuance and intensity. Releasing opens a short reflection that is saved before a separate, optional Leidsatz step. Individual history entries can be edited or permanently deleted after confirmation from the edit screen, the visible History action, or a long press on the History row.
+Youmotion is a private, local-first Expo app for noticing and recording emotions with a seven-direction feeling pulse. Dragging from the center chooses an emotion; distance chooses nuance and intensity. Releasing opens a short reflection that is saved before a separate, optional Leidsatz step. Individual history entries can be edited or permanently deleted after confirmation from the edit screen, the visible History action, or a long press on the History row.
 
 This is a self-reflection tool, not a substitute for psychotherapy, medical advice, diagnosis, or emergency support.
 
@@ -33,7 +33,7 @@ src/
     domain/                  Effect Schemas and pure emotion geometry
     application/             XState Store
     infrastructure/          Effect-based local repository
-    ui/                      self-contained screens and Gefühlsstern
+    ui/                      self-contained screens and feeling pulse
   features/settings/ui/
   constants.ts               shared configuration and domain vocabulary
 oxlint-rules/                tested local architecture plugin
@@ -187,7 +187,7 @@ Persisted check-ins store stable emotion IDs, intensity, nuance levels, and an o
 
 The repository includes Callstack's project-local React Native, navigation, upgrade, GitHub, and GitHub Actions agent skills. The tooling dependencies are pinned in the pnpm lockfile rather than installed globally.
 
-Pressto provides consistent press feedback for the app's tap controls. A shared configuration uses subtle scale compression, a near-critically damped spring, and the system reduced-motion preference; direct-manipulation gestures such as the emotion star keep their gesture-specific feedback.
+Pressto provides consistent press feedback for the app's tap controls. A shared configuration uses subtle scale compression, a near-critically damped spring, and the system reduced-motion preference; direct-manipulation gestures such as the feeling pulse keep their gesture-specific feedback.
 
 Use a development build when working with native tooling. Expo Go cannot load Inspector, React Native Grab, Nitro Modules, or the Ottrelite Tracy backend.
 
@@ -269,4 +269,4 @@ Project-local skills are installed under `.agents/skills`, including Software Ma
 
 ## Source material
 
-The interaction language and emotion vocabulary were derived from the supplied `Youmotion.pdf` and `Gefühlsstern.pdf`. The built-in Leidsatz catalog was transcribed from the supplied `Leitsätze.pdf` and `Mögliche-Leitsätze.pdf`; near-identical statements were normalized into stable source-controlled entries. The dedicated reformulation prompts were adapted from the supplied `Leitsätze-Verändern.pdf`. The implementation also follows the linked vertical-codebase, self-contained-component, TigerStyle, XState 6 alpha, and custom-linting references.
+The interaction language and emotion vocabulary were derived from the supplied Youmotion and therapeutic reference material. The built-in Leidsatz catalog was transcribed from the supplied `Leitsätze.pdf` and `Mögliche-Leitsätze.pdf`; near-identical statements were normalized into stable source-controlled entries. The dedicated reformulation prompts were adapted from the supplied `Leitsätze-Verändern.pdf`. The implementation also follows the linked vertical-codebase, self-contained-component, TigerStyle, XState 6 alpha, and custom-linting references.

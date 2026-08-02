@@ -263,7 +263,7 @@ describe('check-in screens', () => {
     expect(screen.getByText('The farther you move from the center, the more intense the feeling.')).toBeTruthy();
     expect(screen.queryByTestId('emotion-word-help-toggle')).toBeNull();
     expect(screen.queryByTestId('emotion-word-help-content')).toBeNull();
-    expect(screen.getByLabelText('Emotion star. Drag outward from the center.')).toBeTruthy();
+    expect(screen.getByLabelText('Feeling pulse. Drag outward from the center.')).toBeTruthy();
     expect(screen.getByTestId('base-state-ripples')).toHaveStyle({
       alignItems: 'center',
       justifyContent: 'center',
@@ -1405,7 +1405,7 @@ describe('check-in screens', () => {
     expect(today.queryByText(/50%/)).toBeNull();
     const gestureRegion = today.getByTestId('check-in-gesture-region');
     const detailsScroll = today.getByTestId('check-in-details-scroll');
-    expect(within(gestureRegion).getByLabelText('Emotion star. Drag outward from the center.')).toBeTruthy();
+    expect(within(gestureRegion).getByLabelText('Feeling pulse. Drag outward from the center.')).toBeTruthy();
     expect(within(detailsScroll).getByText('Latest check-in')).toBeTruthy();
     expect(within(detailsScroll).getByText('Youmotion supports self-awareness and does not replace psychotherapeutic or medical treatment.')).toHaveStyle({ marginTop: 24 });
     expect(detailsScroll.props).toMatchObject({

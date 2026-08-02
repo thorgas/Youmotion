@@ -14,6 +14,7 @@ import {
   useAppNavigationActor,
 } from '@/navigation/app-navigation.provider';
 import { dataArchiveSummary } from '../domain/data-archive';
+import { DataSafetyMessage } from './data-safety-message';
 
 type DataSafetyView = {
   archive: ReturnType<AppNavigationActor['getSnapshot']>['context']['dataArchive'];
@@ -184,29 +185,6 @@ function DeleteConfirmationCard({
   );
 }
 
-function DataSafetyMessage({
-  error,
-  notice,
-  onDismiss,
-}: {
-  error: string | null;
-  notice: string | null;
-  onDismiss: () => void;
-}) {
-  const message = error ?? notice;
-  if (!message) return null;
-  return (
-    <Pressable
-      accessibilityRole={error ? 'alert' : 'button'}
-      onPress={onDismiss}
-      style={[styles.notice, error ? styles.errorNotice : null]}
-      testID={error ? 'data-safety-error' : 'data-safety-notice'}
-    >
-      <Text style={styles.noticeText}>{message}</Text>
-    </Pressable>
-  );
-}
-
 export function DataSafetyControls({ locale }: { locale: string }) {
   const actor = useAppNavigationActor();
   const view = useSelector(actor, _selectDataSafetyView);
@@ -335,7 +313,4 @@ const styles = StyleSheet.create({
   primaryButton: { flex: 1, minHeight: 44, alignItems: 'center', justifyContent: 'center', backgroundColor: palette.ink, borderRadius: 14 },
   destructiveButton: { flex: 1, minHeight: 44, alignItems: 'center', justifyContent: 'center', backgroundColor: '#8A3D35', borderRadius: 14 },
   primaryButtonText: { fontFamily: type.semibold, color: '#FFFFFF', fontSize: 14 },
-  notice: { backgroundColor: '#EDF0EB', borderRadius: 14, marginTop: 14, padding: 14 },
-  errorNotice: { backgroundColor: '#F5E8E5' },
-  noticeText: { fontFamily: type.medium, color: palette.ink, fontSize: 13, lineHeight: 19 },
 });

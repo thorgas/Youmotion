@@ -408,28 +408,6 @@
       ],
       "types": []
     },
-    "TiL26KMpEl+SOXn11xtWcQ==": {
-      "description": "About the emotion star setting title",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "Über den Gefühlsstern",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "A8ko/SXByYQjGxHIG6RPaw==": {
-      "description": "Explanation of the emotion star source and purpose",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "Die sieben Gefühlsrichtungen orientieren sich am deutschen Therapiematerial „Der Gefühlsstern“. Youmotion hilft dir bei der Selbstreflexion und stellt keine Diagnose.",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
     "3kkTuAL7PCZ9OHsto/IQxQ==": {
       "description": "Heading for the most recent check-in",
       "tokens": [],
@@ -1057,17 +1035,6 @@
       ],
       "types": []
     },
-    "bUGRMLxXNGkgePkmYDZf+A==": {
-      "description": "Emotion star accessibility instructions",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "Gefühlsstern. Ziehe vom Mittelpunkt nach außen.",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
     "bur8y6WgEM3yYFGxxKlvMw==": {
       "description": "Check-in history eyebrow heading",
       "tokens": [],
@@ -1409,45 +1376,12 @@
       ],
       "types": []
     },
-    "vUJ2M8KqsBpzXsBY62aX2Q==": {
-      "description": "Primary instruction above the emotion star",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "Berühre den Punkt und bewege deinen Finger.",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
     "+BCHCTVYTZu3FpJJbDacvg==": {
       "description": "Supporting instruction asking the user to intuitively choose and confirm an emotion",
       "tokens": [],
       "translations": [
         {
           "translation": "Wähle das Gefühl aus, das sich für dich stimmig anfühlt, und lasse deinen Finger los.",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "DVtzoSc8xL5kjA1bmnsdNg==": {
-      "description": "Emotion star label display setting title",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "Emotionsbeschriftungen",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "2sJq2xy1JcbPkw8DAHFahg==": {
-      "description": "Explanation of the emotion star label display setting",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "Wähle, was um den Gefühlsstern erscheint, bevor du ihn berührst.",
           "variations": {}
         }
       ],
@@ -2677,18 +2611,6 @@
       ],
       "types": []
     },
-    "CbRePYNbSDeyI96x9roHQA==": {
-      "description": "Explanation of the emotion star dimensions",
-      "status": "new",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "Die Richtung benennt das Gefühl. Der Abstand zeigt, wie stark es da ist.",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
     "bEb7lQP8df5IBIMoSmpgyA==": {
       "description": "Explanation that the onboarding Pulse example is transient",
       "status": "new",
@@ -3403,30 +3325,6 @@
       ],
       "types": []
     },
-    "56U65ARrL9RMHvL4jxWuSQ==": {
-      "description": "Empty filtered check-in history title",
-      "status": "new",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "Keine Momente in diesem Zeitraum.",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "NTZqUkOD2CG0MNMJUJgKlA==": {
-      "description": "Empty filtered check-in history explanation",
-      "status": "new",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "Wähle einen anderen Zeitraum, um mehr von deinem Verlauf zu sehen.",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
     "+16xw5cn/N/sFCmClpjt9w==": {
       "description": "Evidence below the most frequently selected guiding belief in the selected analytics timeframe",
       "status": "new",
@@ -3703,42 +3601,6 @@
       ],
       "types": []
     },
-    "ugAFdVoT9cLgDi2S7FCkkA==": {
-      "description": "History banner explaining that one evidence moment for a selected insight is visible",
-      "status": "new",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "1 Moment unterstützt diese Erkenntnis.",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "eVi00zTgsAfoilJHVb77jw==": {
-      "description": "History banner explaining that only evidence for a selected insight is visible",
-      "status": "new",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "{count} Momente unterstützen diese Erkenntnis.",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "fOsWsa4exxWfBb/M6RhYww==": {
-      "description": "Button clearing an insight evidence filter in History",
-      "status": "new",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "Alle Momente anzeigen",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
     "sj1bMWp7YtE6tveL2N7u5Q==": {
       "description": "Evidence count and comparison period below the primary analytics insight",
       "status": "new",
@@ -3835,18 +3697,6 @@
       ],
       "types": []
     },
-    "e34DClwZwMxU9gVFqSq0uQ==": {
-      "description": "Button opening the moments supporting an analytics insight",
-      "status": "new",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "Unterstützende Momente ansehen",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
     "Hs//3szfDSk0zA7JrlwkiQ==": {
       "description": "Button dismissing the current primary insight",
       "status": "new",
@@ -3938,18 +3788,6 @@
       "translations": [
         {
           "translation": "REFLEKTIEREN",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "nNq0nBoTqm0JEFCAhpTw7g==": {
-      "description": "Button returning from reflection to the emotion star",
-      "status": "new",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "‹ Zurück",
           "variations": {}
         }
       ],
@@ -4063,135 +3901,390 @@
       ],
       "types": []
     },
-    "IDoJEksiE6KKY0Ot8c4cJg==": {
-      "description": "Label for moments supporting a selected analytics insight",
-      "status": "new",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "BELEGE FÜR DIESEN EINBLICK",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
     "RDlbNk913XK2BN2OUntm7g==": {
       "description": "History emotion filter showing every emotion",
       "status": "new",
       "tokens": [],
-      "translations": [{ "translation": "Alle", "variations": {} }],
+      "translations": [
+        {
+          "translation": "Alle",
+          "variations": {}
+        }
+      ],
       "types": []
     },
     "0EE5bZQVCL2xaFGCXbR57A==": {
       "description": "History content filter showing every kind of moment",
       "status": "new",
       "tokens": [],
-      "translations": [{ "translation": "Alle", "variations": {} }],
+      "translations": [
+        {
+          "translation": "Alle",
+          "variations": {}
+        }
+      ],
       "types": []
     },
     "o2Ze7QI3eariPxwSya00gQ==": {
       "description": "History content filter for moments with written reflections",
       "status": "new",
       "tokens": [],
-      "translations": [{ "translation": "Reflexionen", "variations": {} }],
+      "translations": [
+        {
+          "translation": "Reflexionen",
+          "variations": {}
+        }
+      ],
       "types": []
     },
     "7NYlGCTfeYgZ3TwvzZDJIA==": {
       "description": "History content filter for moments with beliefs",
       "status": "new",
       "tokens": [],
-      "translations": [{ "translation": "Leit- & Leidsätze", "variations": {} }],
+      "translations": [
+        {
+          "translation": "Leit- & Leidsätze",
+          "variations": {}
+        }
+      ],
       "types": []
     },
     "hTE0PR/PlC8yY53dcHMdlw==": {
       "description": "Accessibility label for History search input",
       "status": "new",
       "tokens": [],
-      "translations": [{ "translation": "Verlauf durchsuchen", "variations": {} }],
+      "translations": [
+        {
+          "translation": "Verlauf durchsuchen",
+          "variations": {}
+        }
+      ],
       "types": []
     },
     "Hq+j4OnEWQvyMvXYIK4ZZg==": {
       "description": "Placeholder for History search input",
       "status": "new",
       "tokens": [],
-      "translations": [{ "translation": "Momente durchsuchen", "variations": {} }],
+      "translations": [
+        {
+          "translation": "Momente durchsuchen",
+          "variations": {}
+        }
+      ],
       "types": []
     },
     "tfD8fcqo0O58gL9xy8MkQw==": {
       "description": "Button opening History filters",
       "status": "new",
       "tokens": [],
-      "translations": [{ "translation": "Filter", "variations": {} }],
+      "translations": [
+        {
+          "translation": "Filter",
+          "variations": {}
+        }
+      ],
       "types": []
     },
     "25GjqVB/eCz0J+QB1jBCNQ==": {
       "description": "History filter group label",
       "status": "new",
       "tokens": [],
-      "translations": [{ "translation": "GEFÜHL", "variations": {} }],
+      "translations": [
+        {
+          "translation": "GEFÜHL",
+          "variations": {}
+        }
+      ],
       "types": []
     },
     "iC+E3qtoYdASiQTgqM5i1g==": {
       "description": "History filter group label",
       "status": "new",
       "tokens": [],
-      "translations": [{ "translation": "INHALT", "variations": {} }],
+      "translations": [
+        {
+          "translation": "INHALT",
+          "variations": {}
+        }
+      ],
       "types": []
     },
     "RWIgESgsia65L3i1QJZfkg==": {
       "description": "Button clearing all History filters",
       "status": "new",
       "tokens": [],
-      "translations": [{ "translation": "Filter zurücksetzen", "variations": {} }],
+      "translations": [
+        {
+          "translation": "Filter zurücksetzen",
+          "variations": {}
+        }
+      ],
       "types": []
     },
     "ANRScOijoIg2tIgWSA6D1w==": {
       "description": "Empty filtered check-in history title",
       "status": "new",
       "tokens": [],
-      "translations": [{ "translation": "Keine passenden Momente.", "variations": {} }],
+      "translations": [
+        {
+          "translation": "Keine passenden Momente.",
+          "variations": {}
+        }
+      ],
       "types": []
     },
     "5mbme5n+gjr9UT9BgvKIrA==": {
       "description": "Empty filtered check-in history explanation",
       "status": "new",
       "tokens": [],
-      "translations": [{ "translation": "Probiere eine andere Suche, einen anderen Filter oder Zeitraum.", "variations": {} }],
+      "translations": [
+        {
+          "translation": "Probiere eine andere Suche, einen anderen Filter oder Zeitraum.",
+          "variations": {}
+        }
+      ],
       "types": []
     },
     "s+uf+Xas1dsC78DEuPrr/w==": {
       "description": "Analytics hero tab for the most selected guiding belief",
       "status": "new",
       "tokens": [],
-      "translations": [{ "translation": "Leitsatz", "variations": {} }],
+      "translations": [
+        {
+          "translation": "Leitsatz",
+          "variations": {}
+        }
+      ],
       "types": []
     },
     "srKUIzj1i9m5u6jqU7XZhw==": {
       "description": "Analytics hero tab for a recurring pattern",
       "status": "new",
       "tokens": [],
-      "translations": [{ "translation": "Muster", "variations": {} }],
+      "translations": [
+        {
+          "translation": "Muster",
+          "variations": {}
+        }
+      ],
       "types": []
     },
     "c48gjdaop7eMhj/RYhVGig==": {
       "description": "Copy when one other guiding belief ties the one shown in the Analytics hero",
       "status": "new",
       "tokens": [],
-      "translations": [{ "translation": "1 weiterer Leitsatz wurde ebenso oft gewählt.", "variations": {} }],
+      "translations": [
+        {
+          "translation": "1 weiterer Leitsatz wurde ebenso oft gewählt.",
+          "variations": {}
+        }
+      ],
       "types": []
     },
     "UWIQsfdGvouK186A5oTxRg==": {
       "description": "Copy when multiple guiding beliefs tie the one shown in the Analytics hero",
       "status": "new",
-      "tokens": ["count"],
-      "translations": [{ "translation": "{count} weitere Leitsätze wurden ebenso oft gewählt.", "variations": {} }],
+      "tokens": [
+        "count"
+      ],
+      "translations": [
+        {
+          "translation": "{count} weitere Leitsätze wurden ebenso oft gewählt.",
+          "variations": {}
+        }
+      ],
       "types": []
     },
     "2FO4ZSsxGB8b6yJY3o5rTQ==": {
       "description": "Button opening the moments supporting an analytics insight",
       "status": "new",
       "tokens": [],
-      "translations": [{ "translation": "Passende Momente ansehen", "variations": {} }],
+      "translations": [
+        {
+          "translation": "Passende Momente ansehen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "9KOv0Hxsxa5dw81Mgx/6/Q==": {
+      "description": "Feeling pulse label display setting title",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Gefühlsbezeichnungen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "HDBfnmGq/POaN02zCkJjDw==": {
+      "description": "Explanation of the feeling pulse label display setting",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Wähle, was um den Gefühlspuls erscheint, bevor du ihn berührst.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "d8E2SHgiM3cM+6r9Kyg9Og==": {
+      "description": "About the feeling pulse setting title",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Über den Gefühlspuls",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "2NtQEy6mByeibqAk5pUQAw==": {
+      "description": "Explanation of the feeling pulse and its purpose",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Der Gefühlspuls verbindet sieben Gefühlsrichtungen. Youmotion unterstützt dich bei der Selbstreflexion und stellt keine Diagnose.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "6R0rzVMZj4iAxWVWeg+vAA==": {
+      "description": "Explanation of the feeling pulse dimensions",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Die Richtung benennt das Gefühl. Die Entfernung zeigt, wie stark es da ist.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "BO2yR2PQxQf+Qk1zCW02eQ==": {
+      "description": "Successful data backup export notice",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Deine Sicherung ist bereit.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "UpnvCtFwNFUSDfcXw7eQyg==": {
+      "description": "Successful data backup restore notice",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Deine Sicherung hat die Daten auf diesem Gerät ersetzt.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "w7r3VxUdnYKD1Toq2Hy7Tw==": {
+      "description": "Successful deletion of all journal data notice",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Deine Momente und persönlichen Glaubenssätze wurden gelöscht.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "ZiBJpM0XyNyJoofmFFR18Q==": {
+      "description": "Data backup export failure notice",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Deine Sicherung konnte nicht erstellt werden.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "DLhTNJ7gYxheJSN/O2Wp0A==": {
+      "description": "Data backup file opening failure notice",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Diese Sicherung konnte nicht geöffnet werden.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "zwUmgzJyuXMUH9xii0DmBg==": {
+      "description": "Data backup restore failure notice",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Deine Daten wurden nicht geändert, weil die Sicherung nicht wiederhergestellt werden konnte.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "0r2dSxfscbkNwSDa9vcq/g==": {
+      "description": "Delete all journal data failure notice",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Deine Momente konnten nicht gelöscht werden.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "Q3clRGwuDzRJT1gv0f5cLw==": {
+      "description": "Feeling pulse accessibility instructions",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Gefühlspuls. Ziehe vom Mittelpunkt nach außen.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "/bRh1KvEm+MSDiplVKfg8A==": {
+      "description": "Primary instruction above the feeling pulse",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Berühre den Punkt und bewege deinen Finger.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "0LcAa5k6Sc1NF2xuj8kx+w==": {
+      "description": "Button returning from reflection to the feeling pulse",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "‹ Zurück",
+          "variations": {}
+        }
+      ],
       "types": []
     }
   }

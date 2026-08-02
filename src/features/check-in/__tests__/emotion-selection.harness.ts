@@ -3,7 +3,7 @@ import { describe, expect, it } from 'react-native-harness';
 import { EMOTION_IDS } from '@/constants';
 import { selectionFromPoint } from '../domain/emotion-selection';
 
-describe('Gefühlsstern geometry on the native runtime', () => {
+describe('Gefühlspuls geometry on the native runtime', () => {
   it('selects the same emotion and clamps intensity across engines', () => {
     const selection = selectionFromPoint({
       point: { x: 100, y: 0 },

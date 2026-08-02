@@ -317,7 +317,7 @@ function ReflectionNoteStep() {
               testID="reflection-back"
             >
               <Text style={styles.inlineBackText}>
-                <fbt desc="Button returning from reflection to the emotion star">‹ Back</fbt>
+                <fbt desc="Button returning from reflection to the feeling pulse">‹ Back</fbt>
               </Text>
             </PressableScale>
             <PressableScale

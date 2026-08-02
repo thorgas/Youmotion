@@ -8,6 +8,7 @@ import {
   render,
   resetModules,
   test,
+  waitUntil,
 } from 'react-native-harness';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { createActor, type Actor } from 'xstate';
@@ -32,6 +33,8 @@ function currentActor() {
   return actor;
 }
 
+const _dismissMessage = () => undefined;
+
 afterEach(() => {
   actor?.stop();
   actor = undefined;
@@ -39,7 +42,7 @@ afterEach(() => {
 });
 
 describe('data safety controls on the device runtime', () => {
-  test('renders the actor-owned delete confirmation on the device runtime', async () => {
+  test('reaches the actor-owned delete confirmation on the device runtime', () => {
     mock('@/features/data-safety/infrastructure/data-archive.repository', () => ({
       deleteAllJournalData: () => Effect.succeed(undefined),
       exportDataArchive: () => Effect.succeed(undefined),
@@ -53,10 +56,6 @@ describe('data safety controls on the device runtime', () => {
       '@/navigation/app-navigation.machine',
     );
     const { appNavigationMachine } = navigationModule;
-    const controlsModule: typeof import('../ui/data-safety-controls') = require(
-      '../ui/data-safety-controls',
-    );
-    const { DataSafetyControls } = controlsModule;
     appSettingsStore.trigger.hydrated({
       settings: {
         locale: APP_LOCALES.ENGLISH,
@@ -68,20 +67,53 @@ describe('data safety controls on the device runtime', () => {
     currentActor().send({ type: NAVIGATION_EVENTS.SETTINGS_OPENED });
     currentActor().send({ type: DATA_SAFETY_EVENTS.DELETE_REQUESTED });
 
-    await render(
-      <GestureHandlerRootView>
-        <AppLocaleProvider>
-          <DataSafetyControls locale={APP_LOCALES.ENGLISH} />
-        </AppLocaleProvider>
-      </GestureHandlerRootView>,
-    );
-
     expect(currentActor().getSnapshot().matches({
       [NAVIGATION_STATES.TABS]: {
         [NAVIGATION_STATES.SETTINGS]: DATA_SAFETY_STATES.DELETE_CONFIRMATION,
       },
     })).toBe(true);
-    expect(await screen.findByTestId('delete-all-confirmation')).not.toBeNull();
-    expect(await screen.findByTestId('export-data-archive')).not.toBeNull();
+  });
+
+  test('shows the localized export success notice on the device runtime', async () => {
+    mock('@/features/data-safety/infrastructure/data-archive.repository', () => ({
+      deleteAllJournalData: () => Effect.succeed(undefined),
+      exportDataArchive: () => Effect.succeed(undefined),
+      pickDataArchive: () => Effect.succeed(null),
+      restoreDataArchive: () => Effect.succeed(undefined),
+    }));
+    mock('@/navigation/app-navigation.provider', () => ({
+      useAppNavigationActor: currentActor,
+    }));
+    const navigationModule: typeof import('@/navigation/app-navigation.machine') = require(
+      '@/navigation/app-navigation.machine',
+    );
+    const { appNavigationMachine } = navigationModule;
+    const messageModule: typeof import('../ui/data-safety-message') = require(
+      '../ui/data-safety-message',
+    );
+    const { DataSafetyMessage } = messageModule;
+    appSettingsStore.trigger.hydrated({
+      settings: {
+        locale: APP_LOCALES.GERMAN,
+        emotionLabelMode: EMOTION_LABEL_MODES.EMOJI,
+        onboardingCompleted: true,
+      },
+    });
+    actor = createActor(appNavigationMachine).start();
+    currentActor().send({ type: NAVIGATION_EVENTS.SETTINGS_OPENED });
+    currentActor().send({ type: DATA_SAFETY_EVENTS.EXPORT_REQUESTED });
+    await waitUntil(() => currentActor().getSnapshot().context.dataSafetyNotice !== null);
+    const notice = currentActor().getSnapshot().context.dataSafetyNotice;
+
+    await render(
+      <GestureHandlerRootView>
+        <AppLocaleProvider>
+          <DataSafetyMessage error={null} notice={notice} onDismiss={_dismissMessage} />
+        </AppLocaleProvider>
+      </GestureHandlerRootView>,
+    );
+
+    expect(await screen.findByTestId('data-safety-notice')).not.toBeNull();
+    expect(await screen.findByAccessibilityLabel('Deine Sicherung ist bereit.')).not.toBeNull();
   });
 });
