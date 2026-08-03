@@ -70,8 +70,8 @@ export function entriesForAnalyticsTimeframe({
   if (range.start === null) return entries;
   const start = range.start;
   return entries.filter((entry) => {
-    const createdAt = new Date(entry.createdAt);
-    return !Number.isNaN(createdAt.getTime()) && createdAt >= start && createdAt < range.end;
+    const occurredAt = new Date(entry.occurredAt);
+    return !Number.isNaN(occurredAt.getTime()) && occurredAt >= start && occurredAt < range.end;
   });
 }
 
@@ -123,22 +123,22 @@ export function topLeitsaetzeForTimeframe({
     });
     const guidingStatement = entry.guidingStatementSnapshot ?? statement?.guidingStatement;
     if (!guidingStatement) return items;
-    const createdAt = new Date(entry.createdAt).getTime();
+    const occurredAt = new Date(entry.occurredAt).getTime();
     const existing = items.find(({ beliefSystemId }) => beliefSystemId === entry.beliefSystemId);
     if (!existing) {
       return items.concat({
         beliefSystemId: entry.beliefSystemId,
         count: 1,
         guidingStatement,
-        latestAt: createdAt,
+        latestAt: occurredAt,
         supportingIds: [entry.id],
       });
     }
     return items.map((item) => item !== existing ? item : {
       ...item,
       count: item.count + 1,
-      guidingStatement: createdAt > item.latestAt ? guidingStatement : item.guidingStatement,
-      latestAt: Math.max(createdAt, item.latestAt),
+      guidingStatement: occurredAt > item.latestAt ? guidingStatement : item.guidingStatement,
+      latestAt: Math.max(occurredAt, item.latestAt),
       supportingIds: item.supportingIds.concat(entry.id),
     });
   }, []);

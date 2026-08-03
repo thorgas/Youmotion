@@ -33,7 +33,7 @@ export function emotionFrequencies(entries: readonly CheckIn[]) {
 
 function recordedDayCount(entries: readonly CheckIn[]) {
   return new Set(entries.flatMap((entry) => {
-    const date = new Date(entry.createdAt);
+    const date = new Date(entry.occurredAt);
     if (Number.isNaN(date.getTime())) return [];
     return [`${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`];
   })).size;

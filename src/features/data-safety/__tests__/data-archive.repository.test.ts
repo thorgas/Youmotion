@@ -14,6 +14,7 @@ import {
   resetSurrealDatabaseMock,
 } from '@/test-utils/surrealdb.repository.mock';
 import {
+  DATA_ARCHIVE_VERSION,
   DataArchiveSchema,
   DataArchiveTimestamp,
 } from '../domain/data-archive';
@@ -68,11 +69,12 @@ jest.mock('@/features/check-in/infrastructure/surrealdb.database', () => ({
 }));
 
 const archive = DataArchiveSchema.make({
-  version: 1,
+  version: 2,
   exportedAt: DataArchiveTimestamp.make('2026-08-02T08:00:00.000Z'),
   checkIns: [{
     id: CheckInId.make('moment-1'),
     createdAt: CheckInTimestamp.make('2026-08-01T18:00:00.000Z'),
+    occurredAt: CheckInTimestamp.make('2026-08-01T18:00:00.000Z'),
     emotionId: EMOTION_IDS.JOY,
     intensity: 0.6,
     level: 3,
@@ -132,7 +134,7 @@ describe('data archive repository', () => {
     expect(typeof sharedUri).toBe('string');
     if (typeof sharedUri !== 'string') throw new Error('Expected a shared URI.');
     expect(JSON.parse(mockFiles.get(sharedUri) ?? '')).toMatchObject({
-      version: 1,
+      version: DATA_ARCHIVE_VERSION,
       checkIns: archive.checkIns,
       settings: archive.settings,
     });

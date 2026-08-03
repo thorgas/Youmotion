@@ -1,12 +1,19 @@
 import { useSelector } from '@xstate/react';
 import { useSelector as useStoreSelector } from '@xstate/store-react';
+import { BottomSheet } from '@expo/ui';
+import {
+  DateTimePicker,
+  type DateTimePickerProps,
+} from '@expo/ui/community/datetime-picker';
 import { useFocusEffect } from 'expo-router';
 import { fbs } from 'fbtee';
 import { PressableScale } from 'pressto';
 import { useRef } from 'react';
 import {
   ActivityIndicator,
+  Keyboard,
   Platform,
+  Pressable,
   ScrollView,
   StyleSheet,
   Text,
@@ -30,13 +37,23 @@ import {
 } from '@/constants';
 import { useAppNavigationActor } from '@/navigation/app-navigation.provider';
 import {
+  formatHistoryDate,
+  formatMomentDate,
+  formatMomentTime,
+} from '@/localization/date-copy';
+import { appSettingsStore } from '@/features/settings/application/app-settings.store';
+import {
   emotionName,
   emotionNuance,
   optionalNoteAccessibilityLabel,
   optionalNotePlaceholder,
 } from './emotion-copy';
 import { checkInHistoryStore } from '../application/check-in-history.store';
-import type { CheckIn, EmotionSelection } from '../domain/check-in';
+import {
+  checkInTimestampFromDate,
+  type CheckIn,
+  type EmotionSelection,
+} from '../domain/check-in';
 import {
   recommendedBeliefSystemIds,
 } from '../domain/belief-system';
@@ -67,6 +84,165 @@ const _selectSnapshot = (
 const _selectHistory = (
   state: ReturnType<typeof checkInHistoryStore.getSnapshot>,
 ) => state.context.entries;
+const _selectLocale = (
+  state: ReturnType<typeof appSettingsStore.getSnapshot>,
+) => state.context.locale;
+
+function momentTimeText({
+  customized,
+  date,
+  locale,
+}: {
+  customized: boolean;
+  date: Date;
+  locale: string;
+}) {
+  if (!customized) return String(fbs('Now', 'Current time label for a new emotion'));
+  return formatHistoryDate({ date, locale });
+}
+
+export function MomentTimeControl({ disabled }: { disabled: boolean }) {
+  const actor = useAppNavigationActor();
+  const snapshot = useSelector(actor, _selectSnapshot);
+  const locale = useStoreSelector(appSettingsStore, _selectLocale);
+  const occurredAt = snapshot.context.occurredAtDraft;
+  const pickerMode = snapshot.context.momentTimePickerMode;
+  const _open = () => {
+    Keyboard.dismiss();
+    actor.send({ type: CHECK_IN_EVENTS.MOMENT_TIME_EDITOR_OPENED });
+  };
+  const _close = () => actor.send({ type: CHECK_IN_EVENTS.MOMENT_TIME_EDITOR_CLOSED });
+  const _requestDate = () => actor.send({
+    type: CHECK_IN_EVENTS.MOMENT_TIME_DATE_REQUESTED,
+  });
+  const _requestTime = () => actor.send({
+    type: CHECK_IN_EVENTS.MOMENT_TIME_TIME_REQUESTED,
+  });
+  const _dismissPicker = () => actor.send({
+    type: CHECK_IN_EVENTS.MOMENT_TIME_PICKER_DISMISSED,
+  });
+  const _reset = () => actor.send({ type: CHECK_IN_EVENTS.MOMENT_TIME_RESET });
+  const _change: NonNullable<DateTimePickerProps['onValueChange']> = (...parameters) => {
+    actor.send({
+      type: CHECK_IN_EVENTS.MOMENT_TIME_CHANGED,
+      occurredAt: checkInTimestampFromDate(parameters[1]),
+    });
+  };
+  const now = new Date();
+  if (!occurredAt) return null;
+  const value = new Date(occurredAt);
+  const label = momentTimeText({
+    customized: snapshot.context.occurredAtCustomized,
+    date: value,
+    locale,
+  });
+
+  return (
+    <>
+      <Pressable
+        accessibilityHint={String(fbs(
+          'Change when this emotion happened',
+          'Hint for opening the emotion date and time editor',
+        ))}
+        accessibilityLabel={label}
+        accessibilityRole="button"
+        disabled={disabled}
+        onPress={_open}
+        style={styles.momentTimePill}
+        testID="moment-time-control"
+      >
+        <Text style={styles.momentTimeIcon}>◷</Text>
+        <Text style={styles.momentTimeText}>{label}</Text>
+      </Pressable>
+      <BottomSheet
+        isPresented={snapshot.context.momentTimeEditorOpen}
+        onDismiss={_close}
+        snapPoints={[{ height: 340 }]}
+        testID="moment-time-sheet"
+      >
+        <View style={styles.momentTimeSheet}>
+          <View style={styles.momentTimeSheetHeader}>
+            <View>
+              <Text style={styles.momentTimeSheetEyebrow}>
+                <fbt desc="Heading above the emotion date and time editor">When was this?</fbt>
+              </Text>
+              <Text style={styles.momentTimeSheetValue}>
+                {formatHistoryDate({ date: value, locale })}
+              </Text>
+            </View>
+            <Pressable
+              accessibilityRole="button"
+              onPress={_close}
+              style={styles.momentTimeDone}
+            >
+              <Text style={styles.momentTimeDoneText}>
+                <fbt desc="Button closing the emotion date and time editor">Done</fbt>
+              </Text>
+            </Pressable>
+          </View>
+          {Platform.OS === 'ios' ? (
+            <DateTimePicker
+              accentColor={palette.moss}
+              display="compact"
+              maximumDate={now}
+              mode="datetime"
+              onValueChange={_change}
+              testID="moment-time-picker"
+              value={value}
+            />
+          ) : (
+            <View style={styles.momentTimeAndroidControls}>
+              <Pressable
+                accessibilityRole="button"
+                onPress={_requestDate}
+                style={styles.momentTimeAndroidButton}
+              >
+                <Text style={styles.momentTimeAndroidLabel}>
+                  <fbt desc="Button opening the date picker for an emotion">Date</fbt>
+                </Text>
+                <Text style={styles.momentTimeAndroidValue}>
+                  {formatMomentDate({ date: value, locale })}
+                </Text>
+              </Pressable>
+              <Pressable
+                accessibilityRole="button"
+                onPress={_requestTime}
+                style={styles.momentTimeAndroidButton}
+              >
+                <Text style={styles.momentTimeAndroidLabel}>
+                  <fbt desc="Button opening the time picker for an emotion">Time</fbt>
+                </Text>
+                <Text style={styles.momentTimeAndroidValue}>
+                  {formatMomentTime({ date: value, locale })}
+                </Text>
+              </Pressable>
+              {pickerMode ? (
+                <DateTimePicker
+                  accentColor={palette.moss}
+                  maximumDate={now}
+                  mode={pickerMode}
+                  onDismiss={_dismissPicker}
+                  onValueChange={_change}
+                  presentation="dialog"
+                  value={value}
+                />
+              ) : null}
+            </View>
+          )}
+          <Pressable
+            accessibilityRole="button"
+            onPress={_reset}
+            style={styles.momentTimeReset}
+          >
+            <Text style={styles.momentTimeResetText}>
+              <fbt desc="Button setting an emotion's date and time to the present">Set to now</fbt>
+            </Text>
+          </Pressable>
+        </View>
+      </BottomSheet>
+    </>
+  );
+}
 
 function recommendationsForSelection({
   history,
@@ -320,24 +496,27 @@ function ReflectionNoteStep() {
                 <fbt desc="Button returning from reflection to the feeling pulse">‹ Back</fbt>
               </Text>
             </PressableScale>
-            <PressableScale
-              accessibilityRole={editing ? 'button' : undefined}
-              disabled={!editing || saving}
-              onPress={_editSelection}
-              style={styles.selectionPill}
-            >
-              <View style={[styles.dot, { backgroundColor: selection.color }]} />
-              <Text style={styles.selectionPillText}>
-                {emotionName(selection.emotionId)} · {emotionNuance(selection)}
-              </Text>
-              {editing ? (
-                <Text style={styles.changeSelection}>
-                  <fbt desc="Button for changing the feeling of an existing check-in">
-                    Change
-                  </fbt>
+            <View style={styles.momentMetadataRow}>
+              <PressableScale
+                accessibilityRole={editing ? 'button' : undefined}
+                disabled={!editing || saving}
+                onPress={_editSelection}
+                style={styles.selectionPill}
+              >
+                <View style={[styles.dot, { backgroundColor: selection.color }]} />
+                <Text style={styles.selectionPillText}>
+                  {emotionName(selection.emotionId)} · {emotionNuance(selection)}
                 </Text>
-              ) : null}
-            </PressableScale>
+                {editing ? (
+                  <Text style={styles.changeSelection}>
+                    <fbt desc="Button for changing the feeling of an existing check-in">
+                      Change
+                    </fbt>
+                  </Text>
+                ) : null}
+              </PressableScale>
+              <MomentTimeControl disabled={saving} />
+            </View>
             <Text
               style={[
                 styles.title,
@@ -815,6 +994,13 @@ const styles = StyleSheet.create({
   },
   flowContent: { paddingTop: 8 },
   reflectionHeading: { gap: 0 },
+  momentMetadataRow: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+    marginBottom: 14,
+  },
   inlineBack: {
     alignSelf: 'flex-start',
     justifyContent: 'center',
@@ -844,11 +1030,48 @@ const styles = StyleSheet.create({
     borderCurve: 'continuous',
     borderRadius: 999,
     flexDirection: 'row',
-    marginBottom: 14,
     minHeight: 34,
     paddingHorizontal: 12,
   },
   selectionPillText: { color: palette.ink, fontFamily: type.medium, fontSize: 12 },
+  momentTimePill: {
+    alignItems: 'center',
+    alignSelf: 'flex-start',
+    backgroundColor: palette.paperRaised,
+    borderColor: palette.hairline,
+    borderCurve: 'continuous',
+    borderRadius: 999,
+    borderWidth: 1,
+    flexDirection: 'row',
+    minHeight: 34,
+    paddingHorizontal: 12,
+  },
+  momentTimeIcon: { color: palette.inkMuted, fontFamily: type.medium, fontSize: 14 },
+  momentTimeText: { color: palette.inkMuted, fontFamily: type.medium, fontSize: 12, marginLeft: 6 },
+  momentTimeSheet: { padding: 22, paddingBottom: 34 },
+  momentTimeSheetHeader: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 24,
+  },
+  momentTimeSheetEyebrow: { color: palette.ink, fontFamily: type.semibold, fontSize: 17 },
+  momentTimeSheetValue: { color: palette.inkMuted, fontFamily: type.regular, fontSize: 13, marginTop: 4 },
+  momentTimeDone: { minHeight: 44, justifyContent: 'center', paddingHorizontal: 8 },
+  momentTimeDoneText: { color: palette.moss, fontFamily: type.semibold, fontSize: 15 },
+  momentTimeAndroidControls: { gap: 10 },
+  momentTimeAndroidButton: {
+    backgroundColor: '#F4F0E9',
+    borderCurve: 'continuous',
+    borderRadius: 14,
+    minHeight: 58,
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+  },
+  momentTimeAndroidLabel: { color: palette.inkMuted, fontFamily: type.medium, fontSize: 11 },
+  momentTimeAndroidValue: { color: palette.ink, fontFamily: type.medium, fontSize: 14, marginTop: 3 },
+  momentTimeReset: { alignSelf: 'flex-start', justifyContent: 'center', marginTop: 18, minHeight: 44 },
+  momentTimeResetText: { color: palette.moss, fontFamily: type.semibold, fontSize: 14 },
   card: {
     marginTop: 28,
     padding: 20,

@@ -35,6 +35,7 @@ function checkIn({ beliefSystemId, day, emotionId, guidingStatementSnapshot, id 
   return {
     id: CheckInId.make(id),
     createdAt: CheckInTimestamp.make(new Date(2026, 6, day, 12).toISOString()),
+    occurredAt: CheckInTimestamp.make(new Date(2026, 6, day, 12).toISOString()),
     emotionId,
     intensity: 0.5,
     level: 2,
@@ -72,6 +73,19 @@ describe('check-in analytics', () => {
     expect(result.days).toHaveLength(31);
     expect(result.days[4]?.entries).toHaveLength(2);
     expect(result.days[20]?.entries).toHaveLength(1);
+  });
+
+  it('uses occurrence time instead of immutable creation time', () => {
+    const moved = {
+      ...checkIn({ day: 21, emotionId: EMOTION_IDS.JOY, id: 'moved' }),
+      createdAt: CheckInTimestamp.make(new Date(2026, 6, 21, 12).toISOString()),
+      occurredAt: CheckInTimestamp.make(new Date(2026, 6, 5, 12).toISOString()),
+    };
+
+    const result = calendarMonth({ entries: [moved], month: new Date(2026, 6, 1) });
+
+    expect(result.days[4]?.entries).toEqual([moved]);
+    expect(result.days[20]?.entries).toEqual([]);
   });
 
   it('shows every daily emotion once, ranked by count with Pulse-order ties', () => {

@@ -1,10 +1,14 @@
 import * as Schema from 'effect/Schema';
 
 import { BeliefStatementListSchema } from '@/features/check-in/domain/belief-statement';
-import { CheckInListSchema } from '@/features/check-in/domain/check-in';
+import {
+  CheckInListSchema,
+  LegacyCheckInListSchema,
+  withOccurrenceTime,
+} from '@/features/check-in/domain/check-in';
 import { AppSettingsSchema } from '@/features/settings/domain/app-settings';
 
-export const DATA_ARCHIVE_VERSION = 1;
+export const DATA_ARCHIVE_VERSION = 2;
 
 export const DataArchiveTimestamp = Schema.String.pipe(
   Schema.brand('DataArchiveTimestamp'),
@@ -20,7 +24,30 @@ export const DataArchiveSchema = Schema.Struct({
 
 export type DataArchive = typeof DataArchiveSchema.Type;
 
-export const DataArchiveFromJson = Schema.parseJson(DataArchiveSchema);
+const LegacyDataArchiveSchema = Schema.Struct({
+  version: Schema.Literal(1),
+  exportedAt: DataArchiveTimestamp,
+  checkIns: LegacyCheckInListSchema,
+  beliefStatements: BeliefStatementListSchema,
+  settings: AppSettingsSchema,
+});
+
+export const PersistedDataArchiveSchema = Schema.Union(
+  DataArchiveSchema,
+  LegacyDataArchiveSchema,
+);
+export const DataArchiveFromJson = Schema.parseJson(PersistedDataArchiveSchema);
+
+export function currentDataArchive(
+  archive: typeof PersistedDataArchiveSchema.Type,
+): DataArchive {
+  if (archive.version === DATA_ARCHIVE_VERSION) return archive;
+  return DataArchiveSchema.make({
+    ...archive,
+    version: DATA_ARCHIVE_VERSION,
+    checkIns: archive.checkIns.map(withOccurrenceTime),
+  });
+}
 
 export function dataArchiveSummary(archive: DataArchive) {
   return {

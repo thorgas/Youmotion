@@ -86,6 +86,7 @@ function checkIn({
     id: CheckInId.make(id),
     beliefSystemId,
     createdAt: CheckInTimestamp.make(new Date(2026, 6, day, 12).toISOString()),
+    occurredAt: CheckInTimestamp.make(new Date(2026, 6, day, 12).toISOString()),
     emotionId,
     intensity: 0.5,
     level: 2,

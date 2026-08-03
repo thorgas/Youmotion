@@ -3,7 +3,7 @@ import * as Effect from 'effect/Effect';
 import { NONE } from 'react-native-surrealdb';
 
 import { CHECK_IN_STORAGE_KEY, EMOTION_IDS, BELIEF_SYSTEM_IDS } from '@/constants';
-import { CheckInId } from '../domain/check-in';
+import { CheckInId, CheckInTimestamp } from '../domain/check-in';
 import type { EmotionSelection } from '../domain/check-in';
 import {
   deleteCheckIn,
@@ -29,6 +29,7 @@ const selection = {
   level: 2,
   color: '#E7AD32',
 } satisfies EmotionSelection;
+const occurredAt = CheckInTimestamp.make('2026-07-20T12:30:00.000Z');
 
 describe('Effect check-in repository', () => {
   beforeEach(async () => {
@@ -40,6 +41,7 @@ describe('Effect check-in repository', () => {
     const saved = await Effect.runPromise(persistCheckIn({
       selection,
       note: '  Ein heller Moment.  ',
+      occurredAt,
       beliefSystemId: BELIEF_SYSTEM_IDS.ALWAYS_FUNCTIONING,
       existing: null,
     }));
@@ -61,12 +63,14 @@ describe('Effect check-in repository', () => {
     const saved = await Effect.runPromise(persistCheckIn({
       selection,
       note: 'Before',
+      occurredAt,
       beliefSystemId: null,
       existing: null,
     }));
     const updated = await Effect.runPromise(persistCheckIn({
       selection: { ...selection, intensity: 0.8, level: 4 },
       note: 'After',
+      occurredAt: CheckInTimestamp.make('2026-07-19T09:00:00.000Z'),
       beliefSystemId: BELIEF_SYSTEM_IDS.PERFECT_EVERYTHING,
       existing: saved,
     }));
@@ -74,6 +78,7 @@ describe('Effect check-in repository', () => {
     expect(updated).toMatchObject({
       id: saved.id,
       createdAt: saved.createdAt,
+      occurredAt: '2026-07-19T09:00:00.000Z',
       intensity: 0.8,
       level: 4,
       note: 'After',
@@ -85,6 +90,7 @@ describe('Effect check-in repository', () => {
     const saved = await Effect.runPromise(persistCheckIn({
       selection,
       note: '',
+      occurredAt,
       beliefSystemId: BELIEF_SYSTEM_IDS.ALWAYS_FUNCTIONING,
       existing: null,
     }));
@@ -124,6 +130,7 @@ describe('Effect check-in repository', () => {
     expect(loaded).toEqual([{
       id: stored.id,
       createdAt: stored.createdAt,
+      occurredAt: stored.createdAt,
       emotionId: stored.emotionId,
       intensity: stored.intensity,
       level: 2,
@@ -144,7 +151,10 @@ describe('Effect check-in repository', () => {
 
     const loaded = await Effect.runPromise(loadCheckIns);
 
-    expect(loaded).toEqual([expect.objectContaining({ id: 'legacy-check-in' })]);
+    expect(loaded).toEqual([expect.objectContaining({
+      id: 'legacy-check-in',
+      occurredAt: '2026-07-12T12:00:00.000Z',
+    })]);
     expect(mockSurrealQuery).toHaveBeenCalledWith(
       'UPSERT $record CONTENT $checkIn',
       expect.objectContaining({
@@ -165,6 +175,7 @@ describe('Effect check-in repository', () => {
     const error = await Effect.runPromise(Effect.flip(persistCheckIn({
       selection,
       note: '',
+      occurredAt,
       beliefSystemId: null,
       existing: null,
     })));

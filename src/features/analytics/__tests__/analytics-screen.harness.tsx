@@ -52,6 +52,7 @@ function checkIn({ day, emotionId, id, note = '' }: {
       ? BELIEF_SYSTEM_IDS.ALWAYS_FUNCTIONING
       : undefined,
     createdAt: CheckInTimestamp.make(new Date(2026, 6, day, 12).toISOString()),
+    occurredAt: CheckInTimestamp.make(new Date(2026, 6, day, 12).toISOString()),
     emotionId,
     intensity: 0.5,
     level: 2,
@@ -83,6 +84,9 @@ function checkInsForBelief({
     id: CheckInId.make(`${prefix}-${String(index + 1)}`),
     beliefSystemId,
     createdAt: CheckInTimestamp.make(
+      new Date(2026, month, day, 10, index).toISOString(),
+    ),
+    occurredAt: CheckInTimestamp.make(
       new Date(2026, month, day, 10, index).toISOString(),
     ),
     emotionId,

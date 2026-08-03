@@ -17,6 +17,7 @@ function entry(index: number): CheckIn {
   return {
     id: CheckInId.make(`all-history-${index}`),
     createdAt: CheckInTimestamp.make(new Date(2026, 0, index + 1).toISOString()),
+    occurredAt: CheckInTimestamp.make(new Date(2026, 0, index + 1).toISOString()),
     emotionId: EMOTION_IDS.JOY,
     intensity: 0.5,
     level: 2,
@@ -36,6 +37,28 @@ describe('check-in history store', () => {
     });
 
     expect(checkInHistoryStore.getSnapshot().context.entries).toHaveLength(35);
+  });
+
+  it('reorders edited moments by occurrence time with deterministic ties', () => {
+    const first = entry(0);
+    const second = entry(1);
+    checkInHistoryStore.trigger.hydrated({ entries: [first, second] });
+
+    expect(checkInHistoryStore.getSnapshot().context.entries.map(({ id }) => id)).toEqual([
+      second.id,
+      first.id,
+    ]);
+
+    checkInHistoryStore.trigger.recorded({
+      entry: {
+        ...first,
+        occurredAt: CheckInTimestamp.make('2027-01-01T00:00:00.000Z'),
+      },
+    });
+    expect(checkInHistoryStore.getSnapshot().context.entries.map(({ id }) => id)).toEqual([
+      first.id,
+      second.id,
+    ]);
   });
 
   it('keeps the history timeframe separate and defaults it to all time', () => {

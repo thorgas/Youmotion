@@ -10,9 +10,10 @@ import {
 
 import {
   CheckInId,
-  CheckInListFromJson,
+  PersistedCheckInListFromJson,
   CheckInSchema,
   CheckInTimestamp,
+  withOccurrenceTime,
   type CheckIn,
   type EmotionSelection,
 } from '../domain/check-in';
@@ -71,6 +72,7 @@ const SurrealOptionalBeliefSystemId = Schema.Union(
 const CheckInDatabaseSchema = Schema.Struct({
   id: CheckInId,
   createdAt: CheckInTimestamp,
+  occurredAt: Schema.optional(CheckInTimestamp),
   emotionId: CheckInSchema.fields.emotionId,
   intensity: SurrealIntensity,
   level: Schema.optional(SurrealNonNegativeInteger),
@@ -87,7 +89,8 @@ const CheckInDatabaseListSchema = Schema.Array(CheckInDatabaseSchema);
 function checkInFromDatabase(
   entry: typeof CheckInDatabaseSchema.Type,
 ): CheckIn {
-  const { beliefSystemId, guidingStatementSnapshot, ...checkIn } = entry;
+  const { beliefSystemId, guidingStatementSnapshot, ...persistedCheckIn } = entry;
+  const checkIn = withOccurrenceTime(persistedCheckIn);
   const statementSnapshot = typeof guidingStatementSnapshot === 'string'
     ? { guidingStatementSnapshot }
     : {};
@@ -105,8 +108,9 @@ const readLegacy = Effect.tryPromise({
 const decodeLegacy = readLegacy.pipe(
   Effect.flatMap((raw) => {
     if (raw === null) return Effect.succeed<readonly CheckIn[]>([]);
-    return Schema.decodeUnknown(CheckInListFromJson)(raw).pipe(
+    return Schema.decodeUnknown(PersistedCheckInListFromJson)(raw).pipe(
       Effect.mapError((cause) => CheckInDataError.make({ operation: 'decode', cause })),
+      Effect.map((entries) => entries.map(withOccurrenceTime)),
     );
   }),
 );
@@ -115,7 +119,7 @@ const selectCheckIns = Effect.tryPromise({
   try: async () => {
     const database = await getDatabase();
     return database.query<unknown>(
-      `SELECT checkInId AS id, createdAt, emotionId, intensity, level, note, beliefSystemId, guidingStatementSnapshot FROM ${CHECK_IN_TABLE} ORDER BY createdAt DESC`,
+      `SELECT checkInId AS id, createdAt, occurredAt, emotionId, intensity, level, note, beliefSystemId, guidingStatementSnapshot FROM ${CHECK_IN_TABLE} ORDER BY occurredAt DESC, createdAt DESC`,
     );
   },
   catch: (cause) => CheckInStorageError.make({ operation: 'read', cause }),
@@ -165,11 +169,13 @@ export const loadCheckIns = selectCheckIns.pipe(
 export const persistCheckIn = Effect.fn('CheckInRepository.persist')(({
   selection,
   note,
+  occurredAt,
   beliefSystemId,
   existing,
 }: {
   selection: EmotionSelection;
   note: string;
+  occurredAt: CheckInTimestamp;
   beliefSystemId: CheckIn['beliefSystemId'] | null;
   existing: CheckIn | null;
 }) => {
@@ -187,6 +193,7 @@ export const persistCheckIn = Effect.fn('CheckInRepository.persist')(({
   const checkIn: CheckIn = {
     id: identity.id,
     createdAt: identity.createdAt,
+    occurredAt,
     emotionId: selection.emotionId,
     intensity: selection.intensity,
     level: selection.level,

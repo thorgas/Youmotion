@@ -686,6 +686,18 @@ describe('check-in screens', () => {
     });
   });
 
+  it('keeps occurrence time quiet until the user opens the native editor', async () => {
+    await act(_reachReflection);
+    const screen = await _renderLocalized(<ReflectionScreen />);
+
+    expect(within(screen.getByTestId('moment-time-control')).getByText('Now')).toBeTruthy();
+    expect(screen.queryByText('When was this?')).toBeNull();
+
+    await fireEvent.press(screen.getByTestId('moment-time-control'));
+    expect(screen.getByText('When was this?')).toBeTruthy();
+    expect(screen.getByText('Set to now')).toBeTruthy();
+  });
+
   it('submits a reflection from the native keyboard before offering the optional core belief step', async () => {
     await act(_reachReflection);
     const screen = await _renderLocalized(<ReflectionScreen />);
@@ -1021,6 +1033,7 @@ describe('check-in screens', () => {
     const moments = [{
       id: CheckInId.make('history-current-week'),
       createdAt: CheckInTimestamp.make(new Date(2026, 6, 21, 12).toISOString()),
+      occurredAt: CheckInTimestamp.make(new Date(2026, 6, 21, 12).toISOString()),
       emotionId: EMOTION_IDS.JOY,
       intensity: 0.5,
       level: 2,
@@ -1028,6 +1041,7 @@ describe('check-in screens', () => {
     }, {
       id: CheckInId.make('history-previous-week'),
       createdAt: CheckInTimestamp.make(new Date(2026, 6, 19, 12).toISOString()),
+      occurredAt: CheckInTimestamp.make(new Date(2026, 6, 19, 12).toISOString()),
       emotionId: EMOTION_IDS.FEAR,
       intensity: 0.5,
       level: 2,
@@ -1053,12 +1067,14 @@ describe('check-in screens', () => {
     const moments = [{
       id: CheckInId.make('evidence-match'),
       createdAt: CheckInTimestamp.make(new Date(2026, 6, 19, 12).toISOString()),
+      occurredAt: CheckInTimestamp.make(new Date(2026, 6, 19, 12).toISOString()),
       emotionId: EMOTION_IDS.FEAR,
       intensity: 0.5,
       note: 'Supporting moment',
     }, {
       id: CheckInId.make('evidence-other'),
       createdAt: CheckInTimestamp.make(new Date(2026, 6, 18, 12).toISOString()),
+      occurredAt: CheckInTimestamp.make(new Date(2026, 6, 18, 12).toISOString()),
       emotionId: EMOTION_IDS.JOY,
       intensity: 0.5,
       note: 'Another moment',
@@ -1085,6 +1101,7 @@ describe('check-in screens', () => {
     const moments = [{
       id: firstFearId,
       createdAt: CheckInTimestamp.make(new Date(2026, 6, 18, 12).toISOString()),
+      occurredAt: CheckInTimestamp.make(new Date(2026, 6, 18, 12).toISOString()),
       emotionId: EMOTION_IDS.FEAR,
       intensity: 0.5,
       note: '',
@@ -1092,6 +1109,7 @@ describe('check-in screens', () => {
     }, {
       id: secondFearId,
       createdAt: CheckInTimestamp.make(new Date(2026, 6, 19, 12).toISOString()),
+      occurredAt: CheckInTimestamp.make(new Date(2026, 6, 19, 12).toISOString()),
       emotionId: EMOTION_IDS.FEAR,
       intensity: 0.5,
       note: '',
@@ -1099,6 +1117,7 @@ describe('check-in screens', () => {
     }, {
       id: CheckInId.make('insight-joy'),
       createdAt: CheckInTimestamp.make(new Date(2026, 6, 17, 12).toISOString()),
+      occurredAt: CheckInTimestamp.make(new Date(2026, 6, 17, 12).toISOString()),
       emotionId: EMOTION_IDS.JOY,
       intensity: 0.5,
       note: '',
@@ -1128,6 +1147,7 @@ describe('check-in screens', () => {
     const moments = [{
       id: CheckInId.make('additional-pattern-fear-1'),
       createdAt: CheckInTimestamp.make(new Date(2026, 6, 18, 12).toISOString()),
+      occurredAt: CheckInTimestamp.make(new Date(2026, 6, 18, 12).toISOString()),
       emotionId: EMOTION_IDS.FEAR,
       intensity: 0.5,
       note: '',
@@ -1135,6 +1155,7 @@ describe('check-in screens', () => {
     }, {
       id: CheckInId.make('additional-pattern-fear-2'),
       createdAt: CheckInTimestamp.make(new Date(2026, 6, 19, 12).toISOString()),
+      occurredAt: CheckInTimestamp.make(new Date(2026, 6, 19, 12).toISOString()),
       emotionId: EMOTION_IDS.FEAR,
       intensity: 0.5,
       note: '',
@@ -1142,6 +1163,7 @@ describe('check-in screens', () => {
     }, {
       id: CheckInId.make('additional-pattern-joy'),
       createdAt: CheckInTimestamp.make(new Date(2026, 6, 17, 12).toISOString()),
+      occurredAt: CheckInTimestamp.make(new Date(2026, 6, 17, 12).toISOString()),
       emotionId: EMOTION_IDS.JOY,
       intensity: 0.5,
       note: '',
@@ -1177,6 +1199,7 @@ describe('check-in screens', () => {
       entries: [{
         id: CheckInId.make('history-harmful-belief'),
         createdAt: CheckInTimestamp.make(new Date(2026, 6, 21, 12).toISOString()),
+        occurredAt: CheckInTimestamp.make(new Date(2026, 6, 21, 12).toISOString()),
         emotionId: EMOTION_IDS.SADNESS,
         intensity: 0.5,
         level: 2,

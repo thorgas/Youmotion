@@ -14,10 +14,18 @@ const initialContext = {
   error: string | null;
 };
 
+function _sortEntries(entries: readonly CheckIn[]) {
+  return entries.toSorted((left, right) => (
+    right.occurredAt.localeCompare(left.occurredAt)
+    || right.createdAt.localeCompare(left.createdAt)
+    || right.id.localeCompare(left.id)
+  ));
+}
+
 const _recordEntry = ({ entries, entry }: { entries: readonly CheckIn[]; entry: CheckIn }) => {
   const alreadyRecorded = entries.some((candidate) => candidate.id === entry.id);
-  if (!alreadyRecorded) return [entry, ...entries];
-  return entries.map((candidate) => candidate.id === entry.id ? entry : candidate);
+  if (!alreadyRecorded) return _sortEntries([entry, ...entries]);
+  return _sortEntries(entries.map((candidate) => candidate.id === entry.id ? entry : candidate));
 };
 
 const _deleteEntry = ({ entries, id }: { entries: readonly CheckIn[]; id: CheckIn['id'] }) => (
@@ -41,7 +49,11 @@ export const checkInHistoryStore = createStore({
   },
   context: initialContext,
   on: {
-    hydrated: (_context, event) => ({ entries: event.entries, hydrated: true, error: null }),
+    hydrated: (_context, event) => ({
+      entries: _sortEntries(event.entries),
+      hydrated: true,
+      error: null,
+    }),
     hydrationFailed: (context, event) => ({ ...context, hydrated: true, error: event.message }),
     recorded: (context, event) => ({
       ...context,

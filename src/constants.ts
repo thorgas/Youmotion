@@ -41,6 +41,13 @@ export const CHECK_IN_EVENTS = Object.freeze({
   SELECTION_CANCELLED: literal('selection.cancelled'),
   SELECTION_RELEASED: literal('selection.released'),
   NOTE_CHANGED: literal('note.changed'),
+  MOMENT_TIME_EDITOR_OPENED: literal('momentTime.editorOpened'),
+  MOMENT_TIME_EDITOR_CLOSED: literal('momentTime.editorClosed'),
+  MOMENT_TIME_DATE_REQUESTED: literal('momentTime.dateRequested'),
+  MOMENT_TIME_TIME_REQUESTED: literal('momentTime.timeRequested'),
+  MOMENT_TIME_PICKER_DISMISSED: literal('momentTime.pickerDismissed'),
+  MOMENT_TIME_CHANGED: literal('momentTime.changed'),
+  MOMENT_TIME_RESET: literal('momentTime.reset'),
   SAVE_FOR_NOW_REQUESTED: literal('checkIn.saveForNowRequested'),
   BELIEF_SYSTEM_CHANGED: literal('beliefSystem.changed'),
   BELIEF_SYSTEM_BACK_REQUESTED: literal('beliefSystem.backRequested'),
@@ -73,6 +80,11 @@ export const CHECK_IN_EVENTS = Object.freeze({
   RETRIED: literal('checkIn.retried'),
   RESTARTED: literal('checkIn.restarted'),
   REFLECTION_CANCELLED: literal('reflection.cancelled'),
+});
+
+export const MOMENT_TIME_PICKER_MODES = Object.freeze({
+  DATE: literal('date'),
+  TIME: literal('time'),
 });
 
 export const CHECK_IN_SAVE_DESTINATIONS = Object.freeze({

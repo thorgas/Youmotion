@@ -57,10 +57,10 @@ export function periodCalendarDays({
     days.push({
       date,
       entries: entries.filter((entry) => {
-        const createdAt = new Date(entry.createdAt);
-        return !Number.isNaN(createdAt.getTime())
-          && createdAt >= date
-          && createdAt < nextDay;
+        const occurredAt = new Date(entry.occurredAt);
+        return !Number.isNaN(occurredAt.getTime())
+          && occurredAt >= date
+          && occurredAt < nextDay;
       }),
     });
   }
@@ -80,7 +80,7 @@ export function calendarMonth({ entries, month }: {
   const dayCount = new Date(year, monthIndex + 1, 0).getDate();
   const leadingDayCount = (new Date(year, monthIndex, 1).getDay() + 6) % 7;
   const entriesByDay = entries.reduce<Map<number, readonly CheckIn[]>>((buckets, entry) => {
-    const date = new Date(entry.createdAt);
+    const date = new Date(entry.occurredAt);
     if (Number.isNaN(date.getTime()) || !sameLocalMonth({ date, month: monthIndex, year })) {
       return buckets;
     }

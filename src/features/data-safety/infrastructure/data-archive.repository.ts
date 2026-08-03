@@ -23,6 +23,8 @@ import {
   DataArchiveFromJson,
   DataArchiveSchema,
   DataArchiveTimestamp,
+  DATA_ARCHIVE_VERSION,
+  currentDataArchive,
   type DataArchive,
 } from '../domain/data-archive';
 
@@ -72,7 +74,7 @@ export const createDataArchive = Effect.all({
   settings: loadAppSettings,
 }).pipe(
   Effect.map(({ beliefStatements, checkIns, settings }) => DataArchiveSchema.make({
-    version: 1,
+    version: DATA_ARCHIVE_VERSION,
     exportedAt: DataArchiveTimestamp.make(new Date().toISOString()),
     checkIns,
     beliefStatements,
@@ -128,7 +130,7 @@ export const pickDataArchive = Effect.fn('DataArchiveRepository.pick')(() => Eff
     }).pipe(
       Effect.flatMap((contents) => Schema.decodeUnknown(DataArchiveFromJson)(contents)),
       Effect.mapError((cause) => DataArchiveDataError.make({ operation: 'decode', cause })),
-      Effect.map((archive): DataArchive | null => archive),
+      Effect.map((archive): DataArchive | null => currentDataArchive(archive)),
     );
   }),
 ));

@@ -3,7 +3,7 @@ import { afterEach, describe, expect, test } from 'react-native-harness';
 import { SurrealRecordId } from 'react-native-surrealdb';
 
 import { CHECK_IN_TABLE, EMOTION_IDS } from '@/constants';
-import type { CheckIn, EmotionSelection } from '../domain/check-in';
+import { CheckInTimestamp, type CheckIn, type EmotionSelection } from '../domain/check-in';
 import { loadCheckIns, persistCheckIn } from '../infrastructure/check-in.repository';
 import { getDatabase } from '../infrastructure/surrealdb.database';
 
@@ -30,6 +30,7 @@ describe('SurrealDB check-in repository', () => {
     saved = await Effect.runPromise(persistCheckIn({
       selection,
       note: 'Native SurrealKV harness check',
+      occurredAt: CheckInTimestamp.make(new Date().toISOString()),
       beliefSystemId: null,
       existing: null,
     }));

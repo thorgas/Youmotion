@@ -79,13 +79,14 @@ const selection = {
 const hydrationSentinel = {
   id: CheckInId.make('hydration-sentinel'),
   createdAt: CheckInTimestamp.make('2026-07-18T00:00:00.000Z'),
+  occurredAt: CheckInTimestamp.make('2026-07-18T00:00:00.000Z'),
   emotionId: EMOTION_IDS.JOY,
   intensity: 0.5,
   note: '',
 } satisfies CheckIn;
 
 const dataArchive = DataArchiveSchema.make({
-  version: 1,
+  version: 2,
   exportedAt: DataArchiveTimestamp.make('2026-08-02T08:00:00.000Z'),
   checkIns: [{
     ...hydrationSentinel,
@@ -544,6 +545,29 @@ describe('app navigation model', () => {
       note: 'Enough for today.',
     });
     expect(routeForStateValue(completed.value)).toBe(APP_ROUTES.SUCCESS);
+  });
+
+  it('owns an editable occurrence time and rejects future values', () => {
+    const actor = createActor(appNavigationMachine).start();
+    actor.send({ type: CHECK_IN_EVENTS.TOUCH_STARTED });
+    actor.send({ type: CHECK_IN_EVENTS.SELECTION_CHANGED, selection });
+    actor.send({ type: CHECK_IN_EVENTS.SELECTION_RELEASED });
+
+    expect(actor.getSnapshot().context.occurredAtDraft).not.toBeNull();
+    expect(actor.getSnapshot().context.occurredAtCustomized).toBe(false);
+
+    const past = CheckInTimestamp.make('2020-04-12T08:30:00.000Z');
+    actor.send({ type: CHECK_IN_EVENTS.MOMENT_TIME_CHANGED, occurredAt: past });
+    expect(actor.getSnapshot().context).toMatchObject({
+      occurredAtDraft: past,
+      occurredAtCustomized: true,
+    });
+
+    actor.send({
+      type: CHECK_IN_EVENTS.MOMENT_TIME_CHANGED,
+      occurredAt: CheckInTimestamp.make('2999-01-01T00:00:00.000Z'),
+    });
+    expect(actor.getSnapshot().context.occurredAtDraft).toBe(past);
   });
 
   it('cancels an interrupted drag without selecting its preview', () => {

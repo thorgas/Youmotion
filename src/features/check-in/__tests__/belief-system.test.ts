@@ -31,6 +31,7 @@ function checkIn({
   return {
     id: CheckInId.make(id),
     createdAt: CheckInTimestamp.make('2026-07-18T12:00:00.000Z'),
+    occurredAt: CheckInTimestamp.make('2026-07-18T12:00:00.000Z'),
     emotionId,
     intensity: 0.5,
     level: 2,

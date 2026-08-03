@@ -11,6 +11,7 @@ import {
   DataArchiveFromJson,
   DataArchiveSchema,
   DataArchiveTimestamp,
+  currentDataArchive,
   dataArchiveSummary,
 } from '../domain/data-archive';
 import { CheckInId, CheckInTimestamp } from '@/features/check-in/domain/check-in';
@@ -21,6 +22,7 @@ const archive = DataArchiveSchema.make({
   checkIns: [{
     id: CheckInId.make('moment-1'),
     createdAt: CheckInTimestamp.make('2026-08-01T18:00:00.000Z'),
+    occurredAt: CheckInTimestamp.make('2026-08-01T18:00:00.000Z'),
     emotionId: EMOTION_IDS.JOY,
     intensity: 0.6,
     level: 3,
@@ -40,7 +42,7 @@ describe('data archive schema', () => {
     const decoded = await Effect.runPromise(Schema.decodeUnknown(DataArchiveFromJson)(encoded));
 
     expect(decoded).toEqual(archive);
-    expect(dataArchiveSummary(decoded)).toEqual({
+    expect(dataArchiveSummary(currentDataArchive(decoded))).toEqual({
       exportedAt: archive.exportedAt,
       checkInCount: 1,
       beliefStatementCount: 0,
@@ -51,11 +53,24 @@ describe('data archive schema', () => {
     const result = await Effect.runPromise(Effect.either(
       Schema.decodeUnknown(DataArchiveFromJson)(JSON.stringify({
         ...archive,
-        version: 2,
+        version: 3,
       })),
     ));
 
     expect(result._tag).toBe('Left');
+  });
+
+  it('upgrades version 1 archives by using creation time as occurrence time', async () => {
+    const legacy = JSON.stringify({
+      ...archive,
+      version: 1,
+      checkIns: archive.checkIns.map(({ occurredAt: _occurredAt, ...checkIn }) => checkIn),
+    });
+    const decoded = await Effect.runPromise(Schema.decodeUnknown(DataArchiveFromJson)(legacy));
+    const upgraded = currentDataArchive(decoded);
+
+    expect(upgraded.version).toBe(DATA_ARCHIVE_VERSION);
+    expect(upgraded.checkIns[0]?.occurredAt).toBe(upgraded.checkIns[0]?.createdAt);
   });
 
   it('rejects malformed persisted entries before restore', async () => {

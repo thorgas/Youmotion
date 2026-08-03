@@ -260,7 +260,7 @@ function MomentRow({ entry, locale }: { entry: CheckIn; locale: string }) {
         />
         <View style={styles.rowCopy}>
           <Text style={styles.emotion}>{emotionSummary(entry)}</Text>
-          <Text style={styles.date}>{formatHistoryDate({ date: new Date(entry.createdAt), locale })}</Text>
+          <Text style={styles.date}>{formatHistoryDate({ date: new Date(entry.occurredAt), locale })}</Text>
           {entry.note ? <Text style={styles.note}>{entry.note}</Text> : null}
           <HistoryBelief entry={entry} statements={beliefStatements} />
         </View>
