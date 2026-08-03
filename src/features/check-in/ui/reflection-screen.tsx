@@ -199,7 +199,7 @@ function ReflectionEditorActions({
         accessibilityRole="button"
         disabled={saving}
         onPress={onSave}
-        style={styles.primaryButton}
+        style={[styles.primaryButton, styles.standalonePrimaryButton]}
         testID="reflection-save"
       >
         {saving ? <ActivityIndicator color="#FFFFFF" /> : (
@@ -1071,9 +1071,9 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     alignItems: 'center',
     justifyContent: 'center',
-    marginTop: 14,
     paddingHorizontal: 16,
   },
+  standalonePrimaryButton: { marginTop: 14 },
   primaryText: { fontFamily: type.semibold, color: '#FFFFFF', fontSize: 14 },
   secondaryButton: {
     minHeight: 50,

@@ -570,6 +570,14 @@ describe('check-in screens', () => {
       now: 2,
     });
     expect(screen.getByTestId('belief-system-browse').props['accessibilityRole']).toBe('button');
+    const beliefBackStyle = StyleSheet.flatten(
+      screen.getByTestId('belief-system-back').props['style'],
+    );
+    const beliefFinishStyle = StyleSheet.flatten(
+      screen.getByTestId('belief-system-finish').props['style'],
+    );
+    expect(beliefFinishStyle['minHeight']).toBe(beliefBackStyle['minHeight']);
+    expect(beliefFinishStyle['marginTop']).toBeUndefined();
 
     await fireEvent.press(screen.getByTestId('belief-system-browse'));
     await waitFor(() => expect(
