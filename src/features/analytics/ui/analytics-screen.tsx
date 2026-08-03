@@ -9,17 +9,15 @@ import {
   useWindowDimensions,
   View,
 } from 'react-native';
-import Animated, {
-  FadeInDown,
-  ReduceMotion,
-} from 'react-native-reanimated';
+import Animated, { FadeIn } from 'react-native-reanimated';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import {
   ANALYTICS_EVENTS,
+  ANALYTICS_INSIGHT_TABS,
   ANALYTICS_TIMEFRAMES,
-  MOTION_DURATION,
-  MOTION_OFFSET,
+  HISTORY_EVENTS,
+  NAVIGATION_EVENTS,
 } from '@/constants';
 import {
   tabScreenContentStyle,
@@ -27,6 +25,7 @@ import {
   tabScreenTitleStyle,
 } from '@/components/ui/tab-screen-layout';
 import { checkInHistoryStore } from '@/features/check-in/application/check-in-history.store';
+import { historyTimeframeStore } from '@/features/check-in/application/history-timeframe.store';
 import type { CheckIn } from '@/features/check-in/domain/check-in';
 import { emotions } from '@/features/check-in/domain/emotion';
 import type { BeliefStatement } from '@/features/check-in/domain/belief-statement';
@@ -39,6 +38,8 @@ import { analyticsStore } from '../application/analytics.store';
 import {
   analyticsObservations,
   emotionFrequencies,
+  primaryAnalyticsInsights,
+  type PrimaryAnalyticsInsight,
   type AnalyticsObservation,
   type EmotionFrequency,
 } from '../domain/check-in-analytics';
@@ -53,14 +54,18 @@ import {
   entriesForAnalyticsTimeframe,
   topLeitsaetzeForTimeframe,
   type AnalyticsTimeframe,
+  type TopLeitsatz,
+  type TopLeitsatzGroup,
 } from '../domain/analytics-timeframe';
 import {
   analyticsMonthLabel,
   analyticsTimeframeRangeLabel,
-  additionalTopLeitsaetzeCopy,
   analyticsWeekdayLabel,
   calendarDayAccessibilityLabel,
   observationCopy,
+  insightEvidenceCopy,
+  insightLearningCopy,
+  insightNoPatternCopy,
   topLeitsatzEvidenceCopy,
   topLeitsatzLabel,
 } from './analytics-copy';
@@ -98,74 +103,353 @@ const _selectAllTime = () => {
     timeframe: ANALYTICS_TIMEFRAMES.ALL_TIME,
   });
 };
-const leitsatzEntering = FadeInDown
-  .duration(MOTION_DURATION.ENTER)
-  .reduceMotion(ReduceMotion.System)
-  .withInitialValues({
-    opacity: 0,
-    transform: [{ translateY: MOTION_OFFSET.STATE }],
+const _selectGuidingBeliefInsight = () => {
+  analyticsStore.trigger[ANALYTICS_EVENTS.INSIGHT_TAB_SELECTED]({
+    tab: ANALYTICS_INSIGHT_TABS.GUIDING_BELIEF,
   });
+};
+const _selectPatternInsight = () => {
+  analyticsStore.trigger[ANALYTICS_EVENTS.INSIGHT_TAB_SELECTED]({
+    tab: ANALYTICS_INSIGHT_TABS.PATTERN,
+  });
+};
 
-function TopLeitsatz({
+type GuidingBeliefEvidenceInsight = Readonly<{
+  beliefSystemId: NonNullable<CheckIn['beliefSystemId']>;
+  kind: 'guiding-belief';
+  supportingIds: readonly CheckIn['id'][];
+}>;
+type InsightEvidenceSelection = Readonly<{
+  insight: PrimaryAnalyticsInsight | GuidingBeliefEvidenceInsight;
+  timeframe: AnalyticsTimeframe;
+}>;
+
+function InsightTab({ label, onPress, selected, testID }: {
+  label: string;
+  onPress: () => void;
+  selected: boolean;
+  testID: string;
+}) {
+  return (
+    <Pressable
+      accessibilityRole="tab"
+      accessibilityState={{ selected }}
+      onPress={onPress}
+      style={[styles.insightTab, selected ? styles.insightTabSelected : null]}
+      testID={testID}
+    >
+      <Text style={[styles.insightTabText, selected ? styles.insightTabTextSelected : null]}>
+        {label}
+      </Text>
+    </Pressable>
+  );
+}
+
+function resolvedInsightTab({
+  guidingBelief,
+  pattern,
+  selectedTab,
+}: {
+  guidingBelief: TopLeitsatz | undefined;
+  pattern: PrimaryAnalyticsInsight | null;
+  selectedTab: typeof ANALYTICS_INSIGHT_TABS[keyof typeof ANALYTICS_INSIGHT_TABS];
+}) {
+  if (!guidingBelief) return ANALYTICS_INSIGHT_TABS.PATTERN;
+  if (!pattern) return ANALYTICS_INSIGHT_TABS.GUIDING_BELIEF;
+  return selectedTab;
+}
+
+function InsightTabs({ showingPattern, visible }: { showingPattern: boolean; visible: boolean }) {
+  if (!visible) return null;
+  return (
+    <View accessibilityRole="tablist" style={styles.insightTabs} testID="analytics-insight-tabs">
+      <InsightTab
+        label={String(fbs('Guiding belief', 'Analytics hero tab for the most selected guiding belief'))}
+        onPress={_selectGuidingBeliefInsight}
+        selected={!showingPattern}
+        testID="analytics-insight-tab-guiding-belief"
+      />
+      <InsightTab
+        label={String(fbs('Pattern', 'Analytics hero tab for a recurring pattern'))}
+        onPress={_selectPatternInsight}
+        selected={showingPattern}
+        testID="analytics-insight-tab-pattern"
+      />
+    </View>
+  );
+}
+
+function PatternInsight({ entries, pattern, rangeLabel, statements }: {
+  entries: readonly CheckIn[];
+  pattern: PrimaryAnalyticsInsight;
+  rangeLabel: string;
+  statements: readonly BeliefStatement[];
+}) {
+  return (
+    <View testID={`analytics-insight-pattern-${pattern.kind}`}>
+      <Text style={styles.insightText}>{observationCopy({ observation: pattern, statements })}</Text>
+      <Text style={styles.insightEvidence}>
+        {insightEvidenceCopy({
+          momentCount: entries.length,
+          rangeLabel,
+          supportingCount: pattern.supportingIds.length,
+        })}
+      </Text>
+    </View>
+  );
+}
+
+function tiedGuidingBeliefCopy(count: number) {
+  if (count === 1) {
+    return String(fbs(
+      '1 other guiding belief was selected equally often.',
+      'Copy when one other guiding belief ties the one shown in the Analytics hero',
+    ));
+  }
+  return String(fbs(
+    fbs.param('count', String(count)) + ' other guiding beliefs were selected equally often.',
+    'Copy when multiple guiding beliefs tie the one shown in the Analytics hero',
+  ));
+}
+
+function GuidingBeliefInsight({ group, leitsatz, locale }: {
+  group: TopLeitsatzGroup;
+  leitsatz: TopLeitsatz;
+  locale: AppLocale;
+}) {
+  const tiedCount = group.leitsaetze.length - 1 + group.additionalCount;
+  return (
+    <View testID={`analytics-insight-guiding-belief-${leitsatz.beliefSystemId}`}>
+      <Text style={styles.insightText}>“{leitsatz.guidingStatement}”</Text>
+      <Text
+        accessibilityLabel={topLeitsatzEvidenceCopy({
+          leitsatz,
+          locale,
+          range: group.range,
+          timeframe: group.timeframe,
+        })}
+        style={styles.insightEvidence}
+      >
+        {topLeitsatzEvidenceCopy({
+          leitsatz,
+          locale,
+          range: group.range,
+          timeframe: group.timeframe,
+        })}
+      </Text>
+      {tiedCount > 0 ? (
+        <Text style={styles.insightTieCopy}>{tiedGuidingBeliefCopy(tiedCount)}</Text>
+      ) : null}
+    </View>
+  );
+}
+
+function InsightHeading({ group, showingPattern, timeframe }: {
+  group: TopLeitsatzGroup | null;
+  showingPattern: boolean;
+  timeframe: AnalyticsTimeframe;
+}) {
+  const multiple = (group?.leitsaetze.length ?? 0) > 1 || (group?.additionalCount ?? 0) > 0;
+  const label = showingPattern
+    ? String(fbs('ONE PATTERN', 'Primary evidence-linked insight label'))
+    : topLeitsatzLabel({ multiple, timeframe });
+  return (
+    <View style={styles.insightHeading}>
+      <View style={styles.insightMarker} />
+      <Text accessibilityLabel={label} style={styles.insightEyebrow}>{label}</Text>
+    </View>
+  );
+}
+
+function InsightBody({
+  entries,
+  group,
+  locale,
+  pattern,
+  rangeLabel,
+  showingPattern,
+  statements,
+  timeframe,
+}: {
+  entries: readonly CheckIn[];
+  group: TopLeitsatzGroup | null;
+  locale: AppLocale;
+  pattern: PrimaryAnalyticsInsight | null;
+  rangeLabel: string;
+  showingPattern: boolean;
+  statements: readonly BeliefStatement[];
+  timeframe: AnalyticsTimeframe;
+}) {
+  const guidingBelief = group?.leitsaetze[0];
+  return (
+    <>
+      <InsightHeading group={group} showingPattern={showingPattern} timeframe={timeframe} />
+      {showingPattern && pattern ? (
+        <PatternInsight
+          entries={entries}
+          pattern={pattern}
+          rangeLabel={rangeLabel}
+          statements={statements}
+        />
+      ) : guidingBelief && group ? (
+        <GuidingBeliefInsight group={group} leitsatz={guidingBelief} locale={locale} />
+      ) : null}
+    </>
+  );
+}
+
+function InsightActions({
+  guidingBelief,
+  onEvidencePress,
+  pattern,
+  patternCount,
+  patternPosition,
+  showingPattern,
+  timeframe,
+}: {
+  guidingBelief: TopLeitsatz | undefined;
+  onEvidencePress: ((selection: InsightEvidenceSelection) => void) | undefined;
+  pattern: PrimaryAnalyticsInsight | null;
+  patternCount: number;
+  patternPosition: number;
+  showingPattern: boolean;
+  timeframe: AnalyticsTimeframe;
+}) {
+  const _openEvidence = () => {
+    if (!onEvidencePress) return;
+    if (showingPattern && pattern) {
+      onEvidencePress({ insight: pattern, timeframe });
+      return;
+    }
+    if (!guidingBelief) return;
+    onEvidencePress({
+      insight: {
+        beliefSystemId: guidingBelief.beliefSystemId,
+        kind: 'guiding-belief',
+        supportingIds: guidingBelief.supportingIds,
+      },
+      timeframe,
+    });
+  };
+  const _nextPattern = () => {
+    analyticsStore.trigger[ANALYTICS_EVENTS.NEXT_PATTERN_REQUESTED]({ patternCount });
+  };
+  return (
+    <View style={styles.insightActions}>
+      <Pressable
+        accessibilityRole="button"
+        onPress={_openEvidence}
+        style={styles.insightEvidenceButton}
+        testID="analytics-insight-evidence"
+      >
+        <Text style={styles.insightEvidenceButtonText}>
+          <fbt desc="Button opening the moments supporting an analytics insight">See matching moments</fbt>
+        </Text>
+        <Text accessibilityElementsHidden style={styles.insightDisclosure}>›</Text>
+      </Pressable>
+      {showingPattern && patternCount > 1 ? (
+        <View style={styles.insightPatternNavigation}>
+          <Text style={styles.insightPatternPosition}>
+            {patternPosition + 1} / {patternCount}
+          </Text>
+          <Pressable
+            accessibilityRole="button"
+            onPress={_nextPattern}
+            style={styles.insightNextPatternButton}
+            testID="analytics-insight-next-pattern"
+          >
+            <Text style={styles.insightNextPatternText}>
+              <fbt desc="Button showing the next available analytics pattern">Next pattern</fbt>
+            </Text>
+            <Text accessibilityElementsHidden style={styles.insightNextPatternDisclosure}>›</Text>
+          </Pressable>
+        </View>
+      ) : null}
+    </View>
+  );
+}
+
+function InsightHero({
   entries,
   locale,
   now,
+  onEvidencePress,
   statements,
   timeframe,
 }: {
   entries: readonly CheckIn[];
   locale: AppLocale;
   now: Date;
+  onEvidencePress: ((selection: InsightEvidenceSelection) => void) | undefined;
   statements: readonly BeliefStatement[];
   timeframe: AnalyticsTimeframe;
 }) {
-  const group = topLeitsaetzeForTimeframe({ entries, now, statements, timeframe });
-  if (!group) return null;
-  const multiple = group.leitsaetze.length > 1 || group.additionalCount > 0;
-  const label = topLeitsatzLabel({ multiple, timeframe: group.timeframe });
-  return (
-    <Animated.View
-      entering={leitsatzEntering}
-      style={styles.leitsatzCard}
-      testID="analytics-top-leitsatz"
-    >
-      <Text
-        accessibilityLabel={label}
-        style={styles.leitsatzLabel}
-        testID="analytics-top-leitsatz-label"
-      >
-        {label}
-      </Text>
-      {group.leitsaetze.map((leitsatz, index) => {
-        const evidence = topLeitsatzEvidenceCopy({
-          leitsatz,
-          locale,
-          range: group.range,
-          timeframe: group.timeframe,
-        });
-        return (
-          <View
-            key={leitsatz.beliefSystemId}
-            style={index === 0 ? undefined : styles.leitsatzTie}
-            testID={`analytics-top-leitsatz-${leitsatz.beliefSystemId}`}
-          >
-            <Text style={styles.leitsatzText}>“{leitsatz.guidingStatement}”</Text>
-            <Text
-              accessibilityLabel={evidence}
-              style={styles.leitsatzEvidence}
-              testID={`analytics-top-leitsatz-evidence-${leitsatz.beliefSystemId}`}
-            >
-              {evidence}
-            </Text>
-          </View>
-        );
-      })}
-      {group.additionalCount > 0 ? (
-        <Text style={styles.leitsatzAdditional}>
-          {additionalTopLeitsaetzeCopy(group.additionalCount)}
+  const analytics = useSelector(analyticsStore, _selectCalendar);
+  const patterns = primaryAnalyticsInsights(entries);
+  const patternPosition = patterns.length > 0
+    ? analytics.patternIndex % patterns.length
+    : 0;
+  const pattern = patterns[patternPosition] ?? null;
+  const guidingBeliefGroup = topLeitsaetzeForTimeframe({
+    entries,
+    now,
+    statements,
+    timeframe,
+  });
+  const guidingBelief = guidingBeliefGroup?.leitsaetze[0];
+  const hasBoth = guidingBelief !== undefined && pattern !== null;
+  const activeTab = resolvedInsightTab({
+    guidingBelief,
+    pattern,
+    selectedTab: analytics.insightTab,
+  });
+  const showingPattern = activeTab === ANALYTICS_INSIGHT_TABS.PATTERN;
+  const range = analyticsDateRange({ now, timeframe });
+  const rangeLabel = analyticsTimeframeRangeLabel({ locale, range, timeframe });
+
+  if (entries.length < 3 && guidingBelief === undefined) {
+    return (
+      <View style={styles.insightLearning} testID="analytics-insight-learning">
+        <Text style={styles.insightEyebrow}><fbt desc="Primary insight learning state label">STILL LEARNING</fbt></Text>
+        <Text style={styles.insightLearningText}>{insightLearningCopy(3 - entries.length)}</Text>
+      </View>
+    );
+  }
+  if (!pattern && guidingBelief === undefined) {
+    return (
+      <View style={styles.insightLearning} testID="analytics-insight-no-pattern">
+        <Text style={styles.insightEyebrow}><fbt desc="Primary insight no-pattern state label">WHAT STANDS OUT</fbt></Text>
+        <Text style={styles.insightLearningText}>
+          {insightNoPatternCopy({ momentCount: entries.length, rangeLabel })}
         </Text>
-      ) : null}
-    </Animated.View>
+      </View>
+    );
+  }
+  return (
+    <View style={styles.insightCard} testID="analytics-primary-insight">
+      <InsightTabs showingPattern={showingPattern} visible={hasBoth} />
+      <Animated.View entering={FadeIn.duration(180)} key={`${activeTab}-${patternPosition}`}>
+        <InsightBody
+          entries={entries}
+          group={guidingBeliefGroup}
+          locale={locale}
+          pattern={pattern}
+          rangeLabel={rangeLabel}
+          showingPattern={showingPattern}
+          statements={statements}
+          timeframe={timeframe}
+        />
+        <InsightActions
+          guidingBelief={guidingBelief}
+          onEvidencePress={onEvidencePress}
+          pattern={pattern}
+          patternCount={patterns.length}
+          patternPosition={patternPosition}
+          showingPattern={showingPattern}
+          timeframe={timeframe}
+        />
+      </Animated.View>
+    </View>
   );
 }
 
@@ -214,7 +498,10 @@ function ObservationSection({ entries, statements }: {
   entries: readonly CheckIn[];
   statements: readonly BeliefStatement[];
 }) {
-  const observations = analyticsObservations(entries);
+  const primaryKeys = new Set(primaryAnalyticsInsights(entries).map(observationKey));
+  const observations = analyticsObservations(entries).filter(
+    (observation) => !primaryKeys.has(observationKey(observation)),
+  );
   if (observations.length === 0) return null;
   return (
     <View style={styles.section} testID="analytics-observations">
@@ -442,10 +729,11 @@ function CalendarSection({ entries, locale, now }: {
   );
 }
 
-export function AnalyticsContent({ entries, locale, now, statements }: {
+export function AnalyticsContent({ entries, locale, now, onEvidencePress, statements }: {
   entries: readonly CheckIn[];
   locale: AppLocale;
   now: Date;
+  onEvidencePress?: (selection: InsightEvidenceSelection) => void;
   statements: readonly BeliefStatement[];
 }) {
   const analytics = useSelector(analyticsStore, _selectCalendar);
@@ -481,10 +769,11 @@ export function AnalyticsContent({ entries, locale, now, statements }: {
             onLastWeekPress={_selectLastWeek}
             timeframe={analytics.timeframe}
           />
-          <TopLeitsatz
-            entries={entries}
+          <InsightHero
+            entries={scopedEntries}
             locale={locale}
             now={now}
+            onEvidencePress={onEvidencePress}
             statements={statements}
             timeframe={analytics.timeframe}
           />
@@ -533,11 +822,31 @@ export function AnalyticsScreen({ now }: { now?: Date }) {
   const history = useSelector(checkInHistoryStore, _selectHistory);
   const locale = useAppLocale();
   const currentDate = now ?? new Date();
+  const _openEvidence = (selection: InsightEvidenceSelection) => {
+    if (
+      selection.insight.kind === 'belief'
+      || selection.insight.kind === 'guiding-belief'
+    ) {
+      historyTimeframeStore.trigger[HISTORY_EVENTS.BELIEF_FILTER_SELECTED]({
+        beliefSystemId: selection.insight.beliefSystemId,
+        timeframe: selection.timeframe,
+      });
+    } else {
+      historyTimeframeStore.trigger[HISTORY_EVENTS.TIMEFRAME_SELECTED]({
+        timeframe: selection.timeframe,
+      });
+      historyTimeframeStore.trigger[HISTORY_EVENTS.EMOTION_FILTER_SELECTED]({
+        emotionId: selection.insight.emotionId,
+      });
+    }
+    actor.send({ type: NAVIGATION_EVENTS.HISTORY_OPENED });
+  };
   return (
     <AnalyticsContent
       entries={history.entries}
       locale={locale}
       now={currentDate}
+      onEvidencePress={_openEvidence}
       statements={statements}
     />
   );
@@ -548,50 +857,96 @@ const styles = StyleSheet.create({
   safeArea: { flex: 1 },
   content: tabScreenContentStyle,
   eyebrow: tabScreenEyebrowStyle,
-  title: tabScreenTitleStyle,
+  title: {
+    ...tabScreenTitleStyle,
+    fontSize: 27,
+    lineHeight: 33,
+    marginTop: 6,
+  },
   intro: { fontFamily: type.regular, color: palette.inkMuted, fontSize: 14, lineHeight: 21, marginTop: 10 },
-  leitsatzCard: {
-    marginTop: 26,
-    padding: 21,
-    borderRadius: 22,
+  insightCard: {
+    marginTop: 24,
+    padding: 22,
+    borderRadius: 24,
     borderCurve: 'continuous',
     borderWidth: 1,
-    borderColor: 'rgba(94, 111, 97, 0.32)',
-    backgroundColor: '#EDF0EB',
+    borderColor: 'rgba(94, 111, 97, 0.24)',
+    backgroundColor: '#F0F2ED',
   },
-  leitsatzLabel: {
-    fontFamily: type.semibold,
-    color: palette.moss,
-    fontSize: 10,
-    letterSpacing: 1.05,
+  insightTabs: {
+    flexDirection: 'row',
+    gap: 4,
+    marginBottom: 18,
+    padding: 4,
+    borderRadius: 15,
+    borderCurve: 'continuous',
+    backgroundColor: 'rgba(94, 111, 97, 0.09)',
   },
-  leitsatzText: {
+  insightTab: {
+    flex: 1,
+    minHeight: 36,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 11,
+    borderCurve: 'continuous',
+  },
+  insightTabSelected: {
+    backgroundColor: palette.paperRaised,
+    boxShadow: '0 1px 3px rgba(43, 45, 42, 0.12)',
+  },
+  insightTabText: { fontFamily: type.medium, color: palette.inkMuted, fontSize: 12 },
+  insightTabTextSelected: { fontFamily: type.semibold, color: palette.ink },
+  insightLearning: {
+    marginTop: 24,
+    padding: 19,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: palette.hairline,
+    backgroundColor: palette.paperRaised,
+  },
+  insightHeading: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  insightMarker: { width: 7, height: 7, borderRadius: 4, backgroundColor: palette.moss },
+  insightEyebrow: { fontFamily: type.semibold, color: palette.moss, fontSize: 10, letterSpacing: 1.05 },
+  insightText: { fontFamily: type.medium, color: palette.ink, fontSize: 20, lineHeight: 28, marginTop: 13 },
+  insightEvidence: { fontFamily: type.regular, color: palette.inkMuted, fontSize: 12, lineHeight: 18, marginTop: 11 },
+  insightTieCopy: { fontFamily: type.regular, color: palette.inkMuted, fontSize: 12, lineHeight: 18, marginTop: 8 },
+  insightLearningText: { fontFamily: type.medium, color: palette.ink, fontSize: 15, lineHeight: 22, marginTop: 7 },
+  insightActions: { gap: 6, marginTop: 16 },
+  insightEvidenceButton: {
+    minHeight: 44,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    borderRadius: 15,
+    backgroundColor: palette.paperRaised,
+    borderWidth: 1,
+    borderColor: 'rgba(94, 111, 97, 0.18)',
+    paddingHorizontal: 15,
+  },
+  insightEvidenceButtonText: { flex: 1, fontFamily: type.semibold, color: palette.ink, fontSize: 13 },
+  insightDisclosure: { fontFamily: type.regular, color: palette.inkMuted, fontSize: 22, lineHeight: 22 },
+  insightPatternNavigation: {
+    minHeight: 44,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 4,
+  },
+  insightPatternPosition: {
     fontFamily: type.medium,
-    color: palette.ink,
-    fontSize: 21,
-    lineHeight: 29,
-    marginTop: 10,
-  },
-  leitsatzEvidence: {
-    fontFamily: type.regular,
     color: palette.inkMuted,
     fontSize: 12,
-    lineHeight: 18,
-    marginTop: 11,
+    fontVariant: ['tabular-nums'],
   },
-  leitsatzTie: {
-    borderTopWidth: 1,
-    borderTopColor: 'rgba(94, 111, 97, 0.24)',
-    marginTop: 17,
-    paddingTop: 7,
+  insightNextPatternButton: {
+    minHeight: 44,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    paddingHorizontal: 8,
   },
-  leitsatzAdditional: {
-    fontFamily: type.regular,
-    color: palette.inkMuted,
-    fontSize: 12,
-    lineHeight: 18,
-    marginTop: 17,
-  },
+  insightNextPatternText: { fontFamily: type.semibold, color: palette.moss, fontSize: 13 },
+  insightNextPatternDisclosure: { fontFamily: type.regular, color: palette.moss, fontSize: 21, lineHeight: 21 },
   section: { backgroundColor: palette.paper, marginTop: 34 },
   constellationSection: { backgroundColor: palette.paper, marginTop: 38 },
   sectionEyebrow: { fontFamily: type.semibold, color: palette.inkMuted, fontSize: 10, letterSpacing: 1.25 },

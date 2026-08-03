@@ -11,6 +11,7 @@ import {
 import {
   analyticsObservations,
   emotionFrequencies,
+  primaryAnalyticsInsights,
 } from '../domain/check-in-analytics';
 import {
   calendarEmotionFrequencies,
@@ -273,12 +274,54 @@ describe('check-in analytics', () => {
       kind: 'emotion',
       emotionId: EMOTION_IDS.FEAR,
       count: 3,
+      supportingIds: ['fear-1', 'fear-2', 'fear-3'],
     });
     expect(observations[2]).toEqual({
       kind: 'belief',
       beliefSystemId: BELIEF_SYSTEM_IDS.ALWAYS_FUNCTIONING,
       emotionId: EMOTION_IDS.FEAR,
       count: 3,
+      supportingIds: ['fear-1', 'fear-2', 'fear-3'],
     });
+  });
+
+  it('requires three moments and orders every available primary insight', () => {
+    const entries = [
+      checkIn({ beliefSystemId: BELIEF_SYSTEM_IDS.ALWAYS_FUNCTIONING, day: 1, emotionId: EMOTION_IDS.FEAR, id: 'fear-1' }),
+      checkIn({ beliefSystemId: BELIEF_SYSTEM_IDS.ALWAYS_FUNCTIONING, day: 2, emotionId: EMOTION_IDS.FEAR, id: 'fear-2' }),
+      checkIn({ day: 3, emotionId: EMOTION_IDS.FEAR, id: 'fear-3' }),
+    ];
+
+    expect(primaryAnalyticsInsights(entries.slice(0, 2))).toEqual([]);
+    expect(primaryAnalyticsInsights(entries)).toEqual([
+      {
+        kind: 'belief',
+        beliefSystemId: BELIEF_SYSTEM_IDS.ALWAYS_FUNCTIONING,
+        emotionId: EMOTION_IDS.FEAR,
+        count: 2,
+        supportingIds: ['fear-1', 'fear-2'],
+      },
+      {
+        kind: 'emotion',
+        emotionId: EMOTION_IDS.FEAR,
+        count: 3,
+        supportingIds: ['fear-1', 'fear-2', 'fear-3'],
+      },
+    ]);
+  });
+
+  it('returns one primary insight when only a recurring emotion is available', () => {
+    const entries = [
+      checkIn({ day: 1, emotionId: EMOTION_IDS.JOY, id: 'joy-1' }),
+      checkIn({ day: 2, emotionId: EMOTION_IDS.JOY, id: 'joy-2' }),
+      checkIn({ day: 3, emotionId: EMOTION_IDS.JOY, id: 'joy-3' }),
+    ];
+
+    expect(primaryAnalyticsInsights(entries)).toEqual([{
+      kind: 'emotion',
+      emotionId: EMOTION_IDS.JOY,
+      count: 3,
+      supportingIds: ['joy-1', 'joy-2', 'joy-3'],
+    }]);
   });
 });

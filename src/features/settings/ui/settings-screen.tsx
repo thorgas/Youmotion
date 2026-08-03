@@ -33,6 +33,7 @@ import {
 } from '@/components/ui/tab-screen-layout';
 import { activeCustomBeliefStatements } from '@/features/check-in/domain/belief-statement';
 import { palette, type } from '@/features/check-in/ui/theme';
+import { DataSafetyControls } from '@/features/data-safety/ui/data-safety-controls';
 import { useAppNavigationActor } from '@/navigation/app-navigation.provider';
 import { appSettingsStore } from '../application/app-settings.store';
 
@@ -209,8 +210,8 @@ export function SettingsScreen() {
           </View>
           <View style={styles.preferenceDivider} />
           <View style={styles.preferenceGroup}>
-          <Text style={styles.cardTitle}><fbt desc="Emotion star label display setting title">Emotion labels</fbt></Text>
-          <Text style={styles.cardCopy}><fbt desc="Explanation of the emotion star label display setting">Choose what appears around the emotion star before you touch it.</fbt></Text>
+          <Text style={styles.cardTitle}><fbt desc="Feeling pulse label display setting title">Emotion labels</fbt></Text>
+          <Text style={styles.cardCopy}><fbt desc="Explanation of the feeling pulse label display setting">Choose what appears around the feeling pulse before you touch it.</fbt></Text>
           <View style={styles.labelModeRow}>
             <PreferenceOption
               label={String(fbs('Emoji', 'Emoji-only emotion label display option'))}
@@ -277,15 +278,11 @@ export function SettingsScreen() {
         <Text style={styles.sectionHeading}>
           <fbt desc="Heading grouping data and product information in settings">YOUR DATA</fbt>
         </Text>
+        <DataSafetyControls locale={locale} />
         <View style={styles.infoGroup}>
           <View style={styles.infoRow}>
-            <Text style={styles.infoTitle}><fbt desc="Local privacy setting title">Private by design</fbt></Text>
-            <Text style={styles.infoCopy}><fbt desc="Local privacy explanation">Your check-ins are currently stored exclusively on this device.</fbt></Text>
-          </View>
-          <View style={styles.actionDivider} />
-          <View style={styles.infoRow}>
-            <Text style={styles.infoTitle}><fbt desc="About the emotion star setting title">About the emotion star</fbt></Text>
-            <Text style={styles.infoCopy}><fbt desc="Explanation of the emotion star source and purpose">The seven basic directions are based on the German therapeutic material “Der Gefühlsstern.” The app supports self-reflection, not diagnosis.</fbt></Text>
+            <Text style={styles.infoTitle}><fbt desc="About the feeling pulse setting title">About the feeling pulse</fbt></Text>
+            <Text style={styles.infoCopy}><fbt desc="Explanation of the feeling pulse and its purpose">The feeling pulse brings seven emotional directions together. Youmotion supports self-reflection, not diagnosis.</fbt></Text>
           </View>
         </View>
         <AppReleaseInfoCard
@@ -366,7 +363,6 @@ const styles = StyleSheet.create({
     lineHeight: 18,
     marginTop: 3,
   },
-  actionDivider: { height: 1, backgroundColor: palette.hairline },
   actionCount: {
     minWidth: 28,
     minHeight: 28,
@@ -389,6 +385,7 @@ const styles = StyleSheet.create({
     borderCurve: 'continuous',
     backgroundColor: '#F2EFEA',
     paddingHorizontal: 18,
+    marginTop: 24,
     marginBottom: 24,
   },
   infoRow: { paddingVertical: 16 },

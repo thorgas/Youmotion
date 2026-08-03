@@ -132,7 +132,7 @@ export function OnboardingPulseStep() {
           responsive.compact && styles.explanationCompact,
         ]}>
         <Text style={styles.explanationTitle}>
-          <fbt desc="Explanation of the emotion star dimensions">Direction names the emotion. Distance shows how strongly it is present.</fbt>
+          <fbt desc="Explanation of the feeling pulse dimensions">Direction names the emotion. Distance shows how strongly it is present.</fbt>
         </Text>
         <Text style={styles.explanationCopy}>
           <fbt desc="Explanation that the onboarding Pulse example is transient">This is a practice example. It is not saved to your history.</fbt>

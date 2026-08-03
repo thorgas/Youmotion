@@ -8,6 +8,7 @@ import { NONE } from 'react-native-surrealdb';
 
 import {
   APP_LOCALES,
+  ANALYTICS_EVENTS,
   ANALYTICS_TIMEFRAMES,
   BELIEF_LIBRARY_EVENTS,
   BELIEF_LIBRARY_STATES,
@@ -21,6 +22,7 @@ import {
   ONBOARDING_EVENTS,
   ONBOARDING_STATES,
   HISTORY_EVENTS,
+  HISTORY_CONTENT_FILTERS,
 } from '@/constants';
 import { AppLocaleProvider } from '@/localization/app-locale-provider';
 import { appNavigationMachine } from '@/navigation/app-navigation.machine';
@@ -51,6 +53,8 @@ import { reflectionResponsiveLayout } from '../ui/reflection-responsive-layout';
 import { GuidingBeliefScreen } from '../ui/guiding-belief-screen';
 import { SuccessScreen } from '../ui/success-screen';
 import { SettingsScreen } from '@/features/settings/ui/settings-screen';
+import { analyticsStore } from '@/features/analytics/application/analytics.store';
+import { AnalyticsScreen } from '@/features/analytics/ui/analytics-screen';
 import { BeliefLibraryScreen } from '@/features/settings/ui/belief-library-screen';
 import { appSettingsStore } from '@/features/settings/application/app-settings.store';
 import {
@@ -63,6 +67,10 @@ let mockActor: Actor<typeof appNavigationMachine>;
 
 jest.mock('@/navigation/app-navigation.provider', () => ({
   useAppNavigationActor: () => mockActor,
+}));
+
+jest.mock('@/features/analytics/ui/emotion-radar-chart', () => ({
+  EmotionRadarChart: () => null,
 }));
 
 jest.mock('expo-router', () => ({
@@ -194,8 +202,9 @@ describe('check-in screens', () => {
     jest.mocked(useFocusEffect).mockClear();
     resetSurrealDatabaseMock();
     checkInHistoryStore.trigger.hydrated({ entries: [] });
-    historyTimeframeStore.trigger[HISTORY_EVENTS.TIMEFRAME_SELECTED]({
-      timeframe: ANALYTICS_TIMEFRAMES.ALL_TIME,
+    historyTimeframeStore.trigger[HISTORY_EVENTS.FILTERS_CLEARED]({});
+    analyticsStore.trigger[ANALYTICS_EVENTS.TIMEFRAME_SELECTED]({
+      timeframe: ANALYTICS_TIMEFRAMES.LAST_WEEK,
     });
     appSettingsStore.trigger.hydrated({
       settings: {
@@ -253,7 +262,7 @@ describe('check-in screens', () => {
     expect(screen.getByText('The farther you move from the center, the more intense the feeling.')).toBeTruthy();
     expect(screen.queryByTestId('emotion-word-help-toggle')).toBeNull();
     expect(screen.queryByTestId('emotion-word-help-content')).toBeNull();
-    expect(screen.getByLabelText('Emotion star. Drag outward from the center.')).toBeTruthy();
+    expect(screen.getByLabelText('Feeling pulse. Drag outward from the center.')).toBeTruthy();
     expect(screen.getByTestId('base-state-ripples')).toHaveStyle({
       alignItems: 'center',
       justifyContent: 'center',
@@ -517,13 +526,17 @@ describe('check-in screens', () => {
       accessibilityRole: 'progressbar',
       accessibilityValue: { min: 1, max: 3, now: 1 },
     });
-    expect(within(screen.getByTestId('check-in-progress')).getAllByText('Optional')).toHaveLength(2);
+    expect(within(screen.getByTestId('check-in-progress')).queryByText('Optional')).toBeNull();
     expect(screen.getByText(
-      "Next, you can add or change this moment's core belief and guiding belief. Both steps are optional.",
+      'Gently explore what may be underneath. You can stop at any time.',
     )).toBeTruthy();
+    expect(screen.getByText(
+      'A few words make this moment easier to remember—and give future insights something real to work with.',
+    )).toBeTruthy();
+    expect(screen.getByTestId('reflection-save-for-now')).toBeTruthy();
     expect(useFocusEffect).toHaveBeenCalledTimes(1);
     expect(screen.getByLabelText('Optional note about the feeling').props['autoFocus']).toBeUndefined();
-    expect(screen.getByText('Cheerfulness')).toBeTruthy();
+    expect(screen.getByText('Joy · Cheerfulness')).toBeTruthy();
     expect(screen.queryByText(/50%/)).toBeNull();
     expect(screen.getByTestId('reflection-keyboard-scroll').props).toMatchObject({
       keyboardDismissMode: 'interactive',
@@ -534,7 +547,7 @@ describe('check-in screens', () => {
     )).toBeNull();
     expect(screen.queryByText('Does a core belief fit this moment?')).toBeNull();
     await fireEvent.changeText(screen.getByLabelText('Optional note about the feeling'), 'Ein heller Moment.');
-    await fireEvent.press(screen.getByText('Save and continue'));
+    await fireEvent.press(screen.getByText('Continue reflection'));
 
     await waitFor(() => expect(
       mockActor.getSnapshot().matches(CHECK_IN_STATES.BELIEF_SYSTEM),
@@ -556,6 +569,14 @@ describe('check-in screens', () => {
       now: 2,
     });
     expect(screen.getByTestId('belief-system-browse').props['accessibilityRole']).toBe('button');
+    const beliefBackStyle = StyleSheet.flatten(
+      screen.getByTestId('belief-system-back').props['style'],
+    );
+    const beliefFinishStyle = StyleSheet.flatten(
+      screen.getByTestId('belief-system-finish').props['style'],
+    );
+    expect(beliefFinishStyle['minHeight']).toBe(beliefBackStyle['minHeight']);
+    expect(beliefFinishStyle['marginTop']).toBeUndefined();
 
     await fireEvent.press(screen.getByTestId('belief-system-browse'));
     await waitFor(() => expect(
@@ -643,6 +664,26 @@ describe('check-in screens', () => {
     expect(history.getByTestId(`history-guiding-belief-${saved.id}`)).toHaveTextContent(
       'I may pause and I am still loved.',
     );
+  });
+
+  it('keeps guided reflection primary while allowing a pressure-free early save', async () => {
+    await act(_reachReflection);
+    const screen = await _renderLocalized(<ReflectionScreen />);
+
+    await fireEvent.changeText(
+      screen.getByLabelText('Optional note about the feeling'),
+      'Enough for today.',
+    );
+    await fireEvent.press(screen.getByTestId('reflection-save-for-now'));
+
+    await waitFor(() => expect(
+      mockActor.getSnapshot().matches(CHECK_IN_STATES.SUCCESS),
+    ).toBe(true));
+    expect(mockActor.getSnapshot().context.saved).toMatchObject({
+      emotionId: selection.emotionId,
+      intensity: selection.intensity,
+      note: 'Enough for today.',
+    });
   });
 
   it('submits a reflection from the native keyboard before offering the optional core belief step', async () => {
@@ -900,12 +941,14 @@ describe('check-in screens', () => {
     await screen.rerender(
       <AppLocaleProvider><GuidingBeliefScreen /></AppLocaleProvider>,
     );
-    expect(screen.getByText('04 · NEUE RICHTUNG')).toBeTruthy();
+    expect(screen.getByText('NEUE RICHTUNG · OPTIONAL')).toBeTruthy();
     const progress = within(screen.getByTestId('check-in-progress'));
-    expect(progress.getByText('Moment')).toBeTruthy();
-    expect(progress.getByText('Leidsatz')).toBeTruthy();
-    expect(progress.getByText('Leitsatz')).toBeTruthy();
-    expect(progress.getAllByText('Optional')).toHaveLength(2);
+    expect(progress.queryByText('Moment')).toBeNull();
+    expect(progress.queryByText('Leidsatz')).toBeNull();
+    expect(progress.queryByText('Leitsatz')).toBeNull();
+    expect(screen.getByTestId('check-in-progress').props['accessibilityValue']).toMatchObject({
+      now: 3,
+    });
     expect(screen.getByText(/Zurück/)).toBeTruthy();
     expect(screen.getByText('Was würde dich stattdessen unterstützen?')).toBeTruthy();
     expect(screen.getByText(
@@ -1006,6 +1049,126 @@ describe('check-in screens', () => {
     expect(history.getByTestId('history-moment-history-previous-week')).toBeTruthy();
   });
 
+  it('searches moments and combines the query with ordinary filters', async () => {
+    const moments = [{
+      id: CheckInId.make('evidence-match'),
+      createdAt: CheckInTimestamp.make(new Date(2026, 6, 19, 12).toISOString()),
+      emotionId: EMOTION_IDS.FEAR,
+      intensity: 0.5,
+      note: 'Supporting moment',
+    }, {
+      id: CheckInId.make('evidence-other'),
+      createdAt: CheckInTimestamp.make(new Date(2026, 6, 18, 12).toISOString()),
+      emotionId: EMOTION_IDS.JOY,
+      intensity: 0.5,
+      note: 'Another moment',
+    }] satisfies readonly CheckIn[];
+    checkInHistoryStore.trigger.hydrated({ entries: moments });
+
+    const history = await _renderLocalized(
+      <HistoryScreen now={new Date(2026, 6, 21, 12)} />,
+    );
+    await fireEvent.changeText(history.getByTestId('history-search-input'), 'Supporting');
+    expect(history.getByTestId('history-moment-evidence-match')).toBeTruthy();
+    expect(history.queryByTestId('history-moment-evidence-other')).toBeNull();
+
+    await fireEvent.press(history.getByTestId('history-filters-toggle'));
+    await fireEvent.press(history.getByTestId(`history-emotion-filter-${EMOTION_IDS.JOY}`));
+    expect(history.queryByTestId('history-moment-evidence-match')).toBeNull();
+    await fireEvent.press(history.getByTestId('history-filters-clear'));
+    expect(history.getByTestId('history-moment-evidence-other')).toBeTruthy();
+  });
+
+  it('opens History with ordinary filters matching the primary insight', async () => {
+    const firstFearId = CheckInId.make('insight-fear-1');
+    const secondFearId = CheckInId.make('insight-fear-2');
+    const moments = [{
+      id: firstFearId,
+      createdAt: CheckInTimestamp.make(new Date(2026, 6, 18, 12).toISOString()),
+      emotionId: EMOTION_IDS.FEAR,
+      intensity: 0.5,
+      note: '',
+      beliefSystemId: BELIEF_SYSTEM_IDS.ALWAYS_FUNCTIONING,
+    }, {
+      id: secondFearId,
+      createdAt: CheckInTimestamp.make(new Date(2026, 6, 19, 12).toISOString()),
+      emotionId: EMOTION_IDS.FEAR,
+      intensity: 0.5,
+      note: '',
+      beliefSystemId: BELIEF_SYSTEM_IDS.ALWAYS_FUNCTIONING,
+    }, {
+      id: CheckInId.make('insight-joy'),
+      createdAt: CheckInTimestamp.make(new Date(2026, 6, 17, 12).toISOString()),
+      emotionId: EMOTION_IDS.JOY,
+      intensity: 0.5,
+      note: '',
+    }] satisfies readonly CheckIn[];
+    checkInHistoryStore.trigger.hydrated({ entries: moments });
+    await act(() => mockActor.send({ type: NAVIGATION_EVENTS.ANALYTICS_OPENED }));
+    const analytics = await _renderLocalized(
+      <AnalyticsScreen now={new Date(2026, 6, 21, 12)} />,
+    );
+
+    await fireEvent.press(analytics.getByTestId('analytics-insight-evidence'));
+
+    expect(mockActor.getSnapshot().matches({
+      [NAVIGATION_STATES.TABS]: NAVIGATION_STATES.HISTORY,
+    })).toBe(true);
+    expect(historyTimeframeStore.getSnapshot().context).toEqual({
+      beliefSystemId: BELIEF_SYSTEM_IDS.ALWAYS_FUNCTIONING,
+      content: HISTORY_CONTENT_FILTERS.BELIEFS,
+      emotionId: null,
+      filtersOpen: true,
+      query: '',
+      timeframe: ANALYTICS_TIMEFRAMES.LAST_WEEK,
+    });
+  });
+
+  it('opens History with filters matching the selected additional pattern', async () => {
+    const moments = [{
+      id: CheckInId.make('additional-pattern-fear-1'),
+      createdAt: CheckInTimestamp.make(new Date(2026, 6, 18, 12).toISOString()),
+      emotionId: EMOTION_IDS.FEAR,
+      intensity: 0.5,
+      note: '',
+      beliefSystemId: BELIEF_SYSTEM_IDS.ALWAYS_FUNCTIONING,
+    }, {
+      id: CheckInId.make('additional-pattern-fear-2'),
+      createdAt: CheckInTimestamp.make(new Date(2026, 6, 19, 12).toISOString()),
+      emotionId: EMOTION_IDS.FEAR,
+      intensity: 0.5,
+      note: '',
+      beliefSystemId: BELIEF_SYSTEM_IDS.ALWAYS_FUNCTIONING,
+    }, {
+      id: CheckInId.make('additional-pattern-joy'),
+      createdAt: CheckInTimestamp.make(new Date(2026, 6, 17, 12).toISOString()),
+      emotionId: EMOTION_IDS.JOY,
+      intensity: 0.5,
+      note: '',
+    }] satisfies readonly CheckIn[];
+    checkInHistoryStore.trigger.hydrated({ entries: moments });
+    await act(() => mockActor.send({ type: NAVIGATION_EVENTS.ANALYTICS_OPENED }));
+    const analytics = await _renderLocalized(
+      <AnalyticsScreen now={new Date(2026, 6, 21, 12)} />,
+    );
+
+    expect(analytics.getByTestId('analytics-insight-pattern-belief')).toBeTruthy();
+    await fireEvent.press(analytics.getByTestId('analytics-insight-next-pattern'));
+    expect(analytics.getByTestId('analytics-insight-pattern-emotion')).toBeTruthy();
+    await fireEvent.press(analytics.getByTestId('analytics-insight-evidence'));
+
+    expect(mockActor.getSnapshot().matches({
+      [NAVIGATION_STATES.TABS]: NAVIGATION_STATES.HISTORY,
+    })).toBe(true);
+    expect(historyTimeframeStore.getSnapshot().context).toMatchObject({
+      beliefSystemId: null,
+      content: HISTORY_CONTENT_FILTERS.ALL,
+      emotionId: EMOTION_IDS.FEAR,
+      query: '',
+      timeframe: ANALYTICS_TIMEFRAMES.LAST_WEEK,
+    });
+  });
+
   it('labels an unreframed harmful belief and renders it as muted text', async () => {
     await act(() => appSettingsStore.trigger.languageChanged({
       locale: APP_LOCALES.GERMAN,
@@ -1060,7 +1223,7 @@ describe('check-in screens', () => {
     expect(history.getByText(/Joy · Cheerfulness/)).toBeTruthy();
 
     const settings = await _renderLocalized(<SettingsScreen />);
-    expect(settings.getByText('Private by design')).toBeTruthy();
+    expect(settings.getByText('Your journal belongs to you.')).toBeTruthy();
     expect(settings.getByText('App information')).toBeTruthy();
     expect(settings.getByText('App')).toBeTruthy();
     expect(settings.getByText('Channel')).toBeTruthy();
@@ -1069,10 +1232,25 @@ describe('check-in screens', () => {
     expect(settings.getByText('development')).toBeTruthy();
     expect(settings.getByText('f4610f7')).toBeTruthy();
     await fireEvent.press(settings.getByText('German'));
-    await waitFor(() => expect(settings.getByText('Von Anfang an privat')).toBeTruthy());
+    await waitFor(() => expect(settings.getByText('Dein Journal gehört dir.')).toBeTruthy());
     expect(settings.getByText('App-Informationen')).toBeTruthy();
     await fireEvent.press(settings.getByText('Englisch'));
-    await waitFor(() => expect(settings.getByText('Private by design')).toBeTruthy());
+    await waitFor(() => expect(settings.getByText('Your journal belongs to you.')).toBeTruthy());
+  });
+
+  it('makes backup controls visible and requires confirmation before deleting moments', async () => {
+    await act(() => mockActor.send({ type: NAVIGATION_EVENTS.SETTINGS_OPENED }));
+    const settings = await _renderLocalized(<SettingsScreen />);
+
+    expect(settings.getByRole('button', { name: /Export a backup/ })).toBeEnabled();
+    expect(settings.getByRole('button', { name: /Restore from a backup/ })).toBeEnabled();
+    await fireEvent.press(settings.getByRole('button', { name: /Delete all moments/ }));
+
+    expect(settings.getByRole('alert')).toHaveTextContent('Delete every moment?');
+    expect(settings.getByRole('button', { name: 'Delete moments' })).toBeEnabled();
+    await fireEvent.press(settings.getByRole('button', { name: 'Cancel' }));
+
+    expect(settings.queryByText('Delete every moment?')).not.toBeOnTheScreen();
   });
 
   it('edits and removes personal beliefs from the settings library', async () => {
@@ -1209,11 +1387,12 @@ describe('check-in screens', () => {
     expect(mockActor.getSnapshot().matches(NAVIGATION_STATES.REFLECTION)).toBe(true);
     const reflection = await _renderLocalized(<ReflectionScreen />);
     expect(reflection.getByText('Edit this moment.')).toBeTruthy();
-    expect(reflection.getByText(
-      "Next, you can add or change this moment's core belief and guiding belief. Both steps are optional.",
-    )).toBeTruthy();
-    expect(reflection.getByText('Save and continue')).toBeTruthy();
-    expect(reflection.getByText('Change feeling')).toBeTruthy();
+    expect(reflection.queryByText(
+      'Gently explore what may be underneath. You can stop at any time.',
+    )).toBeNull();
+    expect(reflection.getByText('Save changes')).toBeTruthy();
+    expect(reflection.queryByTestId('reflection-save-for-now')).toBeNull();
+    expect(reflection.getByText('Change')).toBeTruthy();
     expect(reflection.getByTestId('delete-edited-moment')).toBeTruthy();
     expect(useFocusEffect).toHaveBeenCalledTimes(1);
     expect(reflection.getByDisplayValue('Before').props['autoFocus']).toBeUndefined();
@@ -1278,7 +1457,7 @@ describe('check-in screens', () => {
     expect(today.queryByText(/50%/)).toBeNull();
     const gestureRegion = today.getByTestId('check-in-gesture-region');
     const detailsScroll = today.getByTestId('check-in-details-scroll');
-    expect(within(gestureRegion).getByLabelText('Emotion star. Drag outward from the center.')).toBeTruthy();
+    expect(within(gestureRegion).getByLabelText('Feeling pulse. Drag outward from the center.')).toBeTruthy();
     expect(within(detailsScroll).getByText('Latest check-in')).toBeTruthy();
     expect(within(detailsScroll).getByText('Youmotion supports self-awareness and does not replace psychotherapeutic or medical treatment.')).toHaveStyle({ marginTop: 24 });
     expect(detailsScroll.props).toMatchObject({

@@ -41,6 +41,7 @@ export const CHECK_IN_EVENTS = Object.freeze({
   SELECTION_CANCELLED: literal('selection.cancelled'),
   SELECTION_RELEASED: literal('selection.released'),
   NOTE_CHANGED: literal('note.changed'),
+  SAVE_FOR_NOW_REQUESTED: literal('checkIn.saveForNowRequested'),
   BELIEF_SYSTEM_CHANGED: literal('beliefSystem.changed'),
   BELIEF_SYSTEM_BACK_REQUESTED: literal('beliefSystem.backRequested'),
   BELIEF_SYSTEM_CATALOG_REQUESTED: literal('beliefSystem.catalogRequested'),
@@ -72,6 +73,11 @@ export const CHECK_IN_EVENTS = Object.freeze({
   RETRIED: literal('checkIn.retried'),
   RESTARTED: literal('checkIn.restarted'),
   REFLECTION_CANCELLED: literal('reflection.cancelled'),
+});
+
+export const CHECK_IN_SAVE_DESTINATIONS = Object.freeze({
+  BELIEF_SYSTEM: literal('beliefSystem'),
+  COMPLETE: literal('complete'),
 });
 
 export const CHECK_IN_STATES = Object.freeze({
@@ -106,6 +112,13 @@ export const ANALYTICS_EVENTS = Object.freeze({
   NEXT_MONTH_REQUESTED: literal('analytics.nextMonthRequested'),
   CURRENT_MONTH_REQUESTED: literal('analytics.currentMonthRequested'),
   TIMEFRAME_SELECTED: literal('analytics.timeframeSelected'),
+  INSIGHT_TAB_SELECTED: literal('analytics.insightTabSelected'),
+  NEXT_PATTERN_REQUESTED: literal('analytics.nextPatternRequested'),
+});
+
+export const ANALYTICS_INSIGHT_TABS = Object.freeze({
+  GUIDING_BELIEF: literal('guidingBelief'),
+  PATTERN: literal('pattern'),
 });
 
 export const ANALYTICS_TIMEFRAMES = Object.freeze({
@@ -116,6 +129,18 @@ export const ANALYTICS_TIMEFRAMES = Object.freeze({
 
 export const HISTORY_EVENTS = Object.freeze({
   TIMEFRAME_SELECTED: literal('history.timeframeSelected'),
+  QUERY_CHANGED: literal('history.queryChanged'),
+  FILTERS_TOGGLED: literal('history.filtersToggled'),
+  EMOTION_FILTER_SELECTED: literal('history.emotionFilterSelected'),
+  CONTENT_FILTER_SELECTED: literal('history.contentFilterSelected'),
+  BELIEF_FILTER_SELECTED: literal('history.beliefFilterSelected'),
+  FILTERS_CLEARED: literal('history.filtersCleared'),
+});
+
+export const HISTORY_CONTENT_FILTERS = Object.freeze({
+  ALL: literal('all'),
+  NOTES: literal('notes'),
+  BELIEFS: literal('beliefs'),
 });
 
 export const ONBOARDING_EVENTS = Object.freeze({
@@ -148,6 +173,33 @@ export const SETTINGS_EVENTS = Object.freeze({
   APP_SETTINGS_HYDRATED: literal('settings.appSettingsHydrated'),
   APP_SETTINGS_HYDRATION_FAILED: literal('settings.appSettingsHydrationFailed'),
   APP_SETTINGS_PERSISTENCE_FAILED: literal('settings.appSettingsPersistenceFailed'),
+});
+
+export const DATA_SAFETY_EVENTS = Object.freeze({
+  EXPORT_REQUESTED: literal('dataSafety.exportRequested'),
+  EXPORT_SUCCEEDED: literal('dataSafety.exportSucceeded'),
+  RESTORE_REQUESTED: literal('dataSafety.restoreRequested'),
+  ARCHIVE_PICKED: literal('dataSafety.archivePicked'),
+  PICK_CANCELLED: literal('dataSafety.pickCancelled'),
+  RESTORE_CONFIRMED: literal('dataSafety.restoreConfirmed'),
+  RESTORE_CANCELLED: literal('dataSafety.restoreCancelled'),
+  RESTORE_SUCCEEDED: literal('dataSafety.restoreSucceeded'),
+  DELETE_REQUESTED: literal('dataSafety.deleteRequested'),
+  DELETE_CONFIRMED: literal('dataSafety.deleteConfirmed'),
+  DELETE_CANCELLED: literal('dataSafety.deleteCancelled'),
+  DELETE_SUCCEEDED: literal('dataSafety.deleteSucceeded'),
+  OPERATION_FAILED: literal('dataSafety.operationFailed'),
+  NOTICE_DISMISSED: literal('dataSafety.noticeDismissed'),
+});
+
+export const DATA_SAFETY_STATES = Object.freeze({
+  IDLE: literal('dataSafetyIdle'),
+  EXPORTING: literal('exportingData'),
+  PICKING_ARCHIVE: literal('pickingDataArchive'),
+  RESTORE_PREVIEW: literal('restorePreview'),
+  RESTORING: literal('restoringData'),
+  DELETE_CONFIRMATION: literal('deleteDataConfirmation'),
+  DELETING: literal('deletingData'),
 });
 
 export const BELIEF_LIBRARY_EVENTS = Object.freeze({
@@ -253,6 +305,10 @@ export const BELIEF_SYSTEM_FAILURE_MESSAGE = 'Your core belief could not be atta
 export const BELIEF_STATEMENT_FAILURE_MESSAGE = 'Your belief could not be saved.';
 export const CHECK_IN_DELETE_FAILURE_MESSAGE = 'Your check-in could not be deleted.';
 export const SETTINGS_FAILURE_MESSAGE = 'Your preference could not be saved.';
+export const DATA_EXPORT_FAILURE_MESSAGE = 'Your backup could not be created.';
+export const DATA_ARCHIVE_FAILURE_MESSAGE = 'That backup could not be opened.';
+export const DATA_RESTORE_FAILURE_MESSAGE = 'Your data was not changed because the backup could not be restored.';
+export const DATA_DELETE_ALL_FAILURE_MESSAGE = 'Your moments could not be deleted.';
 export const EMOTION_AXIS_START_ANGLE = -Math.PI / 4;
 export const EMOTION_AXIS_STEP = Math.PI / 4;
 export const BASE_RIPPLE_DURATION = 2800;

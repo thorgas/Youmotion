@@ -2,6 +2,7 @@ import * as Schema from 'effect/Schema';
 
 import { ANALYTICS_TIMEFRAMES } from '@/constants';
 import type { CheckIn } from '@/features/check-in/domain/check-in';
+import { CheckInIdListSchema } from '@/features/check-in/domain/check-in';
 import {
   BeliefStatementText,
   BeliefSystemId,
@@ -20,6 +21,7 @@ export const TopLeitsatzSchema = Schema.Struct({
   beliefSystemId: BeliefSystemId,
   guidingStatement: BeliefStatementText,
   count: Schema.Int.pipe(Schema.positive()),
+  supportingIds: CheckInIdListSchema,
 });
 export type TopLeitsatz = typeof TopLeitsatzSchema.Type;
 export type TopLeitsatzGroup = Readonly<{
@@ -80,6 +82,7 @@ type LeitsatzFrequency = Readonly<{
   count: number;
   guidingStatement: string;
   latestAt: number;
+  supportingIds: readonly CheckIn['id'][];
 }>;
 
 function rankLeitsatzFrequencies(items: readonly LeitsatzFrequency[]) {
@@ -128,6 +131,7 @@ export function topLeitsaetzeForTimeframe({
         count: 1,
         guidingStatement,
         latestAt: createdAt,
+        supportingIds: [entry.id],
       });
     }
     return items.map((item) => item !== existing ? item : {
@@ -135,6 +139,7 @@ export function topLeitsaetzeForTimeframe({
       count: item.count + 1,
       guidingStatement: createdAt > item.latestAt ? guidingStatement : item.guidingStatement,
       latestAt: Math.max(createdAt, item.latestAt),
+      supportingIds: item.supportingIds.concat(entry.id),
     });
   }, []);
   const ranked = rankLeitsatzFrequencies(frequencies);
@@ -147,6 +152,7 @@ export function topLeitsaetzeForTimeframe({
       beliefSystemId: leader.beliefSystemId,
       guidingStatement: leader.guidingStatement,
       count: leader.count,
+      supportingIds: leader.supportingIds,
     }));
   return {
     additionalCount: coLeaders.length - visibleLeitsaetze.length,

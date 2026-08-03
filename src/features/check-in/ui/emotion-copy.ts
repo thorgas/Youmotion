@@ -139,7 +139,7 @@ export function emotionSummary(selection: LocalizedEmotionSelection) {
 }
 
 export function emotionStarAccessibility(selection: EmotionSelection | null) {
-  if (!selection) return String(fbs('Emotion star. Drag outward from the center.', 'Emotion star accessibility instructions'));
+  if (!selection) return String(fbs('Feeling pulse. Drag outward from the center.', 'Feeling pulse accessibility instructions'));
   return emotionSummary(selection);
 }
 

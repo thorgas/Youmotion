@@ -3,6 +3,7 @@ import * as Schema from 'effect/Schema';
 
 import {
   ANALYTICS_EVENTS,
+  ANALYTICS_INSIGHT_TABS,
   ANALYTICS_TIMEFRAMES,
 } from '@/constants';
 
@@ -13,14 +14,21 @@ const AnalyticsTimeframeSchema = Schema.Literal(
 );
 
 const initialContext = {
+  insightTab: ANALYTICS_INSIGHT_TABS.GUIDING_BELIEF,
   monthOffset: 0,
+  patternIndex: 0,
   timeframe: ANALYTICS_TIMEFRAMES.LAST_WEEK,
 };
 
 export const analyticsStore = createStore({
   schemas: {
     context: Schema.standardSchemaV1(Schema.Struct({
+      insightTab: Schema.Literal(
+        ANALYTICS_INSIGHT_TABS.GUIDING_BELIEF,
+        ANALYTICS_INSIGHT_TABS.PATTERN,
+      ),
       monthOffset: Schema.Int,
+      patternIndex: Schema.Int,
       timeframe: AnalyticsTimeframeSchema,
     })),
     events: {
@@ -29,6 +37,15 @@ export const analyticsStore = createStore({
       [ANALYTICS_EVENTS.CURRENT_MONTH_REQUESTED]: Schema.standardSchemaV1(Schema.Struct({})),
       [ANALYTICS_EVENTS.TIMEFRAME_SELECTED]: Schema.standardSchemaV1(Schema.Struct({
         timeframe: AnalyticsTimeframeSchema,
+      })),
+      [ANALYTICS_EVENTS.INSIGHT_TAB_SELECTED]: Schema.standardSchemaV1(Schema.Struct({
+        tab: Schema.Literal(
+          ANALYTICS_INSIGHT_TABS.GUIDING_BELIEF,
+          ANALYTICS_INSIGHT_TABS.PATTERN,
+        ),
+      })),
+      [ANALYTICS_EVENTS.NEXT_PATTERN_REQUESTED]: Schema.standardSchemaV1(Schema.Struct({
+        patternCount: Schema.Int,
       })),
     },
   },
@@ -48,8 +65,20 @@ export const analyticsStore = createStore({
     }),
     [ANALYTICS_EVENTS.TIMEFRAME_SELECTED]: (context, event) => ({
       ...context,
+      insightTab: ANALYTICS_INSIGHT_TABS.GUIDING_BELIEF,
       monthOffset: 0,
+      patternIndex: 0,
       timeframe: event.timeframe,
+    }),
+    [ANALYTICS_EVENTS.INSIGHT_TAB_SELECTED]: (context, event) => ({
+      ...context,
+      insightTab: event.tab,
+    }),
+    [ANALYTICS_EVENTS.NEXT_PATTERN_REQUESTED]: (context, event) => ({
+      ...context,
+      patternIndex: event.patternCount > 1
+        ? (context.patternIndex + 1) % event.patternCount
+        : 0,
     }),
   },
 });

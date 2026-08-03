@@ -2,7 +2,7 @@
   "expo": {
     "name": "Youmotion",
     "slug": "youmotion",
-    "version": "1.0.0",
+    "version": "1.0.2",
     "orientation": "portrait",
     "icon": "./assets/images/app-icon-ios.png",
     "scheme": "youmotion",

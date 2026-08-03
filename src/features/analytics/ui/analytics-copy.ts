@@ -205,11 +205,12 @@ export function observationCopy({ observation, statements }: {
     ));
   }
   if (observation.kind === 'belief') {
+    const belief = beliefSystemText({
+      id: observation.beliefSystemId,
+      statements,
+    }).replace(/[.!?]+$/u, '');
     return String(fbs(
-      fbs.param('belief', beliefSystemText({
-        id: observation.beliefSystemId,
-        statements,
-      }))
+      fbs.param('belief', `“${belief}”`)
         + ' appeared alongside '
         + fbs.param('emotion', emotionName(observation.emotionId))
         + ' in '
@@ -225,6 +226,49 @@ export function observationCopy({ observation, statements }: {
       + fbs.param('momentCount', String(observation.momentCount))
       + ' recorded moments.',
     'Analytics observation summarizing written reflection use',
+  ));
+}
+
+export function insightEvidenceCopy({
+  momentCount,
+  rangeLabel,
+  supportingCount,
+}: {
+  momentCount: number;
+  rangeLabel: string;
+  supportingCount: number;
+}) {
+  return String(fbs(
+    'Based on '
+      + fbs.param('supportingCount', String(supportingCount))
+      + ' of '
+      + fbs.param('momentCount', String(momentCount))
+      + ' moments · '
+      + fbs.param('range', rangeLabel),
+    'Evidence count and comparison period below the primary analytics insight',
+  ));
+}
+
+export function insightLearningCopy(remainingCount: number) {
+  return String(fbs(
+    'Record '
+      + fbs.param('remainingCount', String(remainingCount))
+      + ' more moments in this period to reveal a pattern with visible evidence.',
+    'Analytics learning state before enough moments exist for an insight',
+  ));
+}
+
+export function insightNoPatternCopy({ momentCount, rangeLabel }: {
+  momentCount: number;
+  rangeLabel: string;
+}) {
+  return String(fbs(
+    'No single recurring pattern stands out across '
+      + fbs.param('momentCount', String(momentCount))
+      + ' moments · '
+      + fbs.param('range', rangeLabel)
+      + '. That is useful to know too.',
+    'Honest analytics state when enough data exists but no unique pattern stands out',
   ));
 }
 

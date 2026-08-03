@@ -215,7 +215,7 @@ export function EmotionStar({
           style={[styles.readoutPrompt, promptStyle]}
           testID="emotion-readout-prompt">
           <Text style={styles.promptLead}>
-            <fbt desc="Primary instruction above the emotion star">
+            <fbt desc="Primary instruction above the feeling pulse">
               Touch the point and move your finger.
             </fbt>
           </Text>
