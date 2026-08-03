@@ -9,7 +9,6 @@ import {
   type CheckIn,
 } from '@/features/check-in/domain/check-in';
 import {
-  analyticsInsightKey,
   analyticsObservations,
   emotionFrequencies,
   primaryAnalyticsInsight,
@@ -303,6 +302,5 @@ describe('check-in analytics', () => {
       supportingIds: ['fear-1', 'fear-2'],
     });
     if (!insight) throw new Error('Three recurring moments must produce an insight.');
-    expect(analyticsInsightKey(insight)).toBe('belief:fear-1:fear-2');
   });
 });

@@ -37,7 +37,6 @@ import { useAppNavigationActor } from '@/navigation/app-navigation.provider';
 import { analyticsStore } from '../application/analytics.store';
 import {
   analyticsObservations,
-  analyticsInsightKey,
   emotionFrequencies,
   primaryAnalyticsInsight,
   type PrimaryAnalyticsInsight,
@@ -103,9 +102,6 @@ const _selectAllTime = () => {
   analyticsStore.trigger[ANALYTICS_EVENTS.TIMEFRAME_SELECTED]({
     timeframe: ANALYTICS_TIMEFRAMES.ALL_TIME,
   });
-};
-const _restoreInsight = () => {
-  analyticsStore.trigger[ANALYTICS_EVENTS.INSIGHT_RESTORED]({});
 };
 const _selectGuidingBeliefInsight = () => {
   analyticsStore.trigger[ANALYTICS_EVENTS.INSIGHT_TAB_SELECTED]({
@@ -179,19 +175,6 @@ function InsightTabs({ showingPattern, visible }: { showingPattern: boolean; vis
         selected={showingPattern}
         testID="analytics-insight-tab-pattern"
       />
-    </View>
-  );
-}
-
-function HiddenInsight() {
-  return (
-    <View style={styles.insightHidden} testID="analytics-insight-hidden">
-      <Text style={styles.insightHiddenText}>
-        <fbt desc="Confirmation that the current primary insight is hidden">This insight is hidden for now.</fbt>
-      </Text>
-      <Pressable accessibilityRole="button" onPress={_restoreInsight} testID="analytics-insight-restore">
-        <Text style={styles.insightRestoreText}><fbt desc="Button restoring a dismissed primary insight">Show insight</fbt></Text>
-      </Pressable>
     </View>
   );
 }
@@ -344,12 +327,6 @@ function InsightActions({
       timeframe,
     });
   };
-  const _dismiss = () => {
-    if (!pattern) return;
-    analyticsStore.trigger[ANALYTICS_EVENTS.INSIGHT_DISMISSED]({
-      key: analyticsInsightKey(pattern),
-    });
-  };
   return (
     <View style={styles.insightActions}>
       <Pressable
@@ -363,16 +340,6 @@ function InsightActions({
         </Text>
         <Text accessibilityElementsHidden style={styles.insightDisclosure}>›</Text>
       </Pressable>
-      {showingPattern ? (
-        <Pressable
-          accessibilityRole="button"
-          onPress={_dismiss}
-          style={styles.insightDismissButton}
-          testID="analytics-insight-dismiss"
-        >
-          <Text style={styles.insightDismissText}><fbt desc="Button dismissing the current primary insight">Hide for now</fbt></Text>
-        </Pressable>
-      ) : null}
     </View>
   );
 }
@@ -410,8 +377,6 @@ function InsightHero({
   const showingPattern = activeTab === ANALYTICS_INSIGHT_TABS.PATTERN;
   const range = analyticsDateRange({ now, timeframe });
   const rangeLabel = analyticsTimeframeRangeLabel({ locale, range, timeframe });
-  const insightKey = pattern ? analyticsInsightKey(pattern) : null;
-  const dismissed = insightKey !== null && analytics.dismissedInsightKey === insightKey;
 
   if (entries.length < 3 && guidingBelief === undefined) {
     return (
@@ -435,29 +400,23 @@ function InsightHero({
     <View style={styles.insightCard} testID="analytics-primary-insight">
       <InsightTabs showingPattern={showingPattern} visible={hasBoth} />
       <Animated.View entering={FadeIn.duration(180)} key={activeTab}>
-        {showingPattern && dismissed ? (
-          <HiddenInsight />
-        ) : (
-          <>
-            <InsightBody
-              entries={entries}
-              group={guidingBeliefGroup}
-              locale={locale}
-              pattern={pattern}
-              rangeLabel={rangeLabel}
-              showingPattern={showingPattern}
-              statements={statements}
-              timeframe={timeframe}
-            />
-            <InsightActions
-              guidingBelief={guidingBelief}
-              onEvidencePress={onEvidencePress}
-              pattern={pattern}
-              showingPattern={showingPattern}
-              timeframe={timeframe}
-            />
-          </>
-        )}
+        <InsightBody
+          entries={entries}
+          group={guidingBeliefGroup}
+          locale={locale}
+          pattern={pattern}
+          rangeLabel={rangeLabel}
+          showingPattern={showingPattern}
+          statements={statements}
+          timeframe={timeframe}
+        />
+        <InsightActions
+          guidingBelief={guidingBelief}
+          onEvidencePress={onEvidencePress}
+          pattern={pattern}
+          showingPattern={showingPattern}
+          timeframe={timeframe}
+        />
       </Animated.View>
     </View>
   );
@@ -915,14 +874,6 @@ const styles = StyleSheet.create({
     borderColor: palette.hairline,
     backgroundColor: palette.paperRaised,
   },
-  insightHidden: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    gap: 12,
-    marginTop: 20,
-    paddingVertical: 12,
-  },
   insightHeading: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   insightMarker: { width: 7, height: 7, borderRadius: 4, backgroundColor: palette.moss },
   insightEyebrow: { fontFamily: type.semibold, color: palette.moss, fontSize: 10, letterSpacing: 1.05 },
@@ -930,8 +881,6 @@ const styles = StyleSheet.create({
   insightEvidence: { fontFamily: type.regular, color: palette.inkMuted, fontSize: 12, lineHeight: 18, marginTop: 11 },
   insightTieCopy: { fontFamily: type.regular, color: palette.inkMuted, fontSize: 12, lineHeight: 18, marginTop: 8 },
   insightLearningText: { fontFamily: type.medium, color: palette.ink, fontSize: 15, lineHeight: 22, marginTop: 7 },
-  insightHiddenText: { flex: 1, fontFamily: type.regular, color: palette.inkMuted, fontSize: 13 },
-  insightRestoreText: { fontFamily: type.semibold, color: palette.moss, fontSize: 12 },
   insightActions: { gap: 6, marginTop: 16 },
   insightEvidenceButton: {
     minHeight: 44,
@@ -946,8 +895,6 @@ const styles = StyleSheet.create({
   },
   insightEvidenceButtonText: { flex: 1, fontFamily: type.semibold, color: palette.ink, fontSize: 13 },
   insightDisclosure: { fontFamily: type.regular, color: palette.inkMuted, fontSize: 22, lineHeight: 22 },
-  insightDismissButton: { minHeight: 38, alignSelf: 'center', justifyContent: 'center', paddingHorizontal: 12 },
-  insightDismissText: { fontFamily: type.medium, color: palette.inkMuted, fontSize: 12 },
   section: { backgroundColor: palette.paper, marginTop: 34 },
   constellationSection: { backgroundColor: palette.paper, marginTop: 38 },
   sectionEyebrow: { fontFamily: type.semibold, color: palette.inkMuted, fontSize: 10, letterSpacing: 1.25 },

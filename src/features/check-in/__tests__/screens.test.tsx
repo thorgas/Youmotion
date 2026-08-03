@@ -206,7 +206,6 @@ describe('check-in screens', () => {
     analyticsStore.trigger[ANALYTICS_EVENTS.TIMEFRAME_SELECTED]({
       timeframe: ANALYTICS_TIMEFRAMES.LAST_WEEK,
     });
-    analyticsStore.trigger[ANALYTICS_EVENTS.INSIGHT_RESTORED]({});
     appSettingsStore.trigger.hydrated({
       settings: {
         locale: APP_LOCALES.ENGLISH,

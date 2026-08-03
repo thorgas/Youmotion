@@ -141,7 +141,3 @@ export function primaryAnalyticsInsight(
   const emotion = observations.find((observation) => observation.kind === 'emotion');
   return emotion?.kind === 'emotion' ? emotion : null;
 }
-
-export function analyticsInsightKey(insight: PrimaryAnalyticsInsight) {
-  return [insight.kind, ...insight.supportingIds].join(':');
-}

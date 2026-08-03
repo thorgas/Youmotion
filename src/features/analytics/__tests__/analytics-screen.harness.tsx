@@ -148,7 +148,6 @@ beforeEach(() => {
 
 afterEach(() => {
   capturedEvidenceCount = 0;
-  analyticsStore.trigger[ANALYTICS_EVENTS.INSIGHT_RESTORED]({});
   analyticsStore.trigger[ANALYTICS_EVENTS.TIMEFRAME_SELECTED]({
     timeframe: ANALYTICS_TIMEFRAMES.LAST_WEEK,
   });
@@ -201,10 +200,7 @@ describe('analytics on the device runtime', () => {
     });
     await userEvent.press(await screen.findByTestId('analytics-insight-evidence'));
     expect(capturedEvidenceCount).toBe(11);
-    await userEvent.press(await screen.findByTestId('analytics-insight-dismiss'));
-    expect(await screen.findByTestId('analytics-insight-hidden')).not.toBeNull();
-    await userEvent.press(await screen.findByTestId('analytics-insight-restore'));
-    expect(await screen.findByTestId('analytics-primary-insight')).not.toBeNull();
+    expect(screen.queryByTestId('analytics-insight-dismiss')).toBeNull();
   });
 
   test('keeps tied guiding beliefs inside one hero', async () => {

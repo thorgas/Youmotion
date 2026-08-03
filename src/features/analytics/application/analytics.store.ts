@@ -14,7 +14,6 @@ const AnalyticsTimeframeSchema = Schema.Literal(
 );
 
 const initialContext = {
-  dismissedInsightKey: null,
   insightTab: ANALYTICS_INSIGHT_TABS.GUIDING_BELIEF,
   monthOffset: 0,
   timeframe: ANALYTICS_TIMEFRAMES.LAST_WEEK,
@@ -23,7 +22,6 @@ const initialContext = {
 export const analyticsStore = createStore({
   schemas: {
     context: Schema.standardSchemaV1(Schema.Struct({
-      dismissedInsightKey: Schema.NullOr(Schema.String),
       insightTab: Schema.Literal(
         ANALYTICS_INSIGHT_TABS.GUIDING_BELIEF,
         ANALYTICS_INSIGHT_TABS.PATTERN,
@@ -44,10 +42,6 @@ export const analyticsStore = createStore({
           ANALYTICS_INSIGHT_TABS.PATTERN,
         ),
       })),
-      [ANALYTICS_EVENTS.INSIGHT_DISMISSED]: Schema.standardSchemaV1(Schema.Struct({
-        key: Schema.String,
-      })),
-      [ANALYTICS_EVENTS.INSIGHT_RESTORED]: Schema.standardSchemaV1(Schema.Struct({})),
     },
   },
   context: initialContext,
@@ -73,14 +67,6 @@ export const analyticsStore = createStore({
     [ANALYTICS_EVENTS.INSIGHT_TAB_SELECTED]: (context, event) => ({
       ...context,
       insightTab: event.tab,
-    }),
-    [ANALYTICS_EVENTS.INSIGHT_DISMISSED]: (context, event) => ({
-      ...context,
-      dismissedInsightKey: event.key,
-    }),
-    [ANALYTICS_EVENTS.INSIGHT_RESTORED]: (context) => ({
-      ...context,
-      dismissedInsightKey: null,
     }),
   },
 });
