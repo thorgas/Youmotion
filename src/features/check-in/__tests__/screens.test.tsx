@@ -1124,6 +1124,51 @@ describe('check-in screens', () => {
     });
   });
 
+  it('opens History with filters matching the selected additional pattern', async () => {
+    const moments = [{
+      id: CheckInId.make('additional-pattern-fear-1'),
+      createdAt: CheckInTimestamp.make(new Date(2026, 6, 18, 12).toISOString()),
+      emotionId: EMOTION_IDS.FEAR,
+      intensity: 0.5,
+      note: '',
+      beliefSystemId: BELIEF_SYSTEM_IDS.ALWAYS_FUNCTIONING,
+    }, {
+      id: CheckInId.make('additional-pattern-fear-2'),
+      createdAt: CheckInTimestamp.make(new Date(2026, 6, 19, 12).toISOString()),
+      emotionId: EMOTION_IDS.FEAR,
+      intensity: 0.5,
+      note: '',
+      beliefSystemId: BELIEF_SYSTEM_IDS.ALWAYS_FUNCTIONING,
+    }, {
+      id: CheckInId.make('additional-pattern-joy'),
+      createdAt: CheckInTimestamp.make(new Date(2026, 6, 17, 12).toISOString()),
+      emotionId: EMOTION_IDS.JOY,
+      intensity: 0.5,
+      note: '',
+    }] satisfies readonly CheckIn[];
+    checkInHistoryStore.trigger.hydrated({ entries: moments });
+    await act(() => mockActor.send({ type: NAVIGATION_EVENTS.ANALYTICS_OPENED }));
+    const analytics = await _renderLocalized(
+      <AnalyticsScreen now={new Date(2026, 6, 21, 12)} />,
+    );
+
+    expect(analytics.getByTestId('analytics-insight-pattern-belief')).toBeTruthy();
+    await fireEvent.press(analytics.getByTestId('analytics-insight-next-pattern'));
+    expect(analytics.getByTestId('analytics-insight-pattern-emotion')).toBeTruthy();
+    await fireEvent.press(analytics.getByTestId('analytics-insight-evidence'));
+
+    expect(mockActor.getSnapshot().matches({
+      [NAVIGATION_STATES.TABS]: NAVIGATION_STATES.HISTORY,
+    })).toBe(true);
+    expect(historyTimeframeStore.getSnapshot().context).toMatchObject({
+      beliefSystemId: null,
+      content: HISTORY_CONTENT_FILTERS.ALL,
+      emotionId: EMOTION_IDS.FEAR,
+      query: '',
+      timeframe: ANALYTICS_TIMEFRAMES.LAST_WEEK,
+    });
+  });
+
   it('labels an unreframed harmful belief and renders it as muted text', async () => {
     await act(() => appSettingsStore.trigger.languageChanged({
       locale: APP_LOCALES.GERMAN,

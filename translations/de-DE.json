@@ -3661,30 +3661,6 @@
       ],
       "types": []
     },
-    "rjGFVS6W4cdhan93FLYxYA==": {
-      "description": "Confirmation that the current primary insight is hidden",
-      "status": "new",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "Diese Erkenntnis ist vorerst ausgeblendet.",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "ZUPBjcl2I+r1tgIcfw2HMQ==": {
-      "description": "Button restoring a dismissed primary insight",
-      "status": "new",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "Erkenntnis anzeigen",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
     "f8p8koRibhpauWtTJ9vnHg==": {
       "description": "Primary evidence-linked insight label",
       "status": "new",
@@ -3692,18 +3668,6 @@
       "translations": [
         {
           "translation": "EIN MUSTER",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "Hs//3szfDSk0zA7JrlwkiQ==": {
-      "description": "Button dismissing the current primary insight",
-      "status": "new",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "Vorerst ausblenden",
           "variations": {}
         }
       ],
@@ -4282,6 +4246,18 @@
       "translations": [
         {
           "translation": "‹ Zurück",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "ZPxuiR7doGYvsvK3OKeZYw==": {
+      "description": "Button showing the next available analytics pattern",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Nächstes Muster",
           "variations": {}
         }
       ],

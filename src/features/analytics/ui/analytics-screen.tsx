@@ -38,7 +38,7 @@ import { analyticsStore } from '../application/analytics.store';
 import {
   analyticsObservations,
   emotionFrequencies,
-  primaryAnalyticsInsight,
+  primaryAnalyticsInsights,
   type PrimaryAnalyticsInsight,
   type AnalyticsObservation,
   type EmotionFrequency,
@@ -186,7 +186,7 @@ function PatternInsight({ entries, pattern, rangeLabel, statements }: {
   statements: readonly BeliefStatement[];
 }) {
   return (
-    <View testID="analytics-insight-pattern">
+    <View testID={`analytics-insight-pattern-${pattern.kind}`}>
       <Text style={styles.insightText}>{observationCopy({ observation: pattern, statements })}</Text>
       <Text style={styles.insightEvidence}>
         {insightEvidenceCopy({
@@ -302,12 +302,16 @@ function InsightActions({
   guidingBelief,
   onEvidencePress,
   pattern,
+  patternCount,
+  patternPosition,
   showingPattern,
   timeframe,
 }: {
   guidingBelief: TopLeitsatz | undefined;
   onEvidencePress: ((selection: InsightEvidenceSelection) => void) | undefined;
   pattern: PrimaryAnalyticsInsight | null;
+  patternCount: number;
+  patternPosition: number;
   showingPattern: boolean;
   timeframe: AnalyticsTimeframe;
 }) {
@@ -327,6 +331,9 @@ function InsightActions({
       timeframe,
     });
   };
+  const _nextPattern = () => {
+    analyticsStore.trigger[ANALYTICS_EVENTS.NEXT_PATTERN_REQUESTED]({ patternCount });
+  };
   return (
     <View style={styles.insightActions}>
       <Pressable
@@ -340,6 +347,24 @@ function InsightActions({
         </Text>
         <Text accessibilityElementsHidden style={styles.insightDisclosure}>›</Text>
       </Pressable>
+      {showingPattern && patternCount > 1 ? (
+        <View style={styles.insightPatternNavigation}>
+          <Text style={styles.insightPatternPosition}>
+            {patternPosition + 1} / {patternCount}
+          </Text>
+          <Pressable
+            accessibilityRole="button"
+            onPress={_nextPattern}
+            style={styles.insightNextPatternButton}
+            testID="analytics-insight-next-pattern"
+          >
+            <Text style={styles.insightNextPatternText}>
+              <fbt desc="Button showing the next available analytics pattern">Next pattern</fbt>
+            </Text>
+            <Text accessibilityElementsHidden style={styles.insightNextPatternDisclosure}>›</Text>
+          </Pressable>
+        </View>
+      ) : null}
     </View>
   );
 }
@@ -360,7 +385,11 @@ function InsightHero({
   timeframe: AnalyticsTimeframe;
 }) {
   const analytics = useSelector(analyticsStore, _selectCalendar);
-  const pattern = primaryAnalyticsInsight(entries);
+  const patterns = primaryAnalyticsInsights(entries);
+  const patternPosition = patterns.length > 0
+    ? analytics.patternIndex % patterns.length
+    : 0;
+  const pattern = patterns[patternPosition] ?? null;
   const guidingBeliefGroup = topLeitsaetzeForTimeframe({
     entries,
     now,
@@ -399,7 +428,7 @@ function InsightHero({
   return (
     <View style={styles.insightCard} testID="analytics-primary-insight">
       <InsightTabs showingPattern={showingPattern} visible={hasBoth} />
-      <Animated.View entering={FadeIn.duration(180)} key={activeTab}>
+      <Animated.View entering={FadeIn.duration(180)} key={`${activeTab}-${patternPosition}`}>
         <InsightBody
           entries={entries}
           group={guidingBeliefGroup}
@@ -414,6 +443,8 @@ function InsightHero({
           guidingBelief={guidingBelief}
           onEvidencePress={onEvidencePress}
           pattern={pattern}
+          patternCount={patterns.length}
+          patternPosition={patternPosition}
           showingPattern={showingPattern}
           timeframe={timeframe}
         />
@@ -467,10 +498,9 @@ function ObservationSection({ entries, statements }: {
   entries: readonly CheckIn[];
   statements: readonly BeliefStatement[];
 }) {
-  const primary = primaryAnalyticsInsight(entries);
-  const primaryKey = primary ? observationKey(primary) : null;
+  const primaryKeys = new Set(primaryAnalyticsInsights(entries).map(observationKey));
   const observations = analyticsObservations(entries).filter(
-    (observation) => observationKey(observation) !== primaryKey,
+    (observation) => !primaryKeys.has(observationKey(observation)),
   );
   if (observations.length === 0) return null;
   return (
@@ -895,6 +925,28 @@ const styles = StyleSheet.create({
   },
   insightEvidenceButtonText: { flex: 1, fontFamily: type.semibold, color: palette.ink, fontSize: 13 },
   insightDisclosure: { fontFamily: type.regular, color: palette.inkMuted, fontSize: 22, lineHeight: 22 },
+  insightPatternNavigation: {
+    minHeight: 44,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 4,
+  },
+  insightPatternPosition: {
+    fontFamily: type.medium,
+    color: palette.inkMuted,
+    fontSize: 12,
+    fontVariant: ['tabular-nums'],
+  },
+  insightNextPatternButton: {
+    minHeight: 44,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    paddingHorizontal: 8,
+  },
+  insightNextPatternText: { fontFamily: type.semibold, color: palette.moss, fontSize: 13 },
+  insightNextPatternDisclosure: { fontFamily: type.regular, color: palette.moss, fontSize: 21, lineHeight: 21 },
   section: { backgroundColor: palette.paper, marginTop: 34 },
   constellationSection: { backgroundColor: palette.paper, marginTop: 38 },
   sectionEyebrow: { fontFamily: type.semibold, color: palette.inkMuted, fontSize: 10, letterSpacing: 1.25 },

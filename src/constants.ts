@@ -113,6 +113,7 @@ export const ANALYTICS_EVENTS = Object.freeze({
   CURRENT_MONTH_REQUESTED: literal('analytics.currentMonthRequested'),
   TIMEFRAME_SELECTED: literal('analytics.timeframeSelected'),
   INSIGHT_TAB_SELECTED: literal('analytics.insightTabSelected'),
+  NEXT_PATTERN_REQUESTED: literal('analytics.nextPatternRequested'),
 });
 
 export const ANALYTICS_INSIGHT_TABS = Object.freeze({

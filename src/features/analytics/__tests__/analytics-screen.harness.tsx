@@ -33,10 +33,12 @@ let AnalyticsContent: AnalyticsContentComponent;
 
 const FIXED_NOW = new Date(2026, 6, 21, 12);
 let capturedEvidenceCount = 0;
+let capturedEvidenceKind = '';
 const _captureEvidence: NonNullable<
   ComponentProps<AnalyticsContentComponent>['onEvidencePress']
 > = (selection) => {
   capturedEvidenceCount = selection.insight.supportingIds.length;
+  capturedEvidenceKind = selection.insight.kind;
 };
 function checkIn({ day, emotionId, id, note = '' }: {
   day: number;
@@ -148,6 +150,7 @@ beforeEach(() => {
 
 afterEach(() => {
   capturedEvidenceCount = 0;
+  capturedEvidenceKind = '';
   analyticsStore.trigger[ANALYTICS_EVENTS.TIMEFRAME_SELECTED]({
     timeframe: ANALYTICS_TIMEFRAMES.LAST_WEEK,
   });
@@ -172,7 +175,7 @@ describe('analytics on the device runtime', () => {
     expect(await screen.findByTestId(
       `analytics-insight-guiding-belief-${BELIEF_SYSTEM_IDS.ALWAYS_FUNCTIONING}`,
     )).not.toBeNull();
-    expect(screen.queryByTestId('analytics-insight-pattern')).toBeNull();
+    expect(screen.queryByTestId('analytics-insight-pattern-belief')).toBeNull();
     const guidingBeliefScreenshot = await screen.screenshot(
       await screen.findByTestId('analytics-primary-insight'),
     );
@@ -184,8 +187,10 @@ describe('analytics on the device runtime', () => {
     });
     await userEvent.press(await screen.findByTestId('analytics-insight-evidence'));
     expect(capturedEvidenceCount).toBe(11);
+    expect(capturedEvidenceKind).toBe('guiding-belief');
     await userEvent.press(await screen.findByTestId('analytics-insight-tab-pattern'));
-    expect(await screen.findByTestId('analytics-insight-pattern')).not.toBeNull();
+    expect(await screen.findByTestId('analytics-insight-pattern-belief')).not.toBeNull();
+    expect(await screen.findByTestId('analytics-insight-next-pattern')).not.toBeNull();
     expect(screen.queryByTestId(
       `analytics-insight-guiding-belief-${BELIEF_SYSTEM_IDS.ALWAYS_FUNCTIONING}`,
     )).toBeNull();
@@ -200,7 +205,48 @@ describe('analytics on the device runtime', () => {
     });
     await userEvent.press(await screen.findByTestId('analytics-insight-evidence'));
     expect(capturedEvidenceCount).toBe(11);
+    expect(capturedEvidenceKind).toBe('belief');
     expect(screen.queryByTestId('analytics-insight-dismiss')).toBeNull();
+
+    await userEvent.press(await screen.findByTestId('analytics-insight-next-pattern'));
+    expect(await screen.findByTestId('analytics-insight-pattern-emotion')).not.toBeNull();
+    expect(screen.queryByTestId('analytics-insight-pattern-belief')).toBeNull();
+    const nextPatternScreenshot = await screen.screenshot(
+      await screen.findByTestId('analytics-primary-insight'),
+    );
+    if (!nextPatternScreenshot) throw new Error('The additional pattern screenshot is required.');
+    await expect(nextPatternScreenshot).toMatchImageSnapshot({
+      name: 'analytics-competing-insights-next-pattern',
+      comparisonMethod: 'ssim',
+      ssimThreshold: 0.98,
+    });
+    await userEvent.press(await screen.findByTestId('analytics-insight-evidence'));
+    expect(capturedEvidenceCount).toBe(11);
+    expect(capturedEvidenceKind).toBe('emotion');
+
+    await userEvent.press(await screen.findByTestId('analytics-insight-next-pattern'));
+    expect(await screen.findByTestId('analytics-insight-pattern-belief')).not.toBeNull();
+  });
+
+  test('does not show pattern navigation when only one pattern is available', async () => {
+    const entries = [
+      checkIn({ day: 17, emotionId: EMOTION_IDS.JOY, id: 'joy-1' }),
+      checkIn({ day: 18, emotionId: EMOTION_IDS.JOY, id: 'joy-2' }),
+      checkIn({ day: 19, emotionId: EMOTION_IDS.JOY, id: 'joy-3' }),
+    ];
+    await render(
+      <GestureHandlerRootView style={styles.root}>
+        <AnalyticsContent
+          entries={entries}
+          locale={APP_LOCALES.ENGLISH}
+          now={FIXED_NOW}
+          statements={[]}
+        />
+      </GestureHandlerRootView>,
+    );
+
+    expect(await screen.findByTestId('analytics-insight-pattern-emotion')).not.toBeNull();
+    expect(screen.queryByTestId('analytics-insight-next-pattern')).toBeNull();
   });
 
   test('keeps tied guiding beliefs inside one hero', async () => {

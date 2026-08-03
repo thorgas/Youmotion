@@ -131,13 +131,15 @@ export type PrimaryAnalyticsInsight = Extract<
   Readonly<{ kind: 'belief' | 'emotion' }>
 >;
 
-export function primaryAnalyticsInsight(
+export function primaryAnalyticsInsights(
   entries: readonly CheckIn[],
-): PrimaryAnalyticsInsight | null {
-  if (entries.length < 3) return null;
+): readonly PrimaryAnalyticsInsight[] {
+  if (entries.length < 3) return [];
   const observations = analyticsObservations(entries);
   const belief = observations.find((observation) => observation.kind === 'belief');
-  if (belief?.kind === 'belief') return belief;
   const emotion = observations.find((observation) => observation.kind === 'emotion');
-  return emotion?.kind === 'emotion' ? emotion : null;
+  return [
+    ...(belief?.kind === 'belief' ? [belief] : []),
+    ...(emotion?.kind === 'emotion' ? [emotion] : []),
+  ];
 }
