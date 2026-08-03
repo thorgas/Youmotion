@@ -19,6 +19,10 @@ import {
 } from '../domain/check-in';
 import { BeliefStatementText, BeliefSystemId } from '../domain/belief-statement';
 import { getDatabase } from './surrealdb.database';
+import {
+  LegacyOccurrenceTimeDatabaseSchema,
+  migrateLegacyOccurrenceTime,
+} from './migrations/legacy-occurrence-time.migration';
 
 export class CheckInStorageError extends Schema.TaggedError<CheckInStorageError>()(
   'CheckInStorageError',
@@ -64,15 +68,13 @@ const SurrealIntensity = Schema.Union(
   ),
 );
 
-const SurrealOptionalBeliefSystemId = Schema.Union(
-  BeliefSystemId,
-  Schema.Struct({ kind: Schema.Literal('none') }),
-);
+const SurrealNoneSchema = Schema.Struct({ kind: Schema.Literal('none') });
+const SurrealOptionalBeliefSystemId = Schema.Union(BeliefSystemId, SurrealNoneSchema);
 
 const CheckInDatabaseSchema = Schema.Struct({
   id: CheckInId,
   createdAt: CheckInTimestamp,
-  occurredAt: Schema.optional(CheckInTimestamp),
+  occurredAt: LegacyOccurrenceTimeDatabaseSchema,
   emotionId: CheckInSchema.fields.emotionId,
   intensity: SurrealIntensity,
   level: Schema.optional(SurrealNonNegativeInteger),
@@ -80,7 +82,7 @@ const CheckInDatabaseSchema = Schema.Struct({
   beliefSystemId: Schema.optional(SurrealOptionalBeliefSystemId),
   guidingStatementSnapshot: Schema.optional(Schema.Union(
     BeliefStatementText,
-    Schema.Struct({ kind: Schema.Literal('none') }),
+    SurrealNoneSchema,
   )),
 });
 
@@ -89,8 +91,16 @@ const CheckInDatabaseListSchema = Schema.Array(CheckInDatabaseSchema);
 function checkInFromDatabase(
   entry: typeof CheckInDatabaseSchema.Type,
 ): CheckIn {
-  const { beliefSystemId, guidingStatementSnapshot, ...persistedCheckIn } = entry;
-  const checkIn = withOccurrenceTime(persistedCheckIn);
+  const {
+    beliefSystemId,
+    guidingStatementSnapshot,
+    occurredAt,
+    ...legacyCheckIn
+  } = entry;
+  const checkIn = migrateLegacyOccurrenceTime({
+    checkIn: legacyCheckIn,
+    occurredAt,
+  });
   const statementSnapshot = typeof guidingStatementSnapshot === 'string'
     ? { guidingStatementSnapshot }
     : {};

@@ -115,6 +115,7 @@ describe('Effect check-in repository', () => {
     const stored = {
       id: 'stored-check-in',
       createdAt: '2026-07-12T12:00:00.000Z',
+      occurredAt: NONE,
       emotionId: EMOTION_IDS.JOY,
       intensity: 0.5,
       level: 2n,

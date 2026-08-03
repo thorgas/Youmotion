@@ -22,7 +22,8 @@ The relevant ownership boundaries are:
 - `src/features/check-in/domain/check-in.ts`: canonical persisted check-in schema and types.
 - `src/features/check-in/domain/belief-statement.ts`: built-in and custom belief IDs plus persisted Leidsatz/Leitsatz schemas.
 - `src/features/check-in/domain/belief-system.ts`: stable belief-system IDs, emotion mappings, and history-based recommendation ranking.
-- `src/features/check-in/infrastructure/check-in.repository.ts`: queries, persistence, legacy migration, and typed errors.
+- `src/features/check-in/infrastructure/check-in.repository.ts`: queries, persistence, migration orchestration, and typed errors.
+- `src/features/check-in/infrastructure/migrations/`: storage-boundary compatibility migrations for legacy check-in rows.
 - `src/features/check-in/infrastructure/belief-statement.repository.ts`: custom Leidsatz and Leitsatz queries, persistence, and typed errors.
 - `src/features/check-in/infrastructure/surrealdb.database.ts`: filesystem location and shared native connection.
 - `src/features/check-in/application/check-in-history.store.ts`: validated in-memory history projection.
@@ -87,7 +88,7 @@ The following values are deliberately not persisted:
 - Derived display copy
 - Navigation or transient UI state
 
-Localized labels and colors are derived from stable IDs when rendering. Custom Leidsatz text is resolved from the separate `belief_statement` table. Older records without `level` remain supported; the app derives their level from intensity and clamps it to the emotion's available nuance range. The repository also normalizes integral SurrealDB numbers returned as bigints before domain validation. `beliefSystemId` is optional, so records written before the belief-system feature decode without a data migration. Existing built-in IDs remain valid after widening the field to also accept branded custom IDs. The native SurrealDB client represents a selected-but-absent optional field as `NONE`; the repository schema normalizes that boundary value to an omitted domain property.
+Localized labels and colors are derived from stable IDs when rendering. Custom Leidsatz text is resolved from the separate `belief_statement` table. Older records without `level` remain supported; the app derives their level from intensity and clamps it to the emotion's available nuance range. The repository also normalizes integral SurrealDB numbers returned as bigints before domain validation. `beliefSystemId` is optional, so records written before the belief-system feature decode without a data migration. Existing built-in IDs remain valid after widening the field to also accept branded custom IDs. The native SurrealDB client represents a selected-but-absent optional field as `NONE`; repository schemas normalize those boundary values before domain validation. The occurrence-time case is isolated and documented in [the check-in occurrence-time compatibility migration](./docs/migrations/2026-08-03-check-in-occurrence-time.md).
 
 ## Belief-statement record schema
 
@@ -237,6 +238,12 @@ Legacy records may contain localized `emotion` and `nuance` fields. The legacy d
 
 Important limitation: migration is currently gated on the recent SurrealDB query being empty. It is not a versioned migration ledger and does not merge legacy data into a partially populated database. Future migrations should use an explicit schema-version record and be idempotent.
 
+## Legacy occurrence-time compatibility migration
+
+Check-ins created before editable moment times have no `occurredAt` field. A SurrealDB query represents that absent selected field as `NONE`, so the repository delegates decoding to `infrastructure/migrations/legacy-occurrence-time.migration.ts`. The migration preserves explicit timestamps and maps `NONE` or an omitted field to `createdAt` before domain validation. It is read-time, non-destructive, and idempotent.
+
+See [Check-in occurrence-time compatibility migration](./docs/migrations/2026-08-03-check-in-occurrence-time.md) for the incident path, data evidence, screenshots, verification, and removal criteria.
+
 ## Error model
 
 Expected repository failures remain in the Effect error channel:
@@ -322,6 +329,7 @@ Use `pnpm start:tunnel` when a physical device cannot reach Metro over the local
 Database coverage is split across:
 
 - `surrealdb.database.test.ts`: directory creation, singleton connection, URI rejection, and retry after failure.
+- `legacy-occurrence-time.migration.test.ts`: direct missing, SurrealDB `NONE`, and already-migrated occurrence-time cases.
 - `check-in.repository.test.ts`: encode/decode, create, update, delete, legacy migration, integer transport, and tagged failures using a mocked client.
 - `belief-statement.repository.test.ts`: built-in Leitsatz and custom Leidsatz persistence, Leitsatz removal, schema-validated loading, query shape, and tagged failures.
 - `belief-system.test.ts`: catalog completeness, many-to-many defaults, custom entries, and history-based ranking.
@@ -329,6 +337,7 @@ Database coverage is split across:
 - `belief-statement-flow.harness.tsx`: custom Leidsatz creation, dedicated guiding-belief state, positive Leitsatz persistence, attachment, and completion under the native runtime.
 - `app-navigation.machine.test.ts`: hydration, persistence, failure, retry, complete saved-moment editing, custom creation, Leitsatz updates and removal, belief-system attachment, and delete event paths.
 - `check-in.repository.harness.ts`: real persistence and reload through the native SurrealKV engine, with record cleanup.
+- `check-in-history.store.harness.ts`: occurrence-time ordering through the native JavaScript runtime without unsupported array methods.
 
 Run the standard gates:
 

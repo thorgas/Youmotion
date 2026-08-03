@@ -25,6 +25,7 @@ import {
   HISTORY_CONTENT_FILTERS,
 } from '@/constants';
 import { AppLocaleProvider } from '@/localization/app-locale-provider';
+import { formatHistoryDate } from '@/localization/date-copy';
 import { appNavigationMachine } from '@/navigation/app-navigation.machine';
 import {
   CheckInId,
@@ -686,14 +687,23 @@ describe('check-in screens', () => {
     });
   });
 
-  it('keeps occurrence time quiet until the user opens the native editor', async () => {
+  it('shows the full occurrence time before opening the native modal editor', async () => {
     await act(_reachReflection);
     const screen = await _renderLocalized(<ReflectionScreen />);
+    const occurredAt = mockActor.getSnapshot().context.occurredAtDraft;
+    if (!occurredAt) throw new Error('The reflection must initialize its occurrence time.');
+    const expectedLabel = formatHistoryDate({
+      date: new Date(occurredAt),
+      locale: APP_LOCALES.ENGLISH,
+    });
 
-    expect(within(screen.getByTestId('moment-time-control')).getByText('Now')).toBeTruthy();
+    expect(
+      within(screen.getByTestId('moment-time-control')).getByText(expectedLabel),
+    ).toBeTruthy();
     expect(screen.queryByText('When was this?')).toBeNull();
 
     await fireEvent.press(screen.getByTestId('moment-time-control'));
+    expect(screen.getByTestId('moment-time-modal')).toBeTruthy();
     expect(screen.getByText('When was this?')).toBeTruthy();
     expect(screen.getByText('Set to now')).toBeTruthy();
   });

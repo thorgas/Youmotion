@@ -15,7 +15,9 @@ const initialContext = {
 };
 
 function _sortEntries(entries: readonly CheckIn[]) {
-  return entries.toSorted((left, right) => (
+  const mutableCopy = entries.slice();
+  /* oxlint-disable-next-line unicorn/no-array-sort -- Hermes lacks toSorted; the copied array preserves immutable store input. Covered by check-in-history.store.harness.ts. */
+  return mutableCopy.sort((left, right) => (
     right.occurredAt.localeCompare(left.occurredAt)
     || right.createdAt.localeCompare(left.createdAt)
     || right.id.localeCompare(left.id)

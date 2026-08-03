@@ -4262,6 +4262,102 @@
         }
       ],
       "types": []
+    },
+    "R9E09VhAEJAlIg2np2EHVQ==": {
+      "description": "Hint for opening the emotion date and time editor",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Ändere, wann dieses Gefühl aufgetreten ist",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "RhRLhmQ8YfezZ380GksTyQ==": {
+      "description": "Heading above the emotion date and time editor",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Wann war das?",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "C/dSy0eWNLTLlh+l090XLw==": {
+      "description": "Button closing the emotion date and time editor",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Fertig",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "BPHh9CMbVhsGHx5r44WA3g==": {
+      "description": "Button opening the date picker for an emotion",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Datum",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "wBnMA28G9Yiubu68OwCsqg==": {
+      "description": "Button opening the time picker for an emotion",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Uhrzeit",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "+kRUY9xeOLxep51xyz0bfQ==": {
+      "description": "Button setting an emotion's date and time to the present",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Auf jetzt setzen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "Hgsfj52RsA/kOo615NsbUA==": {
+      "description": "Label beside the date picker for an emotion",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Datum",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "uSJplHCYlHMEcwF3IRQUzA==": {
+      "description": "Label beside the time picker for an emotion",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Uhrzeit",
+          "variations": {}
+        }
+      ],
+      "types": []
     }
   }
 }

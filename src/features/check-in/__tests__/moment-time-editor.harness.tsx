@@ -47,7 +47,7 @@ afterEach(() => {
 });
 
 describe('moment time editor on the device runtime', () => {
-  test('reveals the native editor from the quiet reflection control', async () => {
+  test('reveals the native modal from the full occurrence time control', async () => {
     mock('@/features/data-safety/infrastructure/data-archive.repository', () => ({
       deleteAllJournalData: () => Effect.succeed(undefined),
       exportDataArchive: () => Effect.succeed(undefined),
@@ -89,5 +89,6 @@ describe('moment time editor on the device runtime', () => {
 
     await waitUntil(() => currentActor().getSnapshot().context.momentTimeEditorOpen);
     expect(currentActor().getSnapshot().context.momentTimeEditorOpen).toBe(true);
+    expect(await screen.findByTestId('moment-time-modal')).toBeTruthy();
   });
 });
