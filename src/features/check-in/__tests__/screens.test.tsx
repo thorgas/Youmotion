@@ -1256,6 +1256,19 @@ describe('check-in screens', () => {
     expect(history.getByText(/Joy · Cheerfulness/)).toBeTruthy();
 
     const settings = await _renderLocalized(<SettingsScreen />);
+    expect(settings.getByTestId('language-english')).toHaveStyle({
+      borderCurve: 'continuous',
+      borderRadius: 14,
+      overflow: 'hidden',
+    });
+    expect(settings.getByTestId('language-english-selection')).toHaveStyle({
+      borderCurve: 'continuous',
+      borderRadius: 14,
+    });
+    expect(settings.getByTestId('emotion-label-mode-both-selection')).toHaveStyle({
+      borderCurve: 'continuous',
+      borderRadius: 14,
+    });
     expect(settings.getByText('Your journal belongs to you.')).toBeTruthy();
     expect(settings.getByText('App information')).toBeTruthy();
     expect(settings.getByText('App')).toBeTruthy();

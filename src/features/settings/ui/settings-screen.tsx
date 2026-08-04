@@ -81,6 +81,7 @@ function PreferenceOption({
       <Animated.View
         pointerEvents="none"
         style={[styles.preferenceSelection, selectionStyle]}
+        testID={`${testID}-selection`}
       />
       <Animated.Text style={[textStyle, selectionTextStyle]}>
         {label}
@@ -328,10 +329,10 @@ const styles = StyleSheet.create({
   cardTitle: { fontFamily: type.medium, color: palette.ink, fontSize: 18 },
   cardCopy: { fontFamily: type.regular, color: palette.inkMuted, fontSize: 14, lineHeight: 21, marginTop: 7 },
   languageRow: { flexDirection: 'row', gap: 10, marginTop: 16 },
-  languageButton: { minHeight: 42, flex: 1, alignItems: 'center', justifyContent: 'center', borderRadius: 14, borderWidth: 1, borderColor: palette.hairline, overflow: 'hidden' },
+  languageButton: { minHeight: 42, flex: 1, alignItems: 'center', justifyContent: 'center', borderRadius: 14, borderCurve: 'continuous', borderWidth: 1, borderColor: palette.hairline, overflow: 'hidden' },
   languageText: { fontFamily: type.semibold, color: palette.ink, fontSize: 14 },
   labelModeRow: { flexDirection: 'row', gap: 8, marginTop: 16 },
-  labelModeButton: { minHeight: 42, flex: 1, alignItems: 'center', justifyContent: 'center', borderRadius: 14, borderWidth: 1, borderColor: palette.hairline, paddingHorizontal: 8, overflow: 'hidden' },
+  labelModeButton: { minHeight: 42, flex: 1, alignItems: 'center', justifyContent: 'center', borderRadius: 14, borderCurve: 'continuous', borderWidth: 1, borderColor: palette.hairline, paddingHorizontal: 8, overflow: 'hidden' },
   labelModeText: { fontFamily: type.semibold, color: palette.ink, fontSize: 13 },
   preferenceSelection: {
     position: 'absolute',
@@ -340,6 +341,8 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     backgroundColor: palette.ink,
+    borderRadius: 14,
+    borderCurve: 'continuous',
   },
   actionGroup: {
     borderTopWidth: 1,
