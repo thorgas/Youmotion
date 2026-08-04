@@ -6,6 +6,7 @@ import {
   expect,
   mock,
   render,
+  requireActual,
   resetModules,
   test,
   waitUntil,
@@ -62,6 +63,21 @@ describe('moment time editor on the device runtime', () => {
     mock('@/navigation/app-navigation.provider', () => ({
       useAppNavigationActor: currentActor,
     }));
+    mock('react-native', () => {
+      const actual: typeof import('react-native') = requireActual('react-native');
+      const react: typeof import('react') = require('react');
+      const mocked = Object.create(
+        Object.getPrototypeOf(actual),
+        Object.getOwnPropertyDescriptors(actual),
+      );
+      Object.defineProperty(mocked, 'Modal', {
+        configurable: true,
+        value: ({ children, visible }: import('react-native').ModalProps) => (
+          visible ? react.createElement(react.Fragment, null, children) : null
+        ),
+      });
+      return mocked;
+    });
     const navigationModule: typeof import('@/navigation/app-navigation.machine') = require(
       '@/navigation/app-navigation.machine',
     );
@@ -104,7 +120,7 @@ describe('moment time editor on the device runtime', () => {
     await waitUntil(() => !currentActor().getSnapshot().context.momentTimeEditorOpen);
     expect(currentActor().getSnapshot().context.occurredAtDraft).toBe(original);
 
-    await userEvent.press(control);
+    await userEvent.press(await screen.findByTestId('moment-time-control'));
     await waitUntil(() => currentActor().getSnapshot().context.momentTimeEditorOpen);
     currentActor().send({ type: CHECK_IN_EVENTS.MOMENT_TIME_CHANGED, occurredAt: changed });
     await userEvent.press(await screen.findByTestId('confirm-moment-time'));
