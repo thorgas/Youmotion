@@ -111,11 +111,11 @@ describe('Effect check-in repository', () => {
     );
   });
 
-  it('loads schema-validated check-ins from SurrealDB', async () => {
+  it('loads schema-validated, migrated check-ins from SurrealDB', async () => {
     const stored = {
       id: 'stored-check-in',
       createdAt: '2026-07-12T12:00:00.000Z',
-      occurredAt: NONE,
+      occurredAt: '2026-07-12T11:00:00.000Z',
       emotionId: EMOTION_IDS.JOY,
       intensity: 0.5,
       level: 2n,
@@ -131,12 +131,27 @@ describe('Effect check-in repository', () => {
     expect(loaded).toEqual([{
       id: stored.id,
       createdAt: stored.createdAt,
-      occurredAt: stored.createdAt,
+      occurredAt: stored.occurredAt,
       emotionId: stored.emotionId,
       intensity: stored.intensity,
       level: 2,
       note: stored.note,
     }]);
+  });
+
+  it('rejects a legacy NONE occurrence time after startup migration', async () => {
+    mockSurrealQuery.mockResolvedValueOnce([{ statementIndex: 0, value: [{
+      id: 'unmigrated-check-in',
+      createdAt: '2026-07-12T12:00:00.000Z',
+      occurredAt: NONE,
+      emotionId: EMOTION_IDS.JOY,
+      intensity: 0.5,
+      note: '',
+    }] }]);
+
+    const error = await Effect.runPromise(Effect.flip(loadCheckIns));
+
+    expect(error).toMatchObject({ _tag: 'CheckInDataError', operation: 'decode' });
   });
 
   it('migrates legacy AsyncStorage check-ins without localized labels', async () => {

@@ -22,8 +22,10 @@ The relevant ownership boundaries are:
 - `src/features/check-in/domain/check-in.ts`: canonical persisted check-in schema and types.
 - `src/features/check-in/domain/belief-statement.ts`: built-in and custom belief IDs plus persisted Leidsatz/Leitsatz schemas.
 - `src/features/check-in/domain/belief-system.ts`: stable belief-system IDs, emotion mappings, and history-based recommendation ranking.
-- `src/features/check-in/infrastructure/check-in.repository.ts`: queries, persistence, migration orchestration, and typed errors.
-- `src/features/check-in/infrastructure/migrations/`: storage-boundary compatibility migrations for legacy check-in rows.
+- `src/features/check-in/infrastructure/check-in.repository.ts`: strict current-schema queries, persistence, and typed errors.
+- `src/features/check-in/infrastructure/migrations/database-migration.runner.ts`: ordered startup migration execution and ledger validation.
+- `src/features/check-in/infrastructure/migrations/database-migrations.ts`: append-only migration registry.
+- `src/features/check-in/infrastructure/migrations/*.database-migration.ts`: individual idempotent migration definitions.
 - `src/features/check-in/infrastructure/belief-statement.repository.ts`: custom Leidsatz and Leitsatz queries, persistence, and typed errors.
 - `src/features/check-in/infrastructure/surrealdb.database.ts`: filesystem location and shared native connection.
 - `src/features/check-in/application/check-in-history.store.ts`: validated in-memory history projection.
@@ -44,6 +46,7 @@ The database configuration is defined in `src/constants.ts`:
 | Database | `local` | SurrealDB database within the namespace |
 | Check-in table | `check_in` | Table containing captured moments |
 | Belief-statement table | `belief_statement` | Table containing custom Leidsätze and attached Leitsätze |
+| Migration ledger table | `database_migration` | Records durable database migrations already applied to this installation |
 | History read limit | `30` | Maximum records loaded into the current app history |
 | Note limit | `240` | Maximum persisted note length |
 | Belief-statement limit | `240` | Maximum length of each Leidsatz or Leitsatz |
@@ -52,7 +55,7 @@ The database configuration is defined in `src/constants.ts`:
 
 `surrealdb.database.ts` creates the directory with Expo FileSystem using `Paths.document`. It accepts only a `file://` URI and converts it into a `surrealkv://` endpoint. The exact absolute path is assigned by iOS or Android and must not be hard-coded.
 
-The module caches one connection promise for the JavaScript runtime. Concurrent callers share that connection. A failed connection clears the cached promise so a later call can retry. The app does not currently close the connection explicitly; the native process lifecycle owns cleanup.
+The module caches one connection promise for the JavaScript runtime. Concurrent callers share connection setup and the same migration attempt. After the native client connects, every pending database migration completes before the connection is returned to a repository. A failed connection or migration clears the cached promise so a later call can retry from the durable ledger. The app does not currently close the connection explicitly; the native process lifecycle owns cleanup.
 
 ## Check-in record schema
 
@@ -64,6 +67,7 @@ Each logical check-in contains:
 | --- | --- | --- |
 | `id` | Branded string | Stable application identity |
 | `createdAt` | Branded string | Creation timestamp; newly created values use ISO 8601 UTC |
+| `occurredAt` | Branded string | Editable timestamp for when the emotion occurred |
 | `emotionId` | `freude`, `liebe`, `scham`, `ekel`, `trauer`, `wut`, or `furcht` | Locale-independent base emotion |
 | `intensity` | Number from `0` through `1` | Normalized radial intensity |
 | `level` | Optional non-negative integer | Stable nuance bucket |
@@ -88,7 +92,7 @@ The following values are deliberately not persisted:
 - Derived display copy
 - Navigation or transient UI state
 
-Localized labels and colors are derived from stable IDs when rendering. Custom Leidsatz text is resolved from the separate `belief_statement` table. Older records without `level` remain supported; the app derives their level from intensity and clamps it to the emotion's available nuance range. The repository also normalizes integral SurrealDB numbers returned as bigints before domain validation. `beliefSystemId` is optional, so records written before the belief-system feature decode without a data migration. Existing built-in IDs remain valid after widening the field to also accept branded custom IDs. The native SurrealDB client represents a selected-but-absent optional field as `NONE`; repository schemas normalize those boundary values before domain validation. The occurrence-time case is isolated and documented in [the check-in occurrence-time compatibility migration](./docs/migrations/2026-08-03-check-in-occurrence-time.md).
+Localized labels and colors are derived from stable IDs when rendering. Custom Leidsatz text is resolved from the separate `belief_statement` table. Older records without `level` remain supported; the app derives their level from intensity and clamps it to the emotion's available nuance range. The repository also normalizes integral SurrealDB numbers returned as bigints before domain validation. `beliefSystemId` is optional, so records written before the belief-system feature decode without a data migration. Existing built-in IDs remain valid after widening the field to also accept branded custom IDs. The native SurrealDB client represents a selected-but-absent optional field as `NONE`; repository schemas normalize optional boundary values before domain validation. Required `occurredAt` is different: startup migration 0001 permanently backfills it before the repository performs strict decoding. See [migration 0001](./docs/migrations/2026-08-03-check-in-occurrence-time.md).
 
 ## Belief-statement record schema
 
@@ -122,6 +126,7 @@ erDiagram
     CHECK_IN {
         string id
         string createdAt
+        string occurredAt
         string emotionId
         number intensity
         number level
@@ -144,11 +149,13 @@ erDiagram
 
 ### Database schema enforcement
 
-There is currently no SurrealQL `DEFINE TABLE` or `DEFINE FIELD` migration. The `check_in` and `belief_statement` tables are schema-less at the SurrealDB layer. Correctness is enforced at application boundaries with Effect Schema:
+There are currently no field definitions and no table definitions for journal entities. `check_in` and `belief_statement` remain schema-less and are created implicitly by writes. The migration runner explicitly executes `DEFINE TABLE IF NOT EXISTS database_migration SCHEMALESS` before reading its ledger because the embedded native engine rejects reads from a table that has never existed. Correctness is enforced at application boundaries with Effect Schema:
 
 - Values are encoded through `CheckInSchema` before an upsert.
 - Belief statements are encoded through `BeliefStatementSchema` before an upsert.
 - Query results are decoded through the repository's database schema.
+- Migration ledger results are decoded before the runner decides what is pending.
+- Pending data changes and their ledger entries commit in the same transaction.
 - Invalid rows fail loading with `CheckInDataError`; they are not silently accepted.
 - XState machine events and the history store validate the same domain shape.
 
@@ -168,14 +175,14 @@ The record ID and content are passed as query parameters. The table name is a so
 
 ### Update
 
-Editing uses the same upsert operation with the existing record. It preserves `id` and `createdAt` while replacing emotion, intensity, level, note, and the optional `beliefSystemId`. Therefore an edit updates one captured moment instead of inserting a duplicate.
+Editing uses the same upsert operation with the existing record. It preserves `id` and `createdAt` while replacing `occurredAt`, emotion, intensity, level, note, and the optional `beliefSystemId`. Therefore an edit updates one captured moment instead of inserting a duplicate.
 
 ### Read and hydrate
 
 At root-machine startup, `loadCheckIns` executes the equivalent of:
 
 ```sql
-SELECT checkInId AS id, createdAt, emotionId, intensity, level, note, beliefSystemId
+SELECT checkInId AS id, createdAt, occurredAt, emotionId, intensity, level, note, beliefSystemId
 FROM check_in
 ORDER BY createdAt DESC
 LIMIT $limit
@@ -238,11 +245,15 @@ Legacy records may contain localized `emotion` and `nuance` fields. The legacy d
 
 Important limitation: migration is currently gated on the recent SurrealDB query being empty. It is not a versioned migration ledger and does not merge legacy data into a partially populated database. Future migrations should use an explicit schema-version record and be idempotent.
 
-## Legacy occurrence-time compatibility migration
+## Versioned database migrations
 
-Check-ins created before editable moment times have no `occurredAt` field. A SurrealDB query represents that absent selected field as `NONE`, so the repository delegates decoding to `infrastructure/migrations/legacy-occurrence-time.migration.ts`. The migration preserves explicit timestamps and maps `NONE` or an omitted field to `createdAt` before domain validation. It is read-time, non-destructive, and idempotent.
+Durable SurrealDB upgrades use the ordered registry in `infrastructure/migrations/database-migrations.ts`. On first connection, the runner decodes `database_migration`, selects registry entries whose IDs are absent, and runs them sequentially. Each data statement and its ledger UPSERT share one transaction. Repository hydration begins only after every pending migration commits.
 
-See [Check-in occurrence-time compatibility migration](./docs/migrations/2026-08-03-check-in-occurrence-time.md) for the incident path, data evidence, screenshots, verification, and removal criteria.
+Migration IDs are immutable, zero-padded strings such as `0001-backfill-check-in-occurrence-time`. Once shipped, append new entries; never reorder, rename, reuse, or change the meaning of an existing ID. A failed transaction leaves the migration pending, fails connection startup, clears the shared promise, and is retried by the next caller. Invalid ledger data fails closed.
+
+Migration 0001 updates legacy check-ins whose `occurredAt` is `NONE`, copying `createdAt` while preserving explicit occurrence times. The repository then accepts only the current required shape. See [migration 0001](./docs/migrations/2026-08-03-check-in-occurrence-time.md) for the complete flow, file map, tests, removal policy, and the procedure for adding migration 0002.
+
+The older AsyncStorage importer above is a separate cross-store migration that predates the ledger. It remains gated on an empty SurrealDB history and must not be used as the pattern for new SurrealDB schema changes.
 
 ## Error model
 
@@ -256,6 +267,12 @@ Expected repository failures remain in the Effect error channel:
 - `CheckInDataError`
   - `decode`: invalid legacy JSON or invalid database results
   - `encode`: application data fails the persisted schema
+- `DatabaseMigrationStorageError`
+  - `prepare-ledger`: native failure while ensuring a fresh database has the schemaless ledger table
+  - `read-ledger`: native query failure while discovering applied migrations
+  - `apply`: a migration transaction failed; includes its migration ID
+- `DatabaseMigrationDataError`
+  - `decode-ledger`: persisted ledger rows do not match the migration-ledger schema
 - `BeliefStatementStorageError`
   - `read`: native connection or query failure while hydrating Leidsätze and Leitsätze
   - `write`: native upsert failure while creating or updating a statement
@@ -328,9 +345,10 @@ Use `pnpm start:tunnel` when a physical device cannot reach Metro over the local
 
 Database coverage is split across:
 
-- `surrealdb.database.test.ts`: directory creation, singleton connection, URI rejection, and retry after failure.
-- `legacy-occurrence-time.migration.test.ts`: direct missing, SurrealDB `NONE`, and already-migrated occurrence-time cases.
-- `check-in.repository.test.ts`: encode/decode, create, update, delete, legacy migration, integer transport, and tagged failures using a mocked client.
+- `database-migration.runner.test.ts`: pending and applied ledger behavior, malformed ledger data, transactions, and failure/retry semantics.
+- `database-migration.runner.harness.ts`: native SurrealKV backfill, explicit-value preservation, idempotency, and a 133-row redacted legacy shape.
+- `surrealdb.database.test.ts`: directory creation, startup migration ordering, singleton connection, URI rejection, and retry after connection or migration failure.
+- `check-in.repository.test.ts`: strict encode/decode, create, update, delete, AsyncStorage migration, integer transport, and tagged failures using a mocked client.
 - `belief-statement.repository.test.ts`: built-in Leitsatz and custom Leidsatz persistence, Leitsatz removal, schema-validated loading, query shape, and tagged failures.
 - `belief-system.test.ts`: catalog completeness, many-to-many defaults, custom entries, and history-based ranking.
 - `belief-system.harness.ts`: recommendation ranking inside the React Native runtime, guarding against JavaScript-engine API mismatches.
@@ -338,6 +356,7 @@ Database coverage is split across:
 - `app-navigation.machine.test.ts`: hydration, persistence, failure, retry, complete saved-moment editing, custom creation, Leitsatz updates and removal, belief-system attachment, and delete event paths.
 - `check-in.repository.harness.ts`: real persistence and reload through the native SurrealKV engine, with record cleanup.
 - `check-in-history.store.harness.ts`: occurrence-time ordering through the native JavaScript runtime without unsupported array methods.
+- `supplied-legacy-archive.e2e.test.js`: opt-in validation of a local private version 1 archive and its version 2 round trip without copying its contents into Git.
 
 Run the standard gates:
 
@@ -356,19 +375,20 @@ For every persisted-schema or database-behavior change:
 1. Update the affected domain schema in `domain/check-in.ts` or `domain/belief-statement.ts`.
 2. Update the corresponding database result schema and write payload in the repository.
 3. Decide how existing rows and missing fields decode.
-4. Add an explicit, idempotent migration when old data cannot decode directly.
-5. Preserve stable record IDs unless the change intentionally creates a new entity.
-6. Keep localized strings and UI-only values out of persisted records.
-7. Model expected failures with `Schema.TaggedError`.
-8. Add repository tests for new, old, invalid, and failure cases.
-9. Add or update the native Harness path when native query behavior changes.
-10. Add navigation model coverage when persistence events or states change.
-11. Run all database and repository verification commands.
-12. Update this document in the same change.
+4. Add an explicit, idempotent `*.database-migration.ts` when old data cannot decode directly.
+5. Give it the next immutable zero-padded ID and append it to `database-migrations.ts`; never edit shipped migration identity or ordering.
+6. Preserve stable record IDs unless the change intentionally creates a new entity.
+7. Keep localized strings and UI-only values out of persisted records.
+8. Model expected failures with `Schema.TaggedError`.
+9. Add runner and repository tests for fresh, old/mixed, applied, invalid, and failure/retry cases.
+10. Add or update the native Harness path when native query behavior changes.
+11. Add navigation model coverage when persistence events or states change.
+12. Document the migration flow, owned files, archive behavior, verification, and lifecycle under `docs/migrations/`.
+13. Run all database and repository verification commands.
+14. Update this document in the same change.
 
 ## Known gaps to resolve before expanding persistence
 
-- Introduce a durable schema-version record and ordered migration system.
 - Decide whether the 30-entry product limit should also prune physical rows.
 - Add delete-all, export, undo, and reset semantics with corresponding privacy copy.
 - Validate timestamp syntax rather than branding any string.

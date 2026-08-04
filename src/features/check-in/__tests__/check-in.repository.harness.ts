@@ -4,7 +4,6 @@ import { SurrealRecordId } from 'react-native-surrealdb';
 
 import { CHECK_IN_TABLE, EMOTION_IDS } from '@/constants';
 import {
-  CheckInId,
   CheckInTimestamp,
   type CheckIn,
   type EmotionSelection,
@@ -21,7 +20,6 @@ const selection = {
 
 describe('SurrealDB check-in repository', () => {
   let saved: CheckIn | undefined;
-  let legacyId: CheckIn['id'] | undefined;
 
   afterEach(async () => {
     const database = await getDatabase();
@@ -30,13 +28,7 @@ describe('SurrealDB check-in repository', () => {
         record: new SurrealRecordId(`${CHECK_IN_TABLE}:${saved.id}`),
       });
     }
-    if (legacyId) {
-      await database.query('DELETE $record', {
-        record: new SurrealRecordId(`${CHECK_IN_TABLE}:${legacyId}`),
-      });
-    }
     saved = undefined;
-    legacyId = undefined;
   });
 
   test('persists and reloads a check-in through the native SurrealKV engine', async () => {
@@ -51,35 +43,5 @@ describe('SurrealDB check-in repository', () => {
     const loaded = await Effect.runPromise(loadCheckIns);
 
     expect(loaded).toContainEqual(saved);
-  });
-
-  test('loads a native legacy record whose occurrence time is SurrealDB NONE', async () => {
-    const database = await getDatabase();
-    legacyId = CheckInId.make('legacy-native-occurrence-time');
-    const createdAt = CheckInTimestamp.make('2026-07-12T12:00:00.000Z');
-    await database.query('UPSERT $record CONTENT $checkIn', {
-      record: new SurrealRecordId(`${CHECK_IN_TABLE}:${legacyId}`),
-      checkIn: {
-        id: legacyId,
-        checkInId: legacyId,
-        createdAt,
-        emotionId: EMOTION_IDS.JOY,
-        intensity: 0.5,
-        level: 2,
-        note: '',
-      },
-    });
-
-    const loaded = await Effect.runPromise(loadCheckIns);
-
-    expect(loaded).toContainEqual({
-      id: legacyId,
-      createdAt,
-      occurredAt: createdAt,
-      emotionId: EMOTION_IDS.JOY,
-      intensity: 0.5,
-      level: 2,
-      note: '',
-    });
   });
 });

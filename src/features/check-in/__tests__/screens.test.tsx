@@ -784,6 +784,7 @@ describe('check-in screens', () => {
           value: [{
             id: checkInId,
             createdAt,
+            occurredAt: createdAt,
             emotionId: EMOTION_IDS.FEAR,
             intensity: 0.5,
             level: 2,

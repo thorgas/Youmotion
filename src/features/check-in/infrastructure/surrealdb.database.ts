@@ -1,4 +1,5 @@
 import { Directory, Paths } from 'expo-file-system';
+import * as Effect from 'effect/Effect';
 import { connect, type SurrealClient } from 'react-native-surrealdb';
 
 import {
@@ -8,6 +9,7 @@ import {
   SURREAL_DATABASE_NAME,
   SURREAL_DATABASE_NAMESPACE,
 } from '@/constants';
+import { runDatabaseMigrations } from './migrations/database-migration.runner';
 
 let databasePromise: Promise<SurrealClient> | undefined;
 
@@ -21,11 +23,13 @@ function databaseEndpoint(directory: Directory) {
 async function connectDatabase() {
   const directory = new Directory(Paths.document, SURREAL_DATABASE_DIRECTORY);
   directory.create({ idempotent: true, intermediates: true });
-  return connect({
+  const database = await connect({
     endpoint: databaseEndpoint(directory),
     namespace: SURREAL_DATABASE_NAMESPACE,
     database: SURREAL_DATABASE_NAME,
   });
+  await Effect.runPromise(runDatabaseMigrations(database));
+  return database;
 }
 
 function resetFailedConnection(cause: unknown): never {

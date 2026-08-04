@@ -19,10 +19,6 @@ import {
 } from '../domain/check-in';
 import { BeliefStatementText, BeliefSystemId } from '../domain/belief-statement';
 import { getDatabase } from './surrealdb.database';
-import {
-  LegacyOccurrenceTimeDatabaseSchema,
-  migrateLegacyOccurrenceTime,
-} from './migrations/legacy-occurrence-time.migration';
 
 export class CheckInStorageError extends Schema.TaggedError<CheckInStorageError>()(
   'CheckInStorageError',
@@ -74,7 +70,7 @@ const SurrealOptionalBeliefSystemId = Schema.Union(BeliefSystemId, SurrealNoneSc
 const CheckInDatabaseSchema = Schema.Struct({
   id: CheckInId,
   createdAt: CheckInTimestamp,
-  occurredAt: LegacyOccurrenceTimeDatabaseSchema,
+  occurredAt: CheckInTimestamp,
   emotionId: CheckInSchema.fields.emotionId,
   intensity: SurrealIntensity,
   level: Schema.optional(SurrealNonNegativeInteger),
@@ -94,13 +90,8 @@ function checkInFromDatabase(
   const {
     beliefSystemId,
     guidingStatementSnapshot,
-    occurredAt,
-    ...legacyCheckIn
+    ...checkIn
   } = entry;
-  const checkIn = migrateLegacyOccurrenceTime({
-    checkIn: legacyCheckIn,
-    occurredAt,
-  });
   const statementSnapshot = typeof guidingStatementSnapshot === 'string'
     ? { guidingStatementSnapshot }
     : {};

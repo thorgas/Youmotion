@@ -309,6 +309,7 @@ export const FILE_URI_PREFIX = 'file://';
 export const CHECK_IN_TABLE = 'check_in';
 export const BELIEF_STATEMENT_TABLE = 'belief_statement';
 export const APP_SETTINGS_TABLE = 'app_settings';
+export const DATABASE_MIGRATION_TABLE = 'database_migration';
 export const APP_SETTINGS_RECORD_ID = 'current';
 export const MAX_NOTE_LENGTH = 240;
 export const MAX_BELIEF_STATEMENT_LENGTH = 240;
