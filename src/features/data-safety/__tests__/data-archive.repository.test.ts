@@ -189,7 +189,7 @@ describe('data archive repository', () => {
 
     expect(mockSurrealQuery).toHaveBeenCalledTimes(1);
     expect(mockSurrealQuery).toHaveBeenCalledWith(
-      expect.stringMatching(/BEGIN TRANSACTION;[\s\S]*COMMIT TRANSACTION;/),
+      expect.stringMatching(/BEGIN TRANSACTION;[\s\S]*RETURN NONE;[\s\S]*COMMIT TRANSACTION;/),
       expect.objectContaining({
         checkIns: archive.checkIns,
         beliefStatements: archive.beliefStatements,

@@ -1,0 +1,66 @@
+appId: com.youmotion.mobile
+name: Restore the redacted power-user backup
+tags:
+  - android-only
+  - data-safety
+  - power-user
+  - restore
+---
+- stopApp
+- launchApp
+- openLink:
+    link: exp+youmotion://expo-development-client/?url=http%3A%2F%2F127.0.0.1%3A8082
+- tapOn:
+    text: Open
+    optional: true
+- tapOn:
+    text: http://127.0.0.1:8082
+    optional: true
+- tapOn:
+    id: reflection-back
+    optional: true
+- tapOn:
+    text: ".*Back"
+    optional: true
+- extendedWaitUntil:
+    visible:
+      id: today-screen
+    timeout: 30000
+- tapOn:
+    id: tab-settings
+- scrollUntilVisible:
+    element:
+      id: restore-data-archive
+    direction: DOWN
+    timeout: 10000
+    speed: 40
+- tapOn:
+    id: restore-data-archive
+- extendedWaitUntil:
+    visible: youmotion-power-user-backup-v2-redacted.json
+    timeout: 10000
+- tapOn: youmotion-power-user-backup-v2-redacted.json
+- extendedWaitUntil:
+    visible:
+      id: restore-preview
+    timeout: 10000
+- assertVisible: "133"
+- assertVisible: "15"
+- tapOn:
+    id: confirm-data-restore
+- extendedWaitUntil:
+    visible:
+      id: data-safety-notice
+    timeout: 30000
+- tapOn:
+    id: tab-history
+- tapOn:
+    id: analytics-timeframe-all
+- tapOn:
+    id: history-search-input
+- inputText: Synthetic power-user reflection 133
+- hideKeyboard
+- extendedWaitUntil:
+    visible:
+      id: history-moment-e2e-power-user-moment-133
+    timeout: 10000

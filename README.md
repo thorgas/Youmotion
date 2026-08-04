@@ -258,10 +258,12 @@ Install the [Maestro CLI](https://docs.maestro.dev/getting-started/installing-ma
 
 ```bash
 pnpm start:maestro
-pnpm test:maestro
+E2E_ALLOW_DATA_REPLACEMENT=true pnpm test:maestro
 ```
 
-The dedicated Metro mode disables the development-only React Native Grab inspection overlay so iOS and Android expose the application accessibility tree to the test runner. Run `pnpm test:maestro:smoke` for the short tab-navigation gate. The flows connect the development client to Metro at `127.0.0.1:8082`; on Android, first run `adb reverse tcp:8082 tcp:8082`. Failure output is written to the ignored `artifacts/maestro` directory.
+The runner preserves cross-platform coverage: when an iOS simulator and Android emulator are both booted, it runs the suite on both. Set `IOS_SIMULATOR_UDID` or `ANDROID_SERIAL` when multiple devices for one platform are booted. The Android pass includes the synthetic power-user backup restore and intentionally replaces that emulator's local data, so it requires the explicit acknowledgement shown above. The iOS pass excludes only this Android Downloads-provider flow. See [the fixture documentation](./.maestro/fixtures/README.md) for its purpose, privacy boundary, and maintenance workflow.
+
+The dedicated Metro mode disables the development-only React Native Grab inspection overlay so iOS and Android expose the application accessibility tree to the test runner. Run `pnpm test:maestro:smoke` for the short non-destructive tab-navigation gate. The flows connect the development client to Metro at `127.0.0.1:8082`. Failure output is written to the ignored `artifacts/maestro` directory.
 
 ## Local Codex skills
 

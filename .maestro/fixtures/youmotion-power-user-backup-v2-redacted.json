@@ -1,0 +1,1430 @@
+{
+  "version": 2,
+  "exportedAt": "2025-02-01T12:00:00.000Z",
+  "checkIns": [
+    {
+      "id": "e2e-power-user-moment-001",
+      "createdAt": "2025-01-01T08:00:00.000Z",
+      "occurredAt": "2024-12-31T20:00:00.000Z",
+      "emotionId": "freude",
+      "intensity": 0.1,
+      "level": 0,
+      "note": "Synthetic power-user reflection 001: I paused before reacting and noticed how the feeling changed."
+    },
+    {
+      "id": "e2e-power-user-moment-002",
+      "createdAt": "2025-01-01T11:07:00.000Z",
+      "occurredAt": "2025-01-01T10:56:00.000Z",
+      "emotionId": "liebe",
+      "intensity": 0.2,
+      "level": 1,
+      "note": "Synthetic power-user reflection 002: A short walk made the situation easier to understand.",
+      "beliefSystemId": "no-mistakes"
+    },
+    {
+      "id": "e2e-power-user-moment-003",
+      "createdAt": "2025-01-01T14:14:00.000Z",
+      "occurredAt": "2025-01-01T13:52:00.000Z",
+      "emotionId": "scham",
+      "intensity": 0.3,
+      "level": 2,
+      "note": "Synthetic power-user reflection 003: Naming the feeling created enough room to choose the next step.",
+      "beliefSystemId": "responsible-for-everything"
+    },
+    {
+      "id": "e2e-power-user-moment-004",
+      "createdAt": "2025-01-01T17:21:00.000Z",
+      "occurredAt": "2025-01-01T16:48:00.000Z",
+      "emotionId": "ekel",
+      "intensity": 0.4,
+      "level": 3,
+      "note": "Synthetic power-user reflection 004: The body signal arrived first; the explanation became clearer later.",
+      "beliefSystemId": "do-everything-alone",
+      "guidingStatementSnapshot": "Synthetic guiding belief 04: I can respond with patience and flexibility."
+    },
+    {
+      "id": "e2e-power-user-moment-005",
+      "createdAt": "2025-01-01T20:28:00.000Z",
+      "occurredAt": "2025-01-01T19:44:00.000Z",
+      "emotionId": "trauer",
+      "intensity": 0.5,
+      "level": 4,
+      "note": "Synthetic power-user reflection 005: A quiet conversation helped separate the facts from the assumptions.",
+      "beliefSystemId": "perfect-everything"
+    },
+    {
+      "id": "e2e-power-user-moment-006",
+      "createdAt": "2025-01-01T23:35:00.000Z",
+      "occurredAt": "2025-01-01T22:40:00.000Z",
+      "emotionId": "wut",
+      "intensity": 0.6,
+      "level": 0,
+      "note": "Synthetic power-user reflection 006: I wrote down one small action that felt possible today."
+    },
+    {
+      "id": "e2e-power-user-moment-007",
+      "createdAt": "2025-01-02T02:00:00.000Z",
+      "occurredAt": "2025-01-02T00:54:00.000Z",
+      "emotionId": "furcht",
+      "intensity": 0.7,
+      "level": 1,
+      "note": "Synthetic power-user reflection 007: I paused before reacting and noticed how the feeling changed.",
+      "beliefSystemId": "perfect-expect-others",
+      "guidingStatementSnapshot": "Synthetic guiding belief 07: I can respond with patience and flexibility."
+    },
+    {
+      "id": "e2e-power-user-moment-008",
+      "createdAt": "2025-01-02T05:07:00.000Z",
+      "occurredAt": "2025-01-02T05:07:00.000Z",
+      "emotionId": "freude",
+      "intensity": 0.8,
+      "level": 2,
+      "note": "Synthetic power-user reflection 008: A short walk made the situation easier to understand.",
+      "beliefSystemId": "love-requires-conformity"
+    },
+    {
+      "id": "e2e-power-user-moment-009",
+      "createdAt": "2025-01-02T08:14:00.000Z",
+      "occurredAt": "2025-01-02T08:03:00.000Z",
+      "emotionId": "liebe",
+      "intensity": 0.9,
+      "level": 3,
+      "note": "Synthetic power-user reflection 009: Naming the feeling created enough room to choose the next step.",
+      "beliefSystemId": "always-considerate"
+    },
+    {
+      "id": "e2e-power-user-moment-010",
+      "createdAt": "2025-01-02T11:21:00.000Z",
+      "occurredAt": "2025-01-02T10:59:00.000Z",
+      "emotionId": "scham",
+      "intensity": 1,
+      "level": 4,
+      "note": "Synthetic power-user reflection 010: The body signal arrived first; the explanation became clearer later.",
+      "beliefSystemId": "must-adapt",
+      "guidingStatementSnapshot": "Synthetic guiding belief 10: I can respond with patience and flexibility."
+    },
+    {
+      "id": "e2e-power-user-moment-011",
+      "createdAt": "2025-01-02T14:28:00.000Z",
+      "occurredAt": "2025-01-02T13:55:00.000Z",
+      "emotionId": "ekel",
+      "intensity": 0.1,
+      "level": 0,
+      "note": ""
+    },
+    {
+      "id": "e2e-power-user-moment-012",
+      "createdAt": "2025-01-02T17:35:00.000Z",
+      "occurredAt": "2025-01-02T16:51:00.000Z",
+      "emotionId": "trauer",
+      "intensity": 0.2,
+      "level": 1,
+      "note": "Synthetic power-user reflection 012: I wrote down one small action that felt possible today.",
+      "beliefSystemId": "cannot-burden-others"
+    },
+    {
+      "id": "e2e-power-user-moment-013",
+      "createdAt": "2025-01-02T20:00:00.000Z",
+      "occurredAt": "2025-01-02T19:05:00.000Z",
+      "emotionId": "wut",
+      "intensity": 0.3,
+      "level": 2,
+      "note": "Synthetic power-user reflection 013: I paused before reacting and noticed how the feeling changed.",
+      "beliefSystemId": "custom-e2e-power-user-001",
+      "guidingStatementSnapshot": "Synthetic custom guidance 01: I can take one thoughtful step at a time."
+    },
+    {
+      "id": "e2e-power-user-moment-014",
+      "createdAt": "2025-01-02T23:07:00.000Z",
+      "occurredAt": "2025-01-02T22:01:00.000Z",
+      "emotionId": "furcht",
+      "intensity": 0.4,
+      "level": 3,
+      "note": "Synthetic power-user reflection 014: A short walk made the situation easier to understand.",
+      "beliefSystemId": "custom-e2e-power-user-002"
+    },
+    {
+      "id": "e2e-power-user-moment-015",
+      "createdAt": "2025-01-03T02:14:00.000Z",
+      "occurredAt": "2025-01-03T02:14:00.000Z",
+      "emotionId": "freude",
+      "intensity": 0.5,
+      "level": 4,
+      "note": "Synthetic power-user reflection 015: Naming the feeling created enough room to choose the next step.",
+      "beliefSystemId": "custom-e2e-power-user-003"
+    },
+    {
+      "id": "e2e-power-user-moment-016",
+      "createdAt": "2025-01-03T05:21:00.000Z",
+      "occurredAt": "2025-01-03T05:10:00.000Z",
+      "emotionId": "liebe",
+      "intensity": 0.6,
+      "level": 0,
+      "note": "Synthetic power-user reflection 016: The body signal arrived first; the explanation became clearer later."
+    },
+    {
+      "id": "e2e-power-user-moment-017",
+      "createdAt": "2025-01-03T08:28:00.000Z",
+      "occurredAt": "2025-01-03T08:06:00.000Z",
+      "emotionId": "scham",
+      "intensity": 0.7,
+      "level": 1,
+      "note": "Synthetic power-user reflection 017: A quiet conversation helped separate the facts from the assumptions.",
+      "beliefSystemId": "no-mistakes"
+    },
+    {
+      "id": "e2e-power-user-moment-018",
+      "createdAt": "2025-01-03T11:35:00.000Z",
+      "occurredAt": "2025-01-02T23:02:00.000Z",
+      "emotionId": "ekel",
+      "intensity": 0.8,
+      "level": 2,
+      "note": "Synthetic power-user reflection 018: I wrote down one small action that felt possible today.",
+      "beliefSystemId": "responsible-for-everything"
+    },
+    {
+      "id": "e2e-power-user-moment-019",
+      "createdAt": "2025-01-03T14:00:00.000Z",
+      "occurredAt": "2025-01-03T13:16:00.000Z",
+      "emotionId": "trauer",
+      "intensity": 0.9,
+      "level": 3,
+      "note": "Synthetic power-user reflection 019: I paused before reacting and noticed how the feeling changed.",
+      "beliefSystemId": "do-everything-alone",
+      "guidingStatementSnapshot": "Synthetic guiding belief 04: I can respond with patience and flexibility."
+    },
+    {
+      "id": "e2e-power-user-moment-020",
+      "createdAt": "2025-01-03T17:07:00.000Z",
+      "occurredAt": "2025-01-03T16:12:00.000Z",
+      "emotionId": "wut",
+      "intensity": 1,
+      "level": 4,
+      "note": "Synthetic power-user reflection 020: A short walk made the situation easier to understand.",
+      "beliefSystemId": "perfect-everything"
+    },
+    {
+      "id": "e2e-power-user-moment-021",
+      "createdAt": "2025-01-03T20:14:00.000Z",
+      "occurredAt": "2025-01-03T19:08:00.000Z",
+      "emotionId": "furcht",
+      "intensity": 0.1,
+      "level": 0,
+      "note": "Synthetic power-user reflection 021: Naming the feeling created enough room to choose the next step."
+    },
+    {
+      "id": "e2e-power-user-moment-022",
+      "createdAt": "2025-01-03T23:21:00.000Z",
+      "occurredAt": "2025-01-03T23:21:00.000Z",
+      "emotionId": "freude",
+      "intensity": 0.2,
+      "level": 1,
+      "note": "",
+      "beliefSystemId": "perfect-expect-others",
+      "guidingStatementSnapshot": "Synthetic guiding belief 07: I can respond with patience and flexibility."
+    },
+    {
+      "id": "e2e-power-user-moment-023",
+      "createdAt": "2025-01-04T02:28:00.000Z",
+      "occurredAt": "2025-01-04T02:17:00.000Z",
+      "emotionId": "liebe",
+      "intensity": 0.3,
+      "level": 2,
+      "note": "Synthetic power-user reflection 023: A quiet conversation helped separate the facts from the assumptions.",
+      "beliefSystemId": "love-requires-conformity"
+    },
+    {
+      "id": "e2e-power-user-moment-024",
+      "createdAt": "2025-01-04T05:35:00.000Z",
+      "occurredAt": "2025-01-04T05:13:00.000Z",
+      "emotionId": "scham",
+      "intensity": 0.4,
+      "level": 3,
+      "note": "Synthetic power-user reflection 024: I wrote down one small action that felt possible today.",
+      "beliefSystemId": "always-considerate"
+    },
+    {
+      "id": "e2e-power-user-moment-025",
+      "createdAt": "2025-01-04T08:00:00.000Z",
+      "occurredAt": "2025-01-04T07:27:00.000Z",
+      "emotionId": "ekel",
+      "intensity": 0.5,
+      "level": 4,
+      "note": "Synthetic power-user reflection 025: I paused before reacting and noticed how the feeling changed.",
+      "beliefSystemId": "must-adapt",
+      "guidingStatementSnapshot": "Synthetic guiding belief 10: I can respond with patience and flexibility."
+    },
+    {
+      "id": "e2e-power-user-moment-026",
+      "createdAt": "2025-01-04T11:07:00.000Z",
+      "occurredAt": "2025-01-04T10:23:00.000Z",
+      "emotionId": "trauer",
+      "intensity": 0.6,
+      "level": 0,
+      "note": "Synthetic power-user reflection 026: A short walk made the situation easier to understand."
+    },
+    {
+      "id": "e2e-power-user-moment-027",
+      "createdAt": "2025-01-04T14:14:00.000Z",
+      "occurredAt": "2025-01-04T13:19:00.000Z",
+      "emotionId": "wut",
+      "intensity": 0.7,
+      "level": 1,
+      "note": "Synthetic power-user reflection 027: Naming the feeling created enough room to choose the next step.",
+      "beliefSystemId": "cannot-burden-others"
+    },
+    {
+      "id": "e2e-power-user-moment-028",
+      "createdAt": "2025-01-04T17:21:00.000Z",
+      "occurredAt": "2025-01-04T16:15:00.000Z",
+      "emotionId": "furcht",
+      "intensity": 0.8,
+      "level": 2,
+      "note": "Synthetic power-user reflection 028: The body signal arrived first; the explanation became clearer later.",
+      "beliefSystemId": "custom-e2e-power-user-001",
+      "guidingStatementSnapshot": "Synthetic custom guidance 01: I can take one thoughtful step at a time."
+    },
+    {
+      "id": "e2e-power-user-moment-029",
+      "createdAt": "2025-01-04T20:28:00.000Z",
+      "occurredAt": "2025-01-04T20:28:00.000Z",
+      "emotionId": "freude",
+      "intensity": 0.9,
+      "level": 3,
+      "note": "Synthetic power-user reflection 029: A quiet conversation helped separate the facts from the assumptions.",
+      "beliefSystemId": "custom-e2e-power-user-002"
+    },
+    {
+      "id": "e2e-power-user-moment-030",
+      "createdAt": "2025-01-04T23:35:00.000Z",
+      "occurredAt": "2025-01-04T23:24:00.000Z",
+      "emotionId": "liebe",
+      "intensity": 1,
+      "level": 4,
+      "note": "Synthetic power-user reflection 030: I wrote down one small action that felt possible today.",
+      "beliefSystemId": "custom-e2e-power-user-003"
+    },
+    {
+      "id": "e2e-power-user-moment-031",
+      "createdAt": "2025-01-05T02:00:00.000Z",
+      "occurredAt": "2025-01-05T01:38:00.000Z",
+      "emotionId": "scham",
+      "intensity": 0.1,
+      "level": 0,
+      "note": "Synthetic power-user reflection 031: I paused before reacting and noticed how the feeling changed."
+    },
+    {
+      "id": "e2e-power-user-moment-032",
+      "createdAt": "2025-01-05T05:07:00.000Z",
+      "occurredAt": "2025-01-05T04:34:00.000Z",
+      "emotionId": "ekel",
+      "intensity": 0.2,
+      "level": 1,
+      "note": "Synthetic power-user reflection 032: A short walk made the situation easier to understand.",
+      "beliefSystemId": "no-mistakes"
+    },
+    {
+      "id": "e2e-power-user-moment-033",
+      "createdAt": "2025-01-05T08:14:00.000Z",
+      "occurredAt": "2025-01-05T07:30:00.000Z",
+      "emotionId": "trauer",
+      "intensity": 0.3,
+      "level": 2,
+      "note": "",
+      "beliefSystemId": "responsible-for-everything"
+    },
+    {
+      "id": "e2e-power-user-moment-034",
+      "createdAt": "2025-01-05T11:21:00.000Z",
+      "occurredAt": "2025-01-05T10:26:00.000Z",
+      "emotionId": "wut",
+      "intensity": 0.4,
+      "level": 3,
+      "note": "Synthetic power-user reflection 034: The body signal arrived first; the explanation became clearer later.",
+      "beliefSystemId": "do-everything-alone",
+      "guidingStatementSnapshot": "Synthetic guiding belief 04: I can respond with patience and flexibility."
+    },
+    {
+      "id": "e2e-power-user-moment-035",
+      "createdAt": "2025-01-05T14:28:00.000Z",
+      "occurredAt": "2025-01-05T01:22:00.000Z",
+      "emotionId": "furcht",
+      "intensity": 0.5,
+      "level": 4,
+      "note": "Synthetic power-user reflection 035: A quiet conversation helped separate the facts from the assumptions.",
+      "beliefSystemId": "perfect-everything"
+    },
+    {
+      "id": "e2e-power-user-moment-036",
+      "createdAt": "2025-01-05T17:35:00.000Z",
+      "occurredAt": "2025-01-05T17:35:00.000Z",
+      "emotionId": "freude",
+      "intensity": 0.6,
+      "level": 0,
+      "note": "Synthetic power-user reflection 036: I wrote down one small action that felt possible today."
+    },
+    {
+      "id": "e2e-power-user-moment-037",
+      "createdAt": "2025-01-05T20:00:00.000Z",
+      "occurredAt": "2025-01-05T19:49:00.000Z",
+      "emotionId": "liebe",
+      "intensity": 0.7,
+      "level": 1,
+      "note": "Synthetic power-user reflection 037: I paused before reacting and noticed how the feeling changed.",
+      "beliefSystemId": "perfect-expect-others",
+      "guidingStatementSnapshot": "Synthetic guiding belief 07: I can respond with patience and flexibility."
+    },
+    {
+      "id": "e2e-power-user-moment-038",
+      "createdAt": "2025-01-05T23:07:00.000Z",
+      "occurredAt": "2025-01-05T22:45:00.000Z",
+      "emotionId": "scham",
+      "intensity": 0.8,
+      "level": 2,
+      "note": "Synthetic power-user reflection 038: A short walk made the situation easier to understand.",
+      "beliefSystemId": "love-requires-conformity"
+    },
+    {
+      "id": "e2e-power-user-moment-039",
+      "createdAt": "2025-01-06T02:14:00.000Z",
+      "occurredAt": "2025-01-06T01:41:00.000Z",
+      "emotionId": "ekel",
+      "intensity": 0.9,
+      "level": 3,
+      "note": "Synthetic power-user reflection 039: Naming the feeling created enough room to choose the next step.",
+      "beliefSystemId": "always-considerate"
+    },
+    {
+      "id": "e2e-power-user-moment-040",
+      "createdAt": "2025-01-06T05:21:00.000Z",
+      "occurredAt": "2025-01-06T04:37:00.000Z",
+      "emotionId": "trauer",
+      "intensity": 1,
+      "level": 4,
+      "note": "Synthetic power-user reflection 040: The body signal arrived first; the explanation became clearer later.",
+      "beliefSystemId": "must-adapt",
+      "guidingStatementSnapshot": "Synthetic guiding belief 10: I can respond with patience and flexibility."
+    },
+    {
+      "id": "e2e-power-user-moment-041",
+      "createdAt": "2025-01-06T08:28:00.000Z",
+      "occurredAt": "2025-01-06T07:33:00.000Z",
+      "emotionId": "wut",
+      "intensity": 0.1,
+      "level": 0,
+      "note": "Synthetic power-user reflection 041: A quiet conversation helped separate the facts from the assumptions."
+    },
+    {
+      "id": "e2e-power-user-moment-042",
+      "createdAt": "2025-01-06T11:35:00.000Z",
+      "occurredAt": "2025-01-06T10:29:00.000Z",
+      "emotionId": "furcht",
+      "intensity": 0.2,
+      "level": 1,
+      "note": "Synthetic power-user reflection 042: I wrote down one small action that felt possible today.",
+      "beliefSystemId": "cannot-burden-others"
+    },
+    {
+      "id": "e2e-power-user-moment-043",
+      "createdAt": "2025-01-06T14:00:00.000Z",
+      "occurredAt": "2025-01-06T14:00:00.000Z",
+      "emotionId": "freude",
+      "intensity": 0.3,
+      "level": 2,
+      "note": "Synthetic power-user reflection 043: I paused before reacting and noticed how the feeling changed.",
+      "beliefSystemId": "custom-e2e-power-user-001",
+      "guidingStatementSnapshot": "Synthetic custom guidance 01: I can take one thoughtful step at a time."
+    },
+    {
+      "id": "e2e-power-user-moment-044",
+      "createdAt": "2025-01-06T17:07:00.000Z",
+      "occurredAt": "2025-01-06T16:56:00.000Z",
+      "emotionId": "liebe",
+      "intensity": 0.4,
+      "level": 3,
+      "note": "",
+      "beliefSystemId": "custom-e2e-power-user-002"
+    },
+    {
+      "id": "e2e-power-user-moment-045",
+      "createdAt": "2025-01-06T20:14:00.000Z",
+      "occurredAt": "2025-01-06T19:52:00.000Z",
+      "emotionId": "scham",
+      "intensity": 0.5,
+      "level": 4,
+      "note": "Synthetic power-user reflection 045: Naming the feeling created enough room to choose the next step.",
+      "beliefSystemId": "custom-e2e-power-user-003"
+    },
+    {
+      "id": "e2e-power-user-moment-046",
+      "createdAt": "2025-01-06T23:21:00.000Z",
+      "occurredAt": "2025-01-06T22:48:00.000Z",
+      "emotionId": "ekel",
+      "intensity": 0.6,
+      "level": 0,
+      "note": "Synthetic power-user reflection 046: The body signal arrived first; the explanation became clearer later."
+    },
+    {
+      "id": "e2e-power-user-moment-047",
+      "createdAt": "2025-01-07T02:28:00.000Z",
+      "occurredAt": "2025-01-07T01:44:00.000Z",
+      "emotionId": "trauer",
+      "intensity": 0.7,
+      "level": 1,
+      "note": "Synthetic power-user reflection 047: A quiet conversation helped separate the facts from the assumptions.",
+      "beliefSystemId": "no-mistakes"
+    },
+    {
+      "id": "e2e-power-user-moment-048",
+      "createdAt": "2025-01-07T05:35:00.000Z",
+      "occurredAt": "2025-01-07T04:40:00.000Z",
+      "emotionId": "wut",
+      "intensity": 0.8,
+      "level": 2,
+      "note": "Synthetic power-user reflection 048: I wrote down one small action that felt possible today.",
+      "beliefSystemId": "responsible-for-everything"
+    },
+    {
+      "id": "e2e-power-user-moment-049",
+      "createdAt": "2025-01-07T08:00:00.000Z",
+      "occurredAt": "2025-01-07T06:54:00.000Z",
+      "emotionId": "furcht",
+      "intensity": 0.9,
+      "level": 3,
+      "note": "Synthetic power-user reflection 049: I paused before reacting and noticed how the feeling changed.",
+      "beliefSystemId": "do-everything-alone",
+      "guidingStatementSnapshot": "Synthetic guiding belief 04: I can respond with patience and flexibility."
+    },
+    {
+      "id": "e2e-power-user-moment-050",
+      "createdAt": "2025-01-07T11:07:00.000Z",
+      "occurredAt": "2025-01-07T11:07:00.000Z",
+      "emotionId": "freude",
+      "intensity": 1,
+      "level": 4,
+      "note": "Synthetic power-user reflection 050: A short walk made the situation easier to understand.",
+      "beliefSystemId": "perfect-everything"
+    },
+    {
+      "id": "e2e-power-user-moment-051",
+      "createdAt": "2025-01-07T14:14:00.000Z",
+      "occurredAt": "2025-01-07T14:03:00.000Z",
+      "emotionId": "liebe",
+      "intensity": 0.1,
+      "level": 0,
+      "note": "Synthetic power-user reflection 051: Naming the feeling created enough room to choose the next step."
+    },
+    {
+      "id": "e2e-power-user-moment-052",
+      "createdAt": "2025-01-07T17:21:00.000Z",
+      "occurredAt": "2025-01-07T04:59:00.000Z",
+      "emotionId": "scham",
+      "intensity": 0.2,
+      "level": 1,
+      "note": "Synthetic power-user reflection 052: The body signal arrived first; the explanation became clearer later.",
+      "beliefSystemId": "perfect-expect-others",
+      "guidingStatementSnapshot": "Synthetic guiding belief 07: I can respond with patience and flexibility."
+    },
+    {
+      "id": "e2e-power-user-moment-053",
+      "createdAt": "2025-01-07T20:28:00.000Z",
+      "occurredAt": "2025-01-07T19:55:00.000Z",
+      "emotionId": "ekel",
+      "intensity": 0.3,
+      "level": 2,
+      "note": "Synthetic power-user reflection 053: A quiet conversation helped separate the facts from the assumptions.",
+      "beliefSystemId": "love-requires-conformity"
+    },
+    {
+      "id": "e2e-power-user-moment-054",
+      "createdAt": "2025-01-07T23:35:00.000Z",
+      "occurredAt": "2025-01-07T22:51:00.000Z",
+      "emotionId": "trauer",
+      "intensity": 0.4,
+      "level": 3,
+      "note": "Synthetic power-user reflection 054: I wrote down one small action that felt possible today.",
+      "beliefSystemId": "always-considerate"
+    },
+    {
+      "id": "e2e-power-user-moment-055",
+      "createdAt": "2025-01-08T02:00:00.000Z",
+      "occurredAt": "2025-01-08T01:05:00.000Z",
+      "emotionId": "wut",
+      "intensity": 0.5,
+      "level": 4,
+      "note": "",
+      "beliefSystemId": "must-adapt",
+      "guidingStatementSnapshot": "Synthetic guiding belief 10: I can respond with patience and flexibility."
+    },
+    {
+      "id": "e2e-power-user-moment-056",
+      "createdAt": "2025-01-08T05:07:00.000Z",
+      "occurredAt": "2025-01-08T04:01:00.000Z",
+      "emotionId": "furcht",
+      "intensity": 0.6,
+      "level": 0,
+      "note": "Synthetic power-user reflection 056: A short walk made the situation easier to understand."
+    },
+    {
+      "id": "e2e-power-user-moment-057",
+      "createdAt": "2025-01-08T08:14:00.000Z",
+      "occurredAt": "2025-01-08T08:14:00.000Z",
+      "emotionId": "freude",
+      "intensity": 0.7,
+      "level": 1,
+      "note": "Synthetic power-user reflection 057: Naming the feeling created enough room to choose the next step.",
+      "beliefSystemId": "cannot-burden-others"
+    },
+    {
+      "id": "e2e-power-user-moment-058",
+      "createdAt": "2025-01-08T11:21:00.000Z",
+      "occurredAt": "2025-01-08T11:10:00.000Z",
+      "emotionId": "liebe",
+      "intensity": 0.8,
+      "level": 2,
+      "note": "Synthetic power-user reflection 058: The body signal arrived first; the explanation became clearer later.",
+      "beliefSystemId": "custom-e2e-power-user-001",
+      "guidingStatementSnapshot": "Synthetic custom guidance 01: I can take one thoughtful step at a time."
+    },
+    {
+      "id": "e2e-power-user-moment-059",
+      "createdAt": "2025-01-08T14:28:00.000Z",
+      "occurredAt": "2025-01-08T14:06:00.000Z",
+      "emotionId": "scham",
+      "intensity": 0.9,
+      "level": 3,
+      "note": "Synthetic power-user reflection 059: A quiet conversation helped separate the facts from the assumptions.",
+      "beliefSystemId": "custom-e2e-power-user-002"
+    },
+    {
+      "id": "e2e-power-user-moment-060",
+      "createdAt": "2025-01-08T17:35:00.000Z",
+      "occurredAt": "2025-01-08T17:02:00.000Z",
+      "emotionId": "ekel",
+      "intensity": 1,
+      "level": 4,
+      "note": "Synthetic power-user reflection 060: I wrote down one small action that felt possible today.",
+      "beliefSystemId": "custom-e2e-power-user-003"
+    },
+    {
+      "id": "e2e-power-user-moment-061",
+      "createdAt": "2025-01-08T20:00:00.000Z",
+      "occurredAt": "2025-01-08T19:16:00.000Z",
+      "emotionId": "trauer",
+      "intensity": 0.1,
+      "level": 0,
+      "note": "Synthetic power-user reflection 061: I paused before reacting and noticed how the feeling changed."
+    },
+    {
+      "id": "e2e-power-user-moment-062",
+      "createdAt": "2025-01-08T23:07:00.000Z",
+      "occurredAt": "2025-01-08T22:12:00.000Z",
+      "emotionId": "wut",
+      "intensity": 0.2,
+      "level": 1,
+      "note": "Synthetic power-user reflection 062: A short walk made the situation easier to understand.",
+      "beliefSystemId": "no-mistakes"
+    },
+    {
+      "id": "e2e-power-user-moment-063",
+      "createdAt": "2025-01-09T02:14:00.000Z",
+      "occurredAt": "2025-01-09T01:08:00.000Z",
+      "emotionId": "furcht",
+      "intensity": 0.3,
+      "level": 2,
+      "note": "Synthetic power-user reflection 063: Naming the feeling created enough room to choose the next step.",
+      "beliefSystemId": "responsible-for-everything"
+    },
+    {
+      "id": "e2e-power-user-moment-064",
+      "createdAt": "2025-01-09T05:21:00.000Z",
+      "occurredAt": "2025-01-09T05:21:00.000Z",
+      "emotionId": "freude",
+      "intensity": 0.4,
+      "level": 3,
+      "note": "Synthetic power-user reflection 064: The body signal arrived first; the explanation became clearer later.",
+      "beliefSystemId": "do-everything-alone",
+      "guidingStatementSnapshot": "Synthetic guiding belief 04: I can respond with patience and flexibility."
+    },
+    {
+      "id": "e2e-power-user-moment-065",
+      "createdAt": "2025-01-09T08:28:00.000Z",
+      "occurredAt": "2025-01-09T08:17:00.000Z",
+      "emotionId": "liebe",
+      "intensity": 0.5,
+      "level": 4,
+      "note": "Synthetic power-user reflection 065: A quiet conversation helped separate the facts from the assumptions.",
+      "beliefSystemId": "perfect-everything"
+    },
+    {
+      "id": "e2e-power-user-moment-066",
+      "createdAt": "2025-01-09T11:35:00.000Z",
+      "occurredAt": "2025-01-09T11:13:00.000Z",
+      "emotionId": "scham",
+      "intensity": 0.6,
+      "level": 0,
+      "note": ""
+    },
+    {
+      "id": "e2e-power-user-moment-067",
+      "createdAt": "2025-01-09T14:00:00.000Z",
+      "occurredAt": "2025-01-09T13:27:00.000Z",
+      "emotionId": "ekel",
+      "intensity": 0.7,
+      "level": 1,
+      "note": "Synthetic power-user reflection 067: I paused before reacting and noticed how the feeling changed.",
+      "beliefSystemId": "perfect-expect-others",
+      "guidingStatementSnapshot": "Synthetic guiding belief 07: I can respond with patience and flexibility."
+    },
+    {
+      "id": "e2e-power-user-moment-068",
+      "createdAt": "2025-01-09T17:07:00.000Z",
+      "occurredAt": "2025-01-09T16:23:00.000Z",
+      "emotionId": "trauer",
+      "intensity": 0.8,
+      "level": 2,
+      "note": "Synthetic power-user reflection 068: A short walk made the situation easier to understand.",
+      "beliefSystemId": "love-requires-conformity"
+    },
+    {
+      "id": "e2e-power-user-moment-069",
+      "createdAt": "2025-01-09T20:14:00.000Z",
+      "occurredAt": "2025-01-09T07:19:00.000Z",
+      "emotionId": "wut",
+      "intensity": 0.9,
+      "level": 3,
+      "note": "Synthetic power-user reflection 069: Naming the feeling created enough room to choose the next step.",
+      "beliefSystemId": "always-considerate"
+    },
+    {
+      "id": "e2e-power-user-moment-070",
+      "createdAt": "2025-01-09T23:21:00.000Z",
+      "occurredAt": "2025-01-09T22:15:00.000Z",
+      "emotionId": "furcht",
+      "intensity": 1,
+      "level": 4,
+      "note": "Synthetic power-user reflection 070: The body signal arrived first; the explanation became clearer later.",
+      "beliefSystemId": "must-adapt",
+      "guidingStatementSnapshot": "Synthetic guiding belief 10: I can respond with patience and flexibility."
+    },
+    {
+      "id": "e2e-power-user-moment-071",
+      "createdAt": "2025-01-10T02:28:00.000Z",
+      "occurredAt": "2025-01-10T02:28:00.000Z",
+      "emotionId": "freude",
+      "intensity": 0.1,
+      "level": 0,
+      "note": "Synthetic power-user reflection 071: A quiet conversation helped separate the facts from the assumptions."
+    },
+    {
+      "id": "e2e-power-user-moment-072",
+      "createdAt": "2025-01-10T05:35:00.000Z",
+      "occurredAt": "2025-01-10T05:24:00.000Z",
+      "emotionId": "liebe",
+      "intensity": 0.2,
+      "level": 1,
+      "note": "Synthetic power-user reflection 072: I wrote down one small action that felt possible today.",
+      "beliefSystemId": "cannot-burden-others"
+    },
+    {
+      "id": "e2e-power-user-moment-073",
+      "createdAt": "2025-01-10T08:00:00.000Z",
+      "occurredAt": "2025-01-10T07:38:00.000Z",
+      "emotionId": "scham",
+      "intensity": 0.3,
+      "level": 2,
+      "note": "Synthetic power-user reflection 073: I paused before reacting and noticed how the feeling changed.",
+      "beliefSystemId": "custom-e2e-power-user-001",
+      "guidingStatementSnapshot": "Synthetic custom guidance 01: I can take one thoughtful step at a time."
+    },
+    {
+      "id": "e2e-power-user-moment-074",
+      "createdAt": "2025-01-10T11:07:00.000Z",
+      "occurredAt": "2025-01-10T10:34:00.000Z",
+      "emotionId": "ekel",
+      "intensity": 0.4,
+      "level": 3,
+      "note": "Synthetic power-user reflection 074: A short walk made the situation easier to understand.",
+      "beliefSystemId": "custom-e2e-power-user-002"
+    },
+    {
+      "id": "e2e-power-user-moment-075",
+      "createdAt": "2025-01-10T14:14:00.000Z",
+      "occurredAt": "2025-01-10T13:30:00.000Z",
+      "emotionId": "trauer",
+      "intensity": 0.5,
+      "level": 4,
+      "note": "Synthetic power-user reflection 075: Naming the feeling created enough room to choose the next step.",
+      "beliefSystemId": "custom-e2e-power-user-003"
+    },
+    {
+      "id": "e2e-power-user-moment-076",
+      "createdAt": "2025-01-10T17:21:00.000Z",
+      "occurredAt": "2025-01-10T16:26:00.000Z",
+      "emotionId": "wut",
+      "intensity": 0.6,
+      "level": 0,
+      "note": "Synthetic power-user reflection 076: The body signal arrived first; the explanation became clearer later."
+    },
+    {
+      "id": "e2e-power-user-moment-077",
+      "createdAt": "2025-01-10T20:28:00.000Z",
+      "occurredAt": "2025-01-10T19:22:00.000Z",
+      "emotionId": "furcht",
+      "intensity": 0.7,
+      "level": 1,
+      "note": "",
+      "beliefSystemId": "no-mistakes"
+    },
+    {
+      "id": "e2e-power-user-moment-078",
+      "createdAt": "2025-01-10T23:35:00.000Z",
+      "occurredAt": "2025-01-10T23:35:00.000Z",
+      "emotionId": "freude",
+      "intensity": 0.8,
+      "level": 2,
+      "note": "Synthetic power-user reflection 078: I wrote down one small action that felt possible today.",
+      "beliefSystemId": "responsible-for-everything"
+    },
+    {
+      "id": "e2e-power-user-moment-079",
+      "createdAt": "2025-01-11T02:00:00.000Z",
+      "occurredAt": "2025-01-11T01:49:00.000Z",
+      "emotionId": "liebe",
+      "intensity": 0.9,
+      "level": 3,
+      "note": "Synthetic power-user reflection 079: I paused before reacting and noticed how the feeling changed.",
+      "beliefSystemId": "do-everything-alone",
+      "guidingStatementSnapshot": "Synthetic guiding belief 04: I can respond with patience and flexibility."
+    },
+    {
+      "id": "e2e-power-user-moment-080",
+      "createdAt": "2025-01-11T05:07:00.000Z",
+      "occurredAt": "2025-01-11T04:45:00.000Z",
+      "emotionId": "scham",
+      "intensity": 1,
+      "level": 4,
+      "note": "Synthetic power-user reflection 080: A short walk made the situation easier to understand.",
+      "beliefSystemId": "perfect-everything"
+    },
+    {
+      "id": "e2e-power-user-moment-081",
+      "createdAt": "2025-01-11T08:14:00.000Z",
+      "occurredAt": "2025-01-11T07:41:00.000Z",
+      "emotionId": "ekel",
+      "intensity": 0.1,
+      "level": 0,
+      "note": "Synthetic power-user reflection 081: Naming the feeling created enough room to choose the next step."
+    },
+    {
+      "id": "e2e-power-user-moment-082",
+      "createdAt": "2025-01-11T11:21:00.000Z",
+      "occurredAt": "2025-01-11T10:37:00.000Z",
+      "emotionId": "trauer",
+      "intensity": 0.2,
+      "level": 1,
+      "note": "Synthetic power-user reflection 082: The body signal arrived first; the explanation became clearer later.",
+      "beliefSystemId": "perfect-expect-others",
+      "guidingStatementSnapshot": "Synthetic guiding belief 07: I can respond with patience and flexibility."
+    },
+    {
+      "id": "e2e-power-user-moment-083",
+      "createdAt": "2025-01-11T14:28:00.000Z",
+      "occurredAt": "2025-01-11T13:33:00.000Z",
+      "emotionId": "wut",
+      "intensity": 0.3,
+      "level": 2,
+      "note": "Synthetic power-user reflection 083: A quiet conversation helped separate the facts from the assumptions.",
+      "beliefSystemId": "love-requires-conformity"
+    },
+    {
+      "id": "e2e-power-user-moment-084",
+      "createdAt": "2025-01-11T17:35:00.000Z",
+      "occurredAt": "2025-01-11T16:29:00.000Z",
+      "emotionId": "furcht",
+      "intensity": 0.4,
+      "level": 3,
+      "note": "Synthetic power-user reflection 084: I wrote down one small action that felt possible today.",
+      "beliefSystemId": "always-considerate"
+    },
+    {
+      "id": "e2e-power-user-moment-085",
+      "createdAt": "2025-01-11T20:00:00.000Z",
+      "occurredAt": "2025-01-11T20:00:00.000Z",
+      "emotionId": "freude",
+      "intensity": 0.5,
+      "level": 4,
+      "note": "Synthetic power-user reflection 085: I paused before reacting and noticed how the feeling changed.",
+      "beliefSystemId": "must-adapt",
+      "guidingStatementSnapshot": "Synthetic guiding belief 10: I can respond with patience and flexibility."
+    },
+    {
+      "id": "e2e-power-user-moment-086",
+      "createdAt": "2025-01-11T23:07:00.000Z",
+      "occurredAt": "2025-01-11T10:56:00.000Z",
+      "emotionId": "liebe",
+      "intensity": 0.6,
+      "level": 0,
+      "note": "Synthetic power-user reflection 086: A short walk made the situation easier to understand."
+    },
+    {
+      "id": "e2e-power-user-moment-087",
+      "createdAt": "2025-01-12T02:14:00.000Z",
+      "occurredAt": "2025-01-12T01:52:00.000Z",
+      "emotionId": "scham",
+      "intensity": 0.7,
+      "level": 1,
+      "note": "Synthetic power-user reflection 087: Naming the feeling created enough room to choose the next step.",
+      "beliefSystemId": "cannot-burden-others"
+    },
+    {
+      "id": "e2e-power-user-moment-088",
+      "createdAt": "2025-01-12T05:21:00.000Z",
+      "occurredAt": "2025-01-12T04:48:00.000Z",
+      "emotionId": "ekel",
+      "intensity": 0.8,
+      "level": 2,
+      "note": "",
+      "beliefSystemId": "custom-e2e-power-user-001",
+      "guidingStatementSnapshot": "Synthetic custom guidance 01: I can take one thoughtful step at a time."
+    },
+    {
+      "id": "e2e-power-user-moment-089",
+      "createdAt": "2025-01-12T08:28:00.000Z",
+      "occurredAt": "2025-01-12T07:44:00.000Z",
+      "emotionId": "trauer",
+      "intensity": 0.9,
+      "level": 3,
+      "note": "Synthetic power-user reflection 089: A quiet conversation helped separate the facts from the assumptions.",
+      "beliefSystemId": "custom-e2e-power-user-002"
+    },
+    {
+      "id": "e2e-power-user-moment-090",
+      "createdAt": "2025-01-12T11:35:00.000Z",
+      "occurredAt": "2025-01-12T10:40:00.000Z",
+      "emotionId": "wut",
+      "intensity": 1,
+      "level": 4,
+      "note": "Synthetic power-user reflection 090: I wrote down one small action that felt possible today.",
+      "beliefSystemId": "custom-e2e-power-user-003"
+    },
+    {
+      "id": "e2e-power-user-moment-091",
+      "createdAt": "2025-01-12T14:00:00.000Z",
+      "occurredAt": "2025-01-12T12:54:00.000Z",
+      "emotionId": "furcht",
+      "intensity": 0.1,
+      "level": 0,
+      "note": "Synthetic power-user reflection 091: I paused before reacting and noticed how the feeling changed."
+    },
+    {
+      "id": "e2e-power-user-moment-092",
+      "createdAt": "2025-01-12T17:07:00.000Z",
+      "occurredAt": "2025-01-12T17:07:00.000Z",
+      "emotionId": "freude",
+      "intensity": 0.2,
+      "level": 1,
+      "note": "Synthetic power-user reflection 092: A short walk made the situation easier to understand.",
+      "beliefSystemId": "no-mistakes"
+    },
+    {
+      "id": "e2e-power-user-moment-093",
+      "createdAt": "2025-01-12T20:14:00.000Z",
+      "occurredAt": "2025-01-12T20:03:00.000Z",
+      "emotionId": "liebe",
+      "intensity": 0.3,
+      "level": 2,
+      "note": "Synthetic power-user reflection 093: Naming the feeling created enough room to choose the next step.",
+      "beliefSystemId": "responsible-for-everything"
+    },
+    {
+      "id": "e2e-power-user-moment-094",
+      "createdAt": "2025-01-12T23:21:00.000Z",
+      "occurredAt": "2025-01-12T22:59:00.000Z",
+      "emotionId": "scham",
+      "intensity": 0.4,
+      "level": 3,
+      "note": "Synthetic power-user reflection 094: The body signal arrived first; the explanation became clearer later.",
+      "beliefSystemId": "do-everything-alone",
+      "guidingStatementSnapshot": "Synthetic guiding belief 04: I can respond with patience and flexibility."
+    },
+    {
+      "id": "e2e-power-user-moment-095",
+      "createdAt": "2025-01-13T02:28:00.000Z",
+      "occurredAt": "2025-01-13T01:55:00.000Z",
+      "emotionId": "ekel",
+      "intensity": 0.5,
+      "level": 4,
+      "note": "Synthetic power-user reflection 095: A quiet conversation helped separate the facts from the assumptions.",
+      "beliefSystemId": "perfect-everything"
+    },
+    {
+      "id": "e2e-power-user-moment-096",
+      "createdAt": "2025-01-13T05:35:00.000Z",
+      "occurredAt": "2025-01-13T04:51:00.000Z",
+      "emotionId": "trauer",
+      "intensity": 0.6,
+      "level": 0,
+      "note": "Synthetic power-user reflection 096: I wrote down one small action that felt possible today."
+    },
+    {
+      "id": "e2e-power-user-moment-097",
+      "createdAt": "2025-01-13T08:00:00.000Z",
+      "occurredAt": "2025-01-13T07:05:00.000Z",
+      "emotionId": "wut",
+      "intensity": 0.7,
+      "level": 1,
+      "note": "Synthetic power-user reflection 097: I paused before reacting and noticed how the feeling changed.",
+      "beliefSystemId": "perfect-expect-others",
+      "guidingStatementSnapshot": "Synthetic guiding belief 07: I can respond with patience and flexibility."
+    },
+    {
+      "id": "e2e-power-user-moment-098",
+      "createdAt": "2025-01-13T11:07:00.000Z",
+      "occurredAt": "2025-01-13T10:01:00.000Z",
+      "emotionId": "furcht",
+      "intensity": 0.8,
+      "level": 2,
+      "note": "Synthetic power-user reflection 098: A short walk made the situation easier to understand.",
+      "beliefSystemId": "love-requires-conformity"
+    },
+    {
+      "id": "e2e-power-user-moment-099",
+      "createdAt": "2025-01-13T14:14:00.000Z",
+      "occurredAt": "2025-01-13T14:14:00.000Z",
+      "emotionId": "freude",
+      "intensity": 0.9,
+      "level": 3,
+      "note": "",
+      "beliefSystemId": "always-considerate"
+    },
+    {
+      "id": "e2e-power-user-moment-100",
+      "createdAt": "2025-01-13T17:21:00.000Z",
+      "occurredAt": "2025-01-13T17:10:00.000Z",
+      "emotionId": "liebe",
+      "intensity": 1,
+      "level": 4,
+      "note": "Synthetic power-user reflection 100: The body signal arrived first; the explanation became clearer later.",
+      "beliefSystemId": "must-adapt",
+      "guidingStatementSnapshot": "Synthetic guiding belief 10: I can respond with patience and flexibility."
+    },
+    {
+      "id": "e2e-power-user-moment-101",
+      "createdAt": "2025-01-13T20:28:00.000Z",
+      "occurredAt": "2025-01-13T20:06:00.000Z",
+      "emotionId": "scham",
+      "intensity": 0.1,
+      "level": 0,
+      "note": "Synthetic power-user reflection 101: A quiet conversation helped separate the facts from the assumptions."
+    },
+    {
+      "id": "e2e-power-user-moment-102",
+      "createdAt": "2025-01-13T23:35:00.000Z",
+      "occurredAt": "2025-01-13T23:02:00.000Z",
+      "emotionId": "ekel",
+      "intensity": 0.2,
+      "level": 1,
+      "note": "Synthetic power-user reflection 102: I wrote down one small action that felt possible today.",
+      "beliefSystemId": "cannot-burden-others"
+    },
+    {
+      "id": "e2e-power-user-moment-103",
+      "createdAt": "2025-01-14T02:00:00.000Z",
+      "occurredAt": "2025-01-13T13:16:00.000Z",
+      "emotionId": "trauer",
+      "intensity": 0.3,
+      "level": 2,
+      "note": "Synthetic power-user reflection 103: I paused before reacting and noticed how the feeling changed.",
+      "beliefSystemId": "custom-e2e-power-user-001",
+      "guidingStatementSnapshot": "Synthetic custom guidance 01: I can take one thoughtful step at a time."
+    },
+    {
+      "id": "e2e-power-user-moment-104",
+      "createdAt": "2025-01-14T05:07:00.000Z",
+      "occurredAt": "2025-01-14T04:12:00.000Z",
+      "emotionId": "wut",
+      "intensity": 0.4,
+      "level": 3,
+      "note": "Synthetic power-user reflection 104: A short walk made the situation easier to understand.",
+      "beliefSystemId": "custom-e2e-power-user-002"
+    },
+    {
+      "id": "e2e-power-user-moment-105",
+      "createdAt": "2025-01-14T08:14:00.000Z",
+      "occurredAt": "2025-01-14T07:08:00.000Z",
+      "emotionId": "furcht",
+      "intensity": 0.5,
+      "level": 4,
+      "note": "Synthetic power-user reflection 105: Naming the feeling created enough room to choose the next step.",
+      "beliefSystemId": "custom-e2e-power-user-003"
+    },
+    {
+      "id": "e2e-power-user-moment-106",
+      "createdAt": "2025-01-14T11:21:00.000Z",
+      "occurredAt": "2025-01-14T11:21:00.000Z",
+      "emotionId": "freude",
+      "intensity": 0.6,
+      "level": 0,
+      "note": "Synthetic power-user reflection 106: The body signal arrived first; the explanation became clearer later."
+    },
+    {
+      "id": "e2e-power-user-moment-107",
+      "createdAt": "2025-01-14T14:28:00.000Z",
+      "occurredAt": "2025-01-14T14:17:00.000Z",
+      "emotionId": "liebe",
+      "intensity": 0.7,
+      "level": 1,
+      "note": "Synthetic power-user reflection 107: A quiet conversation helped separate the facts from the assumptions.",
+      "beliefSystemId": "no-mistakes"
+    },
+    {
+      "id": "e2e-power-user-moment-108",
+      "createdAt": "2025-01-14T17:35:00.000Z",
+      "occurredAt": "2025-01-14T17:13:00.000Z",
+      "emotionId": "scham",
+      "intensity": 0.8,
+      "level": 2,
+      "note": "Synthetic power-user reflection 108: I wrote down one small action that felt possible today.",
+      "beliefSystemId": "responsible-for-everything"
+    },
+    {
+      "id": "e2e-power-user-moment-109",
+      "createdAt": "2025-01-14T20:00:00.000Z",
+      "occurredAt": "2025-01-14T19:27:00.000Z",
+      "emotionId": "ekel",
+      "intensity": 0.9,
+      "level": 3,
+      "note": "Synthetic power-user reflection 109: I paused before reacting and noticed how the feeling changed.",
+      "beliefSystemId": "do-everything-alone",
+      "guidingStatementSnapshot": "Synthetic guiding belief 04: I can respond with patience and flexibility."
+    },
+    {
+      "id": "e2e-power-user-moment-110",
+      "createdAt": "2025-01-14T23:07:00.000Z",
+      "occurredAt": "2025-01-14T22:23:00.000Z",
+      "emotionId": "trauer",
+      "intensity": 1,
+      "level": 4,
+      "note": "",
+      "beliefSystemId": "perfect-everything"
+    },
+    {
+      "id": "e2e-power-user-moment-111",
+      "createdAt": "2025-01-15T02:14:00.000Z",
+      "occurredAt": "2025-01-15T01:19:00.000Z",
+      "emotionId": "wut",
+      "intensity": 0.1,
+      "level": 0,
+      "note": "Synthetic power-user reflection 111: Naming the feeling created enough room to choose the next step."
+    },
+    {
+      "id": "e2e-power-user-moment-112",
+      "createdAt": "2025-01-15T05:21:00.000Z",
+      "occurredAt": "2025-01-15T04:15:00.000Z",
+      "emotionId": "furcht",
+      "intensity": 0.2,
+      "level": 1,
+      "note": "Synthetic power-user reflection 112: The body signal arrived first; the explanation became clearer later.",
+      "beliefSystemId": "perfect-expect-others",
+      "guidingStatementSnapshot": "Synthetic guiding belief 07: I can respond with patience and flexibility."
+    },
+    {
+      "id": "e2e-power-user-moment-113",
+      "createdAt": "2025-01-15T08:28:00.000Z",
+      "occurredAt": "2025-01-15T08:28:00.000Z",
+      "emotionId": "freude",
+      "intensity": 0.3,
+      "level": 2,
+      "note": "Synthetic power-user reflection 113: A quiet conversation helped separate the facts from the assumptions.",
+      "beliefSystemId": "love-requires-conformity"
+    },
+    {
+      "id": "e2e-power-user-moment-114",
+      "createdAt": "2025-01-15T11:35:00.000Z",
+      "occurredAt": "2025-01-15T11:24:00.000Z",
+      "emotionId": "liebe",
+      "intensity": 0.4,
+      "level": 3,
+      "note": "Synthetic power-user reflection 114: I wrote down one small action that felt possible today.",
+      "beliefSystemId": "always-considerate"
+    },
+    {
+      "id": "e2e-power-user-moment-115",
+      "createdAt": "2025-01-15T14:00:00.000Z",
+      "occurredAt": "2025-01-15T13:38:00.000Z",
+      "emotionId": "scham",
+      "intensity": 0.5,
+      "level": 4,
+      "note": "Synthetic power-user reflection 115: I paused before reacting and noticed how the feeling changed.",
+      "beliefSystemId": "must-adapt",
+      "guidingStatementSnapshot": "Synthetic guiding belief 10: I can respond with patience and flexibility."
+    },
+    {
+      "id": "e2e-power-user-moment-116",
+      "createdAt": "2025-01-15T17:07:00.000Z",
+      "occurredAt": "2025-01-15T16:34:00.000Z",
+      "emotionId": "ekel",
+      "intensity": 0.6,
+      "level": 0,
+      "note": "Synthetic power-user reflection 116: A short walk made the situation easier to understand."
+    },
+    {
+      "id": "e2e-power-user-moment-117",
+      "createdAt": "2025-01-15T20:14:00.000Z",
+      "occurredAt": "2025-01-15T19:30:00.000Z",
+      "emotionId": "trauer",
+      "intensity": 0.7,
+      "level": 1,
+      "note": "Synthetic power-user reflection 117: Naming the feeling created enough room to choose the next step.",
+      "beliefSystemId": "cannot-burden-others"
+    },
+    {
+      "id": "e2e-power-user-moment-118",
+      "createdAt": "2025-01-15T23:21:00.000Z",
+      "occurredAt": "2025-01-15T22:26:00.000Z",
+      "emotionId": "wut",
+      "intensity": 0.8,
+      "level": 2,
+      "note": "Synthetic power-user reflection 118: The body signal arrived first; the explanation became clearer later.",
+      "beliefSystemId": "custom-e2e-power-user-001",
+      "guidingStatementSnapshot": "Synthetic custom guidance 01: I can take one thoughtful step at a time."
+    },
+    {
+      "id": "e2e-power-user-moment-119",
+      "createdAt": "2025-01-16T02:28:00.000Z",
+      "occurredAt": "2025-01-16T01:22:00.000Z",
+      "emotionId": "furcht",
+      "intensity": 0.9,
+      "level": 3,
+      "note": "Synthetic power-user reflection 119: A quiet conversation helped separate the facts from the assumptions.",
+      "beliefSystemId": "custom-e2e-power-user-002"
+    },
+    {
+      "id": "e2e-power-user-moment-120",
+      "createdAt": "2025-01-16T05:35:00.000Z",
+      "occurredAt": "2025-01-15T17:35:00.000Z",
+      "emotionId": "freude",
+      "intensity": 1,
+      "level": 4,
+      "note": "Synthetic power-user reflection 120: I wrote down one small action that felt possible today.",
+      "beliefSystemId": "custom-e2e-power-user-003"
+    },
+    {
+      "id": "e2e-power-user-moment-121",
+      "createdAt": "2025-01-16T08:00:00.000Z",
+      "occurredAt": "2025-01-16T07:49:00.000Z",
+      "emotionId": "liebe",
+      "intensity": 0.1,
+      "level": 0,
+      "note": ""
+    },
+    {
+      "id": "e2e-power-user-moment-122",
+      "createdAt": "2025-01-16T11:07:00.000Z",
+      "occurredAt": "2025-01-16T10:45:00.000Z",
+      "emotionId": "scham",
+      "intensity": 0.2,
+      "level": 1,
+      "note": "Synthetic power-user reflection 122: A short walk made the situation easier to understand.",
+      "beliefSystemId": "no-mistakes"
+    },
+    {
+      "id": "e2e-power-user-moment-123",
+      "createdAt": "2025-01-16T14:14:00.000Z",
+      "occurredAt": "2025-01-16T13:41:00.000Z",
+      "emotionId": "ekel",
+      "intensity": 0.3,
+      "level": 2,
+      "note": "Synthetic power-user reflection 123: Naming the feeling created enough room to choose the next step.",
+      "beliefSystemId": "responsible-for-everything"
+    },
+    {
+      "id": "e2e-power-user-moment-124",
+      "createdAt": "2025-01-16T17:21:00.000Z",
+      "occurredAt": "2025-01-16T16:37:00.000Z",
+      "emotionId": "trauer",
+      "intensity": 0.4,
+      "level": 3,
+      "note": "Synthetic power-user reflection 124: The body signal arrived first; the explanation became clearer later.",
+      "beliefSystemId": "do-everything-alone",
+      "guidingStatementSnapshot": "Synthetic guiding belief 04: I can respond with patience and flexibility."
+    },
+    {
+      "id": "e2e-power-user-moment-125",
+      "createdAt": "2025-01-16T20:28:00.000Z",
+      "occurredAt": "2025-01-16T19:33:00.000Z",
+      "emotionId": "wut",
+      "intensity": 0.5,
+      "level": 4,
+      "note": "Synthetic power-user reflection 125: A quiet conversation helped separate the facts from the assumptions.",
+      "beliefSystemId": "perfect-everything"
+    },
+    {
+      "id": "e2e-power-user-moment-126",
+      "createdAt": "2025-01-16T23:35:00.000Z",
+      "occurredAt": "2025-01-16T22:29:00.000Z",
+      "emotionId": "furcht",
+      "intensity": 0.6,
+      "level": 0,
+      "note": "Synthetic power-user reflection 126: I wrote down one small action that felt possible today."
+    },
+    {
+      "id": "e2e-power-user-moment-127",
+      "createdAt": "2025-01-17T02:00:00.000Z",
+      "occurredAt": "2025-01-17T02:00:00.000Z",
+      "emotionId": "freude",
+      "intensity": 0.7,
+      "level": 1,
+      "note": "Synthetic power-user reflection 127: I paused before reacting and noticed how the feeling changed.",
+      "beliefSystemId": "perfect-expect-others",
+      "guidingStatementSnapshot": "Synthetic guiding belief 07: I can respond with patience and flexibility."
+    },
+    {
+      "id": "e2e-power-user-moment-128",
+      "createdAt": "2025-01-17T05:07:00.000Z",
+      "occurredAt": "2025-01-17T04:56:00.000Z",
+      "emotionId": "liebe",
+      "intensity": 0.8,
+      "level": 2,
+      "note": "Synthetic power-user reflection 128: A short walk made the situation easier to understand.",
+      "beliefSystemId": "love-requires-conformity"
+    },
+    {
+      "id": "e2e-power-user-moment-129",
+      "createdAt": "2025-01-17T08:14:00.000Z",
+      "occurredAt": "2025-01-17T07:52:00.000Z",
+      "emotionId": "scham",
+      "intensity": 0.9,
+      "level": 3,
+      "note": "Synthetic power-user reflection 129: Naming the feeling created enough room to choose the next step.",
+      "beliefSystemId": "always-considerate"
+    },
+    {
+      "id": "e2e-power-user-moment-130",
+      "createdAt": "2025-01-17T11:21:00.000Z",
+      "occurredAt": "2025-01-17T10:48:00.000Z",
+      "emotionId": "ekel",
+      "intensity": 1,
+      "level": 4,
+      "note": "Synthetic power-user reflection 130: The body signal arrived first; the explanation became clearer later.",
+      "beliefSystemId": "must-adapt",
+      "guidingStatementSnapshot": "Synthetic guiding belief 10: I can respond with patience and flexibility."
+    },
+    {
+      "id": "e2e-power-user-moment-131",
+      "createdAt": "2025-01-17T14:28:00.000Z",
+      "occurredAt": "2025-01-17T13:44:00.000Z",
+      "emotionId": "trauer",
+      "intensity": 0.1,
+      "level": 0,
+      "note": "Synthetic power-user reflection 131: A quiet conversation helped separate the facts from the assumptions."
+    },
+    {
+      "id": "e2e-power-user-moment-132",
+      "createdAt": "2025-01-17T17:35:00.000Z",
+      "occurredAt": "2025-01-17T16:40:00.000Z",
+      "emotionId": "wut",
+      "intensity": 0.2,
+      "level": 1,
+      "note": "",
+      "beliefSystemId": "cannot-burden-others"
+    },
+    {
+      "id": "e2e-power-user-moment-133",
+      "createdAt": "2025-01-17T20:00:00.000Z",
+      "occurredAt": "2025-01-17T18:54:00.000Z",
+      "emotionId": "furcht",
+      "intensity": 0.3,
+      "level": 2,
+      "note": "Synthetic power-user reflection 133: I paused before reacting and noticed how the feeling changed.",
+      "beliefSystemId": "custom-e2e-power-user-001",
+      "guidingStatementSnapshot": "Synthetic custom guidance 01: I can take one thoughtful step at a time."
+    }
+  ],
+  "beliefStatements": [
+    {
+      "kind": "built-in",
+      "beliefSystemId": "always-functioning",
+      "guidingStatement": "Synthetic guiding belief 01: I can respond with patience and flexibility."
+    },
+    {
+      "kind": "built-in",
+      "beliefSystemId": "no-mistakes",
+      "guidingStatement": "Synthetic guiding belief 02: I can respond with patience and flexibility."
+    },
+    {
+      "kind": "built-in",
+      "beliefSystemId": "responsible-for-everything",
+      "guidingStatement": "Synthetic guiding belief 03: I can respond with patience and flexibility."
+    },
+    {
+      "kind": "built-in",
+      "beliefSystemId": "do-everything-alone",
+      "guidingStatement": "Synthetic guiding belief 04: I can respond with patience and flexibility."
+    },
+    {
+      "kind": "built-in",
+      "beliefSystemId": "perfect-everything",
+      "guidingStatement": "Synthetic guiding belief 05: I can respond with patience and flexibility."
+    },
+    {
+      "kind": "built-in",
+      "beliefSystemId": "there-for-others",
+      "guidingStatement": "Synthetic guiding belief 06: I can respond with patience and flexibility."
+    },
+    {
+      "kind": "built-in",
+      "beliefSystemId": "perfect-expect-others",
+      "guidingStatement": "Synthetic guiding belief 07: I can respond with patience and flexibility."
+    },
+    {
+      "kind": "built-in",
+      "beliefSystemId": "love-requires-conformity",
+      "guidingStatement": "Synthetic guiding belief 08: I can respond with patience and flexibility."
+    },
+    {
+      "kind": "built-in",
+      "beliefSystemId": "always-considerate",
+      "guidingStatement": "Synthetic guiding belief 09: I can respond with patience and flexibility."
+    },
+    {
+      "kind": "built-in",
+      "beliefSystemId": "must-adapt",
+      "guidingStatement": "Synthetic guiding belief 10: I can respond with patience and flexibility."
+    },
+    {
+      "kind": "built-in",
+      "beliefSystemId": "loved-by-everyone",
+      "guidingStatement": "Synthetic guiding belief 11: I can respond with patience and flexibility."
+    },
+    {
+      "kind": "built-in",
+      "beliefSystemId": "cannot-burden-others",
+      "guidingStatement": "Synthetic guiding belief 12: I can respond with patience and flexibility."
+    },
+    {
+      "kind": "custom",
+      "beliefSystemId": "custom-e2e-power-user-001",
+      "harmfulStatement": "Synthetic limiting belief 01: I must solve every uncertainty immediately.",
+      "guidingStatement": "Synthetic custom guidance 01: I can take one thoughtful step at a time."
+    },
+    {
+      "kind": "custom",
+      "beliefSystemId": "custom-e2e-power-user-002",
+      "harmfulStatement": "Synthetic limiting belief 02: I must solve every uncertainty immediately.",
+      "guidingStatement": "Synthetic custom guidance 02: I can take one thoughtful step at a time."
+    },
+    {
+      "kind": "custom",
+      "beliefSystemId": "custom-e2e-power-user-003",
+      "harmfulStatement": "Synthetic limiting belief 03: I must solve every uncertainty immediately.",
+      "guidingStatement": "Synthetic custom guidance 03: I can take one thoughtful step at a time."
+    }
+  ],
+  "settings": {
+    "locale": "en-US",
+    "emotionLabelMode": "both",
+    "onboardingCompleted": true
+  }
+}

@@ -46,18 +46,18 @@ export class DataArchiveDataError extends Schema.TaggedError<DataArchiveDataErro
 
 const restoreTransaction = `
 BEGIN TRANSACTION;
-DELETE ${CHECK_IN_TABLE};
-DELETE ${BELIEF_STATEMENT_TABLE};
-DELETE ${APP_SETTINGS_TABLE};
+DELETE ${CHECK_IN_TABLE} RETURN NONE;
+DELETE ${BELIEF_STATEMENT_TABLE} RETURN NONE;
+DELETE ${APP_SETTINGS_TABLE} RETURN NONE;
 FOR $checkIn IN $checkIns {
   UPSERT type::record('${CHECK_IN_TABLE}', $checkIn.id)
-    CONTENT object::merge($checkIn, { checkInId: $checkIn.id });
+    CONTENT object::merge($checkIn, { checkInId: $checkIn.id }) RETURN NONE;
 };
 FOR $statement IN $beliefStatements {
   UPSERT type::record('${BELIEF_STATEMENT_TABLE}', $statement.beliefSystemId)
-    CONTENT object::merge($statement, { statementId: $statement.beliefSystemId });
+    CONTENT object::merge($statement, { statementId: $statement.beliefSystemId }) RETURN NONE;
 };
-UPSERT type::record('${APP_SETTINGS_TABLE}', '${APP_SETTINGS_RECORD_ID}') CONTENT $settings;
+UPSERT type::record('${APP_SETTINGS_TABLE}', '${APP_SETTINGS_RECORD_ID}') CONTENT $settings RETURN NONE;
 COMMIT TRANSACTION;
 `;
 
