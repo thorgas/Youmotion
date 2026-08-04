@@ -43,6 +43,7 @@ export const CHECK_IN_EVENTS = Object.freeze({
   NOTE_CHANGED: literal('note.changed'),
   MOMENT_TIME_EDITOR_OPENED: literal('momentTime.editorOpened'),
   MOMENT_TIME_EDITOR_CLOSED: literal('momentTime.editorClosed'),
+  MOMENT_TIME_EDITOR_CONFIRMED: literal('momentTime.editorConfirmed'),
   MOMENT_TIME_DATE_REQUESTED: literal('momentTime.dateRequested'),
   MOMENT_TIME_TIME_REQUESTED: literal('momentTime.timeRequested'),
   MOMENT_TIME_PICKER_DISMISSED: literal('momentTime.pickerDismissed'),

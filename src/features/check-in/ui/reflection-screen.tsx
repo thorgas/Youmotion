@@ -99,6 +99,9 @@ export function MomentTimeControl({ disabled }: { disabled: boolean }) {
     actor.send({ type: CHECK_IN_EVENTS.MOMENT_TIME_EDITOR_OPENED });
   };
   const _close = () => actor.send({ type: CHECK_IN_EVENTS.MOMENT_TIME_EDITOR_CLOSED });
+  const _confirm = () => actor.send({
+    type: CHECK_IN_EVENTS.MOMENT_TIME_EDITOR_CONFIRMED,
+  });
   const _requestDate = () => actor.send({
     type: CHECK_IN_EVENTS.MOMENT_TIME_DATE_REQUESTED,
   });
@@ -119,6 +122,8 @@ export function MomentTimeControl({ disabled }: { disabled: boolean }) {
   if (!occurredAt) return null;
   const value = new Date(occurredAt);
   const label = formatHistoryDate({ date: value, locale });
+  const editorValue = new Date(snapshot.context.momentTimeEditorDraft ?? occurredAt);
+  const editorLabel = formatHistoryDate({ date: editorValue, locale });
 
   return (
     <>
@@ -147,23 +152,21 @@ export function MomentTimeControl({ disabled }: { disabled: boolean }) {
         visible={snapshot.context.momentTimeEditorOpen}
       >
         <View style={styles.momentTimeModalBackdrop} testID="moment-time-modal">
+          <Pressable
+            accessibilityElementsHidden
+            importantForAccessibility="no"
+            onPress={_close}
+            style={styles.momentTimeModalDismissArea}
+            testID="moment-time-modal-backdrop"
+          />
           <View accessibilityViewIsModal style={styles.momentTimeModalCard}>
             <View style={styles.momentTimeModalHeader}>
               <View style={styles.momentTimeModalHeading}>
                 <Text style={styles.momentTimeModalTitle}>
                   <fbt desc="Heading above the emotion date and time editor">When was this?</fbt>
                 </Text>
-                <Text style={styles.momentTimeModalValue}>{label}</Text>
+                <Text style={styles.momentTimeModalValue}>{editorLabel}</Text>
               </View>
-              <Pressable
-                accessibilityRole="button"
-                onPress={_close}
-                style={styles.momentTimeDone}
-              >
-                <Text style={styles.momentTimeDoneText}>
-                  <fbt desc="Button closing the emotion date and time editor">Done</fbt>
-                </Text>
-              </Pressable>
             </View>
             <View style={styles.momentTimePickerSection}>
               {Platform.OS === 'ios' ? (
@@ -180,7 +183,7 @@ export function MomentTimeControl({ disabled }: { disabled: boolean }) {
                       onValueChange={_change}
                       style={styles.momentTimeIosPicker}
                       testID="moment-time-date-picker"
-                      value={value}
+                      value={editorValue}
                     />
                   </View>
                   <View style={styles.momentTimeIosControl}>
@@ -195,7 +198,7 @@ export function MomentTimeControl({ disabled }: { disabled: boolean }) {
                       onValueChange={_change}
                       style={styles.momentTimeIosPicker}
                       testID="moment-time-time-picker"
-                      value={value}
+                      value={editorValue}
                     />
                   </View>
                 </View>
@@ -210,7 +213,7 @@ export function MomentTimeControl({ disabled }: { disabled: boolean }) {
                       <fbt desc="Button opening the date picker for an emotion">Date</fbt>
                     </Text>
                     <Text style={styles.momentTimeAndroidValue}>
-                      {formatMomentDate({ date: value, locale })}
+                      {formatMomentDate({ date: editorValue, locale })}
                     </Text>
                   </Pressable>
                   <Pressable
@@ -222,7 +225,7 @@ export function MomentTimeControl({ disabled }: { disabled: boolean }) {
                       <fbt desc="Button opening the time picker for an emotion">Time</fbt>
                     </Text>
                     <Text style={styles.momentTimeAndroidValue}>
-                      {formatMomentTime({ date: value, locale })}
+                      {formatMomentTime({ date: editorValue, locale })}
                     </Text>
                   </Pressable>
                   {pickerMode ? (
@@ -233,7 +236,7 @@ export function MomentTimeControl({ disabled }: { disabled: boolean }) {
                       onDismiss={_dismissPicker}
                       onValueChange={_change}
                       presentation="dialog"
-                      value={value}
+                      value={editorValue}
                     />
                   ) : null}
                 </View>
@@ -248,6 +251,32 @@ export function MomentTimeControl({ disabled }: { disabled: boolean }) {
                 <fbt desc="Button setting an emotion's date and time to the present">Set to now</fbt>
               </Text>
             </Pressable>
+            <View style={styles.momentTimeModalActions}>
+              <PressableScale
+                accessibilityRole="button"
+                onPress={_close}
+                style={styles.momentTimeCancel}
+                testID="cancel-moment-time"
+              >
+                <Text style={styles.momentTimeCancelText}>
+                  <fbt desc="Button discarding changes in the emotion date and time editor">
+                    Cancel
+                  </fbt>
+                </Text>
+              </PressableScale>
+              <PressableScale
+                accessibilityRole="button"
+                onPress={_confirm}
+                style={styles.momentTimeConfirm}
+                testID="confirm-moment-time"
+              >
+                <Text style={styles.momentTimeConfirmText}>
+                  <fbt desc="Button applying changes in the emotion date and time editor">
+                    Set date and time
+                  </fbt>
+                </Text>
+              </PressableScale>
+            </View>
           </View>
         </View>
       </Modal>
@@ -1080,6 +1109,13 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     padding: 22,
   },
+  momentTimeModalDismissArea: {
+    bottom: 0,
+    left: 0,
+    position: 'absolute',
+    right: 0,
+    top: 0,
+  },
   momentTimeModalCard: {
     backgroundColor: palette.paperRaised,
     borderColor: palette.hairline,
@@ -1105,15 +1141,6 @@ const styles = StyleSheet.create({
     lineHeight: 18,
     marginTop: 4,
   },
-  momentTimeDone: {
-    backgroundColor: '#EDF0EB',
-    borderCurve: 'continuous',
-    borderRadius: 999,
-    justifyContent: 'center',
-    minHeight: 40,
-    paddingHorizontal: 14,
-  },
-  momentTimeDoneText: { color: palette.moss, fontFamily: type.semibold, fontSize: 15 },
   momentTimePickerSection: {
     borderColor: palette.hairline,
     borderTopWidth: 1,
@@ -1151,6 +1178,35 @@ const styles = StyleSheet.create({
     minHeight: 44,
   },
   momentTimeResetText: { color: palette.moss, fontFamily: type.semibold, fontSize: 14 },
+  momentTimeModalActions: { flexDirection: 'row', gap: 10, marginTop: 12 },
+  momentTimeCancel: {
+    alignItems: 'center',
+    borderColor: palette.hairline,
+    borderCurve: 'continuous',
+    borderRadius: 14,
+    borderWidth: 1,
+    flex: 1,
+    justifyContent: 'center',
+    minHeight: 52,
+    paddingHorizontal: 12,
+  },
+  momentTimeCancelText: { color: palette.ink, fontFamily: type.semibold, fontSize: 14 },
+  momentTimeConfirm: {
+    alignItems: 'center',
+    backgroundColor: palette.ink,
+    borderCurve: 'continuous',
+    borderRadius: 14,
+    flex: 1.4,
+    justifyContent: 'center',
+    minHeight: 52,
+    paddingHorizontal: 14,
+  },
+  momentTimeConfirmText: {
+    color: palette.paper,
+    fontFamily: type.semibold,
+    fontSize: 14,
+    textAlign: 'center',
+  },
   card: {
     marginTop: 28,
     padding: 20,

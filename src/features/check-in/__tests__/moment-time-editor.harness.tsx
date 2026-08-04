@@ -20,7 +20,7 @@ import {
   NAVIGATION_STATES,
 } from '@/constants';
 import { AppLocaleProvider } from '@/localization/app-locale-provider';
-import type { EmotionSelection } from '../domain/check-in';
+import { CheckInTimestamp, type EmotionSelection } from '../domain/check-in';
 
 type NavigationMachine = typeof import(
   '@/navigation/app-navigation.machine'
@@ -47,7 +47,7 @@ afterEach(() => {
 });
 
 describe('moment time editor on the device runtime', () => {
-  test('reveals the native modal from the full occurrence time control', async () => {
+  test('discards or applies the native modal draft through explicit actions', async () => {
     mock('@/features/data-safety/infrastructure/data-archive.repository', () => ({
       deleteAllJournalData: () => Effect.succeed(undefined),
       exportDataArchive: () => Effect.succeed(undefined),
@@ -71,6 +71,7 @@ describe('moment time editor on the device runtime', () => {
     currentActor().send({ type: CHECK_IN_EVENTS.TOUCH_STARTED });
     currentActor().send({ type: CHECK_IN_EVENTS.SELECTION_CHANGED, selection });
     currentActor().send({ type: CHECK_IN_EVENTS.SELECTION_RELEASED });
+    const original = currentActor().getSnapshot().context.occurredAtDraft;
     const { MomentTimeControl } = reflectionModule;
 
     await render(
@@ -90,5 +91,19 @@ describe('moment time editor on the device runtime', () => {
     await waitUntil(() => currentActor().getSnapshot().context.momentTimeEditorOpen);
     expect(currentActor().getSnapshot().context.momentTimeEditorOpen).toBe(true);
     expect(await screen.findByTestId('moment-time-modal')).toBeTruthy();
+    expect(await screen.findByTestId('confirm-moment-time')).toBeTruthy();
+
+    const changed = CheckInTimestamp.make('2020-04-12T08:30:00.000Z');
+    currentActor().send({ type: CHECK_IN_EVENTS.MOMENT_TIME_CHANGED, occurredAt: changed });
+    await userEvent.press(await screen.findByTestId('cancel-moment-time'));
+    await waitUntil(() => !currentActor().getSnapshot().context.momentTimeEditorOpen);
+    expect(currentActor().getSnapshot().context.occurredAtDraft).toBe(original);
+
+    await userEvent.press(control);
+    await waitUntil(() => currentActor().getSnapshot().context.momentTimeEditorOpen);
+    currentActor().send({ type: CHECK_IN_EVENTS.MOMENT_TIME_CHANGED, occurredAt: changed });
+    await userEvent.press(await screen.findByTestId('confirm-moment-time'));
+    await waitUntil(() => !currentActor().getSnapshot().context.momentTimeEditorOpen);
+    expect(currentActor().getSnapshot().context.occurredAtDraft).toBe(changed);
   });
 });

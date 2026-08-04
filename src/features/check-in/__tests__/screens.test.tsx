@@ -687,7 +687,7 @@ describe('check-in screens', () => {
     });
   });
 
-  it('shows the full occurrence time before opening the native modal editor', async () => {
+  it('shows the full time and requires explicit confirmation for modal edits', async () => {
     await act(_reachReflection);
     const screen = await _renderLocalized(<ReflectionScreen />);
     const occurredAt = mockActor.getSnapshot().context.occurredAtDraft;
@@ -706,6 +706,31 @@ describe('check-in screens', () => {
     expect(screen.getByTestId('moment-time-modal')).toBeTruthy();
     expect(screen.getByText('When was this?')).toBeTruthy();
     expect(screen.getByText('Set to now')).toBeTruthy();
+    expect(screen.getByText('Cancel')).toBeTruthy();
+    expect(screen.getByText('Set date and time')).toBeTruthy();
+
+    const changed = CheckInTimestamp.make('2020-04-12T08:30:00.000Z');
+    await act(() => {
+      mockActor.send({ type: CHECK_IN_EVENTS.MOMENT_TIME_CHANGED, occurredAt: changed });
+    });
+    await fireEvent.press(screen.getByTestId(
+      'moment-time-modal-backdrop',
+      { includeHiddenElements: true },
+    ));
+    expect(mockActor.getSnapshot().context).toMatchObject({
+      occurredAtDraft: occurredAt,
+      momentTimeEditorOpen: false,
+    });
+
+    await fireEvent.press(screen.getByTestId('moment-time-control'));
+    await act(() => {
+      mockActor.send({ type: CHECK_IN_EVENTS.MOMENT_TIME_CHANGED, occurredAt: changed });
+    });
+    await fireEvent.press(screen.getByTestId('confirm-moment-time'));
+    expect(mockActor.getSnapshot().context).toMatchObject({
+      occurredAtDraft: changed,
+      momentTimeEditorOpen: false,
+    });
   });
 
   it('submits a reflection from the native keyboard before offering the optional core belief step', async () => {

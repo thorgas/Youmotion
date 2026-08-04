@@ -547,27 +547,65 @@ describe('app navigation model', () => {
     expect(routeForStateValue(completed.value)).toBe(APP_ROUTES.SUCCESS);
   });
 
-  it('owns an editable occurrence time and rejects future values', () => {
+  it('keeps occurrence-time edits provisional until the user confirms them', () => {
     const actor = createActor(appNavigationMachine).start();
     actor.send({ type: CHECK_IN_EVENTS.TOUCH_STARTED });
     actor.send({ type: CHECK_IN_EVENTS.SELECTION_CHANGED, selection });
     actor.send({ type: CHECK_IN_EVENTS.SELECTION_RELEASED });
 
-    expect(actor.getSnapshot().context.occurredAtDraft).not.toBeNull();
+    const original = actor.getSnapshot().context.occurredAtDraft;
+    expect(original).not.toBeNull();
     expect(actor.getSnapshot().context.occurredAtCustomized).toBe(false);
 
     const past = CheckInTimestamp.make('2020-04-12T08:30:00.000Z');
+    actor.send({ type: CHECK_IN_EVENTS.MOMENT_TIME_EDITOR_OPENED });
     actor.send({ type: CHECK_IN_EVENTS.MOMENT_TIME_CHANGED, occurredAt: past });
     expect(actor.getSnapshot().context).toMatchObject({
-      occurredAtDraft: past,
-      occurredAtCustomized: true,
+      occurredAtDraft: original,
+      occurredAtCustomized: false,
+      momentTimeEditorDraft: past,
+      momentTimeEditorCustomized: true,
     });
 
     actor.send({
       type: CHECK_IN_EVENTS.MOMENT_TIME_CHANGED,
       occurredAt: CheckInTimestamp.make('2999-01-01T00:00:00.000Z'),
     });
-    expect(actor.getSnapshot().context.occurredAtDraft).toBe(past);
+    expect(actor.getSnapshot().context.momentTimeEditorDraft).toBe(past);
+
+    actor.send({ type: CHECK_IN_EVENTS.MOMENT_TIME_EDITOR_CLOSED });
+    expect(actor.getSnapshot().context).toMatchObject({
+      occurredAtDraft: original,
+      momentTimeEditorDraft: null,
+      momentTimeEditorOpen: false,
+    });
+
+    actor.send({ type: CHECK_IN_EVENTS.MOMENT_TIME_EDITOR_OPENED });
+    actor.send({ type: CHECK_IN_EVENTS.MOMENT_TIME_CHANGED, occurredAt: past });
+    actor.send({ type: CHECK_IN_EVENTS.MOMENT_TIME_EDITOR_CONFIRMED });
+    expect(actor.getSnapshot().context).toMatchObject({
+      occurredAtDraft: past,
+      occurredAtCustomized: true,
+      momentTimeEditorDraft: null,
+      momentTimeEditorOpen: false,
+    });
+  });
+
+  it('keeps set-to-now provisional when the time editor is dismissed', () => {
+    const actor = createActor(appNavigationMachine).start();
+    actor.send({ type: CHECK_IN_EVENTS.TOUCH_STARTED });
+    actor.send({ type: CHECK_IN_EVENTS.SELECTION_CHANGED, selection });
+    actor.send({ type: CHECK_IN_EVENTS.SELECTION_RELEASED });
+    const original = actor.getSnapshot().context.occurredAtDraft;
+
+    actor.send({ type: CHECK_IN_EVENTS.MOMENT_TIME_EDITOR_OPENED });
+    actor.send({ type: CHECK_IN_EVENTS.MOMENT_TIME_RESET });
+    expect(actor.getSnapshot().context.momentTimeEditorDraft).not.toBeNull();
+    expect(actor.getSnapshot().context.momentTimeEditorCustomized).toBe(false);
+    expect(actor.getSnapshot().context.occurredAtDraft).toBe(original);
+
+    actor.send({ type: CHECK_IN_EVENTS.MOMENT_TIME_EDITOR_CLOSED });
+    expect(actor.getSnapshot().context.occurredAtDraft).toBe(original);
   });
 
   it('cancels an interrupted drag without selecting its preview', () => {

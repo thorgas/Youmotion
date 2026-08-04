@@ -4335,6 +4335,30 @@
       ],
       "types": []
     },
+    "fUeT0MF0anCeMhTV4zJWxQ==": {
+      "description": "Button discarding changes in the emotion date and time editor",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Abbrechen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "ZzAFv1e4soC4K9PXq/RIfA==": {
+      "description": "Button applying changes in the emotion date and time editor",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Datum und Uhrzeit setzen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
     "Hgsfj52RsA/kOo615NsbUA==": {
       "description": "Label beside the date picker for an emotion",
       "status": "new",

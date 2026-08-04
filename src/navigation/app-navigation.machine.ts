@@ -102,6 +102,8 @@ const AppContextSchema = Schema.Struct({
   occurredAtDraft: Schema.NullOr(CheckInTimestamp),
   occurredAtCustomized: Schema.Boolean,
   momentTimeEditorOpen: Schema.Boolean,
+  momentTimeEditorDraft: Schema.NullOr(CheckInTimestamp),
+  momentTimeEditorCustomized: Schema.Boolean,
   momentTimePickerMode: Schema.NullOr(
     Schema.Literal(...Object.values(MOMENT_TIME_PICKER_MODES)),
   ),
@@ -316,6 +318,7 @@ export const appNavigationMachine = setup({
       [CHECK_IN_EVENTS.NOTE_CHANGED]: Schema.standardSchemaV1(Schema.Struct({ note: Schema.String })),
       [CHECK_IN_EVENTS.MOMENT_TIME_EDITOR_OPENED]: EmptyEventSchema,
       [CHECK_IN_EVENTS.MOMENT_TIME_EDITOR_CLOSED]: EmptyEventSchema,
+      [CHECK_IN_EVENTS.MOMENT_TIME_EDITOR_CONFIRMED]: EmptyEventSchema,
       [CHECK_IN_EVENTS.MOMENT_TIME_DATE_REQUESTED]: EmptyEventSchema,
       [CHECK_IN_EVENTS.MOMENT_TIME_TIME_REQUESTED]: EmptyEventSchema,
       [CHECK_IN_EVENTS.MOMENT_TIME_PICKER_DISMISSED]: EmptyEventSchema,
@@ -459,6 +462,8 @@ export const appNavigationMachine = setup({
     occurredAtDraft: null,
     occurredAtCustomized: false,
     momentTimeEditorOpen: false,
+    momentTimeEditorDraft: null,
+    momentTimeEditorCustomized: false,
     momentTimePickerMode: null,
     saveDestination: CHECK_IN_SAVE_DESTINATIONS.BELIEF_SYSTEM,
     beliefSystemId: null,
@@ -812,6 +817,8 @@ export const appNavigationMachine = setup({
             occurredAtDraft: null,
             occurredAtCustomized: false,
             momentTimeEditorOpen: false,
+            momentTimeEditorDraft: null,
+            momentTimeEditorCustomized: false,
             momentTimePickerMode: null,
             beliefSystemId: null,
             saved: null,
@@ -844,6 +851,8 @@ export const appNavigationMachine = setup({
             occurredAtDraft: event.entry.occurredAt,
             occurredAtCustomized: true,
             momentTimeEditorOpen: false,
+            momentTimeEditorDraft: null,
+            momentTimeEditorCustomized: false,
             momentTimePickerMode: null,
             beliefSystemId: event.entry.beliefSystemId ?? null,
             saved: null,
@@ -890,10 +899,14 @@ export const appNavigationMachine = setup({
                         occurredAtDraft: checkInTimestampFromDate(new Date()),
                         occurredAtCustomized: false,
                         momentTimeEditorOpen: false,
+                        momentTimeEditorDraft: null,
+                        momentTimeEditorCustomized: false,
                         momentTimePickerMode: null,
                       }
                     : {
                         momentTimeEditorOpen: false,
+                        momentTimeEditorDraft: null,
+                        momentTimeEditorCustomized: false,
                         momentTimePickerMode: null,
                       },
                 }),
@@ -1361,6 +1374,8 @@ export const appNavigationMachine = setup({
             occurredAtDraft: null,
             occurredAtCustomized: false,
             momentTimeEditorOpen: false,
+            momentTimeEditorDraft: null,
+            momentTimeEditorCustomized: false,
             momentTimePickerMode: null,
             beliefSystemId: null,
             saved: null,
@@ -1372,11 +1387,34 @@ export const appNavigationMachine = setup({
           context: ({ event }) => ({ note: event.note.slice(0, MAX_NOTE_LENGTH) }),
         },
         [CHECK_IN_EVENTS.MOMENT_TIME_EDITOR_OPENED]: {
-          context: { momentTimeEditorOpen: true },
+          context: ({ context }) => ({
+            momentTimeEditorOpen: true,
+            momentTimeEditorDraft: context.occurredAtDraft,
+            momentTimeEditorCustomized: context.occurredAtCustomized,
+          }),
         },
         [CHECK_IN_EVENTS.MOMENT_TIME_EDITOR_CLOSED]: {
-          context: { momentTimeEditorOpen: false, momentTimePickerMode: null },
+          context: {
+            momentTimeEditorOpen: false,
+            momentTimeEditorDraft: null,
+            momentTimeEditorCustomized: false,
+            momentTimePickerMode: null,
+          },
         },
+        [CHECK_IN_EVENTS.MOMENT_TIME_EDITOR_CONFIRMED]: ({ context }) => (
+          context.momentTimeEditorDraft
+            ? {
+                context: {
+                  occurredAtDraft: context.momentTimeEditorDraft,
+                  occurredAtCustomized: context.momentTimeEditorCustomized,
+                  momentTimeEditorOpen: false,
+                  momentTimeEditorDraft: null,
+                  momentTimeEditorCustomized: false,
+                  momentTimePickerMode: null,
+                },
+              }
+            : undefined
+        ),
         [CHECK_IN_EVENTS.MOMENT_TIME_DATE_REQUESTED]: {
           context: { momentTimePickerMode: MOMENT_TIME_PICKER_MODES.DATE },
         },
@@ -1390,8 +1428,8 @@ export const appNavigationMachine = setup({
           event.occurredAt <= checkInTimestampFromDate(new Date())
             ? {
                 context: {
-                  occurredAtDraft: event.occurredAt,
-                  occurredAtCustomized: true,
+                  momentTimeEditorDraft: event.occurredAt,
+                  momentTimeEditorCustomized: true,
                   momentTimePickerMode: null,
                 },
               }
@@ -1399,8 +1437,8 @@ export const appNavigationMachine = setup({
         ),
         [CHECK_IN_EVENTS.MOMENT_TIME_RESET]: {
           context: () => ({
-            occurredAtDraft: checkInTimestampFromDate(new Date()),
-            occurredAtCustomized: false,
+            momentTimeEditorDraft: checkInTimestampFromDate(new Date()),
+            momentTimeEditorCustomized: false,
             momentTimePickerMode: null,
           }),
         },
@@ -1417,6 +1455,8 @@ export const appNavigationMachine = setup({
             occurredAtDraft: null,
             occurredAtCustomized: false,
             momentTimeEditorOpen: false,
+            momentTimeEditorDraft: null,
+            momentTimeEditorCustomized: false,
             momentTimePickerMode: null,
             beliefSystemId: null,
             saved: null,
@@ -1981,6 +2021,8 @@ export const appNavigationMachine = setup({
             occurredAtDraft: null,
             occurredAtCustomized: false,
             momentTimeEditorOpen: false,
+            momentTimeEditorDraft: null,
+            momentTimeEditorCustomized: false,
             momentTimePickerMode: null,
             saveDestination: CHECK_IN_SAVE_DESTINATIONS.BELIEF_SYSTEM,
             beliefSystemId: null,
@@ -1997,6 +2039,8 @@ export const appNavigationMachine = setup({
             occurredAtDraft: null,
             occurredAtCustomized: false,
             momentTimeEditorOpen: false,
+            momentTimeEditorDraft: null,
+            momentTimeEditorCustomized: false,
             momentTimePickerMode: null,
             saveDestination: CHECK_IN_SAVE_DESTINATIONS.BELIEF_SYSTEM,
             beliefSystemId: null,
