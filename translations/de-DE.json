@@ -3793,18 +3793,6 @@
       ],
       "types": []
     },
-    "l9BUwR4XtU51F0v/vgZQUA==": {
-      "description": "Typical duration of the guided reflection",
-      "status": "new",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "ETWA 30 SEK.",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
     "DpfXf55mkLsLpY1ReoNf1A==": {
       "description": "Label introducing the next guided reflection step",
       "status": "new",
@@ -4378,6 +4366,18 @@
       "translations": [
         {
           "translation": "Uhrzeit",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "b+NN9jQ+JIWZW56N4OsOiA==": {
+      "description": "Label clarifying that the reflection note is optional",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "OPTIONAL",
           "variations": {}
         }
       ],

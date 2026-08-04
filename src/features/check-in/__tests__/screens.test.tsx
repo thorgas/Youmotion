@@ -755,6 +755,8 @@ describe('check-in screens', () => {
   it('starts the reflection placeholder with concrete examples in English and German', async () => {
     await act(_reachReflection);
     const screen = await _renderLocalized(<ReflectionScreen />);
+    expect(screen.getByText('OPTIONAL')).toBeTruthy();
+    expect(screen.queryByText('ABOUT 30 SEC')).toBeNull();
     expect(screen.getByPlaceholderText(
       'A behavior, a thought, a body sensation, a situation…',
     )).toBeTruthy();
@@ -766,6 +768,8 @@ describe('check-in screens', () => {
     expect(screen.getByPlaceholderText(
       'Ein Verhalten, ein Gedanke, ein Körpergefühl, eine Situation …',
     )).toBeTruthy();
+    expect(screen.getByText('OPTIONAL')).toBeTruthy();
+    expect(screen.queryByText('ETWA 30 SEK.')).toBeNull();
   });
 
   it('restores the released and guiding belief hierarchy after cold hydration', async () => {

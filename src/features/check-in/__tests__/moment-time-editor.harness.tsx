@@ -12,15 +12,19 @@ import {
 } from 'react-native-harness';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { StyleSheet, View } from 'react-native';
 import { createActor, type Actor } from 'xstate';
 
 import {
+  APP_LOCALES,
   CHECK_IN_EVENTS,
   EMOTION_IDS,
   NAVIGATION_STATES,
 } from '@/constants';
+import { appSettingsStore } from '@/features/settings/application/app-settings.store';
 import { AppLocaleProvider } from '@/localization/app-locale-provider';
 import { CheckInTimestamp, type EmotionSelection } from '../domain/check-in';
+import { palette } from '../ui/theme';
 
 type NavigationMachine = typeof import(
   '@/navigation/app-navigation.machine'
@@ -43,6 +47,7 @@ const selection = {
 afterEach(() => {
   actor?.stop();
   actor = undefined;
+  appSettingsStore.trigger.languageChanged({ locale: APP_LOCALES.ENGLISH });
   resetModules();
 });
 
@@ -106,4 +111,40 @@ describe('moment time editor on the device runtime', () => {
     await waitUntil(() => !currentActor().getSnapshot().context.momentTimeEditorOpen);
     expect(currentActor().getSnapshot().context.occurredAtDraft).toBe(changed);
   });
+
+  test('shows optionality instead of a timer-like reflection estimate', async () => {
+    const reflectionModule: typeof import('../ui/reflection-screen') = require(
+      '../ui/reflection-screen',
+    );
+    appSettingsStore.trigger.languageChanged({ locale: APP_LOCALES.GERMAN });
+    const { ReflectionNoteHeader } = reflectionModule;
+
+    await render(
+      <AppLocaleProvider>
+        <View style={styles.noteHeaderPreview} testID="reflection-note-header-preview">
+          <ReflectionNoteHeader />
+        </View>
+      </AppLocaleProvider>,
+    );
+
+    expect(await screen.findByTestId('reflection-note-optionality')).toBeTruthy();
+    const editorScreenshot = await screen.screenshot(
+      await screen.findByTestId('reflection-note-header-preview'),
+    );
+    if (!editorScreenshot) throw new Error('The reflection editor screenshot is required.');
+    await expect(editorScreenshot).toMatchImageSnapshot({
+      name: 'reflection-note-optional-label',
+      comparisonMethod: 'ssim',
+      ssimThreshold: 0.98,
+    });
+  });
+});
+
+const styles = StyleSheet.create({
+  noteHeaderPreview: {
+    backgroundColor: palette.paperRaised,
+    paddingHorizontal: 24,
+    paddingVertical: 20,
+    width: '100%',
+  },
 });

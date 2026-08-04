@@ -458,6 +458,19 @@ function ReflectionEditorActions({
   );
 }
 
+export function ReflectionNoteHeader() {
+  return (
+    <View style={styles.noteLabelRow} testID="reflection-note-header">
+      <Text style={styles.noteLabel}>
+        <fbt desc="Optional reflection note field label">A NOTE FOR LATER</fbt>
+      </Text>
+      <Text style={styles.noteOptionality} testID="reflection-note-optionality">
+        <fbt desc="Label clarifying that the reflection note is optional">OPTIONAL</fbt>
+      </Text>
+    </View>
+  );
+}
+
 function ReflectionNoteStep() {
   const actor = useAppNavigationActor();
   const snapshot = useSelector(actor, _selectSnapshot);
@@ -585,14 +598,7 @@ function ReflectionNoteStep() {
               },
             ]}
           >
-            <View style={styles.noteLabelRow}>
-              <Text style={styles.noteLabel}>
-                <fbt desc="Optional reflection note field label">A NOTE FOR LATER</fbt>
-              </Text>
-              <Text style={styles.noteDuration}>
-                <fbt desc="Typical duration of the guided reflection">ABOUT 30 SEC</fbt>
-              </Text>
-            </View>
+            <ReflectionNoteHeader />
             <TextInput
               accessibilityLabel={optionalNoteAccessibilityLabel()}
               editable={!saving}
@@ -1234,7 +1240,7 @@ const styles = StyleSheet.create({
     fontSize: 10,
     letterSpacing: 1.05,
   },
-  noteDuration: {
+  noteOptionality: {
     color: palette.inkMuted,
     fontFamily: type.medium,
     fontSize: 9,
