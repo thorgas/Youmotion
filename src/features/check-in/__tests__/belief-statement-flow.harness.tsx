@@ -9,12 +9,16 @@ import { SurrealRecordId } from 'react-native-surrealdb';
 import { createActor, type Actor } from 'xstate';
 
 import {
+  APP_LOCALES,
   BELIEF_STATEMENT_TABLE,
   CHECK_IN_EVENTS,
   CHECK_IN_STATES,
   CHECK_IN_TABLE,
   EMOTION_IDS,
+  EMOTION_LABEL_MODES,
+  NAVIGATION_STATES,
 } from '@/constants';
+import { appSettingsStore } from '@/features/settings/application/app-settings.store';
 import { appNavigationMachine } from '@/navigation/app-navigation.machine';
 import type { BeliefSystemId } from '../domain/belief-statement';
 import type {
@@ -73,7 +77,15 @@ describe('personal belief flow on the device runtime', () => {
       level: 2,
       color: '#E7AD32',
     } satisfies EmotionSelection;
+    appSettingsStore.trigger.hydrated({
+      settings: {
+        locale: APP_LOCALES.ENGLISH,
+        emotionLabelMode: EMOTION_LABEL_MODES.EMOJI,
+        onboardingCompleted: true,
+      },
+    });
     actor = createActor(appNavigationMachine).start();
+    await waitForState(NAVIGATION_STATES.TABS);
     currentActor().send({ type: CHECK_IN_EVENTS.TOUCH_STARTED });
     currentActor().send({ type: CHECK_IN_EVENTS.SELECTION_CHANGED, selection });
     currentActor().send({ type: CHECK_IN_EVENTS.SELECTION_RELEASED });

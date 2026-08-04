@@ -5,6 +5,7 @@ import {
   fn,
   mock,
   render,
+  requireActual,
   resetModules,
   test,
 } from 'react-native-harness';
@@ -15,9 +16,17 @@ import { APP_LOCALES } from '@/constants';
 const navigationSend = fn();
 
 function loadOnboardingForLanguage(languageCode: string) {
-  mock('expo-localization', () => ({
-    getLocales: () => [{ languageCode }],
-  }));
+  mock('@/features/settings/application/app-settings.store', () => {
+    const actual: typeof import(
+      '@/features/settings/application/app-settings.store'
+    ) = requireActual('@/features/settings/application/app-settings.store');
+    return {
+      ...actual,
+      appSettingsStore: actual.createAppSettingsStore(
+        actual.initialAppSettingsContext([languageCode]),
+      ),
+    };
+  });
   mock('@/navigation/app-navigation.provider', () => ({
     useAppNavigationActor: () => ({ send: navigationSend }),
   }));
@@ -27,11 +36,15 @@ function loadOnboardingForLanguage(languageCode: string) {
   const localizationModule: typeof import(
     '@/localization/app-locale-provider'
   ) = require('@/localization/app-locale-provider');
+  const localizationConfiguration: typeof import(
+    '@/localization/app-locale.configuration'
+  ) = require('@/localization/app-locale.configuration');
   const onboardingModule: typeof import(
     '../ui/onboarding-welcome-step'
   ) = require('../ui/onboarding-welcome-step');
   return {
     ...settingsModule,
+    ...localizationConfiguration,
     ...localizationModule,
     ...onboardingModule,
   };
@@ -46,8 +59,10 @@ describe('first-launch onboarding locale on the device runtime', () => {
     const {
       AppLocaleProvider,
       appSettingsStore,
+      configureAppLocale,
       OnboardingWelcomeStep,
     } = loadOnboardingForLanguage('de');
+    configureAppLocale(appSettingsStore);
 
     await render(
       <AppLocaleProvider>
@@ -66,8 +81,10 @@ describe('first-launch onboarding locale on the device runtime', () => {
     const {
       AppLocaleProvider,
       appSettingsStore,
+      configureAppLocale,
       OnboardingWelcomeStep,
     } = loadOnboardingForLanguage('en');
+    configureAppLocale(appSettingsStore);
 
     await render(
       <AppLocaleProvider>
@@ -86,12 +103,14 @@ describe('first-launch onboarding locale on the device runtime', () => {
     const {
       AppLocaleProvider,
       appSettingsStore,
+      configureAppLocale,
       OnboardingWelcomeStep,
     } = loadOnboardingForLanguage('de');
 
     appSettingsStore.trigger.hydrationFailed({
       message: 'Settings storage is unavailable.',
     });
+    configureAppLocale(appSettingsStore);
     await render(
       <AppLocaleProvider>
         <OnboardingWelcomeStep />

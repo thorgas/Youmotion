@@ -9,15 +9,26 @@ export type AppNavigationActor = ActorRefFrom<typeof appNavigationMachine>;
 
 const AppNavigationContext = createContext<AppNavigationActor | null>(null);
 
+export function AppNavigationActorProvider({
+  actor,
+  children,
+}: PropsWithChildren<{ actor: AppNavigationActor }>) {
+  return (
+    <AppNavigationContext.Provider value={actor}>
+      {children}
+    </AppNavigationContext.Provider>
+  );
+}
+
 export function AppNavigationProvider({ children }: PropsWithChildren) {
   const [, , actor] = useMachine(appNavigationMachine, {
     inspect: inspectAppNavigation,
   });
 
   return (
-    <AppNavigationContext.Provider value={actor}>
+    <AppNavigationActorProvider actor={actor}>
       {children}
-    </AppNavigationContext.Provider>
+    </AppNavigationActorProvider>
   );
 }
 
