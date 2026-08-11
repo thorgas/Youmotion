@@ -1,0 +1,148 @@
+{
+  "flow": "benchmark-onboarding-replay",
+  "device": "28FC32E3-9023-43E2-90C8-76D97ABBA3C8",
+  "executionPrerequisite": "",
+  "ok": true,
+  "passed": 19,
+  "failed": 0,
+  "skipped": 0,
+  "errored": 0,
+  "steps": [
+    {
+      "index": 0,
+      "kind": "launch",
+      "flow": "benchmark-onboarding-replay",
+      "status": "pass"
+    },
+    {
+      "index": 1,
+      "kind": "tool",
+      "flow": "benchmark-onboarding-replay",
+      "status": "pass",
+      "tool": "open-url",
+      "result": {
+        "opened": true,
+        "url": "exp+youmotion://expo-development-client/?url=http%3A%2F%2F127.0.0.1%3A8091"
+      },
+      "args": {
+        "url": "exp+youmotion://expo-development-client/?url=http%3A%2F%2F127.0.0.1%3A8091",
+        "udid": "28FC32E3-9023-43E2-90C8-76D97ABBA3C8"
+      }
+    },
+    {
+      "index": 2,
+      "kind": "await",
+      "flow": "benchmark-onboarding-replay",
+      "target": "visible id=tab-today",
+      "status": "pass"
+    },
+    {
+      "index": 3,
+      "kind": "tap",
+      "flow": "benchmark-onboarding-replay",
+      "target": "id=tab-settings",
+      "status": "pass"
+    },
+    {
+      "index": 4,
+      "kind": "await",
+      "flow": "benchmark-onboarding-replay",
+      "target": "visible \"Kurze Einführung öffnen\"",
+      "status": "pass"
+    },
+    {
+      "index": 5,
+      "kind": "idle",
+      "flow": "benchmark-onboarding-replay",
+      "status": "pass"
+    },
+    {
+      "index": 6,
+      "kind": "tap",
+      "flow": "benchmark-onboarding-replay",
+      "target": "\"Kurze Einführung öffnen\"",
+      "status": "pass"
+    },
+    {
+      "index": 7,
+      "kind": "await",
+      "flow": "benchmark-onboarding-replay",
+      "target": "visible \"Schritt 1 von 3\" id=onboarding-progress",
+      "status": "pass"
+    },
+    {
+      "index": 8,
+      "kind": "idle",
+      "flow": "benchmark-onboarding-replay",
+      "status": "pass"
+    },
+    {
+      "index": 9,
+      "kind": "tap",
+      "flow": "benchmark-onboarding-replay",
+      "target": "\"So funktioniert es\"",
+      "status": "pass"
+    },
+    {
+      "index": 10,
+      "kind": "await",
+      "flow": "benchmark-onboarding-replay",
+      "target": "visible \"Schritt 2 von 3\" id=onboarding-progress",
+      "status": "pass"
+    },
+    {
+      "index": 11,
+      "kind": "tap",
+      "flow": "benchmark-onboarding-replay",
+      "target": "\"Beispiel anzeigen\"",
+      "status": "pass"
+    },
+    {
+      "index": 12,
+      "kind": "await",
+      "flow": "benchmark-onboarding-replay",
+      "target": "visible \"Sorge\" id=emotion-nuance-reveal",
+      "status": "pass"
+    },
+    {
+      "index": 13,
+      "kind": "tap",
+      "flow": "benchmark-onboarding-replay",
+      "target": "\"Weiter\"",
+      "status": "pass"
+    },
+    {
+      "index": 14,
+      "kind": "await",
+      "flow": "benchmark-onboarding-replay",
+      "target": "visible \"Schritt 3 von 3\" id=onboarding-progress",
+      "status": "pass"
+    },
+    {
+      "index": 15,
+      "kind": "idle",
+      "flow": "benchmark-onboarding-replay",
+      "status": "pass"
+    },
+    {
+      "index": 16,
+      "kind": "tap",
+      "flow": "benchmark-onboarding-replay",
+      "target": "\"Probiere deinen ersten Check-in\"",
+      "status": "pass"
+    },
+    {
+      "index": 17,
+      "kind": "await",
+      "flow": "benchmark-onboarding-replay",
+      "target": "visible \"Kurze Einführung öffnen\"",
+      "status": "pass"
+    },
+    {
+      "index": 18,
+      "kind": "idle",
+      "flow": "benchmark-onboarding-replay",
+      "status": "pass"
+    }
+  ]
+}

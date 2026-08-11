@@ -1,0 +1,22 @@
+Running on iPhone 17 Pro - iOS 26.1 - 28FC32E3-9023-43E2-90C8-76D97ABBA3C8
+ > Flow Benchmark onboarding replay
+Launch app "com.youmotion.mobile"... COMPLETED
+Open exp+youmotion://expo-development-client/?url=http%3A%2F%2F127.0.0.1%3A8091... COMPLETED
+Tap on (Optional) "Open"... WARNED
+Assert that id: tab-today is visible... COMPLETED
+Tap on id: tab-settings... COMPLETED
+Assert that id: settings-screen is visible... COMPLETED
+Wait for animation to end... COMPLETED
+Tap on id: open-onboarding... COMPLETED
+Assert that "Schritt 1 von 3", id: onboarding-progress is visible... COMPLETED
+Wait for animation to end... COMPLETED
+Tap on id: onboarding-primary-action... COMPLETED
+Assert that "Schritt 2 von 3", id: onboarding-progress is visible... COMPLETED
+Tap on id: onboarding-primary-action... COMPLETED
+Assert that "Sorge", id: emotion-nuance-reveal is visible... COMPLETED
+Tap on id: onboarding-primary-action... COMPLETED
+Assert that "Schritt 3 von 3", id: onboarding-progress is visible... COMPLETED
+Wait for animation to end... COMPLETED
+Tap on id: onboarding-primary-action... COMPLETED
+Assert that id: settings-screen is visible... COMPLETED
+Wait for animation to end... COMPLETED

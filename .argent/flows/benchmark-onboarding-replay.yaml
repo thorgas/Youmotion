@@ -1,0 +1,23 @@
+steps:
+  - launch: com.youmotion.mobile
+  - tool: open-url
+    args:
+      url: exp+youmotion://expo-development-client/?url=http%3A%2F%2F127.0.0.1%3A8091
+  - await: { visible: { id: tab-today }, timeout: 10000 }
+  - tap:
+      id: tab-settings
+  - await: { visible: { text: Kurze Einführung öffnen }, timeout: 10000 }
+  - await: { idle: true }
+  - tap: { text: Kurze Einführung öffnen }
+  - await: { visible: { id: onboarding-progress, text: Schritt 1 von 3 }, timeout: 10000 }
+  - await: { idle: true }
+  - tap: { text: So funktioniert es }
+  - await: { visible: { id: onboarding-progress, text: Schritt 2 von 3 }, timeout: 10000 }
+  - tap: { text: Beispiel anzeigen }
+  - await: { visible: { id: emotion-nuance-reveal, text: Sorge }, timeout: 10000 }
+  - tap: { text: Weiter }
+  - await: { visible: { id: onboarding-progress, text: Schritt 3 von 3 }, timeout: 10000 }
+  - await: { idle: true }
+  - tap: { text: Probiere deinen ersten Check-in }
+  - await: { visible: { text: Kurze Einführung öffnen }, timeout: 10000 }
+  - await: { idle: true }

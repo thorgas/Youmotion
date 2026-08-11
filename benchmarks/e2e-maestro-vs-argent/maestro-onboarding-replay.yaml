@@ -1,0 +1,45 @@
+appId: com.youmotion.mobile
+name: Benchmark onboarding replay
+---
+- launchApp:
+    clearState: false
+    stopApp: true
+- openLink:
+    link: exp+youmotion://expo-development-client/?url=http%3A%2F%2F127.0.0.1%3A8091
+- tapOn:
+    text: Open
+    optional: true
+- assertVisible:
+    id: tab-today
+- tapOn:
+    id: tab-settings
+- assertVisible:
+    id: settings-screen
+- waitForAnimationToEnd
+- tapOn:
+    id: open-onboarding
+- assertVisible:
+    id: onboarding-progress
+    text: Schritt 1 von 3
+- waitForAnimationToEnd
+- tapOn:
+    id: onboarding-primary-action
+- assertVisible:
+    id: onboarding-progress
+    text: Schritt 2 von 3
+- tapOn:
+    id: onboarding-primary-action
+- assertVisible:
+    id: emotion-nuance-reveal
+    text: Sorge
+- tapOn:
+    id: onboarding-primary-action
+- assertVisible:
+    id: onboarding-progress
+    text: Schritt 3 von 3
+- waitForAnimationToEnd
+- tapOn:
+    id: onboarding-primary-action
+- assertVisible:
+    id: settings-screen
+- waitForAnimationToEnd
