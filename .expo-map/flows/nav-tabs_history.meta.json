@@ -1,0 +1,13 @@
+{
+  "formatVersion": 2,
+  "name": "nav-tabs_history",
+  "route": "(tabs)/history",
+  "title": "Navigate to /history",
+  "device": "iPhone 17 Pro",
+  "steps": {
+    "1": {
+      "capture": "tabs_history.png",
+      "note": "History tab after hydration"
+    }
+  }
+}

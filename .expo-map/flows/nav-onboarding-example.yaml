@@ -1,0 +1,5 @@
+steps:
+  - tool: open-url
+    args:
+      url: "youmotion://onboarding-example"
+  - wait: 1500

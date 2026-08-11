@@ -1,0 +1,12 @@
+{
+  "formatVersion": 2,
+  "name": "nav-belief-library-editor",
+  "route": "belief-library-editor",
+  "title": "Navigate to /belief-library-editor",
+  "device": "iPhone 17 Pro",
+  "steps": {
+    "1": {
+      "capture": "belief-library-editor.png"
+    }
+  }
+}

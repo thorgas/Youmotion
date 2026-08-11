@@ -1,0 +1,13 @@
+{
+  "formatVersion": 2,
+  "name": "nav-index",
+  "route": "index",
+  "title": "Navigate to /",
+  "device": "iPhone 17 Pro",
+  "steps": {
+    "1": {
+      "capture": "index.png",
+      "note": "Root route is an XState synchronization entry"
+    }
+  }
+}

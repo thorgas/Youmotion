@@ -1,0 +1,13 @@
+{
+  "formatVersion": 2,
+  "name": "nav-tabs_analytics",
+  "route": "(tabs)/analytics",
+  "title": "Navigate to /analytics",
+  "device": "iPhone 17 Pro",
+  "steps": {
+    "1": {
+      "capture": "tabs_analytics.png",
+      "note": "Analytics tab after hydration"
+    }
+  }
+}

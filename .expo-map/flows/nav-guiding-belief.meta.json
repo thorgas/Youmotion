@@ -1,0 +1,13 @@
+{
+  "formatVersion": 2,
+  "name": "nav-guiding-belief",
+  "route": "guiding-belief",
+  "title": "Navigate to /guiding-belief",
+  "device": "iPhone 17 Pro",
+  "steps": {
+    "1": {
+      "capture": "guiding-belief.png",
+      "note": "Bare deep link lacks reflection actor context"
+    }
+  }
+}

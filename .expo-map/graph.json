@@ -1,0 +1,211 @@
+{
+  "generatedAt": "2026-08-11T18:48:23.672Z",
+  "projectRoot": "/Users/timhorgas/git/Youmotion",
+  "scheme": "youmotion",
+  "deepLinkTemplates": {
+    "devBuild": "youmotion://<urlPath minus leading slash>",
+    "expoGo": "exp://127.0.0.1:8081/--<urlPath>"
+  },
+  "mode": "expo-router",
+  "appDir": "src/app",
+  "layouts": [
+    {
+      "file": "src/app/(tabs)/_layout.tsx",
+      "dir": "(tabs)",
+      "navigator": "Tabs"
+    },
+    {
+      "file": "src/app/_layout.tsx",
+      "dir": "",
+      "navigator": "Stack"
+    }
+  ],
+  "routes": [
+    {
+      "id": "(tabs)/analytics",
+      "file": "src/app/(tabs)/analytics.tsx",
+      "urlPath": "/analytics",
+      "slug": "tabs_analytics",
+      "params": [],
+      "navigator": "Tabs",
+      "layoutDir": "(tabs)",
+      "presentation": null,
+      "stateHints": []
+    },
+    {
+      "id": "(tabs)/history",
+      "file": "src/app/(tabs)/history.tsx",
+      "urlPath": "/history",
+      "slug": "tabs_history",
+      "params": [],
+      "navigator": "Tabs",
+      "layoutDir": "(tabs)",
+      "presentation": null,
+      "stateHints": []
+    },
+    {
+      "id": "(tabs)/settings",
+      "file": "src/app/(tabs)/settings.tsx",
+      "urlPath": "/settings",
+      "slug": "tabs_settings",
+      "params": [],
+      "navigator": "Tabs",
+      "layoutDir": "(tabs)",
+      "presentation": null,
+      "stateHints": []
+    },
+    {
+      "id": "(tabs)/today",
+      "file": "src/app/(tabs)/today.tsx",
+      "urlPath": "/today",
+      "slug": "tabs_today",
+      "params": [],
+      "navigator": "Tabs",
+      "layoutDir": "(tabs)",
+      "presentation": null,
+      "stateHints": []
+    },
+    {
+      "id": "belief-library-editor",
+      "file": "src/app/belief-library-editor.tsx",
+      "urlPath": "/belief-library-editor",
+      "slug": "belief-library-editor",
+      "params": [],
+      "navigator": "Stack",
+      "layoutDir": "",
+      "presentation": null,
+      "stateHints": []
+    },
+    {
+      "id": "belief-library",
+      "file": "src/app/belief-library.tsx",
+      "urlPath": "/belief-library",
+      "slug": "belief-library",
+      "params": [],
+      "navigator": "Stack",
+      "layoutDir": "",
+      "presentation": null,
+      "stateHints": []
+    },
+    {
+      "id": "belief-system-catalog",
+      "file": "src/app/belief-system-catalog.tsx",
+      "urlPath": "/belief-system-catalog",
+      "slug": "belief-system-catalog",
+      "params": [],
+      "navigator": "Stack",
+      "layoutDir": "",
+      "presentation": null,
+      "stateHints": []
+    },
+    {
+      "id": "belief-system-editor",
+      "file": "src/app/belief-system-editor.tsx",
+      "urlPath": "/belief-system-editor",
+      "slug": "belief-system-editor",
+      "params": [],
+      "navigator": "Stack",
+      "layoutDir": "",
+      "presentation": null,
+      "stateHints": []
+    },
+    {
+      "id": "belief-system",
+      "file": "src/app/belief-system.tsx",
+      "urlPath": "/belief-system",
+      "slug": "belief-system",
+      "params": [],
+      "navigator": "Stack",
+      "layoutDir": "",
+      "presentation": null,
+      "stateHints": []
+    },
+    {
+      "id": "guiding-belief",
+      "file": "src/app/guiding-belief.tsx",
+      "urlPath": "/guiding-belief",
+      "slug": "guiding-belief",
+      "params": [],
+      "navigator": "Stack",
+      "layoutDir": "",
+      "presentation": null,
+      "stateHints": []
+    },
+    {
+      "id": "index",
+      "file": "src/app/index.tsx",
+      "urlPath": "/",
+      "slug": "index",
+      "params": [],
+      "navigator": "Stack",
+      "layoutDir": "",
+      "presentation": null,
+      "stateHints": []
+    },
+    {
+      "id": "onboarding-example",
+      "file": "src/app/onboarding-example.tsx",
+      "urlPath": "/onboarding-example",
+      "slug": "onboarding-example",
+      "params": [],
+      "navigator": "Stack",
+      "layoutDir": "",
+      "presentation": null,
+      "stateHints": []
+    },
+    {
+      "id": "onboarding-pulse",
+      "file": "src/app/onboarding-pulse.tsx",
+      "urlPath": "/onboarding-pulse",
+      "slug": "onboarding-pulse",
+      "params": [],
+      "navigator": "Stack",
+      "layoutDir": "",
+      "presentation": null,
+      "stateHints": []
+    },
+    {
+      "id": "onboarding",
+      "file": "src/app/onboarding.tsx",
+      "urlPath": "/onboarding",
+      "slug": "onboarding",
+      "params": [],
+      "navigator": "Stack",
+      "layoutDir": "",
+      "presentation": null,
+      "stateHints": []
+    },
+    {
+      "id": "reflection",
+      "file": "src/app/reflection.tsx",
+      "urlPath": "/reflection",
+      "slug": "reflection",
+      "params": [],
+      "navigator": "Stack",
+      "layoutDir": "",
+      "presentation": null,
+      "stateHints": []
+    },
+    {
+      "id": "success",
+      "file": "src/app/success.tsx",
+      "urlPath": "/success",
+      "slug": "success",
+      "params": [],
+      "navigator": "Stack",
+      "layoutDir": "",
+      "presentation": null,
+      "stateHints": []
+    }
+  ],
+  "edges": [],
+  "summary": {
+    "mode": "expo-router",
+    "routes": 16,
+    "layouts": 2,
+    "edges": 0,
+    "unresolvedEdges": 0,
+    "routesWithStateHints": 0,
+    "routesNeedingParams": 0
+  }
+}

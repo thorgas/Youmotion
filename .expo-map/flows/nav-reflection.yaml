@@ -1,0 +1,5 @@
+steps:
+  - tool: open-url
+    args:
+      url: "youmotion://reflection"
+  - wait: 1500

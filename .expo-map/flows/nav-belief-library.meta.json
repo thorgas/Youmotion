@@ -1,0 +1,13 @@
+{
+  "formatVersion": 2,
+  "name": "nav-belief-library",
+  "route": "belief-library",
+  "title": "Navigate to /belief-library",
+  "device": "iPhone 17 Pro",
+  "steps": {
+    "1": {
+      "capture": "belief-library.png",
+      "note": "Genuine empty state for a profile without custom beliefs"
+    }
+  }
+}

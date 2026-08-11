@@ -1,0 +1,12 @@
+{
+  "formatVersion": 2,
+  "name": "nav-onboarding-example",
+  "route": "onboarding-example",
+  "title": "Navigate to /onboarding-example",
+  "device": "iPhone 17 Pro",
+  "steps": {
+    "1": {
+      "capture": "onboarding-example.png"
+    }
+  }
+}

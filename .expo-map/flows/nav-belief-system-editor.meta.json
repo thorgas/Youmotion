@@ -1,0 +1,13 @@
+{
+  "formatVersion": 2,
+  "name": "nav-belief-system-editor",
+  "route": "belief-system-editor",
+  "title": "Navigate to /belief-system-editor",
+  "device": "iPhone 17 Pro",
+  "steps": {
+    "1": {
+      "capture": "belief-system-editor.png",
+      "note": "Bare deep link lacks reflection actor context"
+    }
+  }
+}

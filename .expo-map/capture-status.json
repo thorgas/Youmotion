@@ -1,0 +1,65 @@
+{
+  "(tabs)/analytics": {
+    "status": "ok"
+  },
+  "(tabs)/history": {
+    "status": "ok"
+  },
+  "(tabs)/settings": {
+    "status": "ok"
+  },
+  "(tabs)/today": {
+    "status": "ok"
+  },
+  "belief-library-editor": {
+    "status": "ok"
+  },
+  "belief-library": {
+    "status": "empty-state",
+    "note": "The local profile has no custom limiting beliefs yet."
+  },
+  "belief-system-catalog": {
+    "status": "error-boundary",
+    "needsNavigation": true,
+    "note": "A bare deep link has no active reflection actor context. Reach this screen through a staged reflection and belief-system selection."
+  },
+  "belief-system-editor": {
+    "status": "error-boundary",
+    "needsNavigation": true,
+    "note": "A bare deep link has no active reflection actor context. Reach this screen through a staged reflection and belief-system selection."
+  },
+  "belief-system": {
+    "status": "error-boundary",
+    "needsNavigation": true,
+    "note": "A bare deep link has no active reflection actor context. Reach this screen by continuing a staged reflection."
+  },
+  "guiding-belief": {
+    "status": "error-boundary",
+    "needsNavigation": true,
+    "note": "A bare deep link has no active reflection actor context. Reach this screen by continuing a staged reflection."
+  },
+  "index": {
+    "status": "error-boundary",
+    "needsNavigation": true,
+    "note": "The root route is an XState-to-Router synchronization entry and does not render a standalone screen from a bare deep link."
+  },
+  "onboarding-example": {
+    "status": "ok"
+  },
+  "onboarding-pulse": {
+    "status": "ok"
+  },
+  "onboarding": {
+    "status": "loading",
+    "note": "The onboarding welcome screen rendered, but the retained capture includes Metro's transient Refreshing banner."
+  },
+  "reflection": {
+    "status": "ok",
+    "note": "Captured through the real Today emotion-star interaction so the reflection actor context is present."
+  },
+  "success": {
+    "status": "error-boundary",
+    "needsNavigation": true,
+    "note": "A bare deep link has no completed reflection actor context. Reach this screen by completing a staged reflection."
+  }
+}

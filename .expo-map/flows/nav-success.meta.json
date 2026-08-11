@@ -1,0 +1,13 @@
+{
+  "formatVersion": 2,
+  "name": "nav-success",
+  "route": "success",
+  "title": "Navigate to /success",
+  "device": "iPhone 17 Pro",
+  "steps": {
+    "1": {
+      "capture": "success.png",
+      "note": "Bare deep link lacks completed reflection actor context"
+    }
+  }
+}

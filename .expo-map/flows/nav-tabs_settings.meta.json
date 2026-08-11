@@ -1,0 +1,13 @@
+{
+  "formatVersion": 2,
+  "name": "nav-tabs_settings",
+  "route": "(tabs)/settings",
+  "title": "Navigate to /settings",
+  "device": "iPhone 17 Pro",
+  "steps": {
+    "1": {
+      "capture": "tabs_settings.png",
+      "note": "Settings tab after hydration"
+    }
+  }
+}

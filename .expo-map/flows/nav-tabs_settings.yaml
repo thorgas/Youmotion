@@ -1,0 +1,5 @@
+steps:
+  - tool: open-url
+    args:
+      url: "youmotion://settings"
+  - wait: 1500

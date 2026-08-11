@@ -1,0 +1,5 @@
+steps:
+  - tool: open-url
+    args:
+      url: "youmotion://belief-library-editor"
+  - wait: 1500

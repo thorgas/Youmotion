@@ -1,0 +1,13 @@
+{
+  "formatVersion": 2,
+  "name": "nav-reflection",
+  "route": "reflection",
+  "title": "Navigate to /reflection",
+  "device": "iPhone 17 Pro",
+  "steps": {
+    "1": {
+      "capture": "reflection.png",
+      "note": "The committed capture was reached through the Today emotion star so actor context was present"
+    }
+  }
+}

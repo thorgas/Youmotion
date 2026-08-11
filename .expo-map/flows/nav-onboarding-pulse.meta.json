@@ -1,0 +1,12 @@
+{
+  "formatVersion": 2,
+  "name": "nav-onboarding-pulse",
+  "route": "onboarding-pulse",
+  "title": "Navigate to /onboarding-pulse",
+  "device": "iPhone 17 Pro",
+  "steps": {
+    "1": {
+      "capture": "onboarding-pulse.png"
+    }
+  }
+}

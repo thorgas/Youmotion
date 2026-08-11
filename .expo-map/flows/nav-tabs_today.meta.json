@@ -1,0 +1,13 @@
+{
+  "formatVersion": 2,
+  "name": "nav-tabs_today",
+  "route": "(tabs)/today",
+  "title": "Navigate to /today",
+  "device": "iPhone 17 Pro",
+  "steps": {
+    "1": {
+      "capture": "tabs_today.png",
+      "note": "Today tab after hydration"
+    }
+  }
+}
