@@ -54,7 +54,7 @@ const commands = {
 
 const samples = [];
 
-function run(tool, round, order) {
+function run({ tool, round, order }) {
   const specification = commands[tool];
   const startedAt = new Date().toISOString();
   const start = performance.now();
@@ -96,7 +96,7 @@ for (let round = 1; round <= rounds; round += 1) {
   const order = round % 2 === 1
     ? ['argent', 'maestro']
     : ['maestro', 'argent'];
-  order.forEach((tool, index) => run(tool, round, index + 1));
+  order.forEach((tool, index) => run({ tool, round, order: index + 1 }));
 }
 
 const definitionMetrics = Object.fromEntries(
