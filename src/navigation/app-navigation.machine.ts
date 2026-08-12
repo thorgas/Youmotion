@@ -2154,5 +2154,9 @@ export function routeForStateValue(value: StateValue) {
   if (matchesState({ [NAVIGATION_STATES.TABS]: NAVIGATION_STATES.HISTORY }, value)) return APP_ROUTES.HISTORY;
   if (matchesState({ [NAVIGATION_STATES.TABS]: NAVIGATION_STATES.ANALYTICS }, value)) return APP_ROUTES.ANALYTICS;
   if (matchesState({ [NAVIGATION_STATES.TABS]: NAVIGATION_STATES.SETTINGS }, value)) return APP_ROUTES.SETTINGS;
-  return APP_ROUTES.TODAY;
+  if (
+    matchesState(NAVIGATION_STATES.STARTING, value)
+    || matchesState({ [NAVIGATION_STATES.TABS]: NAVIGATION_STATES.TODAY }, value)
+  ) return APP_ROUTES.TODAY;
+  throw new Error(`Unhandled app navigation state: ${JSON.stringify(value)}`);
 }
