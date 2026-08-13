@@ -277,6 +277,8 @@ export const REMINDER_EVENTS = Object.freeze({
   SCHEDULE_UPDATED: literal('reminder.scheduleUpdated'),
   ASSIGNMENT_TOGGLED: literal('reminder.assignmentToggled'),
   ASSIGNMENT_UPDATED: literal('reminder.assignmentUpdated'),
+  ASSIGNMENT_DELETE_REQUESTED: literal('reminder.assignmentDeleteRequested'),
+  ASSIGNMENT_DELETED: literal('reminder.assignmentDeleted'),
   RECONCILE_REQUESTED: literal('reminder.reconcileRequested'),
   OPERATION_FAILED: literal('reminder.operationFailed'),
   DONE: literal('reminder.done'),

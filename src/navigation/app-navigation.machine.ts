@@ -101,6 +101,7 @@ import {
 } from '@/features/settings/infrastructure/app-settings.repository';
 import {
   activateReminder,
+  deleteReminder,
   setReminderAssignmentEnabled,
   updateReminderSchedule,
   type ReminderTarget,
@@ -714,6 +715,13 @@ export const appNavigationMachine = setup({
         assignmentId: ReminderAssignmentId,
       })),
       [REMINDER_EVENTS.ASSIGNMENT_UPDATED]: Schema.standardSchemaV1(Schema.Struct({
+        assignments: ReminderAssignmentListSchema,
+      })),
+      [REMINDER_EVENTS.ASSIGNMENT_DELETE_REQUESTED]: Schema.standardSchemaV1(Schema.Struct({
+        assignmentId: ReminderAssignmentId,
+      })),
+      [REMINDER_EVENTS.ASSIGNMENT_DELETED]: Schema.standardSchemaV1(Schema.Struct({
+        schedules: ReminderScheduleListSchema,
         assignments: ReminderAssignmentListSchema,
       })),
       [REMINDER_EVENTS.RECONCILE_REQUESTED]: EmptyEventSchema,
@@ -1839,6 +1847,37 @@ export const appNavigationMachine = setup({
         [REMINDER_EVENTS.ASSIGNMENT_UPDATED]: {
           context: ({ event }) => ({
             reminderAssignments: event.assignments,
+            reminderError: null,
+          }),
+        },
+        [REMINDER_EVENTS.ASSIGNMENT_DELETE_REQUESTED]: ({ context, event, self }, enq) => {
+          const assignment = context.reminderAssignments.find(
+            (candidate) => candidate.id === event.assignmentId,
+          );
+          if (assignment) enq(() => {
+            void deleteReminder({
+              assignment,
+              assignments: context.reminderAssignments,
+              locale: appSettingsStore.getSnapshot().context.locale,
+              schedules: context.reminderSchedules,
+              statements: context.beliefStatements,
+            }).then(
+              ({ assignments, schedules }) => self.send({
+                type: REMINDER_EVENTS.ASSIGNMENT_DELETED,
+                assignments,
+                schedules,
+              }),
+              () => self.send({
+                type: REMINDER_EVENTS.OPERATION_FAILED,
+                message: 'This reminder could not be deleted.',
+              }),
+            );
+          });
+        },
+        [REMINDER_EVENTS.ASSIGNMENT_DELETED]: {
+          context: ({ event }) => ({
+            reminderAssignments: event.assignments,
+            reminderSchedules: event.schedules,
             reminderError: null,
           }),
         },

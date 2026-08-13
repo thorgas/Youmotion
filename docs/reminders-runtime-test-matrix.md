@@ -29,6 +29,10 @@ This matrix defines the user-visible contract for device-local Pulse and positiv
 | Content privacy | Positive Leitsatz assignment uses the default preview setting | Notification is delivered | Notification contains neutral copy and a stable identifier, never the restrictive Leidsatz or positive text |
 | Content lifecycle | Positive Leitsatz changes or is archived | App is running or next returns to foreground | Content fingerprint changes or target disappears, so stale native requests are replaced or canceled |
 | Schedule lifecycle | Assignment is turned off | User taps Turn off | Persisted assignment becomes disabled and all derived requests for it are canceled |
+| Reminder deletion | An active reminder exists | User taps Delete | A native confirmation offers Cancel and a destructive Delete action; Cancel preserves the reminder and its native requests |
+| Reminder deletion | The user confirms deletion | Assignment storage succeeds | Only that reminder disappears, its derived native requests are canceled, and an unused owned schedule is removed |
+| Legacy schedule deletion | Two assignments still reference one shared schedule | The user deletes one reminder | The selected assignment is removed while the shared schedule and other reminder remain intact |
+| Reminder deletion failure | The user confirms deletion | Assignment storage fails | The reminder remains visible and an error is shown instead of claiming that deletion succeeded |
 | Schedule ownership | Two reminders were created from the same schedule values | User edits one reminder | Only that reminder's owned copy changes; the other reminder keeps its existing days and times |
 | Legacy schedule ownership | Persisted assignments still reference one shared schedule | User edits one of them | A private copy is created for the edited reminder before native requests are reconciled |
 | Clock change | Locale, time zone, or UTC offset changes | App next starts or returns to foreground | Fingerprints change and weekly wall-clock requests are rebuilt for the current device context |

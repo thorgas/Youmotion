@@ -5319,6 +5319,48 @@
       "translations": [{ "translation": "Leitsatz-Erinnerung erstellen", "variations": {} }],
       "types": []
     },
+    "GXRSergzbUp6LaHoNSEnHw==": {
+      "description": "Button cancelling reminder deletion",
+      "tokens": [],
+      "translations": [{ "translation": "Abbrechen", "variations": {} }],
+      "types": []
+    },
+    "UVtK4eSGECXvE3iVFKvdNg==": {
+      "description": "Button permanently deleting one reminder",
+      "tokens": [],
+      "translations": [{ "translation": "Löschen", "variations": {} }],
+      "types": []
+    },
+    "UmmQveadRCvLokDe8PN4Tg==": {
+      "description": "Title confirming deletion of one reminder",
+      "tokens": [],
+      "translations": [{ "translation": "Diese Erinnerung löschen?", "variations": {} }],
+      "types": []
+    },
+    "YpeLB0Xr9ShmhQsDZU9elw==": {
+      "description": "Explanation in reminder deletion confirmation",
+      "tokens": [],
+      "translations": [{ "translation": "Die geplanten Mitteilungen werden beendet und diese Erinnerung wird dauerhaft von diesem Gerät entfernt.", "variations": {} }],
+      "types": []
+    },
+    "Lh3AsG94FxbD9vkL70Cjqw==": {
+      "description": "Visible button for permanently deleting one reminder",
+      "tokens": [],
+      "translations": [{ "translation": "Löschen", "variations": {} }],
+      "types": []
+    },
+    "r4oLhHrGlCqE2AQcrFn/wA==": {
+      "description": "Accessibility label for permanently deleting one reminder",
+      "tokens": [],
+      "translations": [{ "translation": "Erinnerung löschen", "variations": {} }],
+      "types": []
+    },
+    "VSKcbJD8Nguow8hdfcn1WQ==": {
+      "description": "Reminder change failure message",
+      "tokens": [],
+      "translations": [{ "translation": "Deine Änderung an der Erinnerung konnte nicht gespeichert werden.", "variations": {} }],
+      "types": []
+    },
     "NWZgafhJ8d7AkYvs+uFVXQ==": {
       "description": "Empty reminder settings explanation",
       "status": "new",

@@ -4,6 +4,42 @@ This file records source-of-truth examples and continuity rules for this repo.
 
 ## Active Patterns
 
+### Pattern: destructive-action-confirmation
+
+- **Status:** active
+- **Scope:** `src/features/*/ui/*.{ts,tsx}`
+- **Enforcement:** changed-files
+- **Default check:** changed-files
+- **Source of truth:**
+  - `src/features/settings/ui/belief-library-removal.ts` - canonical native confirmation for removing one user-owned item.
+  - `src/features/settings/ui/belief-library-screen.tsx` - canonical visible destructive action beside a primary edit action.
+  - `src/features/check-in/ui/check-in-deletion.ts` - canonical permanent-delete wording and destructive alert role.
+- **Applies to:**
+  - User-triggered deletion or removal of one locally persisted item.
+- **Do not apply to:**
+  - `src/features/data-safety/ui/data-safety-controls.tsx` - deleting all journal data uses an actor-owned inline confirmation because its scope and recovery guidance are larger.
+- **Rule summary:** Show an explicit, clearly labeled destructive action, then require a native confirmation alert with Cancel first and a destructive final action. Explain the concrete local consequence before dispatching the persistence event.
+- **Required shape:**
+  - The visible action uses `palette.danger` and the same restrained outlined hierarchy as nearby actions.
+  - The alert provides a cancel button with `style: 'cancel'` before the final button with `style: 'destructive'`.
+  - Only the confirmed callback dispatches the domain or navigation event that mutates storage.
+  - Copy names the item and states what disappears or remains.
+- **Allowed variations:**
+  - High-impact bulk deletion may use an actor-owned inline confirmation surface instead of `Alert.alert`.
+- **Severity:**
+  - high: deletion occurs without confirmation or the destructive action is visually ambiguous.
+  - medium: consequence copy is vague or the destructive button role is missing.
+  - low: action spacing differs from the nearest card pattern.
+- **Baseline exceptions:**
+  - `src/features/check-in/ui/history-screen.tsx` - long-press is retained for dense history rows, with an accessibility hint and the same native confirmation.
+- **Violation signals:**
+  - A delete/remove event is sent directly from a visible button without a confirmation boundary.
+  - An `Alert.alert` delete action lacks `style: 'destructive'` or Cancel is absent.
+- **CI behavior:** Fail changed destructive flows that bypass confirmation; existing exceptions are advisory.
+- **Fix strategy:** Extract localized confirmation copy into the owning UI feature, route the confirmed callback through the existing actor event, and reuse the nearest outlined destructive-button styles.
+- **Open questions:**
+  - None.
+
 ### Pattern: persisted-data-compatibility-migrations
 
 - **Status:** active

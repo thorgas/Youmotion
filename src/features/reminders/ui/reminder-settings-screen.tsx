@@ -14,6 +14,11 @@ import { palette, type } from '@/features/check-in/ui/theme';
 import { useAppLocale } from '@/localization/app-locale-provider';
 import { formatWeekday } from '@/localization/date-copy';
 import { useAppNavigationActor } from '@/navigation/app-navigation.provider';
+import {
+  confirmReminderDeletion,
+  deleteReminderAccessibilityLabel,
+  deleteReminderText,
+} from './reminder-deletion';
 
 const _selectReminderContext = (
   snapshot: ReturnType<ReturnType<typeof useAppNavigationActor>['getSnapshot']>,
@@ -63,6 +68,14 @@ export function ReminderSettingsScreen() {
               type: REMINDER_EVENTS.ASSIGNMENT_TOGGLED,
               assignmentId: assignment.id,
             });
+            const _delete = () => actor.send({
+              type: REMINDER_EVENTS.ASSIGNMENT_DELETE_REQUESTED,
+              assignmentId: assignment.id,
+            });
+            const _confirmDelete = () => confirmReminderDeletion(_delete);
+            const deleteAccessibilityLabel = statement
+              ? `${deleteReminderAccessibilityLabel()}: “${statement}”`
+              : deleteReminderAccessibilityLabel();
             return (
               <View key={assignment.id} style={styles.scheduleCard}>
                 <Text style={styles.assignmentSectionLabel}>
@@ -101,18 +114,29 @@ export function ReminderSettingsScreen() {
                       ? <fbt desc="Enabled reminder assignment status">Active</fbt>
                       : <fbt desc="Disabled reminder assignment status">Off</fbt>}
                   </Text>
-                  <PressableScale
-                    accessibilityRole="button"
-                    onPress={_toggle}
-                    style={styles.toggleAction}
-                    testID={`reminder-assignment-toggle-${assignment.id}`}
-                  >
-                    <Text style={styles.toggleActionText}>
-                      {assignment.enabled
-                        ? <fbt desc="Turn reminder assignment off button">Turn off</fbt>
-                        : <fbt desc="Turn reminder assignment on button">Turn on</fbt>}
-                    </Text>
-                  </PressableScale>
+                  <View style={styles.assignmentActions}>
+                    <PressableScale
+                      accessibilityRole="button"
+                      onPress={_toggle}
+                      style={styles.toggleAction}
+                      testID={`reminder-assignment-toggle-${assignment.id}`}
+                    >
+                      <Text style={styles.toggleActionText}>
+                        {assignment.enabled
+                          ? <fbt desc="Turn reminder assignment off button">Turn off</fbt>
+                          : <fbt desc="Turn reminder assignment on button">Turn on</fbt>}
+                      </Text>
+                    </PressableScale>
+                    <PressableScale
+                      accessibilityLabel={deleteAccessibilityLabel}
+                      accessibilityRole="button"
+                      onPress={_confirmDelete}
+                      style={styles.deleteAction}
+                      testID={`reminder-assignment-delete-${assignment.id}`}
+                    >
+                      <Text style={styles.deleteActionText}>{deleteReminderText()}</Text>
+                    </PressableScale>
+                  </View>
                 </View>
               </View>
             );
@@ -125,7 +149,11 @@ export function ReminderSettingsScreen() {
           ) : null}
           {error ? (
             <View style={styles.errorCard}>
-              <Text style={styles.error}><fbt desc="Reminder loading failure message">Your reminders could not be loaded.</fbt></Text>
+              <Text style={styles.error}>
+                {error === 'Your reminders could not be loaded.'
+                  ? <fbt desc="Reminder loading failure message">Your reminders could not be loaded.</fbt>
+                  : <fbt desc="Reminder change failure message">Your reminder change could not be saved.</fbt>}
+              </Text>
               <PressableScale
                 accessibilityRole="button"
                 onPress={_retry}
@@ -168,8 +196,11 @@ const styles = StyleSheet.create({
   assignmentCopy: { flex: 1, gap: 2 },
   assignmentTitle: { fontFamily: type.medium, color: palette.ink, fontSize: 15, lineHeight: 21 },
   assignmentStatus: { fontFamily: type.regular, color: palette.inkMuted, fontSize: 13, lineHeight: 19 },
+  assignmentActions: { flexDirection: 'row', gap: 8 },
   toggleAction: { minHeight: 40, justifyContent: 'center', borderWidth: 1, borderColor: palette.hairline, borderRadius: 14, borderCurve: 'continuous', paddingHorizontal: 12 },
   toggleActionText: { fontFamily: type.semibold, color: palette.ink, fontSize: 12 },
+  deleteAction: { minHeight: 40, justifyContent: 'center', borderWidth: 1, borderColor: palette.hairline, borderRadius: 14, borderCurve: 'continuous', paddingHorizontal: 12 },
+  deleteActionText: { fontFamily: type.semibold, color: palette.danger, fontSize: 12 },
   empty: { borderWidth: 1, borderColor: palette.hairline, borderRadius: 22, borderCurve: 'continuous', padding: 20, gap: 8 },
   error: { fontFamily: type.medium, color: palette.danger, fontSize: 14 },
   errorCard: { alignItems: 'flex-start', gap: 8 },

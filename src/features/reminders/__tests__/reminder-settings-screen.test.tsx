@@ -1,4 +1,5 @@
-import { fireEvent, render, screen } from '@testing-library/react-native';
+import { act, fireEvent, render, screen } from '@testing-library/react-native';
+import { Alert } from 'react-native';
 import { createActor, waitFor, type Actor } from 'xstate';
 
 import {
@@ -137,6 +138,8 @@ async function renderSettings(actor: Actor<typeof appNavigationMachine>) {
 describe('reminder settings screen', () => {
   beforeAll(() => configureAppLocale(appSettingsStore));
 
+  afterEach(() => jest.restoreAllMocks());
+
   beforeEach(() => {
     resetSurrealDatabaseMock();
     mockSurrealQuery.mockImplementation((surql: string) => {
@@ -229,5 +232,50 @@ describe('reminder settings screen', () => {
     expect(updated.reminderSchedules.find(
       (candidate) => candidate.id === pulseAssignment?.scheduleId,
     )?.name).toBe('Nur morgens');
+  });
+
+  it('requires destructive confirmation before deleting only one reminder', async () => {
+    const alert = jest.spyOn(Alert, 'alert');
+    const actor = await actorAtReminderSettings();
+    await renderSettings(actor);
+
+    await fireEvent.press(screen.getByRole('button', {
+      name: 'Erinnerung löschen: “I can ask for support.”',
+    }));
+
+    expect(alert).toHaveBeenLastCalledWith(
+      'Diese Erinnerung löschen?',
+      'Die geplanten Mitteilungen werden beendet und diese Erinnerung wird dauerhaft von diesem Gerät entfernt.',
+      expect.any(Array),
+    );
+    expect(actor.getSnapshot().context.reminderAssignments).toHaveLength(3);
+    const buttons = alert.mock.calls[alert.mock.calls.length - 1]?.[2];
+    expect(buttons).toEqual([
+      expect.objectContaining({ text: 'Abbrechen', style: 'cancel' }),
+      expect.objectContaining({ text: 'Löschen', style: 'destructive' }),
+    ]);
+    await act(() => buttons?.[1]?.onPress?.());
+    await waitFor(actor, (snapshot) => snapshot.context.reminderAssignments.length === 2);
+
+    expect(actor.getSnapshot().context.reminderAssignments.some(
+      (assignment) => assignment.id === assignments[1]?.id,
+    )).toBe(false);
+    expect(actor.getSnapshot().context.reminderSchedules).toEqual([schedule]);
+  });
+
+  it('keeps the reminder visible when its local deletion fails', async () => {
+    const alert = jest.spyOn(Alert, 'alert');
+    const actor = await actorAtReminderSettings();
+    await renderSettings(actor);
+    mockSurrealQuery.mockRejectedValueOnce(new Error('storage unavailable'));
+
+    await fireEvent.press(screen.getByTestId('reminder-assignment-delete-support'));
+    const buttons = alert.mock.calls[alert.mock.calls.length - 1]?.[2];
+    await act(() => buttons?.[1]?.onPress?.());
+    await waitFor(actor, (snapshot) => snapshot.context.reminderError !== null);
+
+    expect(actor.getSnapshot().context.reminderAssignments).toHaveLength(3);
+    expect(screen.getByText('Deine Änderung an der Erinnerung konnte nicht gespeichert werden.'))
+      .toBeOnTheScreen();
   });
 });

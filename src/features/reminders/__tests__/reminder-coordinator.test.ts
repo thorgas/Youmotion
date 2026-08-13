@@ -17,6 +17,7 @@ import {
 } from '../domain/reminder-schedule';
 import {
   activateReminder,
+  deleteReminder,
   setReminderAssignmentEnabled,
   updateReminderSchedule,
 } from '../application/reminder-coordinator';
@@ -26,6 +27,8 @@ import * as reminderScheduler from '../infrastructure/local-reminder.scheduler';
 jest.mock('../infrastructure/reminder.repository', () => {
   const effect = jest.requireActual<typeof import('effect/Effect')>('effect/Effect');
   return {
+    deleteReminderAssignment: jest.fn(() => effect.void),
+    deleteReminderSchedule: jest.fn(() => effect.void),
     persistReminderAssignment: jest.fn(() => effect.void),
     persistReminderSchedule: jest.fn(() => effect.void),
   };
@@ -37,6 +40,8 @@ jest.mock('../infrastructure/local-reminder.scheduler', () => ({
 
 const persistedAssignment = jest.mocked(reminderRepository.persistReminderAssignment);
 const persistedSchedule = jest.mocked(reminderRepository.persistReminderSchedule);
+const deletedAssignment = jest.mocked(reminderRepository.deleteReminderAssignment);
+const deletedSchedule = jest.mocked(reminderRepository.deleteReminderSchedule);
 const reconcile = jest.mocked(reminderScheduler.reconcileReminderNotifications);
 const createdAt = ReminderScheduleTimestamp.make('2026-08-13T08:00:00.000Z');
 const beliefSystemId = CustomBeliefSystemId.make('custom-support');
@@ -169,5 +174,50 @@ describe('reminder coordinator', () => {
       enabled: false,
     }));
     expect(reconcile).toHaveBeenCalledWith(expect.objectContaining({ assignments }));
+  });
+
+  it('deletes one reminder and its unused owned schedule before reconciling', async () => {
+    const owned = { ...existing, scheduleId: schedule.id };
+
+    const result = await deleteReminder({
+      assignment: owned,
+      assignments: [owned],
+      locale: APP_LOCALES.ENGLISH,
+      schedules: [schedule],
+      statements,
+    });
+
+    expect(result).toEqual({ assignments: [], schedules: [] });
+    expect(deletedAssignment).toHaveBeenCalledWith(owned.id);
+    expect(deletedSchedule).toHaveBeenCalledWith(schedule.id);
+    expect(reconcile).toHaveBeenCalledWith(expect.objectContaining({
+      assignments: [],
+      schedules: [],
+    }));
+  });
+
+  it('preserves a legacy shared schedule when deleting one reminder', async () => {
+    const pulse = {
+      id: ReminderAssignmentId.make('pulse-assignment'),
+      schemaVersion: 1,
+      scheduleId: schedule.id,
+      targetKind: REMINDER_TARGET_KINDS.PULSE,
+      enabled: true,
+      createdAt,
+      updatedAt: createdAt,
+    } satisfies ReminderAssignment;
+    const guiding = { ...existing, scheduleId: schedule.id };
+
+    const result = await deleteReminder({
+      assignment: guiding,
+      assignments: [pulse, guiding],
+      locale: APP_LOCALES.ENGLISH,
+      schedules: [schedule],
+      statements,
+    });
+
+    expect(result).toEqual({ assignments: [pulse], schedules: [schedule] });
+    expect(deletedAssignment).toHaveBeenCalledWith(guiding.id);
+    expect(deletedSchedule).not.toHaveBeenCalled();
   });
 });

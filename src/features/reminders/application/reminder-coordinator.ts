@@ -18,6 +18,8 @@ import {
   type ReminderSchedule,
 } from '../domain/reminder-schedule';
 import {
+  deleteReminderAssignment,
+  deleteReminderSchedule,
   persistReminderAssignment,
   persistReminderSchedule,
 } from '../infrastructure/reminder.repository';
@@ -204,4 +206,37 @@ export async function setReminderAssignmentEnabled({
     statements,
   });
   return nextAssignments;
+}
+
+export async function deleteReminder({
+  assignment,
+  assignments,
+  locale,
+  schedules,
+  statements,
+}: {
+  assignment: ReminderAssignment;
+  assignments: readonly ReminderAssignment[];
+  locale: AppLocale;
+  schedules: readonly ReminderSchedule[];
+  statements: readonly BeliefStatement[];
+}) {
+  const nextAssignments = assignments.filter((candidate) => candidate.id !== assignment.id);
+  const scheduleStillUsed = nextAssignments.some(
+    (candidate) => candidate.scheduleId === assignment.scheduleId,
+  );
+  const nextSchedules = scheduleStillUsed
+    ? schedules
+    : schedules.filter((schedule) => schedule.id !== assignment.scheduleId);
+  await Effect.runPromise(deleteReminderAssignment(assignment.id));
+  if (!scheduleStillUsed) {
+    await Effect.runPromise(deleteReminderSchedule(assignment.scheduleId));
+  }
+  await reconcileReminderNotifications({
+    assignments: nextAssignments,
+    locale,
+    schedules: nextSchedules,
+    statements,
+  });
+  return { assignments: nextAssignments, schedules: nextSchedules };
 }
