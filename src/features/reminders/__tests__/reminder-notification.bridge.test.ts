@@ -65,6 +65,7 @@ describe('reminder notification bridge', () => {
     expect(actor.send).toHaveBeenCalledTimes(1);
     expect(actor.send).toHaveBeenCalledWith({
       type: REMINDER_EVENTS.NOTIFICATION_OPENED,
+      assignmentId: 'assignment-1',
       targetKind: REMINDER_TARGET_KINDS.GUIDING_BELIEF,
       beliefSystemId: 'custom-support',
     });

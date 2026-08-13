@@ -6,6 +6,9 @@ This matrix defines the user-visible contract for device-local Pulse and positiv
 | --- | --- | --- | --- |
 | Module initialization | Notification response arrives before the navigation actor binds | Cold launch from a Youmotion reminder | One validated target is buffered, delivered once after binding, and opens the Pulse or positive Leitsatz destination |
 | Module initialization | Foreign, malformed, or repeated response | Cold or warm notification open | No navigation occurs for foreign/malformed data; a repeated fingerprint is ignored |
+| Focused notification | A Leitsatz notification is tapped before belief or reminder hydration finishes | Cold launch | The app stays on a loading focused-Leitsatz destination, then resolves the one assignment and never falls back to the full Leitsatz library |
+| Focused notification | Several supportive Leitsätze exist | User taps one Leitsatz reminder | Only that positive Leitsatz is shown; Back returns to Today and the surface remains available for later per-Leitsatz patterns or analytics |
+| Focused reminder edit | The tapped assignment and schedule have hydrated | User taps Edit reminder | Its owned days, times, name, and preview choice open directly without another permission prompt |
 | Permission | Undetermined | User accepts the explanatory screen | Native permission is requested before any schedule can be selected or persisted |
 | Permission | Denied or permanently denied | Permission check finishes | The saved Leitsatz remains intact, no assignment is created, and repair actions expose system settings and a recheck |
 | Permission | Granted | Permission check finishes | Existing schedules and the create-new choice become available |
@@ -27,6 +30,8 @@ This matrix defines the user-visible contract for device-local Pulse and positiv
 | Native projection | Owned requests match fingerprints | Reconciliation runs | Matching requests remain; missing requests are added; obsolete or duplicate owned requests are canceled; foreign requests are untouched |
 | Native projection | Permission is denied | App starts or foregrounds | Reconciliation does not schedule notifications |
 | Content privacy | Positive Leitsatz assignment uses the default preview setting | Notification is delivered | Notification contains neutral copy and a stable identifier, never the restrictive Leidsatz or positive text |
+| Content privacy | User enables the full preview for one Leitsatz reminder | Notification is delivered | Only that reminder displays its positive Leitsatz; other reminders retain their own preview choices |
+| Content projection | A reminder changes between general and full preview | Native reconciliation runs | Its fingerprint changes, old native requests are replaced, and the new copy is used on every selected day and time |
 | Content lifecycle | Positive Leitsatz changes or is archived | App is running or next returns to foreground | Content fingerprint changes or target disappears, so stale native requests are replaced or canceled |
 | Schedule lifecycle | Assignment is turned off | User taps Turn off | Persisted assignment becomes disabled and all derived requests for it are canceled |
 | Reminder deletion | An active reminder exists | User taps Delete | A native confirmation offers Cancel and a destructive Delete action; Cancel preserves the reminder and its native requests |

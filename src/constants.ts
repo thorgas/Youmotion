@@ -265,6 +265,7 @@ export const REMINDER_EVENTS = Object.freeze({
   SCHEDULE_EDIT_REQUESTED: literal('reminder.scheduleEditRequested'),
   NEW_SCHEDULE_REQUESTED: literal('reminder.newScheduleRequested'),
   SCHEDULE_NAME_CHANGED: literal('reminder.scheduleNameChanged'),
+  PREVIEW_CHANGED: literal('reminder.previewChanged'),
   WEEKDAY_TOGGLED: literal('reminder.weekdayToggled'),
   TIME_SHIFTED: literal('reminder.timeShifted'),
   TIME_PICKER_REQUESTED: literal('reminder.timePickerRequested'),

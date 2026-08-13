@@ -148,6 +148,7 @@ const AppContextSchema = Schema.Struct({
   saveDestination: Schema.Literal(...Object.values(CHECK_IN_SAVE_DESTINATIONS)),
   beliefSystemId: Schema.NullOr(BeliefSystemId),
   beliefStatements: BeliefStatementListSchema,
+  beliefStatementsHydrated: Schema.Boolean,
   beliefStatementDraft: Schema.String,
   beliefStatementDraftId: Schema.NullOr(CustomBeliefSystemId),
   guidingBeliefStatementDraft: Schema.String,
@@ -163,10 +164,12 @@ const AppContextSchema = Schema.Struct({
   dataSafetyNotice: Schema.NullOr(Schema.String),
   reminderSchedules: ReminderScheduleListSchema,
   reminderAssignments: ReminderAssignmentListSchema,
+  reminderDataHydrated: Schema.Boolean,
   reminderTargetKind: Schema.Literal(...Object.values(REMINDER_TARGET_KINDS)),
   reminderTargetBeliefSystemId: Schema.NullOr(BeliefSystemId),
   reminderStartedFromSettings: Schema.Boolean,
   reminderAssignmentDraftId: Schema.NullOr(ReminderAssignmentId),
+  reminderShowFullTextDraft: Schema.Boolean,
   reminderScheduleNameDraft: Schema.String,
   reminderWeekdaysDraft: Schema.Array(ReminderWeekday),
   reminderTimesDraft: Schema.Array(ReminderLocalTime),
@@ -386,6 +389,7 @@ function activateSchedule({
     locale,
     schedule,
     schedules: context.reminderSchedules,
+    showFullText: context.reminderShowFullTextDraft,
     statements: context.beliefStatements,
     target,
   }).then(
@@ -680,6 +684,9 @@ export const appNavigationMachine = setup({
       [REMINDER_EVENTS.SCHEDULE_NAME_CHANGED]: Schema.standardSchemaV1(
         Schema.Struct({ name: Schema.String }),
       ),
+      [REMINDER_EVENTS.PREVIEW_CHANGED]: Schema.standardSchemaV1(
+        Schema.Struct({ showFullText: Schema.Boolean }),
+      ),
       [REMINDER_EVENTS.WEEKDAY_TOGGLED]: Schema.standardSchemaV1(
         Schema.Struct({ weekday: ReminderWeekday }),
       ),
@@ -733,6 +740,7 @@ export const appNavigationMachine = setup({
       [REMINDER_EVENTS.OPEN_PULSE_REQUESTED]: EmptyEventSchema,
       [REMINDER_EVENTS.EDIT_REQUESTED]: EmptyEventSchema,
       [REMINDER_EVENTS.NOTIFICATION_OPENED]: Schema.standardSchemaV1(Schema.Struct({
+        assignmentId: ReminderAssignmentId,
         targetKind: Schema.Literal(...Object.values(REMINDER_TARGET_KINDS)),
         beliefSystemId: Schema.optional(BeliefSystemId),
       })),
@@ -755,6 +763,7 @@ export const appNavigationMachine = setup({
     saveDestination: CHECK_IN_SAVE_DESTINATIONS.BELIEF_SYSTEM,
     beliefSystemId: null,
     beliefStatements: [],
+    beliefStatementsHydrated: false,
     beliefStatementDraft: '',
     beliefStatementDraftId: null,
     guidingBeliefStatementDraft: '',
@@ -770,10 +779,12 @@ export const appNavigationMachine = setup({
     dataSafetyNotice: null,
     reminderSchedules: [],
     reminderAssignments: [],
+    reminderDataHydrated: false,
     reminderTargetKind: REMINDER_TARGET_KINDS.PULSE,
     reminderTargetBeliefSystemId: null,
     reminderStartedFromSettings: false,
     reminderAssignmentDraftId: null,
+    reminderShowFullTextDraft: false,
     reminderScheduleNameDraft: '',
     reminderWeekdaysDraft: [2, 3, 4, 5, 6],
     reminderTimesDraft: [{ hour: 9, minute: 0 }],
@@ -840,10 +851,10 @@ export const appNavigationMachine = setup({
         schedules: context.reminderSchedules,
         statements: beliefStatements,
       }));
-      return { context: { beliefStatements } };
+      return { context: { beliefStatements, beliefStatementsHydrated: true } };
     },
     [CHECK_IN_EVENTS.BELIEF_STATEMENTS_HYDRATION_FAILED]: {
-      context: ({ event }) => ({ error: event.message }),
+      context: ({ event }) => ({ error: event.message, beliefStatementsHydrated: true }),
     },
     [REMINDER_EVENTS.HYDRATED]: ({ context, event }, enq) => {
       enq(() => reconcileStoredReminders({
@@ -854,11 +865,12 @@ export const appNavigationMachine = setup({
       return { context: {
         reminderSchedules: event.schedules,
         reminderAssignments: event.assignments,
+        reminderDataHydrated: true,
         reminderError: null,
       } };
     },
     [REMINDER_EVENTS.HYDRATION_FAILED]: {
-      context: ({ event }) => ({ reminderError: event.message }),
+      context: ({ event }) => ({ reminderDataHydrated: true, reminderError: event.message }),
     },
     [REMINDER_EVENTS.RECONCILE_REQUESTED]: ({ context }, enq) => {
       enq(() => reconcileStoredReminders({
@@ -867,21 +879,20 @@ export const appNavigationMachine = setup({
         statements: context.beliefStatements,
       }));
     },
-    [REMINDER_EVENTS.NOTIFICATION_OPENED]: ({ context, event }) => {
+    [REMINDER_EVENTS.NOTIFICATION_OPENED]: ({ event }) => {
       if (event.targetKind === REMINDER_TARGET_KINDS.PULSE) {
         return { target: `#appNavigation.${NAVIGATION_STATES.TABS}.${NAVIGATION_STATES.TODAY}` };
       }
       if (!event.beliefSystemId) return undefined;
-      const statement = beliefStatementForId({
-        beliefSystemId: event.beliefSystemId,
-        statements: context.beliefStatements,
-      });
-      return statement?.guidingStatement
-        ? {
-            target: `#appNavigation.${REMINDER_STATES.GUIDING_BELIEF}`,
-            context: { reminderTargetBeliefSystemId: event.beliefSystemId },
-          }
-        : { target: `#appNavigation.${BELIEF_LIBRARY_STATES.LIBRARY}` };
+      return {
+        target: `#appNavigation.${REMINDER_STATES.GUIDING_BELIEF}`,
+        context: {
+          reminderAssignmentDraftId: event.assignmentId,
+          reminderStartedFromSettings: false,
+          reminderTargetBeliefSystemId: event.beliefSystemId,
+          reminderTargetKind: REMINDER_TARGET_KINDS.GUIDING_BELIEF,
+        },
+      };
     },
     [CHECK_IN_EVENTS.DELETE_REQUESTED]: ({ event, self }, enq) => {
       enq(() => {
@@ -1780,6 +1791,7 @@ export const appNavigationMachine = setup({
             reminderTargetBeliefSystemId: null,
             reminderStartedFromSettings: true,
             reminderAssignmentDraftId: null,
+            reminderShowFullTextDraft: false,
             reminderError: null,
           },
         },
@@ -1811,6 +1823,15 @@ export const appNavigationMachine = setup({
             target: REMINDER_STATES.SCHEDULE_EDITOR,
             context: {
               reminderAssignmentDraftId: assignment.id,
+              reminderTargetKind: assignment.targetKind,
+              reminderTargetBeliefSystemId: assignment.targetKind
+                === REMINDER_TARGET_KINDS.GUIDING_BELIEF
+                ? assignment.beliefSystemId
+                : null,
+              reminderShowFullTextDraft: assignment.targetKind
+                === REMINDER_TARGET_KINDS.GUIDING_BELIEF
+                ? assignment.showFullText
+                : false,
               reminderStartedFromSettings: true,
               reminderScheduleNameDraft: schedule.name,
               reminderWeekdaysDraft: schedule.weekdays,
@@ -1897,6 +1918,7 @@ export const appNavigationMachine = setup({
           context: ({ event }) => ({
             reminderTargetKind: REMINDER_TARGET_KINDS.GUIDING_BELIEF,
             reminderTargetBeliefSystemId: event.beliefSystemId,
+            reminderShowFullTextDraft: false,
             reminderError: null,
           }),
         },
@@ -2040,11 +2062,16 @@ export const appNavigationMachine = setup({
       on: {
         [NAVIGATION_EVENTS.BACK_REQUESTED]: ({ context }) => ({
           target: context.reminderAssignmentDraftId
-            ? REMINDER_STATES.SETTINGS
+            ? context.reminderStartedFromSettings
+              ? REMINDER_STATES.SETTINGS
+              : REMINDER_STATES.GUIDING_BELIEF
             : REMINDER_STATES.SCHEDULE_PICKER,
         }),
         [REMINDER_EVENTS.SCHEDULE_NAME_CHANGED]: {
           context: ({ event }) => ({ reminderScheduleNameDraft: event.name }),
+        },
+        [REMINDER_EVENTS.PREVIEW_CHANGED]: {
+          context: ({ event }) => ({ reminderShowFullTextDraft: event.showFullText }),
         },
         [REMINDER_EVENTS.WEEKDAY_TOGGLED]: {
           context: ({ context, event }) => ({
@@ -2137,6 +2164,7 @@ export const appNavigationMachine = setup({
                 locale: appSettingsStore.getSnapshot().context.locale,
                 schedule,
                 schedules: context.reminderSchedules,
+                showFullText: context.reminderShowFullTextDraft,
                 statements: context.beliefStatements,
               }).then(
                 ({ assignments, schedules }) => self.send({
@@ -2168,12 +2196,16 @@ export const appNavigationMachine = setup({
             reminderError: null,
           },
         }),
-        [REMINDER_EVENTS.SCHEDULE_UPDATED]: ({ event }) => ({
-          target: REMINDER_STATES.SETTINGS,
+        [REMINDER_EVENTS.SCHEDULE_UPDATED]: ({ context, event }) => ({
+          target: context.reminderStartedFromSettings
+            ? REMINDER_STATES.SETTINGS
+            : REMINDER_STATES.GUIDING_BELIEF,
           context: {
             reminderSchedules: event.schedules,
             reminderAssignments: event.assignments,
-            reminderAssignmentDraftId: null,
+            reminderAssignmentDraftId: context.reminderStartedFromSettings
+              ? null
+              : context.reminderAssignmentDraftId,
             reminderError: null,
           },
         }),
@@ -2217,14 +2249,35 @@ export const appNavigationMachine = setup({
     [REMINDER_STATES.GUIDING_BELIEF]: {
       on: {
         [NAVIGATION_EVENTS.BACK_REQUESTED]: {
-          target: `#appNavigation.${BELIEF_LIBRARY_STATES.LIBRARY}`,
+          target: `#appNavigation.${NAVIGATION_STATES.TABS}.${NAVIGATION_STATES.TODAY}`,
         },
         [REMINDER_EVENTS.OPEN_PULSE_REQUESTED]: {
           target: `#appNavigation.${NAVIGATION_STATES.TABS}.${NAVIGATION_STATES.TODAY}`,
         },
-        [REMINDER_EVENTS.EDIT_REQUESTED]: {
-          target: REMINDER_STATES.REQUESTING_PERMISSION,
-          context: { reminderError: null },
+        [REMINDER_EVENTS.EDIT_REQUESTED]: ({ context }) => {
+          const assignment = context.reminderAssignments.find(
+            (candidate) => candidate.id === context.reminderAssignmentDraftId,
+          );
+          const schedule = assignment
+            ? context.reminderSchedules.find((candidate) => (
+                candidate.id === assignment.scheduleId
+              ))
+            : undefined;
+          if (!assignment || !schedule) return undefined;
+          return {
+            target: REMINDER_STATES.SCHEDULE_EDITOR,
+            context: {
+              reminderShowFullTextDraft: assignment.targetKind
+                === REMINDER_TARGET_KINDS.GUIDING_BELIEF
+                ? assignment.showFullText
+                : false,
+              reminderScheduleNameDraft: schedule.name,
+              reminderWeekdaysDraft: schedule.weekdays,
+              reminderTimesDraft: schedule.times,
+              reminderTimePickerIndex: null,
+              reminderError: null,
+            },
+          };
         },
       },
     },

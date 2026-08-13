@@ -5372,6 +5372,60 @@
         }
       ],
       "types": []
+    },
+    "xHKMFi/U6LXA1FUWsW6gog==": {
+      "description": "Leitsatz notification preview field label",
+      "tokens": [],
+      "translations": [{ "translation": "MITTEILUNGSVORSCHAU", "variations": {} }],
+      "types": []
+    },
+    "wtoC7bPCw29/Zac3Y0l+Pw==": {
+      "description": "Leitsatz notification preview privacy explanation",
+      "tokens": [],
+      "translations": [{ "translation": "Wähle, was für diese Erinnerung auf deinem Sperrbildschirm erscheinen darf.", "variations": {} }],
+      "types": []
+    },
+    "lw1kfMspk7swiX60zmMaVg==": {
+      "description": "General Leitsatz notification preview choice",
+      "tokens": [],
+      "translations": [{ "translation": "Allgemeine Nachricht", "variations": {} }],
+      "types": []
+    },
+    "F0mk8o1kfSS2m07NXpsU2g==": {
+      "description": "General Leitsatz notification preview explanation",
+      "tokens": [],
+      "translations": [{ "translation": "Dein Leitsatz bleibt auf dem Sperrbildschirm verborgen.", "variations": {} }],
+      "types": []
+    },
+    "I9jcptbOmfFlvDnB5XreKQ==": {
+      "description": "Full Leitsatz notification preview choice",
+      "tokens": [],
+      "translations": [{ "translation": "Leitsatz anzeigen", "variations": {} }],
+      "types": []
+    },
+    "Dtb0NexK8Yc7uuZf3e+J+w==": {
+      "description": "Full Leitsatz notification preview explanation",
+      "tokens": [],
+      "translations": [{ "translation": "Der vollständige Leitsatz erscheint in der Mitteilung.", "variations": {} }],
+      "types": []
+    },
+    "wNqDgf68rlO5Fjhst3OakA==": {
+      "description": "Loading notification target copy",
+      "tokens": [],
+      "translations": [{ "translation": "Dein Leitsatz wird vorbereitet…", "variations": {} }],
+      "types": []
+    },
+    "aLZYjPR2PLch/2hA570onw==": {
+      "description": "New positive Leitsatz reminder card label",
+      "tokens": [],
+      "translations": [{ "translation": "DEIN NEUER LEITSATZ", "variations": {} }],
+      "types": []
+    },
+    "LnfVGhfeN1d5ngilrV8H4A==": {
+      "description": "Focused positive Leitsatz reminder card label",
+      "tokens": [],
+      "translations": [{ "translation": "DEIN LEITSATZ", "variations": {} }],
+      "types": []
     }
   }
 }

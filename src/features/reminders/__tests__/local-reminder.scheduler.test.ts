@@ -244,4 +244,45 @@ describe('local reminder scheduler', () => {
     expect(JSON.stringify(mockedNotifications.scheduleNotificationAsync.mock.calls))
       .not.toContain('I must never need help.');
   });
+
+  it('replaces native requests when one reminder enables a full preview', async () => {
+    await reconcileReminderNotifications({
+      assignments: [assignment],
+      locale: 'en-US',
+      schedules: [schedule],
+      statements,
+    });
+    const generalFingerprint = mockedNotifications.scheduleNotificationAsync
+      .mock.calls[0]?.[0].content.data?.['fingerprint'];
+    expect(typeof generalFingerprint).toBe('string');
+    mockedNotifications.scheduleNotificationAsync.mockClear();
+    mockedNotifications.getAllScheduledNotificationsAsync.mockResolvedValueOnce([{
+      identifier: 'general-preview',
+      content: {
+        title: null,
+        subtitle: null,
+        body: null,
+        categoryIdentifier: null,
+        sound: null,
+        data: { owner: REMINDER_NOTIFICATION_OWNER, fingerprint: generalFingerprint },
+      },
+      trigger: null,
+    }]);
+
+    await reconcileReminderNotifications({
+      assignments: [{ ...assignment, showFullText: true }],
+      locale: 'en-US',
+      schedules: [schedule],
+      statements,
+    });
+
+    expect(mockedNotifications.cancelScheduledNotificationAsync)
+      .toHaveBeenCalledWith('general-preview');
+    expect(mockedNotifications.scheduleNotificationAsync).toHaveBeenCalledTimes(4);
+    expect(mockedNotifications.scheduleNotificationAsync).toHaveBeenCalledWith(
+      expect.objectContaining({
+        content: expect.objectContaining({ body: 'I may receive support.' }),
+      }),
+    );
+  });
 });

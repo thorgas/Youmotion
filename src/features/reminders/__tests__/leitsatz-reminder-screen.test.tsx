@@ -10,8 +10,14 @@ import {
   REMINDER_EVENTS,
   REMINDER_PERMISSION_STATES,
   REMINDER_STATES,
+  REMINDER_TARGET_KINDS,
 } from '@/constants';
 import { CustomBeliefSystemId } from '@/features/check-in/domain/belief-statement';
+import { ReminderAssignmentId } from '../domain/reminder-assignment';
+import {
+  ReminderScheduleId,
+  ReminderScheduleTimestamp,
+} from '../domain/reminder-schedule';
 import { appSettingsStore } from '@/features/settings/application/app-settings.store';
 import { configureAppLocale } from '@/localization/app-locale.configuration';
 import { AppNavigationActorProvider } from '@/navigation/app-navigation.provider';
@@ -129,6 +135,78 @@ describe('Leitsatz reminder screen', () => {
     expect(screen.getByText('Which Leitsatz should accompany you?')).toBeOnTheScreen();
     expect(screen.getByText('I can ask for support.')).toBeOnTheScreen();
     expect(screen.queryByText('Pick an emotion')).not.toBeOnTheScreen();
+  });
+
+  it('shows only the tapped Leitsatz and edits its private preview choice', async () => {
+    const actor = createActor(appNavigationMachine).start();
+    const assignmentId = ReminderAssignmentId.make('focused-assignment');
+    const scheduleId = ReminderScheduleId.make('focused-schedule');
+    const focusedId = CustomBeliefSystemId.make('custom-focused-belief');
+    const otherId = CustomBeliefSystemId.make('custom-other-belief');
+    const timestamp = ReminderScheduleTimestamp.make('2026-08-13T18:00:00.000Z');
+    await waitFor(actor, (snapshot) => (
+      snapshot.context.beliefStatementsHydrated && snapshot.context.reminderDataHydrated
+    ));
+    actor.send({
+      type: CHECK_IN_EVENTS.BELIEF_STATEMENTS_HYDRATED,
+      statements: [
+        {
+          kind: 'custom',
+          beliefSystemId: focusedId,
+          harmfulStatement: 'I must do this alone.',
+          guidingStatement: 'I may receive support.',
+        },
+        {
+          kind: 'custom',
+          beliefSystemId: otherId,
+          harmfulStatement: 'I must be perfect.',
+          guidingStatement: 'I can learn as I go.',
+        },
+      ],
+    });
+    actor.send({
+      type: REMINDER_EVENTS.HYDRATED,
+      schedules: [{
+        id: scheduleId,
+        schemaVersion: 1,
+        name: 'Quiet evening',
+        weekdays: [2, 4],
+        times: [{ hour: 20, minute: 0 }],
+        createdAt: timestamp,
+        updatedAt: timestamp,
+      }],
+      assignments: [{
+        id: assignmentId,
+        schemaVersion: 1,
+        scheduleId,
+        targetKind: REMINDER_TARGET_KINDS.GUIDING_BELIEF,
+        beliefSystemId: focusedId,
+        enabled: true,
+        showFullText: false,
+        createdAt: timestamp,
+        updatedAt: timestamp,
+      }],
+    });
+    actor.send({
+      type: REMINDER_EVENTS.NOTIFICATION_OPENED,
+      assignmentId,
+      targetKind: REMINDER_TARGET_KINDS.GUIDING_BELIEF,
+      beliefSystemId: focusedId,
+    });
+    expect(actor.getSnapshot().context.reminderAssignments).toHaveLength(1);
+    expect(actor.getSnapshot().context.reminderAssignmentDraftId).toBe(assignmentId);
+    await renderReminder(actor);
+
+    expect(screen.getByText('“I may receive support.”')).toBeOnTheScreen();
+    expect(screen.queryByText('I can learn as I go.')).not.toBeOnTheScreen();
+    await fireEvent.press(screen.getByRole('button', { name: 'Edit reminder' }));
+    expect(screen.getByTestId('reminder-preview-general'))
+      .toHaveProp('accessibilityState', { checked: true });
+    await fireEvent.press(screen.getByTestId('reminder-preview-full'));
+    expect(actor.getSnapshot().context.reminderShowFullTextDraft).toBe(true);
+    expect(screen.getByTestId('reminder-preview-full'))
+      .toHaveProp('accessibilityState', { checked: true });
+    expect(mockRequestReminderPermission).not.toHaveBeenCalled();
   });
 
   it('keeps denial side-effect-free and exposes repair actions', async () => {

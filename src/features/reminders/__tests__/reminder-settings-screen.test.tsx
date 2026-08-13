@@ -205,6 +205,26 @@ describe('reminder settings screen', () => {
     });
   });
 
+  it('opens a Leitsatz reminder with its target and preview choice', async () => {
+    const actor = await actorAtReminderSettings();
+    const assignment = assignments[1];
+    if (!assignment || assignment.targetKind !== REMINDER_TARGET_KINDS.GUIDING_BELIEF) {
+      throw new Error('Expected the second fixture to be a Leitsatz reminder');
+    }
+
+    actor.send({
+      type: REMINDER_EVENTS.SCHEDULE_EDIT_REQUESTED,
+      assignmentId: assignment.id,
+    });
+
+    expect(actor.getSnapshot().context).toMatchObject({
+      reminderAssignmentDraftId: assignment.id,
+      reminderTargetKind: REMINDER_TARGET_KINDS.GUIDING_BELIEF,
+      reminderTargetBeliefSystemId: assignment.beliefSystemId,
+      reminderShowFullTextDraft: false,
+    });
+  });
+
   it('saves a copied schedule for only the selected reminder', async () => {
     const actor = await actorAtReminderSettings();
     actor.send({

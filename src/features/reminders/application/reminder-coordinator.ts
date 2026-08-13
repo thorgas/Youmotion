@@ -37,6 +37,7 @@ export async function activateReminder({
   locale,
   schedule,
   schedules,
+  showFullText,
   statements,
   target,
 }: {
@@ -44,6 +45,7 @@ export async function activateReminder({
   locale: AppLocale;
   schedule: ReminderSchedule;
   schedules: readonly ReminderSchedule[];
+  showFullText: boolean;
   statements: readonly BeliefStatement[];
   target: ReminderTarget;
 }) {
@@ -84,7 +86,7 @@ export async function activateReminder({
         targetKind: target.targetKind,
         beliefSystemId: target.beliefSystemId,
         enabled: true,
-        showFullText: false,
+        showFullText,
         createdAt: existing?.createdAt ?? now,
         updatedAt: now,
       };
@@ -116,6 +118,7 @@ export async function updateReminderSchedule({
   locale,
   schedule,
   schedules,
+  showFullText,
   statements,
 }: {
   assignment: ReminderAssignment;
@@ -123,6 +126,7 @@ export async function updateReminderSchedule({
   locale: AppLocale;
   schedule: ReminderSchedule;
   schedules: readonly ReminderSchedule[];
+  showFullText: boolean;
   statements: readonly BeliefStatement[];
 }) {
   const now = ReminderScheduleTimestamp.make(new Date().toISOString());
@@ -140,11 +144,23 @@ export async function updateReminderSchedule({
         updatedAt: now,
       }
     : schedule;
-  const updatedAssignment: ReminderAssignment = shared
-    ? { ...assignment, scheduleId: updatedSchedule.id, updatedAt: now }
-    : assignment;
+  const previewChanged = assignment.targetKind === REMINDER_TARGET_KINDS.GUIDING_BELIEF
+    && assignment.showFullText !== showFullText;
+  const updatedAssignment: ReminderAssignment = assignment.targetKind
+    === REMINDER_TARGET_KINDS.GUIDING_BELIEF
+    ? {
+        ...assignment,
+        scheduleId: updatedSchedule.id,
+        showFullText,
+        updatedAt: shared || previewChanged ? now : assignment.updatedAt,
+      }
+    : shared
+      ? { ...assignment, scheduleId: updatedSchedule.id, updatedAt: now }
+      : assignment;
   await Effect.runPromise(persistReminderSchedule(updatedSchedule));
-  if (shared) await Effect.runPromise(persistReminderAssignment(updatedAssignment));
+  if (shared || previewChanged) {
+    await Effect.runPromise(persistReminderAssignment(updatedAssignment));
+  }
   const nextSchedules = shared
     ? [...schedules, updatedSchedule]
     : schedules.map((candidate) => (

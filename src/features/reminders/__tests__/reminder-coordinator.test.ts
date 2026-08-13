@@ -82,6 +82,7 @@ describe('reminder coordinator', () => {
       locale: APP_LOCALES.ENGLISH,
       schedule,
       schedules: [],
+      showFullText: true,
       statements,
       target: { targetKind: REMINDER_TARGET_KINDS.GUIDING_BELIEF, beliefSystemId },
     });
@@ -91,6 +92,7 @@ describe('reminder coordinator', () => {
       id: existing.id,
       enabled: true,
       createdAt,
+      showFullText: true,
     });
     expect(result.assignment.scheduleId).not.toBe(schedule.id);
     expect(result.schedules).toEqual([
@@ -123,6 +125,7 @@ describe('reminder coordinator', () => {
       locale: APP_LOCALES.ENGLISH,
       schedule: edited,
       schedules: [schedule],
+      showFullText: false,
       statements,
     });
 
@@ -149,6 +152,7 @@ describe('reminder coordinator', () => {
       locale: APP_LOCALES.ENGLISH,
       schedule: edited,
       schedules: [schedule],
+      showFullText: false,
       statements,
     });
 
@@ -156,6 +160,27 @@ describe('reminder coordinator', () => {
     expect(result.schedules).toEqual([edited]);
     expect(persistedAssignment).not.toHaveBeenCalled();
     expect(persistedSchedule).toHaveBeenCalledWith(edited);
+  });
+
+  it('persists a preview choice on its guiding Leitsatz reminder', async () => {
+    const owned = { ...existing, scheduleId: schedule.id };
+
+    const result = await updateReminderSchedule({
+      assignment: owned,
+      assignments: [owned],
+      locale: APP_LOCALES.ENGLISH,
+      schedule,
+      schedules: [schedule],
+      showFullText: true,
+      statements,
+    });
+
+    expect(result.assignments).toEqual([
+      expect.objectContaining({ id: owned.id, showFullText: true }),
+    ]);
+    expect(persistedAssignment).toHaveBeenCalledWith(
+      expect.objectContaining({ id: owned.id, showFullText: true }),
+    );
   });
 
   it('persists an off assignment before canceling its native projection', async () => {

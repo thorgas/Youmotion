@@ -172,7 +172,9 @@ function fingerprint({
     ? assignment.beliefSystemId
     : '-';
   const contentIdentity = assignment.targetKind === REMINDER_TARGET_KINDS.GUIDING_BELIEF
-    ? textFingerprint(statementForAssignment({ assignment, statements }) ?? '')
+    ? `${assignment.showFullText ? 'full' : 'general'}-${textFingerprint(
+        statementForAssignment({ assignment, statements }) ?? '',
+      )}`
     : '-';
   return [assignment.id, schedule.id, assignment.targetKind, belief, contentIdentity, weekday, hour, minute, locale, timeZone, 1]
     .join(':');

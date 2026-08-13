@@ -22,6 +22,7 @@ import {
   REMINDER_EVENTS,
   REMINDER_PERMISSION_STATES,
   REMINDER_STATES,
+  REMINDER_TARGET_KINDS,
   SETTINGS_EVENTS,
 } from '@/constants';
 import {
@@ -51,6 +52,11 @@ import {
 } from '@/test-utils/surrealdb.repository.mock';
 import { appNavigationMachine, routeForStateValue } from '../app-navigation.machine';
 import * as reminderScheduler from '@/features/reminders/infrastructure/local-reminder.scheduler';
+import { ReminderAssignmentId } from '@/features/reminders/domain/reminder-assignment';
+import {
+  ReminderScheduleId,
+  ReminderScheduleTimestamp,
+} from '@/features/reminders/domain/reminder-schedule';
 
 jest.mock('@/features/check-in/infrastructure/surrealdb.database', () => ({
   getDatabase: jest.fn(() => Promise.resolve(mockSurrealDatabase)),
@@ -608,6 +614,86 @@ describe('app navigation model', () => {
     );
 
     expect(actor.getSnapshot().matches(REMINDER_STATES.OFFER)).toBe(false);
+    expect(mockRequestReminderPermission).not.toHaveBeenCalled();
+  });
+
+  it('keeps a cold notification tap on its focused Leitsatz while beliefs hydrate', () => {
+    const actor = createActor(appNavigationMachine).start();
+    const assignmentId = ReminderAssignmentId.make('notification-assignment');
+    const beliefSystemId = CustomBeliefSystemId.make('custom-notification-belief');
+
+    actor.send({
+      type: REMINDER_EVENTS.NOTIFICATION_OPENED,
+      assignmentId,
+      targetKind: REMINDER_TARGET_KINDS.GUIDING_BELIEF,
+      beliefSystemId,
+    });
+
+    expect(actor.getSnapshot().matches(REMINDER_STATES.GUIDING_BELIEF)).toBe(true);
+    expect(actor.getSnapshot().context).toMatchObject({
+      reminderAssignmentDraftId: assignmentId,
+      reminderTargetBeliefSystemId: beliefSystemId,
+    });
+
+    actor.send({
+      type: CHECK_IN_EVENTS.BELIEF_STATEMENTS_HYDRATED,
+      statements: [{
+        kind: 'custom',
+        beliefSystemId,
+        harmfulStatement: 'I must do this alone.',
+        guidingStatement: 'I may receive support.',
+      }],
+    });
+
+    expect(actor.getSnapshot().matches(REMINDER_STATES.GUIDING_BELIEF)).toBe(true);
+    actor.send({ type: NAVIGATION_EVENTS.BACK_REQUESTED });
+    expect(routeForStateValue(actor.getSnapshot().value)).toBe(APP_ROUTES.TODAY);
+  });
+
+  it('edits the tapped reminder directly without requesting permission again', () => {
+    const actor = createActor(appNavigationMachine).start();
+    const assignmentId = ReminderAssignmentId.make('editable-notification-assignment');
+    const scheduleId = ReminderScheduleId.make('editable-notification-schedule');
+    const beliefSystemId = CustomBeliefSystemId.make('custom-editable-notification-belief');
+    const timestamp = ReminderScheduleTimestamp.make('2026-08-13T18:00:00.000Z');
+    actor.send({
+      type: REMINDER_EVENTS.HYDRATED,
+      schedules: [{
+        id: scheduleId,
+        schemaVersion: 1,
+        name: 'Quiet evening',
+        weekdays: [2, 4],
+        times: [{ hour: 20, minute: 0 }],
+        createdAt: timestamp,
+        updatedAt: timestamp,
+      }],
+      assignments: [{
+        id: assignmentId,
+        schemaVersion: 1,
+        scheduleId,
+        targetKind: REMINDER_TARGET_KINDS.GUIDING_BELIEF,
+        beliefSystemId,
+        enabled: true,
+        showFullText: true,
+        createdAt: timestamp,
+        updatedAt: timestamp,
+      }],
+    });
+    actor.send({
+      type: REMINDER_EVENTS.NOTIFICATION_OPENED,
+      assignmentId,
+      targetKind: REMINDER_TARGET_KINDS.GUIDING_BELIEF,
+      beliefSystemId,
+    });
+    actor.send({ type: REMINDER_EVENTS.EDIT_REQUESTED });
+
+    expect(actor.getSnapshot().matches(REMINDER_STATES.SCHEDULE_EDITOR)).toBe(true);
+    expect(actor.getSnapshot().context).toMatchObject({
+      reminderScheduleNameDraft: 'Quiet evening',
+      reminderShowFullTextDraft: true,
+      reminderWeekdaysDraft: [2, 4],
+      reminderTimesDraft: [{ hour: 20, minute: 0 }],
+    });
     expect(mockRequestReminderPermission).not.toHaveBeenCalled();
   });
 

@@ -32,10 +32,12 @@ type ReminderNotificationEvent =
   | { type: typeof REMINDER_EVENTS.RECONCILE_REQUESTED }
   | {
       type: typeof REMINDER_EVENTS.NOTIFICATION_OPENED;
+      assignmentId: typeof ReminderAssignmentId.Type;
       targetKind: typeof REMINDER_TARGET_KINDS.PULSE;
     }
   | {
       type: typeof REMINDER_EVENTS.NOTIFICATION_OPENED;
+      assignmentId: typeof ReminderAssignmentId.Type;
       targetKind: typeof REMINDER_TARGET_KINDS.GUIDING_BELIEF;
       beliefSystemId: typeof BeliefSystemId.Type;
     };
@@ -48,9 +50,14 @@ let lastFingerprint: string | undefined;
 
 function eventForPayload(payload: ReminderNotificationPayload): ReminderNotificationEvent {
   return payload.targetKind === REMINDER_TARGET_KINDS.PULSE
-    ? { type: REMINDER_EVENTS.NOTIFICATION_OPENED, targetKind: payload.targetKind }
+    ? {
+        type: REMINDER_EVENTS.NOTIFICATION_OPENED,
+        assignmentId: payload.assignmentId,
+        targetKind: payload.targetKind,
+      }
     : {
         type: REMINDER_EVENTS.NOTIFICATION_OPENED,
+        assignmentId: payload.assignmentId,
         targetKind: payload.targetKind,
         beliefSystemId: payload.beliefSystemId,
       };
