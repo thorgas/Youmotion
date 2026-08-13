@@ -1149,6 +1149,8 @@ describe('check-in screens', () => {
     const history = await _renderLocalized(
       <HistoryScreen now={new Date(2026, 6, 21, 12)} />,
     );
+    expect(StyleSheet.flatten(history.getByTestId('history-search-input').props['style']))
+      .toMatchObject({ lineHeight: 20, paddingVertical: 0, textAlignVertical: 'center' });
     await fireEvent.changeText(history.getByTestId('history-search-input'), 'Supporting');
     expect(history.getByTestId('history-moment-evidence-match')).toBeTruthy();
     expect(history.queryByTestId('history-moment-evidence-other')).toBeNull();

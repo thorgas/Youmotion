@@ -402,7 +402,10 @@ const styles = StyleSheet.create({
     color: palette.ink,
     fontFamily: type.regular,
     fontSize: 14,
+    lineHeight: 20,
     paddingHorizontal: 15,
+    paddingVertical: 0,
+    textAlignVertical: 'center',
   },
   filterToggle: {
     minHeight: 46,
