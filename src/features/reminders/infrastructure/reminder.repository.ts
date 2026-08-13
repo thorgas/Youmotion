@@ -7,7 +7,7 @@ import {
   REMINDER_SCHEDULE_TABLE,
   REMINDER_TARGET_KINDS,
 } from '@/constants';
-import { getDatabase } from '@/features/check-in/infrastructure/surrealdb.database';
+import { queryDatabase } from '@/features/check-in/infrastructure/surrealdb.database';
 import {
   ReminderAssignmentListSchema,
   ReminderAssignmentSchema,
@@ -96,10 +96,7 @@ function recordId({ table, id }: { table: string; id: string }) {
 
 function readTable(query: string) {
   return Effect.tryPromise({
-    try: async () => {
-      const database = await getDatabase();
-      return database.query<unknown>(query);
-    },
+    try: () => queryDatabase({ surql: query }),
     catch: (cause) => ReminderStorageError.make({ operation: 'read', cause }),
   });
 }
@@ -148,10 +145,12 @@ function persistRecord({
 }) {
   return Effect.tryPromise({
     try: async () => {
-      const database = await getDatabase();
-      await database.query('UPSERT $record CONTENT $value', {
-        record: recordId({ table, id }),
-        value: encoded,
+      await queryDatabase({
+        surql: 'UPSERT $record CONTENT $value',
+        variables: {
+          record: recordId({ table, id }),
+          value: encoded,
+        },
       });
     },
     catch: (cause) => ReminderStorageError.make({ operation: 'write', cause }),
@@ -208,10 +207,10 @@ export const persistReminderAssignment = Effect.fn('ReminderRepository.persistAs
 
 function deleteRecord({ table, id }: { table: string; id: string }) {
   return Effect.tryPromise({
-    try: async () => {
-      const database = await getDatabase();
-      await database.query('DELETE $record', { record: recordId({ table, id }) });
-    },
+    try: () => queryDatabase({
+      surql: 'DELETE $record',
+      variables: { record: recordId({ table, id }) },
+    }),
     catch: (cause) => ReminderStorageError.make({ operation: 'delete', cause }),
   });
 }

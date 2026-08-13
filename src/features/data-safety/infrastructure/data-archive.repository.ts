@@ -16,7 +16,7 @@ import {
 import { CheckInListSchema } from '@/features/check-in/domain/check-in';
 import { loadBeliefStatements } from '@/features/check-in/infrastructure/belief-statement.repository';
 import { loadCheckIns } from '@/features/check-in/infrastructure/check-in.repository';
-import { getDatabase } from '@/features/check-in/infrastructure/surrealdb.database';
+import { queryDatabase } from '@/features/check-in/infrastructure/surrealdb.database';
 import { AppSettingsSchema } from '@/features/settings/domain/app-settings';
 import { loadAppSettings } from '@/features/settings/infrastructure/app-settings.repository';
 import {
@@ -144,8 +144,7 @@ export const restoreDataArchive = Effect.fn('DataArchiveRepository.restore')(
     Effect.mapError((cause) => DataArchiveDataError.make({ operation: 'encode', cause })),
     Effect.flatMap((variables) => Effect.tryPromise({
       try: async () => {
-        const database = await getDatabase();
-        await database.query(restoreTransaction, variables);
+        await queryDatabase({ surql: restoreTransaction, variables });
       },
       catch: (cause) => DataArchiveStorageError.make({ operation: 'restore', cause }),
     })),
@@ -156,8 +155,7 @@ export const deleteAllJournalData = Effect.fn(
   'DataArchiveRepository.deleteAllJournalData',
 )(() => Effect.tryPromise({
   try: async () => {
-    const database = await getDatabase();
-    await database.query(deleteJournalTransaction);
+    await queryDatabase({ surql: deleteJournalTransaction });
   },
   catch: (cause) => DataArchiveStorageError.make({ operation: 'delete', cause }),
 }));

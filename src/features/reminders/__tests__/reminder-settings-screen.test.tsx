@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react-native';
+import { fireEvent, render, screen } from '@testing-library/react-native';
 import { createActor, waitFor, type Actor } from 'xstate';
 
 import {
@@ -32,6 +32,7 @@ import {
   type ReminderSchedule,
 } from '../domain/reminder-schedule';
 import { ReminderSettingsScreen } from '../ui/reminder-settings-screen';
+import { LeitsatzReminderScreen } from '../ui/leitsatz-reminder-screen';
 
 jest.mock('expo-router', () => ({
   router: {
@@ -43,6 +44,12 @@ jest.mock('expo-router', () => ({
 
 jest.mock('@/features/check-in/infrastructure/surrealdb.database', () => ({
   getDatabase: jest.fn(() => Promise.resolve(mockSurrealDatabase)),
+  queryDatabase: jest.fn(({ surql, variables }: {
+    surql: string;
+    variables?: Parameters<typeof mockSurrealDatabase.query>[1];
+  }) => variables === undefined
+    ? mockSurrealDatabase.query(surql)
+    : mockSurrealDatabase.query(surql, variables)),
 }));
 
 jest.mock('../infrastructure/local-reminder.scheduler', () => ({
@@ -56,6 +63,7 @@ const timestamp = ReminderScheduleTimestamp.make('2026-08-13T08:00:00.000Z');
 const scheduleId = ReminderScheduleId.make('gentle-rhythm');
 const firstBeliefSystemId = CustomBeliefSystemId.make('custom-support');
 const secondBeliefSystemId = CustomBeliefSystemId.make('custom-rest');
+const pulseAssignmentId = ReminderAssignmentId.make('pulse');
 const schedule = {
   id: scheduleId,
   schemaVersion: 1,
@@ -77,7 +85,7 @@ const statements = [{
   guidingStatement: 'Rest belongs in my life.',
 }] satisfies readonly BeliefStatement[];
 const assignments = [{
-  id: ReminderAssignmentId.make('pulse'),
+  id: pulseAssignmentId,
   schemaVersion: 1,
   scheduleId,
   targetKind: REMINDER_TARGET_KINDS.PULSE,
@@ -119,7 +127,7 @@ async function actorAtReminderSettings() {
 }
 
 async function renderSettings(actor: Actor<typeof appNavigationMachine>) {
-  await render(
+  return render(
     <AppNavigationActorProvider actor={actor}>
       <ReminderSettingsScreen />
     </AppNavigationActorProvider>,
@@ -141,6 +149,13 @@ describe('reminder settings screen', () => {
       if (surql.includes('FROM belief_statement')) {
         return Promise.resolve([{ statementIndex: 0, value: statements }]);
       }
+      if (surql.includes('SELECT locale, emotionLabelMode')) {
+        return Promise.resolve([{ statementIndex: 0, value: [{
+          locale: APP_LOCALES.GERMAN,
+          emotionLabelMode: EMOTION_LABEL_MODES.BOTH,
+          onboardingCompleted: true,
+        }] }]);
+      }
       return Promise.resolve([{ statementIndex: 0, value: [] }]);
     });
     appSettingsStore.trigger.hydrated({
@@ -157,11 +172,53 @@ describe('reminder settings screen', () => {
     appSettingsStore.trigger.languageChanged({ locale: APP_LOCALES.GERMAN });
     await renderSettings(actor);
 
-    expect(screen.getByText(
+    expect(screen.getAllByText(
       'Montag, Dienstag, Mittwoch, Donnerstag, Freitag, Samstag · 09:00, 18:00',
-    )).toBeOnTheScreen();
+    )).toHaveLength(3);
     expect(screen.getByText('Gefühl auswählen')).toBeOnTheScreen();
     expect(screen.getByText('“I can ask for support.”')).toBeOnTheScreen();
     expect(screen.getByText('“Rest belongs in my life.”')).toBeOnTheScreen();
+  });
+
+  it('opens the selected reminder schedule as a prefilled draft', async () => {
+    const actor = await actorAtReminderSettings();
+    await renderSettings(actor);
+
+    await fireEvent.press(screen.getByTestId('reminder-schedule-edit-pulse'));
+    expect(actor.getSnapshot().context).toMatchObject({
+      reminderAssignmentDraftId: assignments[0]?.id,
+      reminderScheduleNameDraft: schedule.name,
+      reminderWeekdaysDraft: schedule.weekdays,
+      reminderTimesDraft: schedule.times,
+    });
+  });
+
+  it('saves a copied schedule for only the selected reminder', async () => {
+    const actor = await actorAtReminderSettings();
+    actor.send({
+      type: REMINDER_EVENTS.SCHEDULE_EDIT_REQUESTED,
+      assignmentId: pulseAssignmentId,
+    });
+    await render(
+      <AppNavigationActorProvider actor={actor}>
+        <LeitsatzReminderScreen />
+      </AppNavigationActorProvider>,
+    );
+    expect(screen.getByText('Diese Änderungen gelten nur für diese Erinnerung.'))
+      .toBeOnTheScreen();
+    await fireEvent.changeText(screen.getByLabelText('Name des Zeitplans'), 'Nur morgens');
+    await fireEvent.press(screen.getByRole('button', { name: 'Änderungen speichern' }));
+    await waitFor(actor, (snapshot) => snapshot.matches(REMINDER_STATES.SETTINGS));
+
+    const updated = actor.getSnapshot().context;
+    const pulseAssignment = updated.reminderAssignments.find(
+      (assignment) => assignment.id === assignments[0]?.id,
+    );
+    expect(pulseAssignment?.scheduleId).not.toBe(schedule.id);
+    expect(updated.reminderAssignments[1]?.scheduleId).toBe(schedule.id);
+    expect(updated.reminderAssignments[2]?.scheduleId).toBe(schedule.id);
+    expect(updated.reminderSchedules.find(
+      (candidate) => candidate.id === pulseAssignment?.scheduleId,
+    )?.name).toBe('Nur morgens');
   });
 });

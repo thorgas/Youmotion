@@ -54,6 +54,12 @@ import * as reminderScheduler from '@/features/reminders/infrastructure/local-re
 
 jest.mock('@/features/check-in/infrastructure/surrealdb.database', () => ({
   getDatabase: jest.fn(() => Promise.resolve(mockSurrealDatabase)),
+  queryDatabase: jest.fn(({ surql, variables }: {
+    surql: string;
+    variables?: Parameters<typeof mockSurrealDatabase.query>[1];
+  }) => variables === undefined
+    ? mockSurrealDatabase.query(surql)
+    : mockSurrealDatabase.query(surql, variables)),
 }));
 
 jest.mock('@/features/reminders/infrastructure/local-reminder.scheduler', () => ({
@@ -161,6 +167,7 @@ describe('app navigation model', () => {
     mockPickDataArchive.mockReturnValue(Effect.succeed(null));
     mockRestoreDataArchive.mockReturnValue(Effect.succeed(undefined));
     mockDeleteAllJournalData.mockReturnValue(Effect.succeed(undefined));
+    mockRequestReminderPermission.mockClear();
     mockRequestReminderPermission.mockResolvedValue(REMINDER_PERMISSION_STATES.GRANTED);
   });
 
@@ -490,8 +497,15 @@ describe('app navigation model', () => {
     }));
     expect(routeForStateValue(offer.value)).toBe(APP_ROUTES.LEITSATZ_REMINDER);
 
-    actor.send({ type: REMINDER_EVENTS.OFFER_DECLINED });
+    actor.send({ type: REMINDER_EVENTS.OFFER_ACCEPTED });
+    await waitFor(
+      actor,
+      (candidate) => candidate.matches(REMINDER_STATES.SCHEDULE_PICKER),
+      { timeout: 3_000 },
+    );
+    actor.send({ type: NAVIGATION_EVENTS.BACK_REQUESTED });
     expect(actor.getSnapshot().matches(BELIEF_LIBRARY_STATES.LIBRARY)).toBe(true);
+    expect(actor.getSnapshot().matches(REMINDER_STATES.OFFER)).toBe(false);
   });
 
   it('requests permission before exposing schedules and creates no assignment on denial', async () => {
@@ -539,6 +553,44 @@ describe('app navigation model', () => {
     expect(denied.context.reminderSchedules).toEqual([]);
     expect(denied.context.reminderAssignments).toEqual([]);
     expect(denied.can({ type: REMINDER_EVENTS.SCHEDULE_SAVE_REQUESTED })).toBe(false);
+  });
+
+  it('never returns to the permission offer after a grant and rechecks a later denial', async () => {
+    mockRequestReminderPermission
+      .mockResolvedValueOnce(REMINDER_PERMISSION_STATES.GRANTED)
+      .mockResolvedValue(REMINDER_PERMISSION_STATES.DENIED);
+    const actor = createActor(appNavigationMachine).start();
+    actor.send({ type: NAVIGATION_EVENTS.SETTINGS_OPENED });
+    actor.send({ type: REMINDER_EVENTS.OPENED });
+    actor.send({ type: REMINDER_EVENTS.NEW_SCHEDULE_REQUESTED });
+    actor.send({ type: REMINDER_EVENTS.OFFER_ACCEPTED });
+
+    await waitFor(
+      actor,
+      (candidate) => candidate.matches(REMINDER_STATES.SCHEDULE_PICKER),
+      { timeout: 3_000 },
+    );
+    actor.send({ type: NAVIGATION_EVENTS.BACK_REQUESTED });
+    expect(actor.getSnapshot().matches(REMINDER_STATES.SETTINGS)).toBe(true);
+    expect(actor.getSnapshot().matches(REMINDER_STATES.OFFER)).toBe(false);
+
+    actor.send({ type: REMINDER_EVENTS.NEW_SCHEDULE_REQUESTED });
+    actor.send({ type: REMINDER_EVENTS.OFFER_ACCEPTED });
+    await waitFor(
+      actor,
+      (candidate) => candidate.matches(REMINDER_STATES.PERMISSION_DENIED),
+      { timeout: 3_000 },
+    );
+    actor.send({ type: REMINDER_EVENTS.SETTINGS_RETURNED });
+    await waitFor(
+      actor,
+      (candidate) => candidate.matches(REMINDER_STATES.PERMISSION_DENIED)
+        && mockRequestReminderPermission.mock.calls.length === 3,
+      { timeout: 3_000 },
+    );
+
+    expect(actor.getSnapshot().matches(REMINDER_STATES.OFFER)).toBe(false);
+    expect(mockRequestReminderPermission).toHaveBeenCalledTimes(3);
   });
 
   it('models all emotion-label setting choices', () => {

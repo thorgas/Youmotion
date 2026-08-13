@@ -1,4 +1,6 @@
 import * as Notifications from 'expo-notifications';
+import { PermissionStatus } from 'expo';
+import { Platform } from 'react-native';
 
 import {
   REMINDER_NOTIFICATION_CHANNEL_ID,
@@ -19,6 +21,7 @@ import {
   type ReminderSchedule,
 } from '../domain/reminder-schedule';
 import {
+  requestReminderPermission,
   reconcileReminderNotifications,
   sendTestReminder,
 } from '../infrastructure/local-reminder.scheduler';
@@ -32,6 +35,8 @@ jest.mock('expo-notifications', () => ({
     PROVISIONAL: 3,
     EPHEMERAL: 4,
   },
+  IosAlertStyle: { BANNER: 1 },
+  IosAllowsPreviews: { ALWAYS: 1 },
   SchedulableTriggerInputTypes: { TIME_INTERVAL: 'timeInterval', WEEKLY: 'weekly' },
   setNotificationChannelAsync: jest.fn(() => Promise.resolve(null)),
   getPermissionsAsync: jest.fn(),
@@ -73,6 +78,70 @@ const statements = [{
 
 describe('local reminder scheduler', () => {
   beforeEach(() => jest.clearAllMocks());
+  afterEach(() => jest.restoreAllMocks());
+
+  it('rechecks a previous iOS grant and sends a later denial to Settings', async () => {
+    jest.replaceProperty(Platform, 'OS', 'ios');
+    const iosSettings = {
+      allowsDisplayInNotificationCenter: true,
+      allowsDisplayOnLockScreen: true,
+      allowsDisplayInCarPlay: false,
+      allowsAlert: true,
+      allowsBadge: false,
+      allowsSound: false,
+      allowsCriticalAlerts: false,
+      alertStyle: Notifications.IosAlertStyle.BANNER,
+      allowsPreviews: Notifications.IosAllowsPreviews.ALWAYS,
+      providesAppNotificationSettings: false,
+      allowsAnnouncements: false,
+    };
+    mockedNotifications.getPermissionsAsync
+      .mockResolvedValueOnce({
+        status: PermissionStatus.GRANTED,
+        granted: true,
+        expires: 'never',
+        canAskAgain: false,
+        ios: { ...iosSettings, status: Notifications.IosAuthorizationStatus.AUTHORIZED },
+      })
+      .mockResolvedValueOnce({
+        status: PermissionStatus.DENIED,
+        granted: false,
+        expires: 'never',
+        canAskAgain: false,
+        ios: { ...iosSettings, status: Notifications.IosAuthorizationStatus.DENIED },
+      });
+
+    await expect(requestReminderPermission()).resolves.toBe('granted');
+    await expect(requestReminderPermission()).resolves.toBe('denied');
+    expect(mockedNotifications.requestPermissionsAsync).not.toHaveBeenCalled();
+  });
+
+  it('asks again on Android only while the native response allows it', async () => {
+    jest.replaceProperty(Platform, 'OS', 'android');
+    mockedNotifications.getPermissionsAsync
+      .mockResolvedValueOnce({
+        status: PermissionStatus.DENIED,
+        granted: false,
+        expires: 'never',
+        canAskAgain: true,
+      })
+      .mockResolvedValueOnce({
+        status: PermissionStatus.DENIED,
+        granted: false,
+        expires: 'never',
+        canAskAgain: false,
+      });
+    mockedNotifications.requestPermissionsAsync.mockResolvedValueOnce({
+      status: PermissionStatus.GRANTED,
+      granted: true,
+      expires: 'never',
+      canAskAgain: true,
+    });
+
+    await expect(requestReminderPermission()).resolves.toBe('granted');
+    await expect(requestReminderPermission()).resolves.toBe('denied');
+    expect(mockedNotifications.requestPermissionsAsync).toHaveBeenCalledTimes(1);
+  });
 
   it('projects each selected weekday and time without exposing the harmful Leidsatz', async () => {
     await reconcileReminderNotifications({

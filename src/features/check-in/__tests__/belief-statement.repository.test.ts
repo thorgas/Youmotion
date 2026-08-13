@@ -23,6 +23,12 @@ import {
 
 jest.mock('../infrastructure/surrealdb.database', () => ({
   getDatabase: jest.fn(() => Promise.resolve(mockSurrealDatabase)),
+  queryDatabase: jest.fn(({ surql, variables }: {
+    surql: string;
+    variables?: Parameters<typeof mockSurrealDatabase.query>[1];
+  }) => variables === undefined
+    ? mockSurrealDatabase.query(surql)
+    : mockSurrealDatabase.query(surql, variables)),
 }));
 
 describe('Effect belief statement repository', () => {

@@ -18,7 +18,7 @@ import {
   type EmotionSelection,
 } from '../domain/check-in';
 import { BeliefStatementText, BeliefSystemId } from '../domain/belief-statement';
-import { getDatabase } from './surrealdb.database';
+import { queryDatabase } from './surrealdb.database';
 
 export class CheckInStorageError extends Schema.TaggedError<CheckInStorageError>()(
   'CheckInStorageError',
@@ -117,12 +117,9 @@ const decodeLegacy = readLegacy.pipe(
 );
 
 const selectCheckIns = Effect.tryPromise({
-  try: async () => {
-    const database = await getDatabase();
-    return database.query<unknown>(
-      `SELECT checkInId AS id, createdAt, occurredAt, emotionId, intensity, level, note, beliefSystemId, guidingStatementSnapshot FROM ${CHECK_IN_TABLE} ORDER BY occurredAt DESC, createdAt DESC`,
-    );
-  },
+  try: () => queryDatabase({
+    surql: `SELECT checkInId AS id, createdAt, occurredAt, emotionId, intensity, level, note, beliefSystemId, guidingStatementSnapshot FROM ${CHECK_IN_TABLE} ORDER BY occurredAt DESC, createdAt DESC`,
+  }),
   catch: (cause) => CheckInStorageError.make({ operation: 'read', cause }),
 }).pipe(
   Effect.flatMap((statements) => Schema.decodeUnknown(CheckInDatabaseListSchema)(statements[0]?.value ?? []).pipe(
@@ -136,14 +133,13 @@ const upsertCheckIn = Effect.fn('CheckInRepository.upsert')((checkIn: CheckIn) =
     Effect.mapError((cause) => CheckInDataError.make({ operation: 'encode', cause })),
     Effect.flatMap((encoded) => Effect.tryPromise({
       try: async () => {
-        const database = await getDatabase();
-        await database.query(
-          `UPSERT $record CONTENT $checkIn`,
-          {
+        await queryDatabase({
+          surql: 'UPSERT $record CONTENT $checkIn',
+          variables: {
             record: new SurrealRecordId(`${CHECK_IN_TABLE}:${checkIn.id}`),
             checkIn: { ...encoded, checkInId: encoded.id },
           },
-        );
+        });
       },
       catch: (cause) => CheckInStorageError.make({ operation: 'write', cause }),
     })),
@@ -224,11 +220,10 @@ export const persistGuidingStatementSnapshot = Effect.fn(
 export const deleteCheckIn = Effect.fn('CheckInRepository.delete')((id: CheckInId) => (
   Effect.tryPromise({
     try: async () => {
-      const database = await getDatabase();
-      await database.query(
-        'DELETE $record',
-        { record: new SurrealRecordId(`${CHECK_IN_TABLE}:${id}`) },
-      );
+      await queryDatabase({
+        surql: 'DELETE $record',
+        variables: { record: new SurrealRecordId(`${CHECK_IN_TABLE}:${id}`) },
+      });
     },
     catch: (cause) => CheckInStorageError.make({ operation: 'delete', cause }),
   })

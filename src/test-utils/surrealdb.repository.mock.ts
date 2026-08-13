@@ -35,7 +35,7 @@ async function defaultQuery(surql: string): Promise<QueryResult> {
   return [{ statementIndex: 0, value: surql.startsWith('SELECT') ? [] : null }];
 }
 
-export const mockSurrealQuery = jest.fn(defaultQuery);
+export const mockSurrealQuery = jest.fn<Promise<QueryResult>, [string, unknown?]>(defaultQuery);
 export const mockSurrealDatabase = { query: mockSurrealQuery };
 
 export function resetSurrealDatabaseMock() {

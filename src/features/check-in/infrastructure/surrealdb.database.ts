@@ -12,6 +12,7 @@ import {
 import { runDatabaseMigrations } from './migrations/database-migration.runner';
 
 let databasePromise: Promise<SurrealClient> | undefined;
+const databaseAccess = Effect.unsafeMakeSemaphore(1);
 
 function databaseEndpoint(directory: Directory) {
   if (!directory.uri.startsWith(FILE_URI_PREFIX)) {
@@ -41,4 +42,20 @@ export function getDatabase() {
   if (databasePromise) return databasePromise;
   databasePromise = connectDatabase().catch(resetFailedConnection);
   return databasePromise;
+}
+
+export async function queryDatabase<T = unknown>({
+  surql,
+  variables,
+}: {
+  surql: string;
+  variables?: Parameters<SurrealClient['query']>[1];
+}) {
+  await Effect.runPromise(databaseAccess.take(1));
+  try {
+    const database = await getDatabase();
+    return await database.query<T>(surql, variables);
+  } finally {
+    await Effect.runPromise(databaseAccess.release(1));
+  }
 }

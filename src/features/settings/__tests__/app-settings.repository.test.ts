@@ -58,6 +58,12 @@ const mockDatabase = { query: mockQuery };
 
 jest.mock('@/features/check-in/infrastructure/surrealdb.database', () => ({
   getDatabase: jest.fn(() => Promise.resolve(mockDatabase)),
+  queryDatabase: jest.fn(({ surql, variables }: {
+    surql: string;
+    variables?: Parameters<typeof mockDatabase.query>[1];
+  }) => variables === undefined
+    ? mockDatabase.query(surql)
+    : mockDatabase.query(surql, variables)),
 }));
 
 describe('app settings repository', () => {

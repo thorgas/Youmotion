@@ -18,7 +18,7 @@ import {
   type CustomBeliefStatement,
 } from '../domain/belief-statement';
 import { CheckInId } from '../domain/check-in';
-import { getDatabase } from './surrealdb.database';
+import { queryDatabase } from './surrealdb.database';
 
 export class BeliefStatementStorageError extends Schema.TaggedError<BeliefStatementStorageError>()(
   'BeliefStatementStorageError',
@@ -68,12 +68,9 @@ function beliefStatementFromDatabase(
 }
 
 export const loadBeliefStatements = Effect.tryPromise({
-  try: async () => {
-    const database = await getDatabase();
-    return database.query<unknown>(
-      `SELECT kind, statementId AS beliefSystemId, harmfulStatement, guidingStatement, archivedAt FROM ${BELIEF_STATEMENT_TABLE}`,
-    );
-  },
+  try: () => queryDatabase({
+    surql: `SELECT kind, statementId AS beliefSystemId, harmfulStatement, guidingStatement, archivedAt FROM ${BELIEF_STATEMENT_TABLE}`,
+  }),
   catch: (cause) => BeliefStatementStorageError.make({ operation: 'read', cause }),
 }).pipe(
   Effect.flatMap((statements) => Schema.decodeUnknown(BeliefStatementDatabaseListSchema)(
@@ -98,10 +95,9 @@ export const persistBeliefStatement = Effect.fn(
     })),
     Effect.flatMap((encoded) => Effect.tryPromise({
       try: async () => {
-        const database = await getDatabase();
-        await database.query(
-          'UPSERT $record CONTENT $statement',
-          {
+        await queryDatabase({
+          surql: 'UPSERT $record CONTENT $statement',
+          variables: {
             record: new SurrealRecordId(
               `${BELIEF_STATEMENT_TABLE}:${statement.beliefSystemId}`,
             ),
@@ -110,7 +106,7 @@ export const persistBeliefStatement = Effect.fn(
               statementId: encoded.beliefSystemId,
             },
           },
-        );
+        });
       },
       catch: (cause) => BeliefStatementStorageError.make({
         operation: 'write',
@@ -126,15 +122,14 @@ export const deleteBeliefStatement = Effect.fn(
 )((beliefSystemId: BeliefSystemId) => (
   Effect.tryPromise({
     try: async () => {
-      const database = await getDatabase();
-      await database.query(
-        'DELETE $record',
-        {
+      await queryDatabase({
+        surql: 'DELETE $record',
+        variables: {
           record: new SurrealRecordId(
             `${BELIEF_STATEMENT_TABLE}:${beliefSystemId}`,
           ),
         },
-      );
+      });
     },
     catch: (cause) => BeliefStatementStorageError.make({
       operation: 'delete',
@@ -149,13 +144,10 @@ const isBeliefStatementReferenced = Effect.fn(
   'BeliefStatementRepository.isReferenced',
 )((beliefSystemId: CustomBeliefStatement['beliefSystemId']) => (
   Effect.tryPromise({
-    try: async () => {
-      const database = await getDatabase();
-      return database.query<unknown>(
-        `SELECT VALUE checkInId FROM ${CHECK_IN_TABLE} WHERE beliefSystemId = $beliefSystemId LIMIT 1`,
-        { beliefSystemId },
-      );
-    },
+    try: () => queryDatabase({
+      surql: `SELECT VALUE checkInId FROM ${CHECK_IN_TABLE} WHERE beliefSystemId = $beliefSystemId LIMIT 1`,
+      variables: { beliefSystemId },
+    }),
     catch: (cause) => BeliefStatementStorageError.make({
       operation: 'read',
       cause,

@@ -31,6 +31,12 @@ jest.mock('expo-router', () => ({
 
 jest.mock('@/features/check-in/infrastructure/surrealdb.database', () => ({
   getDatabase: jest.fn(() => Promise.resolve(mockSurrealDatabase)),
+  queryDatabase: jest.fn(({ surql, variables }: {
+    surql: string;
+    variables?: Parameters<typeof mockSurrealDatabase.query>[1];
+  }) => variables === undefined
+    ? mockSurrealDatabase.query(surql)
+    : mockSurrealDatabase.query(surql, variables)),
 }));
 
 jest.mock('../infrastructure/local-reminder.scheduler', () => ({

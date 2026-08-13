@@ -4851,30 +4851,6 @@
       ],
       "types": []
     },
-    "aUFjrtQK90swG7rdDAPCpg==": {
-      "description": "Reminder settings title",
-      "status": "new",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "Deine Erinnerungszeitpläne.",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "w/Jf/edGMXEhdGvOnYODwQ==": {
-      "description": "Reminder settings explanation",
-      "status": "new",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "Zeitpläne bleiben auf diesem Gerät und können für den Pulse oder einen positiven Leitsatz verwendet werden.",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
     "2WmdjoxyhYCJdwk+A1+e7Q==": {
       "description": "Enabled reminder assignment status",
       "status": "new",
@@ -4918,30 +4894,6 @@
       "translations": [
         {
           "translation": "Einschalten",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "p1BmEcTeNuTmwYD0alWJtw==": {
-      "description": "Empty reminder settings title",
-      "status": "new",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "Noch keine Zeitpläne",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "qkDFe17YJV1XVZvtfjjn7A==": {
-      "description": "Empty reminder settings explanation",
-      "status": "new",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "Erstelle einen Zeitplan für eine sanfte Einladung zurückzukehren.",
           "variations": {}
         }
       ],
@@ -5139,18 +5091,6 @@
       ],
       "types": []
     },
-    "MmT4krQhzX2k5vosL+VYtQ==": {
-      "description": "Reminder schedule content section label",
-      "status": "new",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "ERINNERUNGSINHALT",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
     "RjZMYoh9qczdy7BocOj14Q==": {
       "description": "Pulse reminder assignment kind",
       "status": "new",
@@ -5199,13 +5139,121 @@
       ],
       "types": []
     },
-    "B6mQm+I1XJWJhkjRp3KSVA==": {
-      "description": "Reminder schedule without assignments explanation",
+    "j/BwEEjU4nS9RwnKl7EC8Q==": {
+      "description": "Edit reminder schedule eyebrow",
       "status": "new",
       "tokens": [],
       "translations": [
         {
-          "translation": "Dieser Zeitplan wird von keiner Erinnerung verwendet.",
+          "translation": "ZEITPLAN BEARBEITEN",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "xesW9bJu5EBtvsI/sBfmag==": {
+      "description": "Edit reminder schedule title",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Passe diese Erinnerung an.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "w8WsZ09E1Xj0DkR4k1LpBg==": {
+      "description": "Reminder-owned schedule editing explanation",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Diese Änderungen gelten nur für diese Erinnerung.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "54mbFVnFrYbSmxAFEK4bog==": {
+      "description": "Save reminder schedule changes button",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Änderungen speichern",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "erL7klju1wRgcgtwIhboCQ==": {
+      "description": "Edit reminder schedule button",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Bearbeiten",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "nrbSdI/rmaMmtkdJtvvrYQ==": {
+      "description": "Reminder schedule copy explanation",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Wenn du einen Zeitplan auswählst, werden seine Tage und Zeiten für diese Erinnerung kopiert.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "BmbOkB6CrSiHhoRGCqB4aw==": {
+      "description": "Reminder settings title",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Deine Erinnerungen.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "zop6Lppbp/veUir1s4ylqw==": {
+      "description": "Reminder settings explanation",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Jede Erinnerung behält ihre eigenen Tage und Zeiten auf diesem Gerät. Wenn du einen Zeitplan wiederverwendest, werden seine Einstellungen kopiert.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "NTi1lRYXZRPOnmFJNR17PA==": {
+      "description": "Empty reminder settings title",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Noch keine Erinnerungen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "NWZgafhJ8d7AkYvs+uFVXQ==": {
+      "description": "Empty reminder settings explanation",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Erstelle eine Erinnerung, wenn du sanft zum Innehalten eingeladen werden möchtest.",
           "variations": {}
         }
       ],

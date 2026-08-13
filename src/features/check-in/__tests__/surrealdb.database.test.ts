@@ -29,6 +29,10 @@ function loadDatabaseModule() {
   );
 }
 
+function uninitializedQuerySignal(): never {
+  throw new Error('The query signal was not initialized.');
+}
+
 describe('SurrealDB connection', () => {
   beforeEach(() => {
     jest.resetModules();
@@ -72,6 +76,37 @@ describe('SurrealDB connection', () => {
         }),
       }),
     );
+  });
+
+  it('serializes queries across repositories sharing the embedded client', async () => {
+    const { getDatabase, queryDatabase } = loadDatabaseModule();
+    await getDatabase();
+    mockClient.query.mockReset();
+    let releaseFirst: () => void = uninitializedQuerySignal;
+    let markFirstStarted: () => void = uninitializedQuerySignal;
+    const firstReleased = new Promise<void>((resolve) => {
+      releaseFirst = resolve;
+    });
+    const firstStarted = new Promise<void>((resolve) => {
+      markFirstStarted = resolve;
+    });
+    mockClient.query.mockImplementation(async (surql: string) => {
+      if (surql === 'FIRST') {
+        markFirstStarted();
+        await firstReleased;
+      }
+      return [{ statementIndex: 0, value: [] }];
+    });
+
+    const first = queryDatabase({ surql: 'FIRST' });
+    await firstStarted;
+    const second = queryDatabase({ surql: 'SECOND' });
+    await Promise.resolve();
+
+    expect(mockClient.query).toHaveBeenCalledTimes(1);
+    releaseFirst();
+    await Promise.all([first, second]);
+    expect(mockClient.query.mock.calls.map(([surql]) => surql)).toEqual(['FIRST', 'SECOND']);
   });
 
   it('rejects non-file database locations', async () => {

@@ -18,6 +18,7 @@ import {
 import {
   activateReminder,
   setReminderAssignmentEnabled,
+  updateReminderSchedule,
 } from '../application/reminder-coordinator';
 import * as reminderRepository from '../infrastructure/reminder.repository';
 import * as reminderScheduler from '../infrastructure/local-reminder.scheduler';
@@ -35,6 +36,7 @@ jest.mock('../infrastructure/local-reminder.scheduler', () => ({
 }));
 
 const persistedAssignment = jest.mocked(reminderRepository.persistReminderAssignment);
+const persistedSchedule = jest.mocked(reminderRepository.persistReminderSchedule);
 const reconcile = jest.mocked(reminderScheduler.reconcileReminderNotifications);
 const createdAt = ReminderScheduleTimestamp.make('2026-08-13T08:00:00.000Z');
 const beliefSystemId = CustomBeliefSystemId.make('custom-support');
@@ -69,7 +71,7 @@ const statements = [{
 describe('reminder coordinator', () => {
   beforeEach(() => jest.clearAllMocks());
 
-  it('reuses the assignment identity when a positive Leitsatz selects another schedule', async () => {
+  it('reuses the assignment identity and copies a selected schedule', async () => {
     const result = await activateReminder({
       assignments: [existing],
       locale: APP_LOCALES.ENGLISH,
@@ -82,15 +84,73 @@ describe('reminder coordinator', () => {
     expect(result.assignments).toHaveLength(1);
     expect(result.assignment).toMatchObject({
       id: existing.id,
-      scheduleId: schedule.id,
       enabled: true,
       createdAt,
     });
+    expect(result.assignment.scheduleId).not.toBe(schedule.id);
+    expect(result.schedules).toEqual([
+      expect.objectContaining({ id: result.assignment.scheduleId, name: schedule.name }),
+    ]);
+    expect(persistedSchedule).toHaveBeenCalledWith(result.schedules[0]);
     expect(persistedAssignment).toHaveBeenCalledWith(result.assignment);
     expect(reconcile).toHaveBeenCalledWith(expect.objectContaining({
       assignments: result.assignments,
-      schedules: [schedule],
+      schedules: result.schedules,
     }));
+  });
+
+  it('separates legacy shared schedules before editing one reminder', async () => {
+    const pulse = {
+      id: ReminderAssignmentId.make('pulse-assignment'),
+      schemaVersion: 1,
+      scheduleId: schedule.id,
+      targetKind: REMINDER_TARGET_KINDS.PULSE,
+      enabled: true,
+      createdAt,
+      updatedAt: createdAt,
+    } satisfies ReminderAssignment;
+    const guiding = { ...existing, scheduleId: schedule.id };
+    const edited = { ...schedule, name: 'Only this reminder' };
+
+    const result = await updateReminderSchedule({
+      assignment: pulse,
+      assignments: [pulse, guiding],
+      locale: APP_LOCALES.ENGLISH,
+      schedule: edited,
+      schedules: [schedule],
+      statements,
+    });
+
+    expect(result.assignments[0]?.scheduleId).not.toBe(schedule.id);
+    expect(result.assignments[1]?.scheduleId).toBe(schedule.id);
+    expect(result.schedules).toEqual([
+      schedule,
+      expect.objectContaining({ name: 'Only this reminder' }),
+    ]);
+    expect(persistedAssignment).toHaveBeenCalledWith(result.assignments[0]);
+    expect(reconcile).toHaveBeenCalledWith(expect.objectContaining({
+      assignments: result.assignments,
+      schedules: result.schedules,
+    }));
+  });
+
+  it('preserves the owned schedule identity when editing it', async () => {
+    const owned = { ...existing, scheduleId: schedule.id };
+    const edited = { ...schedule, name: 'A calmer morning' };
+
+    const result = await updateReminderSchedule({
+      assignment: owned,
+      assignments: [owned],
+      locale: APP_LOCALES.ENGLISH,
+      schedule: edited,
+      schedules: [schedule],
+      statements,
+    });
+
+    expect(result.assignments).toEqual([owned]);
+    expect(result.schedules).toEqual([edited]);
+    expect(persistedAssignment).not.toHaveBeenCalled();
+    expect(persistedSchedule).toHaveBeenCalledWith(edited);
   });
 
   it('persists an off assignment before canceling its native projection', async () => {

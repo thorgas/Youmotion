@@ -259,6 +259,11 @@ function SchedulePickerContent({
     <>
       <Text style={styles.eyebrow}><fbt desc="Reminder schedule picker eyebrow">NOTIFICATIONS ALLOWED</fbt></Text>
       <Text style={styles.title}><fbt desc="Reminder schedule picker title">When should it return?</fbt></Text>
+      {schedules.length > 0 ? (
+        <Text style={styles.copy}>
+          <fbt desc="Reminder schedule copy explanation">Choosing a schedule copies its days and times for this reminder.</fbt>
+        </Text>
+      ) : null}
       {schedules.map((schedule) => {
         const _selectSchedule = () => actor.send({
           type: REMINDER_EVENTS.SCHEDULE_SELECTED,
@@ -275,12 +280,14 @@ function SchedulePickerContent({
 
 function ScheduleEditorContent({
   actor,
+  editing,
   name,
   pickerIndex,
   times,
   weekdays,
 }: {
   actor: ReminderActor;
+  editing: boolean;
   name: string;
   pickerIndex: number | null;
   times: readonly ReminderLocalTime[];
@@ -294,8 +301,21 @@ function ScheduleEditorContent({
   const _saveSchedule = () => actor.send({ type: REMINDER_EVENTS.SCHEDULE_SAVE_REQUESTED });
   return (
     <>
-      <Text style={styles.eyebrow}><fbt desc="New reminder schedule eyebrow">NEW SCHEDULE</fbt></Text>
-      <Text style={styles.title}><fbt desc="New reminder schedule title">Create a rhythm that fits you.</fbt></Text>
+      <Text style={styles.eyebrow}>
+        {editing
+          ? <fbt desc="Edit reminder schedule eyebrow">EDIT SCHEDULE</fbt>
+          : <fbt desc="New reminder schedule eyebrow">NEW SCHEDULE</fbt>}
+      </Text>
+      <Text style={styles.title}>
+        {editing
+          ? <fbt desc="Edit reminder schedule title">Adjust this reminder.</fbt>
+          : <fbt desc="New reminder schedule title">Create a rhythm that fits you.</fbt>}
+      </Text>
+      {editing ? (
+        <Text style={styles.copy}>
+          <fbt desc="Reminder-owned schedule editing explanation">These changes apply only to this reminder.</fbt>
+        </Text>
+      ) : null}
       <TextInput aria-label={String(fbs('Schedule name', 'Reminder schedule name input label'))} onChangeText={_changeName} placeholder={String(fbs('For example: Weekday mornings', 'Reminder schedule name placeholder'))} style={styles.input} testID="reminder-schedule-name" value={name} />
       <Text style={styles.fieldLabel}><fbt desc="Reminder schedule weekdays label">DAYS</fbt></Text>
       <View style={styles.weekdayRow}>
@@ -326,7 +346,13 @@ function ScheduleEditorContent({
         return <TimeRow canRemove={times.length > 1} hour={hour} index={index} key={`${hour}-${minute}`} minute={minute} onChange={_change} onDismiss={_dismiss} onOpen={_open} onRemove={_remove} pickerOpen={pickerIndex === index} />;
       })}
       {times.length < MAX_REMINDER_TIMES ? <ActionButton label={String(fbs('Add another time', 'Add reminder time button'))} onPress={_addTime} secondary testID="reminder-time-add" /> : null}
-      <ActionButton label={String(fbs('Create and use schedule', 'Save and activate reminder schedule button'))} onPress={_saveSchedule} testID="reminder-save-schedule" />
+      <ActionButton
+        label={editing
+          ? String(fbs('Save changes', 'Save reminder schedule changes button'))
+          : String(fbs('Create and use schedule', 'Save and activate reminder schedule button'))}
+        onPress={_saveSchedule}
+        testID="reminder-save-schedule"
+      />
     </>
   );
 }
@@ -370,6 +396,9 @@ export function LeitsatzReminderScreen() {
         statements: context.beliefStatements,
       })?.guidingStatement
     : undefined;
+  const selectableSchedules = context.reminderSchedules.filter((schedule) => (
+    context.reminderAssignments.some((assignment) => assignment.scheduleId === schedule.id)
+  ));
   const pulseTarget = context.reminderTargetKind === REMINDER_TARGET_KINDS.PULSE;
   const _back = () => actor.send({ type: NAVIGATION_EVENTS.BACK_REQUESTED });
 
@@ -408,10 +437,10 @@ export function LeitsatzReminderScreen() {
             />
           ) : null}
           {snapshot.matches(REMINDER_STATES.SCHEDULE_PICKER) ? (
-            <SchedulePickerContent actor={actor} error={context.reminderError} locale={locale} schedules={context.reminderSchedules} />
+            <SchedulePickerContent actor={actor} error={context.reminderError} locale={locale} schedules={selectableSchedules} />
           ) : null}
           {snapshot.matches(REMINDER_STATES.SCHEDULE_EDITOR) ? (
-            <ScheduleEditorContent actor={actor} name={context.reminderScheduleNameDraft} pickerIndex={context.reminderTimePickerIndex} times={context.reminderTimesDraft} weekdays={context.reminderWeekdaysDraft} />
+            <ScheduleEditorContent actor={actor} editing={context.reminderAssignmentDraftId !== null} name={context.reminderScheduleNameDraft} pickerIndex={context.reminderTimePickerIndex} times={context.reminderTimesDraft} weekdays={context.reminderWeekdaysDraft} />
           ) : null}
           {snapshot.matches(REMINDER_STATES.ACTIVE) ? (
             <ActiveContent actor={actor} statement={statement} />

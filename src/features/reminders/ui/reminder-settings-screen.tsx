@@ -44,83 +44,82 @@ export function ReminderSettingsScreen() {
         </View>
         <ScrollView contentContainerStyle={styles.content}>
           <Text style={styles.eyebrow}><fbt desc="Reminder settings eyebrow">GENTLE REMINDERS</fbt></Text>
-          <Text style={styles.title}><fbt desc="Reminder settings title">Your reminder schedules.</fbt></Text>
-          <Text style={styles.copy}><fbt desc="Reminder settings explanation">Schedules stay on this device and can be used by the Pulse or a positive Leitsatz.</fbt></Text>
-          {schedules.map((schedule) => {
-            const scheduleAssignments = assignments.filter(
-              (assignment) => assignment.scheduleId === schedule.id,
-            );
+          <Text style={styles.title}><fbt desc="Reminder settings title">Your reminders.</fbt></Text>
+          <Text style={styles.copy}><fbt desc="Reminder settings explanation">Each reminder keeps its own days and times on this device. Reusing a schedule copies its settings.</fbt></Text>
+          {assignments.map((assignment) => {
+            const schedule = schedules.find((candidate) => candidate.id === assignment.scheduleId);
+            if (!schedule) return null;
+            const statement = assignment.targetKind === REMINDER_TARGET_KINDS.GUIDING_BELIEF
+              ? statements.find((candidate) => (
+                  candidate.beliefSystemId === assignment.beliefSystemId
+                ))?.guidingStatement
+              : undefined;
+            const _editSchedule = () => actor.send({
+              type: REMINDER_EVENTS.SCHEDULE_EDIT_REQUESTED,
+              assignmentId: assignment.id,
+            });
+            const _toggle = () => actor.send({
+              type: REMINDER_EVENTS.ASSIGNMENT_TOGGLED,
+              assignmentId: assignment.id,
+            });
             return (
-              <View key={schedule.id} style={styles.scheduleCard}>
-                <Text style={styles.scheduleTitle}>{schedule.name}</Text>
-                <Text style={styles.scheduleTiming}>
-                  {schedule.weekdays.map((weekday) => (
-                    formatWeekday({ locale, weekday })
-                  )).join(', ')} · {schedule.times.map(({ hour, minute }) => (
-                    `${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}`
-                  )).join(', ')}
-                </Text>
+              <View key={assignment.id} style={styles.scheduleCard}>
                 <Text style={styles.assignmentSectionLabel}>
-                  <fbt desc="Reminder schedule content section label">REMINDER CONTENT</fbt>
+                  {assignment.targetKind === REMINDER_TARGET_KINDS.PULSE
+                    ? <fbt desc="Pulse reminder assignment kind">PULSE</fbt>
+                    : <fbt desc="Positive Leitsatz reminder assignment kind">LEITSATZ</fbt>}
                 </Text>
-                {scheduleAssignments.map((assignment) => {
-                  const statement = assignment.targetKind === REMINDER_TARGET_KINDS.GUIDING_BELIEF
-                    ? statements.find((candidate) => (
-                        candidate.beliefSystemId === assignment.beliefSystemId
-                      ))?.guidingStatement
-                    : undefined;
-                  const _toggle = () => actor.send({
-                    type: REMINDER_EVENTS.ASSIGNMENT_TOGGLED,
-                    assignmentId: assignment.id,
-                  });
-                  return (
-                    <View key={assignment.id} style={styles.assignmentRow}>
-                      <View style={styles.assignmentCopy}>
-                        <Text style={styles.assignmentKind}>
-                          {assignment.targetKind === REMINDER_TARGET_KINDS.PULSE
-                            ? <fbt desc="Pulse reminder assignment kind">PULSE</fbt>
-                            : <fbt desc="Positive Leitsatz reminder assignment kind">LEITSATZ</fbt>}
-                        </Text>
-                        <Text style={styles.assignmentTitle}>
-                          {assignment.targetKind === REMINDER_TARGET_KINDS.PULSE
-                            ? <fbt desc="Pulse reminder content description">Pick an emotion</fbt>
-                            : statement
-                              ? `“${statement}”`
-                              : <fbt desc="Unavailable Leitsatz reminder assignment label">Leitsatz no longer available</fbt>}
-                        </Text>
-                        <Text style={styles.assignmentStatus}>
-                          {assignment.enabled
-                            ? <fbt desc="Enabled reminder assignment status">Active</fbt>
-                            : <fbt desc="Disabled reminder assignment status">Off</fbt>}
-                        </Text>
-                      </View>
-                      <PressableScale
-                        accessibilityRole="button"
-                        onPress={_toggle}
-                        style={styles.toggleAction}
-                        testID={`reminder-assignment-toggle-${assignment.id}`}
-                      >
-                        <Text style={styles.toggleActionText}>
-                          {assignment.enabled
-                            ? <fbt desc="Turn reminder assignment off button">Turn off</fbt>
-                            : <fbt desc="Turn reminder assignment on button">Turn on</fbt>}
-                        </Text>
-                      </PressableScale>
-                    </View>
-                  );
-                })}
-                {scheduleAssignments.length === 0 ? (
+                <Text style={styles.assignmentTitle}>
+                  {assignment.targetKind === REMINDER_TARGET_KINDS.PULSE
+                    ? <fbt desc="Pulse reminder content description">Pick an emotion</fbt>
+                    : statement
+                      ? `“${statement}”`
+                      : <fbt desc="Unavailable Leitsatz reminder assignment label">Leitsatz no longer available</fbt>}
+                </Text>
+                <PressableScale
+                  accessibilityRole="button"
+                  onPress={_editSchedule}
+                  style={styles.scheduleEdit}
+                  testID={`reminder-schedule-edit-${assignment.id}`}
+                >
+                  <View style={styles.assignmentCopy}>
+                    <Text style={styles.scheduleTitle}>{schedule.name}</Text>
+                    <Text style={styles.scheduleTiming}>
+                      {schedule.weekdays.map((weekday) => (
+                        formatWeekday({ locale, weekday })
+                      )).join(', ')} · {schedule.times.map(({ hour, minute }) => (
+                        `${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}`
+                      )).join(', ')}
+                    </Text>
+                  </View>
+                  <Text style={styles.editLabel}><fbt desc="Edit reminder schedule button">Edit</fbt></Text>
+                </PressableScale>
+                <View style={styles.assignmentRow}>
                   <Text style={styles.assignmentStatus}>
-                    <fbt desc="Reminder schedule without assignments explanation">No reminders use this schedule.</fbt>
+                    {assignment.enabled
+                      ? <fbt desc="Enabled reminder assignment status">Active</fbt>
+                      : <fbt desc="Disabled reminder assignment status">Off</fbt>}
                   </Text>
-                ) : null}
+                  <PressableScale
+                    accessibilityRole="button"
+                    onPress={_toggle}
+                    style={styles.toggleAction}
+                    testID={`reminder-assignment-toggle-${assignment.id}`}
+                  >
+                    <Text style={styles.toggleActionText}>
+                      {assignment.enabled
+                        ? <fbt desc="Turn reminder assignment off button">Turn off</fbt>
+                        : <fbt desc="Turn reminder assignment on button">Turn on</fbt>}
+                    </Text>
+                  </PressableScale>
+                </View>
               </View>
             );
           })}
-          {schedules.length === 0 ? (
+          {assignments.length === 0 ? (
             <View style={styles.empty}>
-              <Text style={styles.scheduleTitle}><fbt desc="Empty reminder settings title">No schedules yet</fbt></Text>
-              <Text style={styles.copy}><fbt desc="Empty reminder settings explanation">Create a schedule when you want a gentle invitation to return.</fbt></Text>
+              <Text style={styles.scheduleTitle}><fbt desc="Empty reminder settings title">No reminders yet</fbt></Text>
+              <Text style={styles.copy}><fbt desc="Empty reminder settings explanation">Create a reminder when you want a gentle invitation to return.</fbt></Text>
             </View>
           ) : null}
           {error ? <Text style={styles.error}>{error}</Text> : null}
@@ -147,12 +146,13 @@ const styles = StyleSheet.create({
   title: { fontFamily: type.semibold, color: palette.ink, fontSize: 34, lineHeight: 40 },
   copy: { fontFamily: type.regular, color: palette.inkMuted, fontSize: 14, lineHeight: 21 },
   scheduleCard: { borderWidth: 1, borderColor: palette.hairline, borderRadius: 22, borderCurve: 'continuous', padding: 18, gap: 6 },
+  scheduleEdit: { minHeight: 64, flexDirection: 'row', alignItems: 'center', gap: 12, borderTopWidth: 1, borderTopColor: palette.hairline, paddingTop: 12, marginTop: 8 },
+  editLabel: { fontFamily: type.semibold, color: palette.moss, fontSize: 13 },
   scheduleTitle: { fontFamily: type.semibold, color: palette.ink, fontSize: 17 },
   scheduleTiming: { fontFamily: type.regular, color: palette.inkMuted, fontSize: 14, lineHeight: 21 },
   assignmentSectionLabel: { fontFamily: type.semibold, color: palette.moss, fontSize: 10, letterSpacing: 1.1, marginTop: 10 },
-  assignmentRow: { minHeight: 72, flexDirection: 'row', alignItems: 'center', gap: 12, borderTopWidth: 1, borderTopColor: palette.hairline, paddingTop: 12, marginTop: 2 },
+  assignmentRow: { minHeight: 52, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 12, borderTopWidth: 1, borderTopColor: palette.hairline, paddingTop: 10, marginTop: 2 },
   assignmentCopy: { flex: 1, gap: 2 },
-  assignmentKind: { fontFamily: type.semibold, color: palette.inkMuted, fontSize: 10, letterSpacing: 1.1 },
   assignmentTitle: { fontFamily: type.medium, color: palette.ink, fontSize: 15, lineHeight: 21 },
   assignmentStatus: { fontFamily: type.regular, color: palette.inkMuted, fontSize: 13, lineHeight: 19 },
   toggleAction: { minHeight: 40, justifyContent: 'center', borderWidth: 1, borderColor: palette.hairline, borderRadius: 14, borderCurve: 'continuous', paddingHorizontal: 12 },

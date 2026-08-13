@@ -8,7 +8,7 @@ import {
   APP_SETTINGS_TABLE,
   EMOTION_LABEL_MODES,
 } from '@/constants';
-import { getDatabase } from '@/features/check-in/infrastructure/surrealdb.database';
+import { queryDatabase } from '@/features/check-in/infrastructure/surrealdb.database';
 import { appLocaleForLanguageCodes } from '../domain/app-locale';
 import { AppLocaleSchema } from '../domain/app-locale';
 import { AppSettingsSchema, type AppSettings } from '../domain/app-settings';
@@ -56,13 +56,10 @@ function defaultAppSettings(): AppSettings {
 }
 
 const selectAppSettings = Effect.tryPromise({
-  try: async () => {
-    const database = await getDatabase();
-    return database.query<unknown>(
-      'SELECT locale, emotionLabelMode, onboardingCompleted FROM $record',
-      { record: appSettingsRecord },
-    );
-  },
+  try: () => queryDatabase({
+    surql: 'SELECT locale, emotionLabelMode, onboardingCompleted FROM $record',
+    variables: { record: appSettingsRecord },
+  }),
   catch: (cause) => AppSettingsStorageError.make({ operation: 'read', cause }),
 }).pipe(
   Effect.flatMap((statements) => Schema.decodeUnknown(LegacyAppSettingsDatabaseListSchema)(
@@ -77,11 +74,10 @@ const upsertAppSettings = Effect.fn('AppSettingsRepository.upsert')((settings: A
     Effect.mapError((cause) => AppSettingsDataError.make({ operation: 'encode', cause })),
     Effect.flatMap((encoded) => Effect.tryPromise({
       try: () => enqueueSettingsWrite(async () => {
-        const database = await getDatabase();
-        await database.query(
-          'UPSERT $record CONTENT $settings',
-          { record: appSettingsRecord, settings: encoded },
-        );
+        await queryDatabase({
+          surql: 'UPSERT $record CONTENT $settings',
+          variables: { record: appSettingsRecord, settings: encoded },
+        });
       }),
       catch: (cause) => AppSettingsStorageError.make({ operation: 'write', cause }),
     })),

@@ -13,6 +13,7 @@ import {
   type ReminderAssignment,
 } from '../domain/reminder-assignment';
 import {
+  createReminderScheduleId,
   ReminderScheduleTimestamp,
   type ReminderSchedule,
 } from '../domain/reminder-schedule';
@@ -45,6 +46,15 @@ export async function activateReminder({
   target: ReminderTarget;
 }) {
   const now = ReminderScheduleTimestamp.make(new Date().toISOString());
+  const ownedSchedule: ReminderSchedule = {
+    ...schedule,
+    id: createReminderScheduleId({
+      timestamp: Date.now(),
+      nonce: Math.random().toString(16).slice(2),
+    }),
+    createdAt: now,
+    updatedAt: now,
+  };
   const existing = assignments.find((candidate) => (
     candidate.targetKind === target.targetKind
     && (
@@ -59,7 +69,7 @@ export async function activateReminder({
     ? {
         id: existing?.id ?? createReminderAssignmentId({ timestamp: Date.now(), nonce: Math.random().toString(16).slice(2) }),
         schemaVersion: 1,
-        scheduleId: schedule.id,
+        scheduleId: ownedSchedule.id,
         targetKind: target.targetKind,
         enabled: true,
         createdAt: existing?.createdAt ?? now,
@@ -68,7 +78,7 @@ export async function activateReminder({
     : {
         id: existing?.id ?? createReminderAssignmentId({ timestamp: Date.now(), nonce: Math.random().toString(16).slice(2) }),
         schemaVersion: 1,
-        scheduleId: schedule.id,
+        scheduleId: ownedSchedule.id,
         targetKind: target.targetKind,
         beliefSystemId: target.beliefSystemId,
         enabled: true,
@@ -76,11 +86,9 @@ export async function activateReminder({
         createdAt: existing?.createdAt ?? now,
         updatedAt: now,
       };
-  await Effect.runPromise(persistReminderSchedule(schedule));
+  await Effect.runPromise(persistReminderSchedule(ownedSchedule));
   await Effect.runPromise(persistReminderAssignment(assignment));
-  const nextSchedules = schedules.some((candidate) => candidate.id === schedule.id)
-    ? schedules.map((candidate) => candidate.id === schedule.id ? schedule : candidate)
-    : [...schedules, schedule];
+  const nextSchedules = [...schedules, ownedSchedule];
   const nextAssignments = assignments
     .filter((candidate) => (
       candidate.targetKind !== target.targetKind
@@ -98,6 +106,58 @@ export async function activateReminder({
     statements,
   });
   return { assignment, schedules: nextSchedules, assignments: nextAssignments };
+}
+
+export async function updateReminderSchedule({
+  assignment,
+  assignments,
+  locale,
+  schedule,
+  schedules,
+  statements,
+}: {
+  assignment: ReminderAssignment;
+  assignments: readonly ReminderAssignment[];
+  locale: AppLocale;
+  schedule: ReminderSchedule;
+  schedules: readonly ReminderSchedule[];
+  statements: readonly BeliefStatement[];
+}) {
+  const now = ReminderScheduleTimestamp.make(new Date().toISOString());
+  const shared = assignments.some((candidate) => (
+    candidate.id !== assignment.id && candidate.scheduleId === assignment.scheduleId
+  ));
+  const updatedSchedule: ReminderSchedule = shared
+    ? {
+        ...schedule,
+        id: createReminderScheduleId({
+          timestamp: Date.now(),
+          nonce: Math.random().toString(16).slice(2),
+        }),
+        createdAt: now,
+        updatedAt: now,
+      }
+    : schedule;
+  const updatedAssignment: ReminderAssignment = shared
+    ? { ...assignment, scheduleId: updatedSchedule.id, updatedAt: now }
+    : assignment;
+  await Effect.runPromise(persistReminderSchedule(updatedSchedule));
+  if (shared) await Effect.runPromise(persistReminderAssignment(updatedAssignment));
+  const nextSchedules = shared
+    ? [...schedules, updatedSchedule]
+    : schedules.map((candidate) => (
+        candidate.id === updatedSchedule.id ? updatedSchedule : candidate
+      ));
+  const nextAssignments = assignments.map((candidate) => (
+    candidate.id === updatedAssignment.id ? updatedAssignment : candidate
+  ));
+  await reconcileReminderNotifications({
+    assignments: nextAssignments,
+    locale,
+    schedules: nextSchedules,
+    statements,
+  });
+  return { assignments: nextAssignments, schedules: nextSchedules };
 }
 
 export function assignmentForTarget({
