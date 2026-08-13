@@ -4275,18 +4275,6 @@
       ],
       "types": []
     },
-    "C/dSy0eWNLTLlh+l090XLw==": {
-      "description": "Button closing the emotion date and time editor",
-      "status": "new",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "Fertig",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
     "BPHh9CMbVhsGHx5r44WA3g==": {
       "description": "Button opening the date picker for an emotion",
       "status": "new",
@@ -4347,30 +4335,6 @@
       ],
       "types": []
     },
-    "Hgsfj52RsA/kOo615NsbUA==": {
-      "description": "Label beside the date picker for an emotion",
-      "status": "new",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "Datum",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "uSJplHCYlHMEcwF3IRQUzA==": {
-      "description": "Label beside the time picker for an emotion",
-      "status": "new",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "Uhrzeit",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
     "b+NN9jQ+JIWZW56N4OsOiA==": {
       "description": "Label clarifying that the reflection note is optional",
       "status": "new",
@@ -4378,6 +4342,834 @@
       "translations": [
         {
           "translation": "OPTIONAL",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "TXlBSeUcy8SEXm9gLzdqYw==": {
+      "description": "Reminder settings entry explanation",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Wähle Tage und Zeiten für den Pulse oder einen positiven Leitsatz.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "IzcqFQivuQJMehXgK1G0Tg==": {
+      "description": "Reminder settings entry title",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Sanfte Erinnerungen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "2gl4kZBWpAlSmK9/Bh0yfg==": {
+      "description": "Positive Leitsatz reminder card label",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "DEIN NEUER LEITSATZ",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "YpOEircW0DWUHYOHqBLp2Q==": {
+      "description": "Remove reminder time button",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Zeit entfernen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "LmIVEy07ktZ+nnzY0Ay4MA==": {
+      "description": "Saved positive Leitsatz eyebrow",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "LEITSATZ GESPEICHERT",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "Nu1OoTXhQ1wfnp4nKsYBhQ==": {
+      "description": "Pulse reminder offer title",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Möchtest du sanft daran erinnert werden, bei dir einzuchecken?",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "siG2MEr/HaZhM7A4UnqGWA==": {
+      "description": "Positive Leitsatz reminder offer title",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Möchtest du freundlich an deinen neuen Leitsatz erinnert werden?",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "lEVR/084DrVhI+1NQl7gqw==": {
+      "description": "Reminder permission before schedule explanation",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Du kannst wählen, wann die Mitteilung erscheint. Youmotion fragt nach deiner Erlaubnis für Mitteilungen, bevor du einen Zeitplan auswählst.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "60r2oR33nL1DVFiNgs+Fww==": {
+      "description": "Button requesting reminder permission",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Mitteilungen erlauben und fortfahren",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "jwhG6V4RONZn6erxKh8twQ==": {
+      "description": "Button declining reminder setup",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Jetzt nicht",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "1Ke0+fU2iImzqLAHuBkn6A==": {
+      "description": "Notification permission eyebrow",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "MITTEILUNGEN",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "tEKSzOjgJQMOLRSsVJQp2A==": {
+      "description": "Notification permission denied title",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Mitteilungen sind ausgeschaltet.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "K50O0mQ2UnqXTYsD+xlxrw==": {
+      "description": "Open notification system settings button",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Systemeinstellungen öffnen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "ZWk3jl9e+Hh26e9YpdE4Gw==": {
+      "description": "Recheck notification permission button",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Erneut prüfen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "G7atOavBe3eJW0ocIcgdMw==": {
+      "description": "Leave denied reminder flow button",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Jetzt nicht",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "cgu1sqWYwZAFYN++U4zyMw==": {
+      "description": "Reminder schedule picker eyebrow",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "MITTEILUNGEN ERLAUBT",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "99Nm0s56KXyhqyk93d+53Q==": {
+      "description": "Reminder schedule picker title",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Wann soll die Erinnerung wiederkommen?",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "apZcN02DkZjy7REBMqC4EA==": {
+      "description": "Empty reminder schedule picker",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Erstelle deinen ersten Zeitplan und wähle Tage und Zeit.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "YqQdYo/gvKYGweFCVwahkw==": {
+      "description": "Create a reminder schedule button",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Neuen Zeitplan erstellen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "fZ7iChmyBUkGVuE5kQ5F4g==": {
+      "description": "New reminder schedule eyebrow",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "NEUER ZEITPLAN",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "S/opO991HaS440BfLeYEVw==": {
+      "description": "New reminder schedule title",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Finde einen Rhythmus, der zu dir passt.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "2TiwUF0Y8HqwGlcqloyBlQ==": {
+      "description": "Reminder schedule name input label",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Name des Zeitplans",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "DBPJxyslDJmuZlIxdEZxnQ==": {
+      "description": "Reminder schedule name placeholder",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Zum Beispiel: Morgens unter der Woche",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "C/VItENnO/9qw83BRFkaEw==": {
+      "description": "Reminder schedule weekdays label",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "TAGE",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "oYKXkZRqarwf+7ua5ToWRw==": {
+      "description": "Reminder schedule time label",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "ZEIT",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "jJBcpBhtHA6NVtVWZ6bxCw==": {
+      "description": "Add reminder time button",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Weitere Zeit hinzufügen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "dvnhthMXpV3Y3CncxliuuA==": {
+      "description": "Save and activate reminder schedule button",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Zeitplan erstellen und verwenden",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "iu5RTz+cEt1CJB6kqMJ5dg==": {
+      "description": "Active reminder eyebrow",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "ERINNERUNG AKTIV",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "VNcnOpDVAs82H3/M4jA1cQ==": {
+      "description": "Active positive Leitsatz reminder title",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Deine Erinnerung ist bereit.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "sdrdHBtKlPDGPfChAh6giQ==": {
+      "description": "Send test reminder button",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Testmitteilung senden",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "yvGKPKJ3b1cwzDJal4VjXA==": {
+      "description": "Finish reminder setup button",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Fertig",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "QOJSK+bUginpJXuyDblsSg==": {
+      "description": "Notification-opened Leitsatz eyebrow",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "DEIN LEITSATZ",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "qqCM1ZxJFvQfCICJIjIdqQ==": {
+      "description": "Notification-opened Leitsatz title",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Ein Gedanke, der dich begleiten darf.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "xxha0h60gX8Ff4BJSgINsQ==": {
+      "description": "Unavailable notification target copy",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Dieser Leitsatz ist nicht mehr verfügbar.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "ZvRdry0mHL75o4RGNB0J1A==": {
+      "description": "Open Pulse from Leitsatz notification button",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Pulse öffnen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "NyVVxn8H9gsqdvQBsUefHw==": {
+      "description": "Edit Leitsatz reminder button",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Erinnerung bearbeiten",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "DfgzZk+TsFCB5XoutLUp7w==": {
+      "description": "Reminder setup loading state",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Deine Erinnerung wird vorbereitet…",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "ahzUykQDDyFIus4UvT+ang==": {
+      "description": "Reminder screen back button accessibility label",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Zurück",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "IAkwG+vKkbjOrGMCWthLaQ==": {
+      "description": "Reminder screen back button",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Zurück",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "lE7MRQ1roxDdvbpLDhbkqg==": {
+      "description": "Reminder settings back button accessibility label",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Zurück",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "bxx4/Xfd4GSF9Z4e0qrtZw==": {
+      "description": "Reminder settings back button",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Zurück",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "G1uScAYwyMex9cb8BSL84Q==": {
+      "description": "Reminder settings eyebrow",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "SANFTE ERINNERUNGEN",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "aUFjrtQK90swG7rdDAPCpg==": {
+      "description": "Reminder settings title",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Deine Erinnerungszeitpläne.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "w/Jf/edGMXEhdGvOnYODwQ==": {
+      "description": "Reminder settings explanation",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Zeitpläne bleiben auf diesem Gerät und können für den Pulse oder einen positiven Leitsatz verwendet werden.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "cdsjZggI30mFRLAsrEPIpg==": {
+      "description": "Reminder schedule assignment count label",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "aktive Verwendungen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "+QuHncyn2oEXzNtAr4Qiyg==": {
+      "description": "Pulse reminder assignment label",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Pulse",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "29wHE00br2QCC664fSzpDw==": {
+      "description": "Unavailable Leitsatz reminder assignment label",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Leitsatz",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "2WmdjoxyhYCJdwk+A1+e7Q==": {
+      "description": "Enabled reminder assignment status",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Aktiv",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "IEFmkff4BcB7/XHSn56UkA==": {
+      "description": "Disabled reminder assignment status",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Aus",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "eKZb/Xh6jlHtjPEEEHM7vQ==": {
+      "description": "Turn reminder assignment off button",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Ausschalten",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "7OoMcF05Es1bCZyQZdOmWw==": {
+      "description": "Turn reminder assignment on button",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Einschalten",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "p1BmEcTeNuTmwYD0alWJtw==": {
+      "description": "Empty reminder settings title",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Noch keine Zeitpläne",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "qkDFe17YJV1XVZvtfjjn7A==": {
+      "description": "Empty reminder settings explanation",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Erstelle einen Zeitplan für eine sanfte Einladung zurückzukehren.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "q0pKCDZa7gjiRyWubBbR7w==": {
+      "description": "New Pulse reminder setup button",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Pulse-Erinnerung erstellen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "yclnOUjgi7fzJPtYr60V6w==": {
+      "description": "Pulse reminder offer eyebrow",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "PULSE-ERINNERUNG",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "5v5Y953BLgPJNmMaGGmmDA==": {
+      "description": "Pulse notification permission denied explanation",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Es wurde kein Erinnerungszeitplan ausgewählt.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "x7LnEKEbAR4GCkTX26r+Kg==": {
+      "description": "Leitsatz notification permission denied explanation",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Dein Leitsatz ist gespeichert. Es wurde kein Erinnerungszeitplan ausgewählt.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "YMEl/vki3H9ihLIhM0vJ/A==": {
+      "description": "Abbreviated Sunday in reminder weekday picker",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "So",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "rHcxijHnGZ2DdL9dbf5h4A==": {
+      "description": "Abbreviated Monday in reminder weekday picker",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Mo",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "tSEcCZpdu5SWcbm0Tn99QA==": {
+      "description": "Abbreviated Tuesday in reminder weekday picker",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Di",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "R6S1MIW77+D/FlpgzFkPUQ==": {
+      "description": "Abbreviated Wednesday in reminder weekday picker",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Mi",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "LXq9/r9yMsjWQoefv2t1sw==": {
+      "description": "Abbreviated Thursday in reminder weekday picker",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Do",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "w+g+RqWXj6KMwbt3LRmC8w==": {
+      "description": "Abbreviated Friday in reminder weekday picker",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Fr",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "SomHmtNWTOqrjDj31tWnAg==": {
+      "description": "Abbreviated Saturday in reminder weekday picker",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Sa",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "lj+pcJvhGEZRiUYy9ZVllw==": {
+      "description": "Confirm reminder time picker button",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Fertig",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "X3rVMUWRZ1hIMGkg88RH2g==": {
+      "description": "Reminder time picker modal title",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Uhrzeit wählen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "gPYhgvMYssFvrm3+IRYv4w==": {
+      "description": "Confirm moment date or time picker button",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Fertig",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "2o1juddPuuZ/so39g+DUpg==": {
+      "description": "Moment date picker modal title",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Datum wählen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "TyFWouBzSKV2zgvldrOt5g==": {
+      "description": "Moment time picker modal title",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Uhrzeit wählen",
           "variations": {}
         }
       ],

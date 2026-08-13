@@ -19,6 +19,9 @@ import {
   ONBOARDING_ENTRY_POINTS,
   ONBOARDING_EVENTS,
   ONBOARDING_STATES,
+  REMINDER_EVENTS,
+  REMINDER_PERMISSION_STATES,
+  REMINDER_STATES,
   SETTINGS_EVENTS,
 } from '@/constants';
 import {
@@ -47,9 +50,17 @@ import {
   resetSurrealDatabaseMock,
 } from '@/test-utils/surrealdb.repository.mock';
 import { appNavigationMachine, routeForStateValue } from '../app-navigation.machine';
+import * as reminderScheduler from '@/features/reminders/infrastructure/local-reminder.scheduler';
 
 jest.mock('@/features/check-in/infrastructure/surrealdb.database', () => ({
   getDatabase: jest.fn(() => Promise.resolve(mockSurrealDatabase)),
+}));
+
+jest.mock('@/features/reminders/infrastructure/local-reminder.scheduler', () => ({
+  getReminderPermission: jest.fn(() => Promise.resolve('granted')),
+  requestReminderPermission: jest.fn(() => Promise.resolve('granted')),
+  reconcileReminderNotifications: jest.fn(() => Promise.resolve()),
+  sendTestReminder: jest.fn(() => Promise.resolve(true)),
 }));
 
 jest.mock('@/features/data-safety/infrastructure/data-archive.repository', () => {
@@ -69,6 +80,7 @@ const mockExportDataArchive = jest.mocked(dataArchiveRepository.exportDataArchiv
 const mockPickDataArchive = jest.mocked(dataArchiveRepository.pickDataArchive);
 const mockRestoreDataArchive = jest.mocked(dataArchiveRepository.restoreDataArchive);
 const mockDeleteAllJournalData = jest.mocked(dataArchiveRepository.deleteAllJournalData);
+const mockRequestReminderPermission = jest.mocked(reminderScheduler.requestReminderPermission);
 
 const selection = {
   emotionId: EMOTION_IDS.JOY,
@@ -149,6 +161,7 @@ describe('app navigation model', () => {
     mockPickDataArchive.mockReturnValue(Effect.succeed(null));
     mockRestoreDataArchive.mockReturnValue(Effect.succeed(undefined));
     mockDeleteAllJournalData.mockReturnValue(Effect.succeed(undefined));
+    mockRequestReminderPermission.mockResolvedValue(REMINDER_PERMISSION_STATES.GRANTED);
   });
 
   it('exports a local backup from an explicit Settings model path', async () => {
@@ -450,6 +463,82 @@ describe('app navigation model', () => {
     );
     actor.send({ type: BELIEF_LIBRARY_EVENTS.CLOSED });
     expect(routeForStateValue(actor.getSnapshot().value)).toBe(APP_ROUTES.SETTINGS);
+  });
+
+  it('offers a reminder only after a new positive Leitsatz is durably saved', async () => {
+    const actor = createActor(appNavigationMachine).start();
+    actor.send({ type: NAVIGATION_EVENTS.SETTINGS_OPENED });
+    actor.send({ type: BELIEF_LIBRARY_EVENTS.OPENED });
+    actor.send({ type: BELIEF_LIBRARY_EVENTS.CREATE_REQUESTED });
+    actor.send({
+      type: BELIEF_LIBRARY_EVENTS.HARMFUL_DRAFT_CHANGED,
+      statement: 'I must always stay strong.',
+    });
+    actor.send({
+      type: BELIEF_LIBRARY_EVENTS.GUIDING_DRAFT_CHANGED,
+      statement: 'I may receive support.',
+    });
+    actor.send({ type: BELIEF_LIBRARY_EVENTS.SAVE_REQUESTED });
+
+    const offer = await waitFor(
+      actor,
+      (candidate) => candidate.matches(REMINDER_STATES.OFFER),
+      { timeout: 1_000 },
+    );
+    expect(offer.context.beliefStatements).toContainEqual(expect.objectContaining({
+      guidingStatement: 'I may receive support.',
+    }));
+    expect(routeForStateValue(offer.value)).toBe(APP_ROUTES.LEITSATZ_REMINDER);
+
+    actor.send({ type: REMINDER_EVENTS.OFFER_DECLINED });
+    expect(actor.getSnapshot().matches(BELIEF_LIBRARY_STATES.LIBRARY)).toBe(true);
+  });
+
+  it('requests permission before exposing schedules and creates no assignment on denial', async () => {
+    mockRequestReminderPermission.mockResolvedValueOnce(REMINDER_PERMISSION_STATES.DENIED);
+    const actor = createActor(appNavigationMachine).start();
+    const beliefSystemId = CustomBeliefSystemId.make('custom-permission-order');
+    actor.send({
+      type: CHECK_IN_EVENTS.BELIEF_STATEMENTS_HYDRATED,
+      statements: [{
+        kind: 'custom',
+        beliefSystemId,
+        harmfulStatement: 'I must never need help.',
+        guidingStatement: 'I may receive support.',
+      }],
+    });
+    actor.send({ type: NAVIGATION_EVENTS.SETTINGS_OPENED });
+    actor.send({ type: BELIEF_LIBRARY_EVENTS.OPENED });
+    actor.send({ type: BELIEF_LIBRARY_EVENTS.EDIT_REQUESTED, beliefSystemId });
+    actor.send({
+      type: BELIEF_LIBRARY_EVENTS.GUIDING_DRAFT_CHANGED,
+      statement: 'I may receive support today.',
+    });
+    actor.send({ type: BELIEF_LIBRARY_EVENTS.SAVE_REQUESTED });
+    await waitFor(actor, (candidate) => candidate.matches(BELIEF_LIBRARY_STATES.LIBRARY));
+
+    actor.send({ type: BELIEF_LIBRARY_EVENTS.CREATE_REQUESTED });
+    actor.send({
+      type: BELIEF_LIBRARY_EVENTS.HARMFUL_DRAFT_CHANGED,
+      statement: 'I must solve this alone.',
+    });
+    actor.send({
+      type: BELIEF_LIBRARY_EVENTS.GUIDING_DRAFT_CHANGED,
+      statement: 'I can ask for help.',
+    });
+    actor.send({ type: BELIEF_LIBRARY_EVENTS.SAVE_REQUESTED });
+    await waitFor(actor, (candidate) => candidate.matches(REMINDER_STATES.OFFER));
+
+    actor.send({ type: REMINDER_EVENTS.OFFER_ACCEPTED });
+    const denied = await waitFor(
+      actor,
+      (candidate) => candidate.matches(REMINDER_STATES.PERMISSION_DENIED),
+      { timeout: 1_000 },
+    );
+    expect(mockRequestReminderPermission).toHaveBeenCalledTimes(1);
+    expect(denied.context.reminderSchedules).toEqual([]);
+    expect(denied.context.reminderAssignments).toEqual([]);
+    expect(denied.can({ type: REMINDER_EVENTS.SCHEDULE_SAVE_REQUESTED })).toBe(false);
   });
 
   it('models all emotion-label setting choices', () => {

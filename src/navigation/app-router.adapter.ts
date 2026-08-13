@@ -15,6 +15,7 @@ import {
   appNavigationMachine,
   routeForStateValue,
 } from './app-navigation.machine';
+import { bindReminderNotificationActor } from '@/features/reminders/infrastructure/reminder-notification.bridge';
 
 type AppNavigationActor = ActorRefFrom<typeof appNavigationMachine>;
 type AppNavigationSnapshot = StateFrom<typeof appNavigationMachine>;
@@ -141,6 +142,7 @@ function syncMachineRoute({
 
 export function inspectAppNavigation(event: InspectionEvent) {
   if (!isAppNavigationTransition(event)) return;
+  bindReminderNotificationActor(event.actorRef);
   if (event.snapshot.matches(NAVIGATION_STATES.STARTING)) return;
   syncMachineRoute({
     actor: event.actorRef,

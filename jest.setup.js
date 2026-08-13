@@ -32,6 +32,37 @@ jest.mock('expo-splash-screen', () => ({
   preventAutoHideAsync: jest.fn(() => Promise.resolve(true)),
 }));
 
+jest.mock('expo-notifications', () => ({
+  AndroidImportance: { DEFAULT: 3 },
+  IosAuthorizationStatus: {
+    NOT_DETERMINED: 0,
+    DENIED: 1,
+    AUTHORIZED: 2,
+    PROVISIONAL: 3,
+    EPHEMERAL: 4,
+  },
+  SchedulableTriggerInputTypes: { WEEKLY: 'weekly' },
+  setNotificationChannelAsync: jest.fn(() => Promise.resolve(null)),
+  getPermissionsAsync: jest.fn(() => Promise.resolve({
+    canAskAgain: true,
+    expires: 'never',
+    granted: false,
+    status: 'undetermined',
+  })),
+  requestPermissionsAsync: jest.fn(() => Promise.resolve({
+    canAskAgain: true,
+    expires: 'never',
+    granted: false,
+    status: 'undetermined',
+  })),
+  getAllScheduledNotificationsAsync: jest.fn(() => Promise.resolve([])),
+  cancelScheduledNotificationAsync: jest.fn(() => Promise.resolve()),
+  scheduleNotificationAsync: jest.fn(() => Promise.resolve('request')),
+  setNotificationHandler: jest.fn(),
+  getLastNotificationResponse: jest.fn(() => null),
+  addNotificationResponseReceivedListener: jest.fn(() => ({ remove: jest.fn() })),
+}));
+
 function mockReanimatedAnimationBuilder() {
   const builder = {
     delay: jest.fn(() => builder),

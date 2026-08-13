@@ -31,6 +31,15 @@
       "expo-router",
       "expo-localization",
       [
+        "expo-notifications",
+        {
+          "icon": "./assets/images/android-icon-monochrome.png",
+          "color": "#5E6B52",
+          "defaultChannel": "gentle-reminders",
+          "enableBackgroundRemoteNotifications": false
+        }
+      ],
+      [
         "expo-dev-client",
         {
           "launchMode": "launcher"

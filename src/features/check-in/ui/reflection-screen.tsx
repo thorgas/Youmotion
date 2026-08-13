@@ -28,11 +28,13 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { AppBackButton } from '@/components/ui/app-back-button';
+import { ConfirmedPickerModal } from '@/components/ui/confirmed-picker-modal';
 import {
   CHECK_IN_EVENTS,
   CHECK_IN_STATES,
   MAX_BELIEF_STATEMENT_LENGTH,
   MAX_NOTE_LENGTH,
+  MOMENT_TIME_PICKER_MODES,
   NAVIGATION_STATES,
   REFLECTION_KEYBOARD_BOTTOM_OFFSET,
 } from '@/constants';
@@ -170,45 +172,12 @@ export function MomentTimeControl({ disabled }: { disabled: boolean }) {
               </View>
             </View>
             <View style={styles.momentTimePickerSection}>
-              {Platform.OS === 'ios' ? (
-                <View style={styles.momentTimeIosControls}>
-                  <View style={styles.momentTimeIosControl}>
-                    <Text style={styles.momentTimeIosLabel}>
-                      <fbt desc="Label beside the date picker for an emotion">Date</fbt>
-                    </Text>
-                    <DateTimePicker
-                      accentColor={palette.moss}
-                      display="compact"
-                      maximumDate={now}
-                      mode="date"
-                      onValueChange={_change}
-                      style={styles.momentTimeIosPicker}
-                      testID="moment-time-date-picker"
-                      value={editorValue}
-                    />
-                  </View>
-                  <View style={styles.momentTimeIosControl}>
-                    <Text style={styles.momentTimeIosLabel}>
-                      <fbt desc="Label beside the time picker for an emotion">Time</fbt>
-                    </Text>
-                    <DateTimePicker
-                      accentColor={palette.moss}
-                      display="compact"
-                      maximumDate={now}
-                      mode="time"
-                      onValueChange={_change}
-                      style={styles.momentTimeIosPicker}
-                      testID="moment-time-time-picker"
-                      value={editorValue}
-                    />
-                  </View>
-                </View>
-              ) : (
-                <View style={styles.momentTimeAndroidControls}>
+              <View style={styles.momentTimeAndroidControls}>
                   <Pressable
                     accessibilityRole="button"
                     onPress={_requestDate}
                     style={styles.momentTimeAndroidButton}
+                    testID="moment-time-date-picker"
                   >
                     <Text style={styles.momentTimeAndroidLabel}>
                       <fbt desc="Button opening the date picker for an emotion">Date</fbt>
@@ -221,6 +190,7 @@ export function MomentTimeControl({ disabled }: { disabled: boolean }) {
                     accessibilityRole="button"
                     onPress={_requestTime}
                     style={styles.momentTimeAndroidButton}
+                    testID="moment-time-time-picker"
                   >
                     <Text style={styles.momentTimeAndroidLabel}>
                       <fbt desc="Button opening the time picker for an emotion">Time</fbt>
@@ -229,7 +199,26 @@ export function MomentTimeControl({ disabled }: { disabled: boolean }) {
                       {formatMomentTime({ date: editorValue, locale })}
                     </Text>
                   </Pressable>
-                  {pickerMode ? (
+                  {Platform.OS === 'ios' ? (
+                    <ConfirmedPickerModal
+                      doneLabel={String(fbs('Done', 'Confirm moment date or time picker button'))}
+                      onDone={_dismissPicker}
+                      testID="moment-time-picker-modal"
+                      title={pickerMode === MOMENT_TIME_PICKER_MODES.DATE
+                        ? String(fbs('Choose a date', 'Moment date picker modal title'))
+                        : String(fbs('Choose a time', 'Moment time picker modal title'))}
+                      visible={pickerMode !== null}
+                    >
+                      <DateTimePicker
+                        accentColor={palette.moss}
+                        display="spinner"
+                        maximumDate={now}
+                        mode={pickerMode ?? MOMENT_TIME_PICKER_MODES.DATE}
+                        onValueChange={_change}
+                        value={editorValue}
+                      />
+                    </ConfirmedPickerModal>
+                  ) : pickerMode ? (
                     <DateTimePicker
                       accentColor={palette.moss}
                       maximumDate={now}
@@ -240,8 +229,7 @@ export function MomentTimeControl({ disabled }: { disabled: boolean }) {
                       value={editorValue}
                     />
                   ) : null}
-                </View>
-              )}
+              </View>
             </View>
             <Pressable
               accessibilityRole="button"

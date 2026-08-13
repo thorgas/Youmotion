@@ -24,6 +24,7 @@ import {
   EMOTION_LABEL_MODES,
   MOTION_DURATION,
   ONBOARDING_EVENTS,
+  REMINDER_EVENTS,
   SETTINGS_EVENTS,
 } from '@/constants';
 import {
@@ -176,6 +177,7 @@ export function SettingsScreen() {
   const _showBoth = () => actor.send({ type: SETTINGS_EVENTS.EMOTION_LABEL_MODE_CHANGED, mode: EMOTION_LABEL_MODES.BOTH });
   const _openOnboarding = () => actor.send({ type: ONBOARDING_EVENTS.OPENED });
   const _openBeliefLibrary = () => actor.send({ type: BELIEF_LIBRARY_EVENTS.OPENED });
+  const _openReminders = () => actor.send({ type: REMINDER_EVENTS.OPENED });
 
   return (
     <View style={styles.page} testID="settings-screen">
@@ -262,6 +264,15 @@ export function SettingsScreen() {
           <fbt desc="Heading grouping personalization links in settings">PERSONALIZE</fbt>
         </Text>
         <View style={styles.actionGroup}>
+          <SettingsActionRow
+            description={String(fbs(
+              'Choose days and times for the Pulse or a positive Leitsatz.',
+              'Reminder settings entry explanation',
+            ))}
+            onPress={_openReminders}
+            testID="open-reminders"
+            title={String(fbs('Gentle reminders', 'Reminder settings entry title'))}
+          />
           <SettingsActionRow
             count={personalBeliefCount}
             description={String(fbs(

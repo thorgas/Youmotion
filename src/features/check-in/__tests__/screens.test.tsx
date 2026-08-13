@@ -24,6 +24,9 @@ import {
   HISTORY_EVENTS,
   HISTORY_CONTENT_FILTERS,
   MAX_NOTE_LENGTH,
+  MOMENT_TIME_PICKER_MODES,
+  REMINDER_EVENTS,
+  REMINDER_STATES,
 } from '@/constants';
 import { AppLocaleProvider } from '@/localization/app-locale-provider';
 import { formatHistoryDate } from '@/localization/date-copy';
@@ -713,9 +716,17 @@ describe('check-in screens', () => {
     expect(screen.getByText('Set date and time')).toBeTruthy();
 
     const changed = CheckInTimestamp.make('2020-04-12T08:30:00.000Z');
+    await fireEvent.press(screen.getByTestId('moment-time-date-picker'));
+    expect(screen.getByTestId('moment-time-picker-modal')).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'Done' })).toBeTruthy();
     await act(() => {
       mockActor.send({ type: CHECK_IN_EVENTS.MOMENT_TIME_CHANGED, occurredAt: changed });
     });
+    expect(mockActor.getSnapshot().context.momentTimePickerMode).toBe(
+      MOMENT_TIME_PICKER_MODES.DATE,
+    );
+    await fireEvent.press(screen.getByTestId('moment-time-picker-modal-done'));
+    expect(mockActor.getSnapshot().context.momentTimePickerMode).toBeNull();
     await fireEvent.press(screen.getByTestId(
       'moment-time-modal-backdrop',
       { includeHiddenElements: true },
@@ -1381,8 +1392,10 @@ describe('check-in screens', () => {
     );
     await fireEvent.press(library.getByTestId('belief-library-save'));
     await waitFor(() => expect(
-      mockActor.getSnapshot().matches(BELIEF_LIBRARY_STATES.LIBRARY),
+      mockActor.getSnapshot().matches(REMINDER_STATES.OFFER),
     ).toBe(true));
+    await act(() => mockActor.send({ type: REMINDER_EVENTS.OFFER_DECLINED }));
+    expect(mockActor.getSnapshot().matches(BELIEF_LIBRARY_STATES.LIBRARY)).toBe(true);
     expect(mockActor.getSnapshot().context.beliefStatements).toContainEqual(
       expect.objectContaining({
         kind: 'custom',

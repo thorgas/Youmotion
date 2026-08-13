@@ -238,6 +238,62 @@ export const BELIEF_LIBRARY_STATES = Object.freeze({
   RETIRING: literal('retiringBeliefLibraryStatement'),
 });
 
+export const REMINDER_TARGET_KINDS = Object.freeze({
+  PULSE: literal('pulse'),
+  GUIDING_BELIEF: literal('guidingBelief'),
+});
+
+export const REMINDER_PERMISSION_STATES = Object.freeze({
+  UNDETERMINED: literal('undetermined'),
+  GRANTED: literal('granted'),
+  DENIED: literal('denied'),
+});
+
+export const REMINDER_EVENTS = Object.freeze({
+  OPENED: literal('reminder.opened'),
+  HYDRATED: literal('reminder.hydrated'),
+  HYDRATION_FAILED: literal('reminder.hydrationFailed'),
+  OFFER_ACCEPTED: literal('reminder.offerAccepted'),
+  OFFER_DECLINED: literal('reminder.offerDeclined'),
+  PERMISSION_RESOLVED: literal('reminder.permissionResolved'),
+  PERMISSION_FAILED: literal('reminder.permissionFailed'),
+  SETTINGS_REQUESTED: literal('reminder.settingsRequested'),
+  SETTINGS_RETURNED: literal('reminder.settingsReturned'),
+  SCHEDULE_SELECTED: literal('reminder.scheduleSelected'),
+  NEW_SCHEDULE_REQUESTED: literal('reminder.newScheduleRequested'),
+  SCHEDULE_NAME_CHANGED: literal('reminder.scheduleNameChanged'),
+  WEEKDAY_TOGGLED: literal('reminder.weekdayToggled'),
+  TIME_SHIFTED: literal('reminder.timeShifted'),
+  TIME_PICKER_REQUESTED: literal('reminder.timePickerRequested'),
+  TIME_PICKER_DISMISSED: literal('reminder.timePickerDismissed'),
+  TIME_CHANGED: literal('reminder.timeChanged'),
+  TIME_ADDED: literal('reminder.timeAdded'),
+  TIME_REMOVED: literal('reminder.timeRemoved'),
+  SCHEDULE_SAVE_REQUESTED: literal('reminder.scheduleSaveRequested'),
+  SCHEDULE_SAVED: literal('reminder.scheduleSaved'),
+  ASSIGNMENT_TOGGLED: literal('reminder.assignmentToggled'),
+  ASSIGNMENT_UPDATED: literal('reminder.assignmentUpdated'),
+  RECONCILE_REQUESTED: literal('reminder.reconcileRequested'),
+  OPERATION_FAILED: literal('reminder.operationFailed'),
+  DONE: literal('reminder.done'),
+  TEST_REQUESTED: literal('reminder.testRequested'),
+  OPEN_PULSE_REQUESTED: literal('reminder.openPulseRequested'),
+  EDIT_REQUESTED: literal('reminder.editRequested'),
+  NOTIFICATION_OPENED: literal('reminder.notificationOpened'),
+});
+
+export const REMINDER_STATES = Object.freeze({
+  SETTINGS: literal('reminderSettings'),
+  OFFER: literal('leitsatzReminderOffer'),
+  REQUESTING_PERMISSION: literal('requestingReminderPermission'),
+  PERMISSION_DENIED: literal('reminderPermissionDenied'),
+  SCHEDULE_PICKER: literal('reminderSchedulePicker'),
+  SCHEDULE_EDITOR: literal('reminderScheduleEditor'),
+  SAVING: literal('savingReminderSchedule'),
+  ACTIVE: literal('leitsatzReminderActive'),
+  GUIDING_BELIEF: literal('reminderGuidingBelief'),
+});
+
 export const EMOTION_LABEL_MODES = Object.freeze({
   EMOJI: literal('emoji'),
   TEXT: literal('text'),
@@ -281,6 +337,8 @@ export const APP_ROUTES = Object.freeze({
   SETTINGS: literal('/settings'),
   BELIEF_LIBRARY: literal('/belief-library'),
   BELIEF_LIBRARY_EDITOR: literal('/belief-library-editor'),
+  LEITSATZ_REMINDER: literal('/leitsatz-reminder'),
+  REMINDERS: literal('/reminders'),
   REFLECTION: literal('/reflection'),
   BELIEF_SYSTEM: literal('/belief-system'),
   BELIEF_SYSTEM_CATALOG: literal('/belief-system-catalog'),
@@ -309,6 +367,11 @@ export const FILE_URI_PREFIX = 'file://';
 export const CHECK_IN_TABLE = 'check_in';
 export const BELIEF_STATEMENT_TABLE = 'belief_statement';
 export const APP_SETTINGS_TABLE = 'app_settings';
+export const REMINDER_SCHEDULE_TABLE = 'reminder_schedule';
+export const REMINDER_ASSIGNMENT_TABLE = 'reminder_assignment';
+export const REMINDER_NOTIFICATION_CHANNEL_ID = 'gentle-reminders';
+export const REMINDER_NOTIFICATION_OWNER = 'youmotion-reminder';
+export const MAX_REMINDER_TIMES = 5;
 export const DATABASE_MIGRATION_TABLE = 'database_migration';
 export const APP_SETTINGS_RECORD_ID = 'current';
 export const MAX_NOTE_LENGTH = 5_000;
