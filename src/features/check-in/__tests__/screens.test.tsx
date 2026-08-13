@@ -23,6 +23,7 @@ import {
   ONBOARDING_STATES,
   HISTORY_EVENTS,
   HISTORY_CONTENT_FILTERS,
+  MAX_NOTE_LENGTH,
 } from '@/constants';
 import { AppLocaleProvider } from '@/localization/app-locale-provider';
 import { formatHistoryDate } from '@/localization/date-copy';
@@ -536,7 +537,9 @@ describe('check-in screens', () => {
     )).toBeTruthy();
     expect(screen.getByTestId('reflection-save-for-now')).toBeTruthy();
     expect(useFocusEffect).toHaveBeenCalledTimes(1);
-    expect(screen.getByLabelText('Optional note about the feeling').props['autoFocus']).toBeUndefined();
+    const noteInput = screen.getByLabelText('Optional note about the feeling');
+    expect(noteInput.props['autoFocus']).toBeUndefined();
+    expect(noteInput.props['maxLength']).toBe(MAX_NOTE_LENGTH);
     expect(screen.getByText('Joy · Cheerfulness')).toBeTruthy();
     expect(screen.queryByText(/50%/)).toBeNull();
     expect(screen.getByTestId('reflection-keyboard-scroll').props).toMatchObject({
@@ -547,7 +550,7 @@ describe('check-in screens', () => {
       'check-in-progress-header',
     )).toBeNull();
     expect(screen.queryByText('Does a core belief fit this moment?')).toBeNull();
-    await fireEvent.changeText(screen.getByLabelText('Optional note about the feeling'), 'Ein heller Moment.');
+    await fireEvent.changeText(noteInput, 'Ein heller Moment.');
     await fireEvent.press(screen.getByText('Continue reflection'));
 
     await waitFor(() => expect(

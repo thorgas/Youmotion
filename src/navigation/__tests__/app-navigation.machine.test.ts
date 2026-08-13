@@ -13,6 +13,7 @@ import {
   EMOTION_LABEL_MODES,
   EMOTION_IDS,
   BELIEF_SYSTEM_IDS,
+  MAX_NOTE_LENGTH,
   NAVIGATION_EVENTS,
   NAVIGATION_STATES,
   ONBOARDING_ENTRY_POINTS,
@@ -519,8 +520,11 @@ describe('app navigation model', () => {
     expect(actor.getSnapshot().matches(NAVIGATION_STATES.REFLECTION)).toBe(true);
     expect(routeForStateValue(actor.getSnapshot().value)).toBe(APP_ROUTES.REFLECTION);
 
-    actor.send({ type: CHECK_IN_EVENTS.NOTE_CHANGED, note: 'a'.repeat(300) });
-    expect(actor.getSnapshot().context.note).toHaveLength(240);
+    actor.send({
+      type: CHECK_IN_EVENTS.NOTE_CHANGED,
+      note: 'a'.repeat(MAX_NOTE_LENGTH + 1),
+    });
+    expect(actor.getSnapshot().context.note).toHaveLength(MAX_NOTE_LENGTH);
     actor.send({ type: CHECK_IN_EVENTS.CONFIRMED });
     expect(actor.getSnapshot().matches(CHECK_IN_STATES.SAVING)).toBe(true);
   });

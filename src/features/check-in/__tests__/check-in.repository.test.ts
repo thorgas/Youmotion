@@ -2,7 +2,12 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Effect from 'effect/Effect';
 import { NONE } from 'react-native-surrealdb';
 
-import { CHECK_IN_STORAGE_KEY, EMOTION_IDS, BELIEF_SYSTEM_IDS } from '@/constants';
+import {
+  BELIEF_SYSTEM_IDS,
+  CHECK_IN_STORAGE_KEY,
+  EMOTION_IDS,
+  MAX_NOTE_LENGTH,
+} from '@/constants';
 import { CheckInId, CheckInTimestamp } from '../domain/check-in';
 import type { EmotionSelection } from '../domain/check-in';
 import {
@@ -55,6 +60,25 @@ describe('Effect check-in repository', () => {
           note: 'Ein heller Moment.',
           beliefSystemId: BELIEF_SYSTEM_IDS.ALWAYS_FUNCTIONING,
         }),
+      }),
+    );
+  });
+
+  it('persists a reflection at the expanded note boundary', async () => {
+    const note = 'a'.repeat(MAX_NOTE_LENGTH);
+    const saved = await Effect.runPromise(persistCheckIn({
+      selection,
+      note,
+      occurredAt,
+      beliefSystemId: null,
+      existing: null,
+    }));
+
+    expect(saved.note).toHaveLength(MAX_NOTE_LENGTH);
+    expect(mockSurrealQuery).toHaveBeenCalledWith(
+      'UPSERT $record CONTENT $checkIn',
+      expect.objectContaining({
+        checkIn: expect.objectContaining({ note }),
       }),
     );
   });

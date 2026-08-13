@@ -32,6 +32,7 @@ import {
   CHECK_IN_EVENTS,
   CHECK_IN_STATES,
   MAX_BELIEF_STATEMENT_LENGTH,
+  MAX_NOTE_LENGTH,
   NAVIGATION_STATES,
   REFLECTION_KEYBOARD_BOTTOM_OFFSET,
 } from '@/constants';
@@ -602,7 +603,7 @@ function ReflectionNoteStep() {
             <TextInput
               accessibilityLabel={optionalNoteAccessibilityLabel()}
               editable={!saving}
-              maxLength={240}
+              maxLength={MAX_NOTE_LENGTH}
               multiline
               onChangeText={_noteChanged}
               onSubmitEditing={_submit}
