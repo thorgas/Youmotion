@@ -1,0 +1,57 @@
+executionPrerequisite: Youmotion development bundle is open on the German Today screen on Android, onboarding is complete, no reminder schedules exist, and notification permission is reset.
+steps:
+  - await:
+      visible:
+        id: today-eyebrow
+  - await:
+      idle: true
+  - echo: From Today, open Settings.
+  - tap:
+      id: tab-settings
+  - await:
+      visible:
+        id: settings-eyebrow
+  - await:
+      idle: true
+  - echo: Open Gentle reminders from Settings.
+  - tap:
+      id: open-reminders
+  - await:
+      visible:
+        id: reminder-settings-new
+  - await:
+      idle: true
+  - echo: Create a new Pulse reminder.
+  - tap:
+      id: reminder-settings-new
+  - await:
+      visible:
+        id: reminder-offer-accept
+  - await:
+      idle: true
+  - echo: Accept the explanation. Expect Android notification permission before schedule selection.
+  - tap:
+      id: reminder-offer-accept
+  - echo: Grant Android notification permission.
+  - tap:
+      id: com.android.permissioncontroller:id/permission_allow_button
+  - await:
+      visible:
+        id: reminder-create-schedule
+  - await:
+      idle: true
+  - echo: Create the first local schedule after permission is granted.
+  - tap:
+      id: reminder-create-schedule
+  - await:
+      visible:
+        id: reminder-save-schedule
+  - await:
+      idle: true
+  - echo: Name the schedule, then select Saturday as another day.
+  - type:
+      on:
+        id: reminder-schedule-name
+      text: Sanfter Rhythmus
+  - tap:
+      id: reminder-weekday-7

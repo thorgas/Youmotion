@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-11T18:48:23.672Z",
+  "generatedAt": "2026-08-13T13:49:17.218Z",
   "projectRoot": "/Users/timhorgas/git/Youmotion",
   "scheme": "youmotion",
   "deepLinkTemplates": {
@@ -143,6 +143,17 @@
       "stateHints": []
     },
     {
+      "id": "leitsatz-reminder",
+      "file": "src/app/leitsatz-reminder.tsx",
+      "urlPath": "/leitsatz-reminder",
+      "slug": "leitsatz-reminder",
+      "params": [],
+      "navigator": "Stack",
+      "layoutDir": "",
+      "presentation": null,
+      "stateHints": []
+    },
+    {
       "id": "onboarding-example",
       "file": "src/app/onboarding-example.tsx",
       "urlPath": "/onboarding-example",
@@ -187,6 +198,17 @@
       "stateHints": []
     },
     {
+      "id": "reminders",
+      "file": "src/app/reminders.tsx",
+      "urlPath": "/reminders",
+      "slug": "reminders",
+      "params": [],
+      "navigator": "Stack",
+      "layoutDir": "",
+      "presentation": null,
+      "stateHints": []
+    },
+    {
       "id": "success",
       "file": "src/app/success.tsx",
       "urlPath": "/success",
@@ -201,7 +223,7 @@
   "edges": [],
   "summary": {
     "mode": "expo-router",
-    "routes": 16,
+    "routes": 18,
     "layouts": 2,
     "edges": 0,
     "unresolvedEdges": 0,

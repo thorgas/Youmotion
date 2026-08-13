@@ -1,0 +1,13 @@
+{
+  "formatVersion": 2,
+  "name": "nav-reminders",
+  "route": "reminders",
+  "title": "Navigate to reminder schedules",
+  "device": "Pixel 6a",
+  "steps": {
+    "1": {
+      "capture": "reminders.png",
+      "note": "Persisted local reminder schedule after a cold app restart"
+    }
+  }
+}
