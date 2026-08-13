@@ -1,0 +1,24 @@
+{
+  "formatVersion": 2,
+  "name": "nav-leitsatz-reminder-preview",
+  "route": "leitsatz-reminder",
+  "title": "Edit one Leitsatz reminder's notification preview",
+  "device": "iPhone 17 Pro",
+  "steps": {
+    "5": {
+      "target": "Sanfte Erinnerungen",
+      "screen": "reminders"
+    },
+    "8": {
+      "target": "Bearbeiten",
+      "screen": "leitsatz-reminder"
+    },
+    "12": {
+      "target": "Leitsatz anzeigen"
+    },
+    "13": {
+      "capture": "leitsatz-reminder--preview-full.png",
+      "note": "The full-text choice is scoped to this reminder; the general lock-screen message remains the default"
+    }
+  }
+}

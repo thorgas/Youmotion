@@ -1,0 +1,6 @@
+executionPrerequisite: A validated Youmotion Leitsatz notification for the realistic redacted reminder is visible on the iOS simulator.
+steps:
+  - tap: { text: "Dein Leitsatz ist für dich da" }
+  - await: { visible: { text: "DEIN LEITSATZ" } }
+  - await: { idle: true }
+  - assert: { visible: { text: "Ich darf Pausen machen und bin trotzdem genug." } }

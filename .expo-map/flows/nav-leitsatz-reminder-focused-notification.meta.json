@@ -1,0 +1,17 @@
+{
+  "formatVersion": 2,
+  "name": "nav-leitsatz-reminder-focused-notification",
+  "route": "leitsatz-reminder",
+  "title": "Open one focused Leitsatz from its notification",
+  "device": "iPhone 17 Pro",
+  "steps": {
+    "0": {
+      "target": "Dein Leitsatz ist für dich da",
+      "screen": "leitsatz-reminder"
+    },
+    "3": {
+      "capture": "leitsatz-reminder--focused-notification.png",
+      "note": "Only the tapped positive Leitsatz is shown; the full Leitsatz library is absent"
+    }
+  }
+}

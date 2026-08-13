@@ -1,0 +1,19 @@
+steps:
+  - tool: open-url
+    args:
+      url: "exp+youmotion://expo-development-client/?url=http%3A%2F%2F127.0.0.1%3A8083"
+  - await: { visible: { id: today-eyebrow } }
+  - tap: { id: gearshape.fill }
+  - await: { visible: { id: settings-eyebrow } }
+  - await: { idle: true }
+  - tap: { text: "Sanfte Erinnerungen" }
+  - await: { visible: { text: "Deine Erinnerungen." } }
+  - await: { idle: true }
+  - tap: { text: "Bearbeiten" }
+  - await: { visible: { text: "ZEITPLAN BEARBEITEN" } }
+  - await: { idle: true }
+  - scroll-to:
+      target: { id: reminder-preview-full }
+      direction: down
+  - tap: { id: reminder-preview-full }
+  - await: { visible: { id: reminder-preview-full } }
