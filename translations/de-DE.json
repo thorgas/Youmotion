@@ -4875,42 +4875,6 @@
       ],
       "types": []
     },
-    "cdsjZggI30mFRLAsrEPIpg==": {
-      "description": "Reminder schedule assignment count label",
-      "status": "new",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "aktive Verwendungen",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "+QuHncyn2oEXzNtAr4Qiyg==": {
-      "description": "Pulse reminder assignment label",
-      "status": "new",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "Pulse",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
-    "29wHE00br2QCC664fSzpDw==": {
-      "description": "Unavailable Leitsatz reminder assignment label",
-      "status": "new",
-      "tokens": [],
-      "translations": [
-        {
-          "translation": "Leitsatz",
-          "variations": {}
-        }
-      ],
-      "types": []
-    },
     "2WmdjoxyhYCJdwk+A1+e7Q==": {
       "description": "Enabled reminder assignment status",
       "status": "new",
@@ -5170,6 +5134,78 @@
       "translations": [
         {
           "translation": "Uhrzeit wählen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "MmT4krQhzX2k5vosL+VYtQ==": {
+      "description": "Reminder schedule content section label",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "ERINNERUNGSINHALT",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "RjZMYoh9qczdy7BocOj14Q==": {
+      "description": "Pulse reminder assignment kind",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "PULSE",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "ZQVSPBA9e6ZFkAXRPd0aQg==": {
+      "description": "Positive Leitsatz reminder assignment kind",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "LEITSATZ",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "9GKOhVMBsxwsiO1lEPMP6Q==": {
+      "description": "Pulse reminder content description",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Gefühl auswählen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "JOPI2jOyjoGUUjweOErErQ==": {
+      "description": "Unavailable Leitsatz reminder assignment label",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Leitsatz nicht mehr verfügbar",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "B6mQm+I1XJWJhkjRp3KSVA==": {
+      "description": "Reminder schedule without assignments explanation",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Dieser Zeitplan wird von keiner Erinnerung verwendet.",
           "variations": {}
         }
       ],

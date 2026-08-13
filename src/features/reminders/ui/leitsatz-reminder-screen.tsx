@@ -27,6 +27,8 @@ import { AppBackButton } from '@/components/ui/app-back-button';
 import { ConfirmedPickerModal } from '@/components/ui/confirmed-picker-modal';
 import { beliefStatementForId } from '@/features/check-in/domain/belief-statement';
 import { palette, type } from '@/features/check-in/ui/theme';
+import { useAppLocale } from '@/localization/app-locale-provider';
+import { formatWeekday } from '@/localization/date-copy';
 import { useAppNavigationActor } from '@/navigation/app-navigation.provider';
 import type {
   ReminderLocalTime,
@@ -82,9 +84,11 @@ function PositiveStatementCard({ statement }: { statement: string }) {
 }
 
 function ScheduleRow({
+  locale,
   onPress,
   schedule,
 }: {
+  locale: string;
   onPress: () => void;
   schedule: ReminderSchedule;
 }) {
@@ -99,7 +103,9 @@ function ScheduleRow({
       testID={`reminder-schedule-${schedule.id}`}
     >
       <Text style={styles.scheduleTitle}>{schedule.name}</Text>
-      <Text style={styles.copy}>{schedule.weekdays.join(', ')} · {times}</Text>
+      <Text style={styles.copy}>
+        {schedule.weekdays.map((weekday) => formatWeekday({ locale, weekday })).join(', ')} · {times}
+      </Text>
     </PressableScale>
   );
 }
@@ -240,10 +246,12 @@ function PermissionDeniedContent({
 function SchedulePickerContent({
   actor,
   error,
+  locale,
   schedules,
 }: {
   actor: ReminderActor;
   error: string | null;
+  locale: string;
   schedules: readonly ReminderSchedule[];
 }) {
   const _newSchedule = () => actor.send({ type: REMINDER_EVENTS.NEW_SCHEDULE_REQUESTED });
@@ -256,7 +264,7 @@ function SchedulePickerContent({
           type: REMINDER_EVENTS.SCHEDULE_SELECTED,
           scheduleId: schedule.id,
         });
-        return <ScheduleRow key={schedule.id} onPress={_selectSchedule} schedule={schedule} />;
+        return <ScheduleRow key={schedule.id} locale={locale} onPress={_selectSchedule} schedule={schedule} />;
       })}
       {schedules.length === 0 ? <Text style={styles.copy}><fbt desc="Empty reminder schedule picker">Create your first schedule and choose its days and time.</fbt></Text> : null}
       {error ? <Text style={styles.error}>{error}</Text> : null}
@@ -353,6 +361,7 @@ function GuidingBeliefContent({ actor, statement }: { actor: ReminderActor; stat
 
 export function LeitsatzReminderScreen() {
   const actor = useAppNavigationActor();
+  const locale = useAppLocale();
   const snapshot = useSelector(actor, _selectSnapshot);
   const context = snapshot.context;
   const statement = context.reminderTargetBeliefSystemId
@@ -399,7 +408,7 @@ export function LeitsatzReminderScreen() {
             />
           ) : null}
           {snapshot.matches(REMINDER_STATES.SCHEDULE_PICKER) ? (
-            <SchedulePickerContent actor={actor} error={context.reminderError} schedules={context.reminderSchedules} />
+            <SchedulePickerContent actor={actor} error={context.reminderError} locale={locale} schedules={context.reminderSchedules} />
           ) : null}
           {snapshot.matches(REMINDER_STATES.SCHEDULE_EDITOR) ? (
             <ScheduleEditorContent actor={actor} name={context.reminderScheduleNameDraft} pickerIndex={context.reminderTimePickerIndex} times={context.reminderTimesDraft} weekdays={context.reminderWeekdaysDraft} />

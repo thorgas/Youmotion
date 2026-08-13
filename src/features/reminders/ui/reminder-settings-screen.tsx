@@ -11,6 +11,8 @@ import {
 } from '@/constants';
 import { AppBackButton } from '@/components/ui/app-back-button';
 import { palette, type } from '@/features/check-in/ui/theme';
+import { useAppLocale } from '@/localization/app-locale-provider';
+import { formatWeekday } from '@/localization/date-copy';
 import { useAppNavigationActor } from '@/navigation/app-navigation.provider';
 
 const _selectReminderContext = (
@@ -24,6 +26,7 @@ const _selectReminderContext = (
 
 export function ReminderSettingsScreen() {
   const actor = useAppNavigationActor();
+  const locale = useAppLocale();
   const { schedules, assignments, statements, error } = useSelector(actor, _selectReminderContext);
   const _back = () => actor.send({ type: NAVIGATION_EVENTS.BACK_REQUESTED });
   const _newSchedule = () => actor.send({ type: REMINDER_EVENTS.NEW_SCHEDULE_REQUESTED });
@@ -47,18 +50,19 @@ export function ReminderSettingsScreen() {
             const scheduleAssignments = assignments.filter(
               (assignment) => assignment.scheduleId === schedule.id,
             );
-            const usageCount = scheduleAssignments.filter(
-              (assignment) => assignment.enabled,
-            ).length;
             return (
               <View key={schedule.id} style={styles.scheduleCard}>
                 <Text style={styles.scheduleTitle}>{schedule.name}</Text>
-                <Text style={styles.copy}>
-                  {schedule.weekdays.join(', ')} · {schedule.times.map(({ hour, minute }) => (
+                <Text style={styles.scheduleTiming}>
+                  {schedule.weekdays.map((weekday) => (
+                    formatWeekday({ locale, weekday })
+                  )).join(', ')} · {schedule.times.map(({ hour, minute }) => (
                     `${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}`
                   )).join(', ')}
                 </Text>
-                <Text style={styles.usage}>{usageCount} <fbt desc="Reminder schedule assignment count label">active uses</fbt></Text>
+                <Text style={styles.assignmentSectionLabel}>
+                  <fbt desc="Reminder schedule content section label">REMINDER CONTENT</fbt>
+                </Text>
                 {scheduleAssignments.map((assignment) => {
                   const statement = assignment.targetKind === REMINDER_TARGET_KINDS.GUIDING_BELIEF
                     ? statements.find((candidate) => (
@@ -72,12 +76,19 @@ export function ReminderSettingsScreen() {
                   return (
                     <View key={assignment.id} style={styles.assignmentRow}>
                       <View style={styles.assignmentCopy}>
-                        <Text numberOfLines={1} style={styles.assignmentTitle}>
+                        <Text style={styles.assignmentKind}>
                           {assignment.targetKind === REMINDER_TARGET_KINDS.PULSE
-                            ? <fbt desc="Pulse reminder assignment label">Pulse</fbt>
-                            : statement ?? <fbt desc="Unavailable Leitsatz reminder assignment label">Leitsatz</fbt>}
+                            ? <fbt desc="Pulse reminder assignment kind">PULSE</fbt>
+                            : <fbt desc="Positive Leitsatz reminder assignment kind">LEITSATZ</fbt>}
                         </Text>
-                        <Text style={styles.copy}>
+                        <Text style={styles.assignmentTitle}>
+                          {assignment.targetKind === REMINDER_TARGET_KINDS.PULSE
+                            ? <fbt desc="Pulse reminder content description">Pick an emotion</fbt>
+                            : statement
+                              ? `“${statement}”`
+                              : <fbt desc="Unavailable Leitsatz reminder assignment label">Leitsatz no longer available</fbt>}
+                        </Text>
+                        <Text style={styles.assignmentStatus}>
                           {assignment.enabled
                             ? <fbt desc="Enabled reminder assignment status">Active</fbt>
                             : <fbt desc="Disabled reminder assignment status">Off</fbt>}
@@ -98,6 +109,11 @@ export function ReminderSettingsScreen() {
                     </View>
                   );
                 })}
+                {scheduleAssignments.length === 0 ? (
+                  <Text style={styles.assignmentStatus}>
+                    <fbt desc="Reminder schedule without assignments explanation">No reminders use this schedule.</fbt>
+                  </Text>
+                ) : null}
               </View>
             );
           })}
@@ -132,10 +148,13 @@ const styles = StyleSheet.create({
   copy: { fontFamily: type.regular, color: palette.inkMuted, fontSize: 14, lineHeight: 21 },
   scheduleCard: { borderWidth: 1, borderColor: palette.hairline, borderRadius: 22, borderCurve: 'continuous', padding: 18, gap: 6 },
   scheduleTitle: { fontFamily: type.semibold, color: palette.ink, fontSize: 17 },
-  usage: { fontFamily: type.medium, color: palette.moss, fontSize: 12 },
-  assignmentRow: { minHeight: 52, flexDirection: 'row', alignItems: 'center', gap: 12, borderTopWidth: 1, borderTopColor: palette.hairline, paddingTop: 10, marginTop: 4 },
-  assignmentCopy: { flex: 1 },
-  assignmentTitle: { fontFamily: type.medium, color: palette.ink, fontSize: 14 },
+  scheduleTiming: { fontFamily: type.regular, color: palette.inkMuted, fontSize: 14, lineHeight: 21 },
+  assignmentSectionLabel: { fontFamily: type.semibold, color: palette.moss, fontSize: 10, letterSpacing: 1.1, marginTop: 10 },
+  assignmentRow: { minHeight: 72, flexDirection: 'row', alignItems: 'center', gap: 12, borderTopWidth: 1, borderTopColor: palette.hairline, paddingTop: 12, marginTop: 2 },
+  assignmentCopy: { flex: 1, gap: 2 },
+  assignmentKind: { fontFamily: type.semibold, color: palette.inkMuted, fontSize: 10, letterSpacing: 1.1 },
+  assignmentTitle: { fontFamily: type.medium, color: palette.ink, fontSize: 15, lineHeight: 21 },
+  assignmentStatus: { fontFamily: type.regular, color: palette.inkMuted, fontSize: 13, lineHeight: 19 },
   toggleAction: { minHeight: 40, justifyContent: 'center', borderWidth: 1, borderColor: palette.hairline, borderRadius: 14, borderCurve: 'continuous', paddingHorizontal: 12 },
   toggleActionText: { fontFamily: type.semibold, color: palette.ink, fontSize: 12 },
   empty: { borderWidth: 1, borderColor: palette.hairline, borderRadius: 22, borderCurve: 'continuous', padding: 20, gap: 8 },

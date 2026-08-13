@@ -28,6 +28,11 @@ const momentTimeFormatters = new Map<string, Intl.DateTimeFormat>([
   [APP_LOCALES.GERMAN, new Intl.DateTimeFormat(APP_LOCALES.GERMAN, { timeStyle: 'short' })],
 ]);
 
+const weekdayFormatters = new Map<string, Intl.DateTimeFormat>([
+  [APP_LOCALES.ENGLISH, new Intl.DateTimeFormat(APP_LOCALES.ENGLISH, { weekday: 'long' })],
+  [APP_LOCALES.GERMAN, new Intl.DateTimeFormat(APP_LOCALES.GERMAN, { weekday: 'long' })],
+]);
+
 export function formatHeadlineDate({ date, locale }: { date: Date; locale: string }) {
   return (headlineDateFormatters.get(locale) ?? headlineDateFormatters.get(APP_LOCALES.ENGLISH))?.format(date) ?? '';
 }
@@ -42,4 +47,9 @@ export function formatMomentDate({ date, locale }: { date: Date; locale: string 
 
 export function formatMomentTime({ date, locale }: { date: Date; locale: string }) {
   return (momentTimeFormatters.get(locale) ?? momentTimeFormatters.get(APP_LOCALES.ENGLISH))?.format(date) ?? '';
+}
+
+export function formatWeekday({ locale, weekday }: { locale: string; weekday: number }) {
+  const date = new Date(2023, 0, weekday);
+  return (weekdayFormatters.get(locale) ?? weekdayFormatters.get(APP_LOCALES.ENGLISH))?.format(date) ?? '';
 }
