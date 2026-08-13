@@ -69,7 +69,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 4,
     paddingTop: 2,
   },
-  picker: { alignItems: 'center', minHeight: 180, justifyContent: 'center' },
+  picker: { alignItems: 'stretch', minHeight: 180, justifyContent: 'center' },
   done: {
     minHeight: 52,
     alignItems: 'center',

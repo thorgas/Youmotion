@@ -54,7 +54,9 @@ export async function queryDatabase<T = unknown>({
   await Effect.runPromise(databaseAccess.take(1));
   try {
     const database = await getDatabase();
-    return await database.query<T>(surql, variables);
+    return variables === undefined
+      ? await database.query<T>(surql)
+      : await database.query<T>(surql, variables);
   } finally {
     await Effect.runPromise(databaseAccess.release(1));
   }

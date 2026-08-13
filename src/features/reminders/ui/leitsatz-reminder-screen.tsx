@@ -25,7 +25,10 @@ import {
 } from '@/constants';
 import { AppBackButton } from '@/components/ui/app-back-button';
 import { ConfirmedPickerModal } from '@/components/ui/confirmed-picker-modal';
-import { beliefStatementForId } from '@/features/check-in/domain/belief-statement';
+import {
+  activeCustomBeliefStatements,
+  beliefStatementForId,
+} from '@/features/check-in/domain/belief-statement';
 import { palette, type } from '@/features/check-in/ui/theme';
 import { useAppLocale } from '@/localization/app-locale-provider';
 import { formatWeekday } from '@/localization/date-copy';
@@ -47,14 +50,23 @@ function reminderWeekdayOptions() {
     { label: String(fbs('Sa', 'Abbreviated Saturday in reminder weekday picker')), weekday: 7 },
   ] satisfies readonly { label: string; weekday: ReminderWeekday }[];
 }
+
+function timeSlotKey(index: number) {
+  if (index === 0) return 'primary';
+  if (index === 1) return 'secondary';
+  if (index === 2) return 'tertiary';
+  return 'quaternary';
+}
 const _selectSnapshot = (snapshot: ReturnType<ReturnType<typeof useAppNavigationActor>['getSnapshot']>) => snapshot;
 
 function ActionButton({
+  disabled = false,
   label,
   onPress,
   secondary = false,
   testID,
 }: {
+  disabled?: boolean;
   label: string;
   onPress: () => void;
   secondary?: boolean;
@@ -63,14 +75,62 @@ function ActionButton({
   return (
     <PressableScale
       accessibilityRole="button"
+      accessibilityState={{ disabled }}
+      disabled={disabled}
       onPress={onPress}
-      style={[styles.action, secondary && styles.actionSecondary]}
+      style={[
+        styles.action,
+        secondary && styles.actionSecondary,
+        disabled && styles.actionDisabled,
+      ]}
       testID={testID}
     >
       <Text style={[styles.actionText, secondary && styles.actionTextSecondary]}>
         {label}
       </Text>
     </PressableScale>
+  );
+}
+
+function TargetPickerContent({
+  actor,
+  statements,
+}: {
+  actor: ReminderActor;
+  statements: ReturnType<typeof activeCustomBeliefStatements>;
+}) {
+  const selectable = statements.filter((statement) => statement.guidingStatement !== undefined);
+  return (
+    <>
+      <Text style={styles.eyebrow}><fbt desc="Leitsatz reminder target picker eyebrow">NEW REMINDER</fbt></Text>
+      <Text style={styles.title}><fbt desc="Leitsatz reminder target picker title">Which Leitsatz should accompany you?</fbt></Text>
+      <Text style={styles.copy}><fbt desc="Leitsatz reminder target picker explanation">Choose one of your supportive Leitsätze. The notification will remind you of these exact words.</fbt></Text>
+      {selectable.map((statement) => {
+        const _select = () => actor.send({
+          type: REMINDER_EVENTS.TARGET_SELECTED,
+          beliefSystemId: statement.beliefSystemId,
+        });
+        return (
+          <PressableScale
+            accessibilityRole="button"
+            key={statement.beliefSystemId}
+            onPress={_select}
+            style={styles.targetCard}
+            testID={`reminder-target-${statement.beliefSystemId}`}
+          >
+            <Text style={styles.targetLabel}><fbt desc="Selectable supportive Leitsatz label">YOUR LEITSATZ</fbt></Text>
+            <Text style={styles.targetText}>{statement.guidingStatement}</Text>
+            <Text accessibilityElementsHidden style={styles.targetDisclosure}>›</Text>
+          </PressableScale>
+        );
+      })}
+      {selectable.length === 0 ? (
+        <View style={styles.emptyCard}>
+          <Text style={styles.scheduleTitle}><fbt desc="No custom Leitsatz reminder target title">No supportive Leitsatz yet</fbt></Text>
+          <Text style={styles.copy}><fbt desc="No custom Leitsatz reminder target explanation">Create a personal Leitsatz first, then you can schedule it here.</fbt></Text>
+        </View>
+      ) : null}
+    </>
   );
 }
 
@@ -299,6 +359,8 @@ function ScheduleEditorContent({
   });
   const _addTime = () => actor.send({ type: REMINDER_EVENTS.TIME_ADDED });
   const _saveSchedule = () => actor.send({ type: REMINDER_EVENTS.SCHEDULE_SAVE_REQUESTED });
+  const nameMissing = name.trim().length === 0;
+  const selectedWeekdays = new Set(weekdays);
   return (
     <>
       <Text style={styles.eyebrow}>
@@ -316,11 +378,15 @@ function ScheduleEditorContent({
           <fbt desc="Reminder-owned schedule editing explanation">These changes apply only to this reminder.</fbt>
         </Text>
       ) : null}
+      <Text style={styles.fieldLabel}><fbt desc="Required reminder schedule name label">NAME · REQUIRED</fbt></Text>
       <TextInput aria-label={String(fbs('Schedule name', 'Reminder schedule name input label'))} onChangeText={_changeName} placeholder={String(fbs('For example: Weekday mornings', 'Reminder schedule name placeholder'))} style={styles.input} testID="reminder-schedule-name" value={name} />
+      {nameMissing ? (
+        <Text style={styles.fieldHint}><fbt desc="Required reminder schedule name guidance">Add a name so you can recognize this reminder later.</fbt></Text>
+      ) : null}
       <Text style={styles.fieldLabel}><fbt desc="Reminder schedule weekdays label">DAYS</fbt></Text>
       <View style={styles.weekdayRow}>
         {reminderWeekdayOptions().map(({ label, weekday }) => {
-          const selected = weekdays.includes(weekday);
+          const selected = selectedWeekdays.has(weekday);
           const _toggle = () => actor.send({ type: REMINDER_EVENTS.WEEKDAY_TOGGLED, weekday });
           return (
             <PressableScale accessibilityRole="button" accessibilityState={{ selected }} key={`${label}-${weekday}`} onPress={_toggle} style={[styles.weekday, selected && styles.weekdaySelected]} testID={`reminder-weekday-${weekday}`}>
@@ -343,7 +409,7 @@ function ScheduleEditorContent({
           });
         };
         const _remove = () => actor.send({ type: REMINDER_EVENTS.TIME_REMOVED, index });
-        return <TimeRow canRemove={times.length > 1} hour={hour} index={index} key={`${hour}-${minute}`} minute={minute} onChange={_change} onDismiss={_dismiss} onOpen={_open} onRemove={_remove} pickerOpen={pickerIndex === index} />;
+        return <TimeRow canRemove={times.length > 1} hour={hour} index={index} key={timeSlotKey(index)} minute={minute} onChange={_change} onDismiss={_dismiss} onOpen={_open} onRemove={_remove} pickerOpen={pickerIndex === index} />;
       })}
       {times.length < MAX_REMINDER_TIMES ? <ActionButton label={String(fbs('Add another time', 'Add reminder time button'))} onPress={_addTime} secondary testID="reminder-time-add" /> : null}
       <ActionButton
@@ -351,6 +417,7 @@ function ScheduleEditorContent({
           ? String(fbs('Save changes', 'Save reminder schedule changes button'))
           : String(fbs('Create and use schedule', 'Save and activate reminder schedule button'))}
         onPress={_saveSchedule}
+        disabled={nameMissing}
         testID="reminder-save-schedule"
       />
     </>
@@ -385,6 +452,14 @@ function GuidingBeliefContent({ actor, statement }: { actor: ReminderActor; stat
   );
 }
 
+function reminderScreenLoading(
+  snapshot: ReturnType<ReturnType<typeof useAppNavigationActor>['getSnapshot']>,
+) {
+  return snapshot.matches(REMINDER_STATES.REQUESTING_PERMISSION)
+    || snapshot.matches(REMINDER_STATES.CHECKING_PERMISSION)
+    || snapshot.matches(REMINDER_STATES.SAVING);
+}
+
 export function LeitsatzReminderScreen() {
   const actor = useAppNavigationActor();
   const locale = useAppLocale();
@@ -400,12 +475,10 @@ export function LeitsatzReminderScreen() {
     context.reminderAssignments.some((assignment) => assignment.scheduleId === schedule.id)
   ));
   const pulseTarget = context.reminderTargetKind === REMINDER_TARGET_KINDS.PULSE;
+  const customStatements = activeCustomBeliefStatements(context.beliefStatements);
   const _back = () => actor.send({ type: NAVIGATION_EVENTS.BACK_REQUESTED });
 
-  if (
-    snapshot.matches(REMINDER_STATES.REQUESTING_PERMISSION)
-    || snapshot.matches(REMINDER_STATES.SAVING)
-  ) {
+  if (reminderScreenLoading(snapshot)) {
     return (
       <View style={styles.loading} testID="reminder-loading">
         <ActivityIndicator color={palette.moss} />
@@ -425,7 +498,13 @@ export function LeitsatzReminderScreen() {
             testID="reminder-back"
           />
         </View>
-        <ScrollView contentContainerStyle={styles.content}>
+        <ScrollView
+          contentContainerStyle={styles.content}
+          scrollEnabled={context.reminderTimePickerIndex === null}
+        >
+          {snapshot.matches(REMINDER_STATES.TARGET_PICKER) ? (
+            <TargetPickerContent actor={actor} statements={customStatements} />
+          ) : null}
           {snapshot.matches(REMINDER_STATES.OFFER) ? (
             <OfferContent actor={actor} pulseTarget={pulseTarget} statement={statement} />
           ) : null}
@@ -468,11 +547,13 @@ const styles = StyleSheet.create({
   statement: { fontFamily: type.medium, color: palette.ink, fontSize: 23, lineHeight: 32, textAlign: 'center' },
   action: { minHeight: 54, alignItems: 'center', justifyContent: 'center', borderRadius: 18, borderCurve: 'continuous', backgroundColor: palette.ink, paddingHorizontal: 18 },
   actionSecondary: { backgroundColor: 'transparent', borderWidth: 1, borderColor: palette.hairline },
+  actionDisabled: { opacity: 0.38 },
   actionText: { fontFamily: type.semibold, color: '#FFFFFF', fontSize: 15 },
   actionTextSecondary: { color: palette.ink },
   scheduleCard: { minHeight: 80, justifyContent: 'center', borderWidth: 1, borderColor: palette.hairline, borderRadius: 20, borderCurve: 'continuous', padding: 18 },
   scheduleTitle: { fontFamily: type.semibold, color: palette.ink, fontSize: 17, marginBottom: 5 },
   input: { minHeight: 54, borderWidth: 1, borderColor: palette.hairline, borderRadius: 16, borderCurve: 'continuous', paddingHorizontal: 16, fontFamily: type.regular, color: palette.ink, fontSize: 16 },
+  fieldHint: { fontFamily: type.regular, color: palette.inkMuted, fontSize: 13, lineHeight: 19, marginTop: -8 },
   fieldLabel: { fontFamily: type.semibold, color: palette.inkMuted, fontSize: 11, letterSpacing: 1.2, marginTop: 8 },
   weekdayRow: { flexDirection: 'row', gap: 6 },
   weekday: { flex: 1, aspectRatio: 1, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: palette.hairline, borderRadius: 14, borderCurve: 'continuous' },
@@ -484,4 +565,9 @@ const styles = StyleSheet.create({
   timePickerButton: { minHeight: 54, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   timeDisclosure: { fontFamily: type.regular, color: palette.inkMuted, fontSize: 28 },
   loading: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 14, backgroundColor: palette.paper },
+  targetCard: { minHeight: 92, justifyContent: 'center', borderWidth: 1, borderColor: palette.hairline, borderRadius: 20, borderCurve: 'continuous', padding: 18, paddingRight: 42, gap: 6 },
+  targetLabel: { fontFamily: type.semibold, color: palette.moss, fontSize: 10, letterSpacing: 1.1 },
+  targetText: { fontFamily: type.medium, color: palette.ink, fontSize: 17, lineHeight: 24 },
+  targetDisclosure: { position: 'absolute', right: 18, color: palette.inkMuted, fontSize: 28 },
+  emptyCard: { borderWidth: 1, borderColor: palette.hairline, borderRadius: 20, borderCurve: 'continuous', padding: 18, gap: 6 },
 });

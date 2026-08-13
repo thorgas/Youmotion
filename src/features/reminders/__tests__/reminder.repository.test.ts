@@ -109,7 +109,7 @@ describe('Effect reminder repository', () => {
     });
   });
 
-  it('serializes local table reads for the embedded database client', async () => {
+  it('serializes the two native-compatible table reads', async () => {
     let scheduleReadCompleted = false;
     mockSurrealQuery
       .mockImplementationOnce(async () => {

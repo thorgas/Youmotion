@@ -253,12 +253,14 @@ export const REMINDER_EVENTS = Object.freeze({
   OPENED: literal('reminder.opened'),
   HYDRATED: literal('reminder.hydrated'),
   HYDRATION_FAILED: literal('reminder.hydrationFailed'),
+  RETRY_REQUESTED: literal('reminder.retryRequested'),
   OFFER_ACCEPTED: literal('reminder.offerAccepted'),
   OFFER_DECLINED: literal('reminder.offerDeclined'),
   PERMISSION_RESOLVED: literal('reminder.permissionResolved'),
   PERMISSION_FAILED: literal('reminder.permissionFailed'),
   SETTINGS_REQUESTED: literal('reminder.settingsRequested'),
   SETTINGS_RETURNED: literal('reminder.settingsReturned'),
+  TARGET_SELECTED: literal('reminder.targetSelected'),
   SCHEDULE_SELECTED: literal('reminder.scheduleSelected'),
   SCHEDULE_EDIT_REQUESTED: literal('reminder.scheduleEditRequested'),
   NEW_SCHEDULE_REQUESTED: literal('reminder.newScheduleRequested'),
@@ -286,6 +288,8 @@ export const REMINDER_EVENTS = Object.freeze({
 
 export const REMINDER_STATES = Object.freeze({
   SETTINGS: literal('reminderSettings'),
+  TARGET_PICKER: literal('reminderTargetPicker'),
+  CHECKING_PERMISSION: literal('checkingReminderPermission'),
   OFFER: literal('leitsatzReminderOffer'),
   REQUESTING_PERMISSION: literal('requestingReminderPermission'),
   PERMISSION_DENIED: literal('reminderPermissionDenied'),

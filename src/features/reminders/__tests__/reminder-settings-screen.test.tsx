@@ -175,9 +175,18 @@ describe('reminder settings screen', () => {
     expect(screen.getAllByText(
       'Montag, Dienstag, Mittwoch, Donnerstag, Freitag, Samstag · 09:00, 18:00',
     )).toHaveLength(3);
-    expect(screen.getByText('Gefühl auswählen')).toBeOnTheScreen();
+    expect(screen.getByText('Bei dir einchecken')).toBeOnTheScreen();
     expect(screen.getByText('“I can ask for support.”')).toBeOnTheScreen();
     expect(screen.getByText('“Rest belongs in my life.”')).toBeOnTheScreen();
+  });
+
+  it('starts new reminders by choosing one of the custom supportive Leitsätze', async () => {
+    const actor = await actorAtReminderSettings();
+    await renderSettings(actor);
+
+    await fireEvent.press(screen.getByRole('button', { name: 'Leitsatz-Erinnerung erstellen' }));
+    expect(actor.getSnapshot().matches(REMINDER_STATES.TARGET_PICKER)).toBe(true);
+    expect(screen.queryByText('Gefühl auswählen')).not.toBeOnTheScreen();
   });
 
   it('opens the selected reminder schedule as a prefilled draft', async () => {

@@ -4,12 +4,14 @@ import { createActor, waitFor, type Actor } from 'xstate';
 import {
   APP_LOCALES,
   BELIEF_LIBRARY_EVENTS,
+  CHECK_IN_EVENTS,
   EMOTION_LABEL_MODES,
   NAVIGATION_EVENTS,
   REMINDER_EVENTS,
   REMINDER_PERMISSION_STATES,
   REMINDER_STATES,
 } from '@/constants';
+import { CustomBeliefSystemId } from '@/features/check-in/domain/belief-statement';
 import { appSettingsStore } from '@/features/settings/application/app-settings.store';
 import { configureAppLocale } from '@/localization/app-locale.configuration';
 import { AppNavigationActorProvider } from '@/navigation/app-navigation.provider';
@@ -47,6 +49,7 @@ jest.mock('../infrastructure/local-reminder.scheduler', () => ({
 }));
 
 const mockRequestReminderPermission = jest.mocked(reminderScheduler.requestReminderPermission);
+const mockGetReminderPermission = jest.mocked(reminderScheduler.getReminderPermission);
 
 async function actorAtReminderOffer() {
   const actor = createActor(appNavigationMachine).start();
@@ -74,8 +77,17 @@ async function renderReminder(actor: Actor<typeof appNavigationMachine>) {
   );
 }
 
-async function actorAtPulseReminderOffer() {
+async function actorAtReminderTargetPicker() {
   const actor = createActor(appNavigationMachine).start();
+  actor.send({
+    type: CHECK_IN_EVENTS.BELIEF_STATEMENTS_HYDRATED,
+    statements: [{
+      kind: 'custom',
+      beliefSystemId: CustomBeliefSystemId.make('custom-reminder-choice'),
+      harmfulStatement: 'I must do everything alone.',
+      guidingStatement: 'I can ask for support.',
+    }],
+  });
   actor.send({ type: NAVIGATION_EVENTS.SETTINGS_OPENED });
   actor.send({ type: REMINDER_EVENTS.OPENED });
   await waitFor(actor, (snapshot) => snapshot.matches(REMINDER_STATES.SETTINGS));
@@ -96,6 +108,7 @@ describe('Leitsatz reminder screen', () => {
       },
     });
     mockRequestReminderPermission.mockResolvedValue(REMINDER_PERMISSION_STATES.GRANTED);
+    mockGetReminderPermission.mockResolvedValue(REMINDER_PERMISSION_STATES.UNDETERMINED);
   });
 
   it('explains permission before any schedule is available', async () => {
@@ -109,12 +122,13 @@ describe('Leitsatz reminder screen', () => {
     expect(actor.getSnapshot().context.reminderAssignments).toEqual([]);
   });
 
-  it('identifies a Pulse offer without implying a Leitsatz was saved', async () => {
-    const actor = await actorAtPulseReminderOffer();
+  it('selects a custom supportive Leitsatz instead of an emotion', async () => {
+    const actor = await actorAtReminderTargetPicker();
     await renderReminder(actor);
 
-    expect(screen.getByText('PULSE REMINDER')).toBeOnTheScreen();
-    expect(screen.queryByText('LEITSATZ SAVED')).not.toBeOnTheScreen();
+    expect(screen.getByText('Which Leitsatz should accompany you?')).toBeOnTheScreen();
+    expect(screen.getByText('I can ask for support.')).toBeOnTheScreen();
+    expect(screen.queryByText('Pick an emotion')).not.toBeOnTheScreen();
   });
 
   it('keeps denial side-effect-free and exposes repair actions', async () => {
@@ -154,7 +168,13 @@ describe('Leitsatz reminder screen', () => {
       name: 'Allow notifications and continue',
     }));
     await fireEvent.press(await screen.findByRole('button', { name: 'Create new schedule' }));
+    expect(screen.getByRole('button', { name: 'Create and use schedule' }))
+      .toBeDisabled();
+    expect(screen.getByText('Add a name so you can recognize this reminder later.'))
+      .toBeOnTheScreen();
     await fireEvent.changeText(screen.getByLabelText('Schedule name'), 'Morning and evening');
+    expect(screen.getByRole('button', { name: 'Create and use schedule' }))
+      .toBeEnabled();
     await fireEvent.press(screen.getByTestId('reminder-weekday-7'));
     await fireEvent.press(screen.getByRole('button', { name: 'Add another time' }));
     expect(screen.getByTestId('reminder-time-picker-0')).toBeOnTheScreen();

@@ -30,6 +30,7 @@ export function ReminderSettingsScreen() {
   const { schedules, assignments, statements, error } = useSelector(actor, _selectReminderContext);
   const _back = () => actor.send({ type: NAVIGATION_EVENTS.BACK_REQUESTED });
   const _newSchedule = () => actor.send({ type: REMINDER_EVENTS.NEW_SCHEDULE_REQUESTED });
+  const _retry = () => actor.send({ type: REMINDER_EVENTS.RETRY_REQUESTED });
 
   return (
     <View style={styles.page} testID="reminder-settings-screen">
@@ -71,7 +72,7 @@ export function ReminderSettingsScreen() {
                 </Text>
                 <Text style={styles.assignmentTitle}>
                   {assignment.targetKind === REMINDER_TARGET_KINDS.PULSE
-                    ? <fbt desc="Pulse reminder content description">Pick an emotion</fbt>
+                    ? <fbt desc="Pulse reminder content description">Check in with yourself</fbt>
                     : statement
                       ? `“${statement}”`
                       : <fbt desc="Unavailable Leitsatz reminder assignment label">Leitsatz no longer available</fbt>}
@@ -122,14 +123,26 @@ export function ReminderSettingsScreen() {
               <Text style={styles.copy}><fbt desc="Empty reminder settings explanation">Create a reminder when you want a gentle invitation to return.</fbt></Text>
             </View>
           ) : null}
-          {error ? <Text style={styles.error}>{error}</Text> : null}
+          {error ? (
+            <View style={styles.errorCard}>
+              <Text style={styles.error}><fbt desc="Reminder loading failure message">Your reminders could not be loaded.</fbt></Text>
+              <PressableScale
+                accessibilityRole="button"
+                onPress={_retry}
+                style={styles.retryAction}
+                testID="reminder-settings-retry"
+              >
+                <Text style={styles.retryActionText}><fbt desc="Retry loading reminders button">Try again</fbt></Text>
+              </PressableScale>
+            </View>
+          ) : null}
           <PressableScale
             accessibilityRole="button"
             onPress={_newSchedule}
             style={styles.action}
             testID="reminder-settings-new"
           >
-            <Text style={styles.actionText}><fbt desc="New Pulse reminder setup button">Create Pulse reminder</fbt></Text>
+            <Text style={styles.actionText}><fbt desc="New Leitsatz reminder setup button">Create Leitsatz reminder</fbt></Text>
           </PressableScale>
         </ScrollView>
       </SafeAreaView>
@@ -159,6 +172,9 @@ const styles = StyleSheet.create({
   toggleActionText: { fontFamily: type.semibold, color: palette.ink, fontSize: 12 },
   empty: { borderWidth: 1, borderColor: palette.hairline, borderRadius: 22, borderCurve: 'continuous', padding: 20, gap: 8 },
   error: { fontFamily: type.medium, color: palette.danger, fontSize: 14 },
+  errorCard: { alignItems: 'flex-start', gap: 8 },
+  retryAction: { minHeight: 40, justifyContent: 'center', borderWidth: 1, borderColor: palette.hairline, borderRadius: 14, borderCurve: 'continuous', paddingHorizontal: 14 },
+  retryActionText: { fontFamily: type.semibold, color: palette.ink, fontSize: 13 },
   action: { minHeight: 54, alignItems: 'center', justifyContent: 'center', borderRadius: 18, borderCurve: 'continuous', backgroundColor: palette.ink, paddingHorizontal: 18 },
   actionText: { fontFamily: type.semibold, color: '#FFFFFF', fontSize: 15 },
 });

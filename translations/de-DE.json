@@ -5247,6 +5247,78 @@
       ],
       "types": []
     },
+    "LFSx+/B0MP+soFwZ2zmP3A==": {
+      "description": "Leitsatz reminder target picker eyebrow",
+      "tokens": [],
+      "translations": [{ "translation": "NEUE ERINNERUNG", "variations": {} }],
+      "types": []
+    },
+    "ZR57mfWFdKmbp/He6v0u9A==": {
+      "description": "Leitsatz reminder target picker title",
+      "tokens": [],
+      "translations": [{ "translation": "Welcher Leitsatz soll dich begleiten?", "variations": {} }],
+      "types": []
+    },
+    "EmKP3vB5p1TGqg1mE7SihQ==": {
+      "description": "Leitsatz reminder target picker explanation",
+      "tokens": [],
+      "translations": [{ "translation": "Wähle einen deiner unterstützenden Leitsätze. Die Mitteilung erinnert dich genau an diese Worte.", "variations": {} }],
+      "types": []
+    },
+    "yoZzklSVrDum35D+sfPgeQ==": {
+      "description": "Selectable supportive Leitsatz label",
+      "tokens": [],
+      "translations": [{ "translation": "DEIN LEITSATZ", "variations": {} }],
+      "types": []
+    },
+    "APag1Hrf6fmFSkCq2XuHZw==": {
+      "description": "No custom Leitsatz reminder target title",
+      "tokens": [],
+      "translations": [{ "translation": "Noch kein unterstützender Leitsatz", "variations": {} }],
+      "types": []
+    },
+    "DnMk83VcVvsDpYQyQSagRQ==": {
+      "description": "No custom Leitsatz reminder target explanation",
+      "tokens": [],
+      "translations": [{ "translation": "Erstelle zuerst einen persönlichen Leitsatz. Danach kannst du ihn hier einplanen.", "variations": {} }],
+      "types": []
+    },
+    "bdL4NMzh2A6DEbFYt0HqHg==": {
+      "description": "Required reminder schedule name label",
+      "tokens": [],
+      "translations": [{ "translation": "NAME · ERFORDERLICH", "variations": {} }],
+      "types": []
+    },
+    "yhLY+vR2TdOno1yFcDLi2w==": {
+      "description": "Required reminder schedule name guidance",
+      "tokens": [],
+      "translations": [{ "translation": "Gib einen Namen ein, damit du diese Erinnerung später wiedererkennst.", "variations": {} }],
+      "types": []
+    },
+    "5UaAU6Mw5NaBt1Vl/hIQkg==": {
+      "description": "Pulse reminder content description",
+      "tokens": [],
+      "translations": [{ "translation": "Bei dir einchecken", "variations": {} }],
+      "types": []
+    },
+    "ehuWKmOs+LGa+eqFXL74VQ==": {
+      "description": "Reminder loading failure message",
+      "tokens": [],
+      "translations": [{ "translation": "Deine Erinnerungen konnten nicht geladen werden.", "variations": {} }],
+      "types": []
+    },
+    "Ashu1xCf/1zNPk8eUWyEJA==": {
+      "description": "Retry loading reminders button",
+      "tokens": [],
+      "translations": [{ "translation": "Erneut versuchen", "variations": {} }],
+      "types": []
+    },
+    "ywJKan6vaRe2vLmfa9w5yQ==": {
+      "description": "New Leitsatz reminder setup button",
+      "tokens": [],
+      "translations": [{ "translation": "Leitsatz-Erinnerung erstellen", "variations": {} }],
+      "types": []
+    },
     "NWZgafhJ8d7AkYvs+uFVXQ==": {
       "description": "Empty reminder settings explanation",
       "status": "new",

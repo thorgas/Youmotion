@@ -9,6 +9,7 @@ This matrix defines the user-visible contract for device-local Pulse and positiv
 | Permission | Undetermined | User accepts the explanatory screen | Native permission is requested before any schedule can be selected or persisted |
 | Permission | Denied or permanently denied | Permission check finishes | The saved Leitsatz remains intact, no assignment is created, and repair actions expose system settings and a recheck |
 | Permission | Granted | Permission check finishes | Existing schedules and the create-new choice become available |
+| Permission reuse | Granted before setup starts | User creates a second reminder or returns from native Settings | The permission explanation and native prompt are skipped; setup continues directly to scheduling |
 | Permission history | Granted, then revoked in iOS Settings | User starts reminder setup again | Current native status wins over the earlier grant; setup opens the denied repair path because iOS cannot show the system prompt again |
 | Permission history | Denied on Android | User starts reminder setup again | Youmotion asks again only while the native `canAskAgain` flag is true; otherwise setup opens the denied repair path |
 | Navigation history | Permission was granted and the schedule picker is visible | User presses Back | Setup exits to reminder Settings or the Leitsatz library without re-entering the permission explanation |
@@ -16,7 +17,13 @@ This matrix defines the user-visible contract for device-local Pulse and positiv
 | Persistence | Schedule or assignment storage fails | User activates a schedule | Setup reports failure and does not claim success; no unpersisted assignment becomes the source of truth |
 | Hydration | Valid persisted schedules and assignments | App starts | Reminders appear in Settings; granted permission triggers idempotent native reconciliation |
 | Hydration concurrency | Realistic 133-entry redacted archive and empty reminder tables | App starts and all repositories hydrate | Shared embedded-database queries run one at a time; reminder Settings stays usable instead of losing a concurrent-client race |
+| Hydration query boundary | Schedules and assignments exist | Reminder Settings loads | The embedded client receives two serialized single-statement reads without an explicit undefined variables argument |
 | Hydration | Malformed reminder data | App starts | Reminder settings expose a load error while the rest of the journal remains usable |
+| Hydration recovery | A reminder read fails transiently | User taps Try again | The screen reloads the snapshot and replaces the error with the current reminder list |
+| Reminder target | Active custom supportive Leitsätze exist | User starts a new reminder from Settings | The user selects the exact positive Leitsatz to receive; emotions and restrictive Leidsätze are not offered |
+| Reminder target | No active custom supportive Leitsatz exists | User starts a new reminder from Settings | An explanatory empty state directs the user to create a supportive Leitsatz first |
+| Required name | Reminder name is blank or whitespace | User reaches the schedule editor | Required guidance is visible and Create/Save stays disabled until a nonblank name is entered |
+| iOS time input | The native wheel picker is open | User scrolls the hour or minute wheel | The picker remains mounted during the gesture, the displayed value changes, and Done explicitly confirms it |
 | Native projection | Owned requests match fingerprints | Reconciliation runs | Matching requests remain; missing requests are added; obsolete or duplicate owned requests are canceled; foreign requests are untouched |
 | Native projection | Permission is denied | App starts or foregrounds | Reconciliation does not schedule notifications |
 | Content privacy | Positive Leitsatz assignment uses the default preview setting | Notification is delivered | Notification contains neutral copy and a stable identifier, never the restrictive Leidsatz or positive text |

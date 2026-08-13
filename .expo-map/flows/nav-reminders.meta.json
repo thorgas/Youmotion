@@ -3,11 +3,15 @@
   "name": "nav-reminders",
   "route": "reminders",
   "title": "Navigate to reminder schedules",
-  "device": "Pixel 6a",
+  "device": "iPhone 17 Pro",
   "steps": {
-    "1": {
+    "4": {
+      "target": "Sanfte Erinnerungen",
+      "screen": "reminders"
+    },
+    "5": {
       "capture": "reminders.png",
-      "note": "Persisted local reminder schedule after a cold app restart"
+      "note": "Persisted local Leitsatz reminder with written weekdays and exact target text"
     }
   }
 }

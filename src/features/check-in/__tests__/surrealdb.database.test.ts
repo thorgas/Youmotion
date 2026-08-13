@@ -109,6 +109,17 @@ describe('SurrealDB connection', () => {
     expect(mockClient.query.mock.calls.map(([surql]) => surql)).toEqual(['FIRST', 'SECOND']);
   });
 
+  it('omits optional variables when a read has none', async () => {
+    const { getDatabase, queryDatabase } = loadDatabaseModule();
+    await getDatabase();
+    mockClient.query.mockReset();
+    mockClient.query.mockResolvedValue([{ statementIndex: 0, value: [] }]);
+
+    await queryDatabase({ surql: 'SELECT * FROM reminder_schedule' });
+
+    expect(mockClient.query).toHaveBeenCalledWith('SELECT * FROM reminder_schedule');
+  });
+
   it('rejects non-file database locations', async () => {
     mockDirectoryUri = 'content://documents/youmotion-surrealdb';
     const { getDatabase } = loadDatabaseModule();

@@ -1,0 +1,17 @@
+steps:
+  - tool: open-url
+    args:
+      url: "youmotion://"
+  - wait: 1200
+  - tool: tap
+    args:
+      id: tab-settings
+  - wait: 500
+  - tool: tap
+    args:
+      id: open-reminders
+  - wait: 800
+  - tap:
+      on:
+        text: "Leitsatz-Erinnerung erstellen"
+  - wait: 800

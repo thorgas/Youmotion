@@ -3,10 +3,10 @@ import {
   EMOTION_LABEL_MODES,
 } from '@/constants';
 
-type QueryResult = readonly [{
+type QueryResult = readonly {
   statementIndex: number;
   value: unknown;
-}];
+}[];
 
 let nextUpsertFailure: unknown;
 let nextDeleteFailure: unknown;

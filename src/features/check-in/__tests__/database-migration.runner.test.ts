@@ -2,6 +2,7 @@ import * as Effect from 'effect/Effect';
 
 import { DATABASE_MIGRATION_TABLE } from '@/constants';
 import { occurrenceTimeDatabaseMigration } from '../infrastructure/migrations/occurrence-time.database-migration';
+import { reminderTablesDatabaseMigration } from '../infrastructure/migrations/reminder-tables.database-migration';
 import { runDatabaseMigrations } from '../infrastructure/migrations/database-migration.runner';
 
 const query = jest.fn();
@@ -16,11 +17,15 @@ describe('database migration runner', () => {
     query
       .mockResolvedValueOnce([{ statementIndex: 0, value: null }])
       .mockResolvedValueOnce([{ statementIndex: 0, value: [] }])
+      .mockResolvedValueOnce([{ statementIndex: 0, value: null }])
       .mockResolvedValueOnce([{ statementIndex: 0, value: null }]);
 
     const applied = await Effect.runPromise(runDatabaseMigrations(database));
 
-    expect(applied).toEqual([occurrenceTimeDatabaseMigration.id]);
+    expect(applied).toEqual([
+      occurrenceTimeDatabaseMigration.id,
+      reminderTablesDatabaseMigration.id,
+    ]);
     expect(query).toHaveBeenNthCalledWith(
       1,
       `DEFINE TABLE IF NOT EXISTS ${DATABASE_MIGRATION_TABLE} SCHEMALESS`,
@@ -46,6 +51,23 @@ describe('database migration runner', () => {
         }),
       }),
     );
+    expect(query).toHaveBeenNthCalledWith(
+      4,
+      expect.stringMatching(
+        /BEGIN TRANSACTION;[\s\S]*DEFINE TABLE IF NOT EXISTS reminder_schedule SCHEMALESS;[\s\S]*DEFINE TABLE IF NOT EXISTS reminder_assignment SCHEMALESS;[\s\S]*UPSERT \$migrationRecord[\s\S]*COMMIT TRANSACTION;/,
+      ),
+      expect.objectContaining({
+        ledgerEntry: expect.objectContaining({
+          migrationId: reminderTablesDatabaseMigration.id,
+          description: reminderTablesDatabaseMigration.description,
+          appliedAt: expect.any(String),
+        }),
+        migrationRecord: expect.objectContaining({
+          kind: 'record',
+          value: `${DATABASE_MIGRATION_TABLE}:${reminderTablesDatabaseMigration.id}`,
+        }),
+      }),
+    );
   });
 
   it('does not rerun a migration already recorded in the ledger', async () => {
@@ -53,7 +75,10 @@ describe('database migration runner', () => {
       .mockResolvedValueOnce([{ statementIndex: 0, value: null }])
       .mockResolvedValueOnce([{
         statementIndex: 0,
-        value: [{ migrationId: occurrenceTimeDatabaseMigration.id }],
+        value: [
+          { migrationId: occurrenceTimeDatabaseMigration.id },
+          { migrationId: reminderTablesDatabaseMigration.id },
+        ],
       }]);
 
     await expect(Effect.runPromise(runDatabaseMigrations(database))).resolves.toEqual([]);

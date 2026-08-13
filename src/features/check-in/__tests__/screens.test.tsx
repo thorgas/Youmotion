@@ -96,6 +96,11 @@ jest.mock('expo-updates', () => ({
   channel: 'development',
 }));
 
+jest.mock('@/features/reminders/infrastructure/local-reminder.scheduler', () => ({
+  ...jest.requireActual('@/features/reminders/infrastructure/local-reminder.scheduler'),
+  getReminderPermission: jest.fn(() => Promise.resolve('undetermined')),
+}));
+
 jest.mock('../infrastructure/surrealdb.database', () => ({
   getDatabase: jest.fn(() => Promise.resolve(mockSurrealDatabase)),
   queryDatabase: jest.fn(({ surql, variables }: {

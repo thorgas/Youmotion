@@ -87,6 +87,7 @@ const mockPickDataArchive = jest.mocked(dataArchiveRepository.pickDataArchive);
 const mockRestoreDataArchive = jest.mocked(dataArchiveRepository.restoreDataArchive);
 const mockDeleteAllJournalData = jest.mocked(dataArchiveRepository.deleteAllJournalData);
 const mockRequestReminderPermission = jest.mocked(reminderScheduler.requestReminderPermission);
+const mockGetReminderPermission = jest.mocked(reminderScheduler.getReminderPermission);
 
 const selection = {
   emotionId: EMOTION_IDS.JOY,
@@ -169,6 +170,8 @@ describe('app navigation model', () => {
     mockDeleteAllJournalData.mockReturnValue(Effect.succeed(undefined));
     mockRequestReminderPermission.mockClear();
     mockRequestReminderPermission.mockResolvedValue(REMINDER_PERMISSION_STATES.GRANTED);
+    mockGetReminderPermission.mockClear();
+    mockGetReminderPermission.mockResolvedValue(REMINDER_PERMISSION_STATES.UNDETERMINED);
   });
 
   it('exports a local backup from an explicit Settings model path', async () => {
@@ -555,42 +558,57 @@ describe('app navigation model', () => {
     expect(denied.can({ type: REMINDER_EVENTS.SCHEDULE_SAVE_REQUESTED })).toBe(false);
   });
 
-  it('never returns to the permission offer after a grant and rechecks a later denial', async () => {
-    mockRequestReminderPermission
-      .mockResolvedValueOnce(REMINDER_PERMISSION_STATES.GRANTED)
-      .mockResolvedValue(REMINDER_PERMISSION_STATES.DENIED);
+  it('skips the offer after a grant and rechecks permission after a later denial', async () => {
     const actor = createActor(appNavigationMachine).start();
+    const beliefSystemId = CustomBeliefSystemId.make('custom-reminder-target');
+    actor.send({
+      type: CHECK_IN_EVENTS.BELIEF_STATEMENTS_HYDRATED,
+      statements: [{
+        kind: 'custom',
+        beliefSystemId,
+        harmfulStatement: 'I must keep going.',
+        guidingStatement: 'I can pause.',
+      }],
+    });
     actor.send({ type: NAVIGATION_EVENTS.SETTINGS_OPENED });
     actor.send({ type: REMINDER_EVENTS.OPENED });
+    await waitFor(actor, (candidate) => candidate.matches(REMINDER_STATES.SETTINGS));
+
+    mockGetReminderPermission.mockResolvedValue(REMINDER_PERMISSION_STATES.GRANTED);
     actor.send({ type: REMINDER_EVENTS.NEW_SCHEDULE_REQUESTED });
-    actor.send({ type: REMINDER_EVENTS.OFFER_ACCEPTED });
+    expect(actor.getSnapshot().matches(REMINDER_STATES.TARGET_PICKER)).toBe(true);
+    actor.send({ type: REMINDER_EVENTS.TARGET_SELECTED, beliefSystemId });
 
     await waitFor(
       actor,
       (candidate) => candidate.matches(REMINDER_STATES.SCHEDULE_PICKER),
       { timeout: 3_000 },
     );
+    expect(mockRequestReminderPermission).not.toHaveBeenCalled();
+    actor.send({ type: NAVIGATION_EVENTS.BACK_REQUESTED });
+    expect(actor.getSnapshot().matches(REMINDER_STATES.TARGET_PICKER)).toBe(true);
     actor.send({ type: NAVIGATION_EVENTS.BACK_REQUESTED });
     expect(actor.getSnapshot().matches(REMINDER_STATES.SETTINGS)).toBe(true);
     expect(actor.getSnapshot().matches(REMINDER_STATES.OFFER)).toBe(false);
 
+    mockGetReminderPermission.mockResolvedValue(REMINDER_PERMISSION_STATES.DENIED);
     actor.send({ type: REMINDER_EVENTS.NEW_SCHEDULE_REQUESTED });
-    actor.send({ type: REMINDER_EVENTS.OFFER_ACCEPTED });
+    actor.send({ type: REMINDER_EVENTS.TARGET_SELECTED, beliefSystemId });
     await waitFor(
       actor,
       (candidate) => candidate.matches(REMINDER_STATES.PERMISSION_DENIED),
       { timeout: 3_000 },
     );
+    mockGetReminderPermission.mockResolvedValue(REMINDER_PERMISSION_STATES.GRANTED);
     actor.send({ type: REMINDER_EVENTS.SETTINGS_RETURNED });
     await waitFor(
       actor,
-      (candidate) => candidate.matches(REMINDER_STATES.PERMISSION_DENIED)
-        && mockRequestReminderPermission.mock.calls.length === 3,
+      (candidate) => candidate.matches(REMINDER_STATES.SCHEDULE_PICKER),
       { timeout: 3_000 },
     );
 
     expect(actor.getSnapshot().matches(REMINDER_STATES.OFFER)).toBe(false);
-    expect(mockRequestReminderPermission).toHaveBeenCalledTimes(3);
+    expect(mockRequestReminderPermission).not.toHaveBeenCalled();
   });
 
   it('models all emotion-label setting choices', () => {

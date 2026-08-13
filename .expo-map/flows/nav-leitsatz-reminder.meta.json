@@ -1,0 +1,21 @@
+{
+  "formatVersion": 2,
+  "name": "nav-leitsatz-reminder",
+  "route": "leitsatz-reminder",
+  "title": "Choose a custom Leitsatz for a new reminder",
+  "device": "iPhone 17 Pro",
+  "steps": {
+    "4": {
+      "target": "Sanfte Erinnerungen",
+      "screen": "reminders"
+    },
+    "6": {
+      "target": "Leitsatz-Erinnerung erstellen",
+      "screen": "leitsatz-reminder"
+    },
+    "7": {
+      "capture": "leitsatz-reminder.png",
+      "note": "Only active custom supportive Leitsätze are selectable; emotions are not offered"
+    }
+  }
+}

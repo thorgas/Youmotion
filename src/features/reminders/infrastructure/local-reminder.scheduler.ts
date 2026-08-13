@@ -274,9 +274,10 @@ function reconcileActions({
       cancelIdentifiers.push(request.identifier);
     }
   }
-  const scheduleRequests = [...expected]
-    .filter(([key]) => !existing.has(key))
-    .map(([, request]) => request);
+  const scheduleRequests: ExpectedNotification[] = [];
+  for (const [key, request] of expected) {
+    if (!existing.has(key)) scheduleRequests.push(request);
+  }
   return { cancelIdentifiers, scheduleRequests };
 }
 

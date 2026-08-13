@@ -164,6 +164,7 @@ const AppContextSchema = Schema.Struct({
   reminderAssignments: ReminderAssignmentListSchema,
   reminderTargetKind: Schema.Literal(...Object.values(REMINDER_TARGET_KINDS)),
   reminderTargetBeliefSystemId: Schema.NullOr(BeliefSystemId),
+  reminderStartedFromSettings: Schema.Boolean,
   reminderAssignmentDraftId: Schema.NullOr(ReminderAssignmentId),
   reminderScheduleNameDraft: Schema.String,
   reminderWeekdaysDraft: Schema.Array(ReminderWeekday),
@@ -475,6 +476,8 @@ export const appNavigationMachine = setup({
     [BELIEF_LIBRARY_STATES.SAVING]: {},
     [BELIEF_LIBRARY_STATES.RETIRING]: {},
     [REMINDER_STATES.SETTINGS]: {},
+    [REMINDER_STATES.TARGET_PICKER]: {},
+    [REMINDER_STATES.CHECKING_PERMISSION]: {},
     [REMINDER_STATES.OFFER]: {},
     [REMINDER_STATES.REQUESTING_PERMISSION]: {},
     [REMINDER_STATES.PERMISSION_DENIED]: {},
@@ -652,6 +655,7 @@ export const appNavigationMachine = setup({
       [REMINDER_EVENTS.HYDRATION_FAILED]: Schema.standardSchemaV1(
         Schema.Struct({ message: Schema.String }),
       ),
+      [REMINDER_EVENTS.RETRY_REQUESTED]: EmptyEventSchema,
       [REMINDER_EVENTS.OFFER_ACCEPTED]: EmptyEventSchema,
       [REMINDER_EVENTS.OFFER_DECLINED]: EmptyEventSchema,
       [REMINDER_EVENTS.PERMISSION_RESOLVED]: Schema.standardSchemaV1(Schema.Struct({
@@ -662,6 +666,9 @@ export const appNavigationMachine = setup({
       ),
       [REMINDER_EVENTS.SETTINGS_REQUESTED]: EmptyEventSchema,
       [REMINDER_EVENTS.SETTINGS_RETURNED]: EmptyEventSchema,
+      [REMINDER_EVENTS.TARGET_SELECTED]: Schema.standardSchemaV1(Schema.Struct({
+        beliefSystemId: CustomBeliefSystemId,
+      })),
       [REMINDER_EVENTS.SCHEDULE_SELECTED]: Schema.standardSchemaV1(Schema.Struct({
         scheduleId: ReminderScheduleId,
       })),
@@ -757,6 +764,7 @@ export const appNavigationMachine = setup({
     reminderAssignments: [],
     reminderTargetKind: REMINDER_TARGET_KINDS.PULSE,
     reminderTargetBeliefSystemId: null,
+    reminderStartedFromSettings: false,
     reminderAssignmentDraftId: null,
     reminderScheduleNameDraft: '',
     reminderWeekdaysDraft: [2, 3, 4, 5, 6],
@@ -1298,6 +1306,7 @@ export const appNavigationMachine = setup({
                 context: {
                   reminderTargetKind: REMINDER_TARGET_KINDS.PULSE,
                   reminderTargetBeliefSystemId: null,
+                  reminderStartedFromSettings: false,
                   reminderError: null,
                 },
               };
@@ -1653,7 +1662,7 @@ export const appNavigationMachine = setup({
               beliefSystemId: event.statement.beliefSystemId,
               statements: context.beliefStatements,
             })?.guidingStatement === undefined
-            ? `#appNavigation.${REMINDER_STATES.OFFER}`
+            ? `#appNavigation.${REMINDER_STATES.CHECKING_PERMISSION}`
             : BELIEF_LIBRARY_STATES.LIBRARY,
           context: {
             beliefStatements,
@@ -1668,6 +1677,7 @@ export const appNavigationMachine = setup({
             reminderTargetBeliefSystemId: event.statement.guidingStatement !== undefined
               ? event.statement.beliefSystemId
               : null,
+            reminderStartedFromSettings: false,
             reminderError: null,
           },
         };
@@ -1756,13 +1766,30 @@ export const appNavigationMachine = setup({
           target: `#appNavigation.${NAVIGATION_STATES.TABS}.${NAVIGATION_STATES.SETTINGS}`,
         },
         [REMINDER_EVENTS.NEW_SCHEDULE_REQUESTED]: {
-          target: REMINDER_STATES.OFFER,
+          target: REMINDER_STATES.TARGET_PICKER,
           context: {
-            reminderTargetKind: REMINDER_TARGET_KINDS.PULSE,
+            reminderTargetKind: REMINDER_TARGET_KINDS.GUIDING_BELIEF,
             reminderTargetBeliefSystemId: null,
+            reminderStartedFromSettings: true,
             reminderAssignmentDraftId: null,
             reminderError: null,
           },
+        },
+        [REMINDER_EVENTS.RETRY_REQUESTED]: ({ self }, enq) => {
+          enq(() => {
+            void Effect.runPromise(loadReminderData).then(
+              ({ schedules, assignments }) => self.send({
+                type: REMINDER_EVENTS.HYDRATED,
+                schedules,
+                assignments,
+              }),
+              () => self.send({
+                type: REMINDER_EVENTS.HYDRATION_FAILED,
+                message: 'Your reminders could not be loaded.',
+              }),
+            );
+          });
+          return { context: { reminderError: null } };
         },
         [REMINDER_EVENTS.SCHEDULE_EDIT_REQUESTED]: ({ context, event }) => {
           const assignment = context.reminderAssignments.find(
@@ -1776,6 +1803,7 @@ export const appNavigationMachine = setup({
             target: REMINDER_STATES.SCHEDULE_EDITOR,
             context: {
               reminderAssignmentDraftId: assignment.id,
+              reminderStartedFromSettings: true,
               reminderScheduleNameDraft: schedule.name,
               reminderWeekdaysDraft: schedule.weekdays,
               reminderTimesDraft: schedule.times,
@@ -1819,14 +1847,62 @@ export const appNavigationMachine = setup({
         },
       },
     },
-    [REMINDER_STATES.OFFER]: {
+    [REMINDER_STATES.TARGET_PICKER]: {
       on: {
         [NAVIGATION_EVENTS.BACK_REQUESTED]: {
-          target: BELIEF_LIBRARY_STATES.LIBRARY,
+          target: REMINDER_STATES.SETTINGS,
+          context: { reminderTargetBeliefSystemId: null, reminderError: null },
         },
+        [REMINDER_EVENTS.TARGET_SELECTED]: {
+          target: REMINDER_STATES.CHECKING_PERMISSION,
+          context: ({ event }) => ({
+            reminderTargetKind: REMINDER_TARGET_KINDS.GUIDING_BELIEF,
+            reminderTargetBeliefSystemId: event.beliefSystemId,
+            reminderError: null,
+          }),
+        },
+      },
+    },
+    [REMINDER_STATES.CHECKING_PERMISSION]: {
+      entry: ({ self }, enq) => {
+        enq(() => {
+          void getReminderPermission().then(
+            (permission) => self.send({
+              type: REMINDER_EVENTS.PERMISSION_RESOLVED,
+              permission,
+            }),
+            () => self.send({
+              type: REMINDER_EVENTS.PERMISSION_FAILED,
+              message: 'Notification permission could not be checked.',
+            }),
+          );
+        });
+      },
+      on: {
+        [REMINDER_EVENTS.PERMISSION_RESOLVED]: ({ event }) => ({
+          target: event.permission === REMINDER_PERMISSION_STATES.GRANTED
+            ? REMINDER_STATES.SCHEDULE_PICKER
+            : event.permission === REMINDER_PERMISSION_STATES.UNDETERMINED
+              ? REMINDER_STATES.OFFER
+              : REMINDER_STATES.PERMISSION_DENIED,
+          context: { reminderPermission: event.permission, reminderError: null },
+        }),
+        [REMINDER_EVENTS.PERMISSION_FAILED]: ({ event }) => ({
+          target: REMINDER_STATES.PERMISSION_DENIED,
+          context: { reminderError: event.message },
+        }),
+      },
+    },
+    [REMINDER_STATES.OFFER]: {
+      on: {
+        [NAVIGATION_EVENTS.BACK_REQUESTED]: ({ context }) => ({
+          target: context.reminderStartedFromSettings
+            ? REMINDER_STATES.TARGET_PICKER
+            : BELIEF_LIBRARY_STATES.LIBRARY,
+        }),
         [REMINDER_EVENTS.OFFER_DECLINED]: ({ context }) => ({
-          target: context.reminderTargetKind === REMINDER_TARGET_KINDS.PULSE
-            ? `#appNavigation.${REMINDER_STATES.SETTINGS}`
+          target: context.reminderStartedFromSettings
+            ? `#appNavigation.${REMINDER_STATES.TARGET_PICKER}`
             : `#appNavigation.${BELIEF_LIBRARY_STATES.LIBRARY}`,
           context: {
             reminderTargetBeliefSystemId: null,
@@ -1868,17 +1944,19 @@ export const appNavigationMachine = setup({
     },
     [REMINDER_STATES.PERMISSION_DENIED]: {
       on: {
-        [NAVIGATION_EVENTS.BACK_REQUESTED]: {
-          target: REMINDER_STATES.OFFER,
-        },
+        [NAVIGATION_EVENTS.BACK_REQUESTED]: ({ context }) => ({
+          target: context.reminderStartedFromSettings
+            ? REMINDER_STATES.TARGET_PICKER
+            : BELIEF_LIBRARY_STATES.LIBRARY,
+        }),
         [REMINDER_EVENTS.OFFER_DECLINED]: ({ context }) => ({
-          target: context.reminderTargetKind === REMINDER_TARGET_KINDS.PULSE
-            ? `#appNavigation.${REMINDER_STATES.SETTINGS}`
+          target: context.reminderStartedFromSettings
+            ? `#appNavigation.${REMINDER_STATES.TARGET_PICKER}`
             : `#appNavigation.${BELIEF_LIBRARY_STATES.LIBRARY}`,
           context: { reminderTargetBeliefSystemId: null, reminderError: null },
         }),
         [REMINDER_EVENTS.SETTINGS_RETURNED]: {
-          target: REMINDER_STATES.REQUESTING_PERMISSION,
+          target: REMINDER_STATES.CHECKING_PERMISSION,
         },
         [REMINDER_EVENTS.SETTINGS_REQUESTED]: (_args, enq) => {
           enq(() => {
@@ -1890,8 +1968,8 @@ export const appNavigationMachine = setup({
     [REMINDER_STATES.SCHEDULE_PICKER]: {
       on: {
         [NAVIGATION_EVENTS.BACK_REQUESTED]: ({ context }) => ({
-          target: context.reminderTargetKind === REMINDER_TARGET_KINDS.PULSE
-            ? REMINDER_STATES.SETTINGS
+          target: context.reminderStartedFromSettings
+            ? REMINDER_STATES.TARGET_PICKER
             : `#appNavigation.${BELIEF_LIBRARY_STATES.LIBRARY}`,
           context: {
             reminderTargetBeliefSystemId: null,
@@ -2069,12 +2147,12 @@ export const appNavigationMachine = setup({
     [REMINDER_STATES.ACTIVE]: {
       on: {
         [NAVIGATION_EVENTS.BACK_REQUESTED]: ({ context }) => ({
-          target: context.reminderTargetKind === REMINDER_TARGET_KINDS.PULSE
+          target: context.reminderStartedFromSettings
             ? `#appNavigation.${REMINDER_STATES.SETTINGS}`
             : `#appNavigation.${BELIEF_LIBRARY_STATES.LIBRARY}`,
         }),
         [REMINDER_EVENTS.DONE]: ({ context }) => ({
-          target: context.reminderTargetKind === REMINDER_TARGET_KINDS.PULSE
+          target: context.reminderStartedFromSettings
             ? `#appNavigation.${REMINDER_STATES.SETTINGS}`
             : `#appNavigation.${BELIEF_LIBRARY_STATES.LIBRARY}`,
         }),
@@ -2848,7 +2926,9 @@ function beliefLibraryRouteForStateValue(value: StateValue) {
 function reminderRouteForStateValue(value: StateValue) {
   if (matchesState(REMINDER_STATES.SETTINGS, value)) return APP_ROUTES.REMINDERS;
   if (
-    matchesState(REMINDER_STATES.OFFER, value)
+    matchesState(REMINDER_STATES.TARGET_PICKER, value)
+    || matchesState(REMINDER_STATES.CHECKING_PERMISSION, value)
+    || matchesState(REMINDER_STATES.OFFER, value)
     || matchesState(REMINDER_STATES.REQUESTING_PERMISSION, value)
     || matchesState(REMINDER_STATES.PERMISSION_DENIED, value)
     || matchesState(REMINDER_STATES.SCHEDULE_PICKER, value)
