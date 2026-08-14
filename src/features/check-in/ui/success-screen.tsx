@@ -1,6 +1,6 @@
 import { useSelector } from '@xstate/react';
 import { PressableScale } from 'pressto';
-import { StyleSheet, Text, View } from 'react-native';
+import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import Animated, {
   FadeInDown,
   ReduceMotion,
@@ -12,6 +12,8 @@ import {
   CHECK_IN_EVENTS,
   MOTION_DURATION,
   MOTION_OFFSET,
+  REMINDER_EVENTS,
+  REMINDER_TARGET_KINDS,
 } from '@/constants';
 import { useAppNavigationActor } from '@/navigation/app-navigation.provider';
 import { savedCheckInCopy } from './emotion-copy';
@@ -39,7 +41,8 @@ const revealAfter = (delay: number) => FadeInDown
 const titleEntering = revealAfter(50);
 const copyEntering = revealAfter(90);
 const guidingCardEntering = revealAfter(130);
-const buttonEntering = revealAfter(170);
+const reminderOfferEntering = revealAfter(170);
+const buttonEntering = revealAfter(210);
 
 export function SuccessScreen() {
   const actor = useAppNavigationActor();
@@ -51,13 +54,25 @@ export function SuccessScreen() {
         statements: context.beliefStatements,
       })
     : undefined;
+  const reminderOfferAvailable = context.reminderDataHydrated
+    && context.reminderError === null
+    && saved?.beliefSystemId !== undefined
+    && guidingStatement !== undefined
+    && !context.reminderAssignments.some((assignment) => (
+      assignment.targetKind === REMINDER_TARGET_KINDS.GUIDING_BELIEF
+      && assignment.beliefSystemId === saved.beliefSystemId
+    ));
+  const _openReminderSetup = () => actor.send({
+    type: REMINDER_EVENTS.SUCCESS_OFFER_ACCEPTED,
+  });
   const _finish = () => actor.send({ type: CHECK_IN_EVENTS.RESTARTED });
 
   if (!saved) return null;
 
   return (
     <View style={styles.page} testID="success-screen">
-      <SafeAreaView style={styles.content}>
+      <SafeAreaView edges={['top', 'bottom']} style={styles.safeArea}>
+        <ScrollView contentContainerStyle={styles.content}>
         <Animated.View entering={haloEntering} style={styles.halo}>
           <Text style={styles.check}>✓</Text>
         </Animated.View>
@@ -80,11 +95,45 @@ export function SuccessScreen() {
             <Text style={styles.guidingText}>{guidingStatement}</Text>
           </Animated.View>
         ) : null}
+        {reminderOfferAvailable ? (
+          <Animated.View
+            entering={reminderOfferEntering}
+            style={styles.reminderOffer}
+            testID="success-reminder-offer">
+            <Text style={styles.reminderEyebrow}>
+              <fbt desc="Completed check-in optional Leitsatz reminder eyebrow">
+                GENTLE REMINDER
+              </fbt>
+            </Text>
+            <Text style={styles.reminderTitle}>
+              <fbt desc="Completed check-in optional Leitsatz reminder title">
+                Would you like this Leitsatz to return to you?
+              </fbt>
+            </Text>
+            <Text style={styles.reminderCopy}>
+              <fbt desc="Completed check-in optional Leitsatz reminder explanation">
+                Choose days and times that feel right. You can change or remove the reminder later.
+              </fbt>
+            </Text>
+            <PressableScale
+              accessibilityRole="button"
+              onPress={_openReminderSetup}
+              style={styles.reminderButton}
+              testID="success-plan-reminder">
+              <Text style={styles.reminderButtonText}>
+                <fbt desc="Open Leitsatz reminder setup from completed check-in button">
+                  Plan reminder
+                </fbt>
+              </Text>
+            </PressableScale>
+          </Animated.View>
+        ) : null}
         <Animated.View entering={buttonEntering}>
           <PressableScale accessibilityRole="button" onPress={_finish} style={styles.button} testID="check-in-done">
             <Text style={styles.buttonText}><fbt desc="Button finishing the completed check-in flow">Done</fbt></Text>
           </PressableScale>
         </Animated.View>
+        </ScrollView>
       </SafeAreaView>
     </View>
   );
@@ -92,7 +141,8 @@ export function SuccessScreen() {
 
 const styles = StyleSheet.create({
   page: { flex: 1, backgroundColor: palette.paper },
-  content: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 28 },
+  safeArea: { flex: 1 },
+  content: { flexGrow: 1, alignItems: 'center', justifyContent: 'center', padding: 28 },
   halo: { width: 76, height: 76, borderRadius: 38, borderWidth: 1.5, borderColor: palette.moss, alignItems: 'center', justifyContent: 'center', backgroundColor: palette.paperRaised },
   check: { fontFamily: type.semibold, color: palette.moss, fontSize: 32 },
   title: { fontFamily: type.semibold, color: palette.ink, fontSize: 32, textAlign: 'center', marginTop: 22 },
@@ -122,6 +172,49 @@ const styles = StyleSheet.create({
     lineHeight: 25,
     marginTop: 8,
   },
+  reminderOffer: {
+    width: '100%',
+    maxWidth: 360,
+    marginTop: 14,
+    padding: 18,
+    borderRadius: 22,
+    borderCurve: 'continuous',
+    borderWidth: 1,
+    borderColor: palette.hairline,
+    backgroundColor: palette.paperRaised,
+  },
+  reminderEyebrow: {
+    fontFamily: type.semibold,
+    color: palette.moss,
+    fontSize: 10,
+    letterSpacing: 1.2,
+  },
+  reminderTitle: {
+    fontFamily: type.semibold,
+    color: palette.ink,
+    fontSize: 17,
+    lineHeight: 23,
+    marginTop: 7,
+  },
+  reminderCopy: {
+    fontFamily: type.regular,
+    color: palette.inkMuted,
+    fontSize: 13,
+    lineHeight: 19,
+    marginTop: 6,
+  },
+  reminderButton: {
+    minHeight: 48,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 16,
+    borderCurve: 'continuous',
+    borderWidth: 1,
+    borderColor: palette.moss,
+    marginTop: 16,
+    paddingHorizontal: 18,
+  },
+  reminderButtonText: { fontFamily: type.semibold, color: palette.moss, fontSize: 14 },
   button: { minHeight: 50, backgroundColor: palette.ink, borderRadius: 16, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 28, marginTop: 28 },
   buttonText: { fontFamily: type.semibold, color: '#FFFFFF', fontSize: 14 },
 });

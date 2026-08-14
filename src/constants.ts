@@ -249,12 +249,20 @@ export const REMINDER_PERMISSION_STATES = Object.freeze({
   DENIED: literal('denied'),
 });
 
+export const REMINDER_ENTRY_POINTS = Object.freeze({
+  BELIEF_LIBRARY: literal('beliefLibrary'),
+  CHECK_IN_SUCCESS: literal('checkInSuccess'),
+  NOTIFICATION: literal('notification'),
+  SETTINGS: literal('settings'),
+});
+
 export const REMINDER_EVENTS = Object.freeze({
   OPENED: literal('reminder.opened'),
   HYDRATED: literal('reminder.hydrated'),
   HYDRATION_FAILED: literal('reminder.hydrationFailed'),
   RETRY_REQUESTED: literal('reminder.retryRequested'),
   OFFER_ACCEPTED: literal('reminder.offerAccepted'),
+  SUCCESS_OFFER_ACCEPTED: literal('reminder.successOfferAccepted'),
   OFFER_DECLINED: literal('reminder.offerDeclined'),
   PERMISSION_RESOLVED: literal('reminder.permissionResolved'),
   PERMISSION_FAILED: literal('reminder.permissionFailed'),

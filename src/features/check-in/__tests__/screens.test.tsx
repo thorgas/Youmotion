@@ -1,4 +1,4 @@
-import { act, fireEvent, render, waitFor, within } from '@testing-library/react-native';
+import { act, fireEvent, render, userEvent, waitFor, within } from '@testing-library/react-native';
 import { useFocusEffect } from 'expo-router';
 import type { ReactElement } from 'react';
 import { Alert, StyleSheet } from 'react-native';
@@ -27,6 +27,7 @@ import {
   MOMENT_TIME_PICKER_MODES,
   REMINDER_EVENTS,
   REMINDER_STATES,
+  REMINDER_TARGET_KINDS,
 } from '@/constants';
 import { AppLocaleProvider } from '@/localization/app-locale-provider';
 import { formatHistoryDate } from '@/localization/date-copy';
@@ -67,6 +68,14 @@ import {
   CenteredBaseStateRipples,
 } from '../ui/base-state-ripples';
 import { palette } from '../ui/theme';
+import {
+  ReminderAssignmentId,
+  type ReminderAssignment,
+} from '@/features/reminders/domain/reminder-assignment';
+import {
+  ReminderScheduleId,
+  ReminderScheduleTimestamp,
+} from '@/features/reminders/domain/reminder-schedule';
 
 let mockActor: Actor<typeof appNavigationMachine>;
 
@@ -129,6 +138,46 @@ const _finishWithoutBeliefSystem = async () => {
     mockActor.getSnapshot().matches(CHECK_IN_STATES.BELIEF_SYSTEM),
   ).toBe(true));
   await act(() => mockActor.send({ type: CHECK_IN_EVENTS.CONFIRMED }));
+  await waitFor(() => expect(
+    mockActor.getSnapshot().matches(CHECK_IN_STATES.SUCCESS),
+  ).toBe(true));
+};
+
+const _finishWithGuidingBelief = async ({
+  assignments = [],
+}: {
+  assignments?: readonly ReminderAssignment[];
+} = {}) => {
+  await waitFor(() => expect(
+    mockActor.getSnapshot().context.reminderDataHydrated,
+  ).toBe(true));
+  mockActor.send({
+    type: CHECK_IN_EVENTS.BELIEF_STATEMENTS_HYDRATED,
+    statements: [{
+      kind: 'built-in',
+      beliefSystemId: BELIEF_SYSTEM_IDS.ALWAYS_FUNCTIONING,
+      guidingStatement: 'I may pause and still be enough.',
+    }],
+  });
+  mockActor.send({
+    type: REMINDER_EVENTS.HYDRATED,
+    schedules: [],
+    assignments,
+  });
+  _reachReflection();
+  mockActor.send({ type: CHECK_IN_EVENTS.CONFIRMED });
+  await waitFor(() => expect(
+    mockActor.getSnapshot().matches(CHECK_IN_STATES.BELIEF_SYSTEM),
+  ).toBe(true));
+  mockActor.send({
+    type: CHECK_IN_EVENTS.BELIEF_SYSTEM_CHANGED,
+    beliefSystemId: BELIEF_SYSTEM_IDS.ALWAYS_FUNCTIONING,
+  });
+  mockActor.send({ type: CHECK_IN_EVENTS.CONFIRMED });
+  await waitFor(() => expect(
+    mockActor.getSnapshot().matches(CHECK_IN_STATES.GUIDING_BELIEF),
+  ).toBe(true));
+  mockActor.send({ type: CHECK_IN_EVENTS.GUIDING_BELIEF_SKIPPED });
   await waitFor(() => expect(
     mockActor.getSnapshot().matches(CHECK_IN_STATES.SUCCESS),
   ).toBe(true));
@@ -1339,6 +1388,48 @@ describe('check-in screens', () => {
     expect(settings.getByText('App-Informationen')).toBeTruthy();
     await fireEvent.press(settings.getByText('Englisch'));
     await waitFor(() => expect(settings.getByText('Your journal belongs to you.')).toBeTruthy());
+  });
+
+  it('offers reminder setup for the completed Leitsatz and opens its permission flow', async () => {
+    const user = userEvent.setup();
+    await _finishWithGuidingBelief();
+
+    const success = await _renderLocalized(<SuccessScreen />);
+
+    expect(success.getByText('I may pause and still be enough.')).toBeOnTheScreen();
+    expect(success.getByText(
+      'Would you like this Leitsatz to return to you?',
+    )).toBeOnTheScreen();
+
+    await user.press(success.getByRole('button', { name: 'Plan reminder' }));
+    await waitFor(() => expect(
+      mockActor.getSnapshot().matches(REMINDER_STATES.OFFER),
+    ).toBe(true));
+    expect(mockActor.getSnapshot().context.reminderTargetBeliefSystemId).toBe(
+      BELIEF_SYSTEM_IDS.ALWAYS_FUNCTIONING,
+    );
+  });
+
+  it('does not repeat the offer when the completed Leitsatz already has a reminder', async () => {
+    const timestamp = ReminderScheduleTimestamp.make('2026-08-13T09:00:00.000Z');
+    await _finishWithGuidingBelief({
+      assignments: [{
+        id: ReminderAssignmentId.make('existing-success-reminder'),
+        schemaVersion: 1,
+        scheduleId: ReminderScheduleId.make('existing-success-schedule'),
+        targetKind: REMINDER_TARGET_KINDS.GUIDING_BELIEF,
+        beliefSystemId: BELIEF_SYSTEM_IDS.ALWAYS_FUNCTIONING,
+        showFullText: false,
+        enabled: false,
+        createdAt: timestamp,
+        updatedAt: timestamp,
+      }],
+    });
+
+    const success = await _renderLocalized(<SuccessScreen />);
+
+    expect(success.queryByTestId('success-reminder-offer')).not.toBeOnTheScreen();
+    expect(success.getByRole('button', { name: 'Done' })).toBeEnabled();
   });
 
   it('makes backup controls visible and requires confirmation before deleting moments', async () => {

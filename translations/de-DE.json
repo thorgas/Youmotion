@@ -5426,6 +5426,30 @@
       "tokens": [],
       "translations": [{ "translation": "DEIN LEITSATZ", "variations": {} }],
       "types": []
+    },
+    "EngN9k/onZsG9N3INOcidw==": {
+      "description": "Completed check-in optional Leitsatz reminder eyebrow",
+      "tokens": [],
+      "translations": [{ "translation": "SANFTE ERINNERUNG", "variations": {} }],
+      "types": []
+    },
+    "A6ci9zuRuE/vAdSSgVlAzg==": {
+      "description": "Completed check-in optional Leitsatz reminder title",
+      "tokens": [],
+      "translations": [{ "translation": "Möchtest du dich an diesen Leitsatz erinnern lassen?", "variations": {} }],
+      "types": []
+    },
+    "5XpPMt6T4DlToOwSMWQTmg==": {
+      "description": "Completed check-in optional Leitsatz reminder explanation",
+      "tokens": [],
+      "translations": [{ "translation": "Wähle Tage und Zeiten, die sich für dich stimmig anfühlen. Du kannst die Erinnerung später ändern oder löschen.", "variations": {} }],
+      "types": []
+    },
+    "/ITTWUUYNxibipGqWgWWWA==": {
+      "description": "Open Leitsatz reminder setup from completed check-in button",
+      "tokens": [],
+      "translations": [{ "translation": "Erinnerung planen", "variations": {} }],
+      "types": []
     }
   }
 }

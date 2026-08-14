@@ -20,6 +20,7 @@ import {
   ONBOARDING_EVENTS,
   ONBOARDING_STATES,
   REMINDER_EVENTS,
+  REMINDER_ENTRY_POINTS,
   REMINDER_PERMISSION_STATES,
   REMINDER_STATES,
   REMINDER_TARGET_KINDS,
@@ -52,9 +53,13 @@ import {
 } from '@/test-utils/surrealdb.repository.mock';
 import { appNavigationMachine, routeForStateValue } from '../app-navigation.machine';
 import * as reminderScheduler from '@/features/reminders/infrastructure/local-reminder.scheduler';
-import { ReminderAssignmentId } from '@/features/reminders/domain/reminder-assignment';
+import {
+  ReminderAssignmentId,
+  ReminderAssignmentSchema,
+} from '@/features/reminders/domain/reminder-assignment';
 import {
   ReminderScheduleId,
+  ReminderScheduleSchema,
   ReminderScheduleTimestamp,
 } from '@/features/reminders/domain/reminder-schedule';
 
@@ -148,6 +153,57 @@ async function finishWithoutBeliefSystem(actor: Actor<typeof appNavigationMachin
     { timeout: 1_000 },
   );
   actor.send({ type: CHECK_IN_EVENTS.CONFIRMED });
+  return waitFor(
+    actor,
+    (candidate) => candidate.matches(CHECK_IN_STATES.SUCCESS),
+    { timeout: 1_000 },
+  );
+}
+
+async function finishWithGuidingBelief({
+  actor,
+  assignments = [],
+  schedules = [],
+}: {
+  actor: Actor<typeof appNavigationMachine>;
+  assignments?: readonly typeof ReminderAssignmentSchema.Type[];
+  schedules?: readonly typeof ReminderScheduleSchema.Type[];
+}) {
+  await waitFor(
+    actor,
+    (candidate) => candidate.context.reminderDataHydrated
+      && candidate.context.beliefStatementsHydrated,
+    { timeout: 1_000 },
+  );
+  actor.send({
+    type: CHECK_IN_EVENTS.BELIEF_STATEMENTS_HYDRATED,
+    statements: [{
+      kind: 'built-in',
+      beliefSystemId: BELIEF_SYSTEM_IDS.ALWAYS_FUNCTIONING,
+      guidingStatement: 'I may pause and still be enough.',
+    }],
+  });
+  actor.send({ type: REMINDER_EVENTS.HYDRATED, assignments, schedules });
+  actor.send({ type: CHECK_IN_EVENTS.TOUCH_STARTED });
+  actor.send({ type: CHECK_IN_EVENTS.SELECTION_CHANGED, selection });
+  actor.send({ type: CHECK_IN_EVENTS.SELECTION_RELEASED });
+  actor.send({ type: CHECK_IN_EVENTS.CONFIRMED });
+  await waitFor(
+    actor,
+    (candidate) => candidate.matches(CHECK_IN_STATES.BELIEF_SYSTEM),
+    { timeout: 1_000 },
+  );
+  actor.send({
+    type: CHECK_IN_EVENTS.BELIEF_SYSTEM_CHANGED,
+    beliefSystemId: BELIEF_SYSTEM_IDS.ALWAYS_FUNCTIONING,
+  });
+  actor.send({ type: CHECK_IN_EVENTS.CONFIRMED });
+  await waitFor(
+    actor,
+    (candidate) => candidate.matches(CHECK_IN_STATES.GUIDING_BELIEF),
+    { timeout: 1_000 },
+  );
+  actor.send({ type: CHECK_IN_EVENTS.GUIDING_BELIEF_SKIPPED });
   return waitFor(
     actor,
     (candidate) => candidate.matches(CHECK_IN_STATES.SUCCESS),
@@ -615,6 +671,96 @@ describe('app navigation model', () => {
 
     expect(actor.getSnapshot().matches(REMINDER_STATES.OFFER)).toBe(false);
     expect(mockRequestReminderPermission).not.toHaveBeenCalled();
+  });
+
+  it('returns every optional success-screen permission exit to the completed check-in', async () => {
+    const actor = createActor(appNavigationMachine).start();
+    await finishWithGuidingBelief({ actor });
+
+    actor.send({ type: REMINDER_EVENTS.SUCCESS_OFFER_ACCEPTED });
+    const offer = await waitFor(
+      actor,
+      (candidate) => candidate.matches(REMINDER_STATES.OFFER),
+      { timeout: 1_000 },
+    );
+    expect(offer.context).toMatchObject({
+      reminderEntryPoint: REMINDER_ENTRY_POINTS.CHECK_IN_SUCCESS,
+      reminderTargetBeliefSystemId: BELIEF_SYSTEM_IDS.ALWAYS_FUNCTIONING,
+    });
+
+    actor.send({ type: NAVIGATION_EVENTS.BACK_REQUESTED });
+    expect(actor.getSnapshot().matches(CHECK_IN_STATES.SUCCESS)).toBe(true);
+
+    actor.send({ type: REMINDER_EVENTS.SUCCESS_OFFER_ACCEPTED });
+    await waitFor(actor, (candidate) => candidate.matches(REMINDER_STATES.OFFER));
+    mockRequestReminderPermission.mockResolvedValueOnce(REMINDER_PERMISSION_STATES.DENIED);
+    actor.send({ type: REMINDER_EVENTS.OFFER_ACCEPTED });
+    await waitFor(actor, (candidate) => candidate.matches(REMINDER_STATES.PERMISSION_DENIED));
+    actor.send({ type: REMINDER_EVENTS.OFFER_DECLINED });
+
+    expect(actor.getSnapshot().matches(CHECK_IN_STATES.SUCCESS)).toBe(true);
+    expect(actor.getSnapshot().context.saved?.beliefSystemId).toBe(
+      BELIEF_SYSTEM_IDS.ALWAYS_FUNCTIONING,
+    );
+  });
+
+  it('returns to success after activating an existing schedule for its Leitsatz', async () => {
+    mockGetReminderPermission.mockResolvedValue(REMINDER_PERMISSION_STATES.GRANTED);
+    const timestamp = ReminderScheduleTimestamp.make('2026-08-13T09:00:00.000Z');
+    const schedule = ReminderScheduleSchema.make({
+      id: ReminderScheduleId.make('success-existing-schedule'),
+      schemaVersion: 1,
+      name: 'Quiet morning',
+      weekdays: [2, 3, 4, 5, 6],
+      times: [{ hour: 9, minute: 0 }],
+      createdAt: timestamp,
+      updatedAt: timestamp,
+    });
+    const actor = createActor(appNavigationMachine).start();
+    await finishWithGuidingBelief({
+      actor,
+      schedules: [schedule],
+      assignments: [{
+        id: ReminderAssignmentId.make('success-pulse-assignment'),
+        schemaVersion: 1,
+        scheduleId: schedule.id,
+        targetKind: REMINDER_TARGET_KINDS.PULSE,
+        enabled: true,
+        createdAt: timestamp,
+        updatedAt: timestamp,
+      }],
+    });
+
+    actor.send({ type: REMINDER_EVENTS.SUCCESS_OFFER_ACCEPTED });
+    await waitFor(actor, (candidate) => candidate.matches(REMINDER_STATES.SCHEDULE_PICKER));
+    actor.send({ type: REMINDER_EVENTS.SCHEDULE_SELECTED, scheduleId: schedule.id });
+    const active = await waitFor(
+      actor,
+      (candidate) => candidate.matches(REMINDER_STATES.ACTIVE),
+      { timeout: 1_000 },
+    );
+    expect(active.context.reminderAssignments).toContainEqual(expect.objectContaining({
+      targetKind: REMINDER_TARGET_KINDS.GUIDING_BELIEF,
+      beliefSystemId: BELIEF_SYSTEM_IDS.ALWAYS_FUNCTIONING,
+    }));
+
+    actor.send({ type: REMINDER_EVENTS.DONE });
+    expect(actor.getSnapshot().matches(CHECK_IN_STATES.SUCCESS)).toBe(true);
+    actor.send({ type: REMINDER_EVENTS.SUCCESS_OFFER_ACCEPTED });
+    expect(actor.getSnapshot().matches(CHECK_IN_STATES.SUCCESS)).toBe(true);
+  });
+
+  it('does not enter reminder setup when reminder data failed to load', async () => {
+    const actor = createActor(appNavigationMachine).start();
+    await finishWithGuidingBelief({ actor });
+    actor.send({
+      type: REMINDER_EVENTS.HYDRATION_FAILED,
+      message: 'Your reminders could not be loaded.',
+    });
+
+    actor.send({ type: REMINDER_EVENTS.SUCCESS_OFFER_ACCEPTED });
+
+    expect(actor.getSnapshot().matches(CHECK_IN_STATES.SUCCESS)).toBe(true);
   });
 
   it('keeps a cold notification tap on its focused Leitsatz while beliefs hydrate', () => {
