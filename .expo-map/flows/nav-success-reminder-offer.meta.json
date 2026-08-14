@@ -1,0 +1,50 @@
+{
+  "formatVersion": 2,
+  "name": "nav-success-reminder-offer",
+  "route": "success",
+  "title": "Complete a check-in and open reminder scheduling for its Leitsatz",
+  "device": "iPhone 17 Pro",
+  "steps": {
+    "6": {
+      "target": "Emotion pulse dragged toward Freude"
+    },
+    "10": {
+      "target": "Was ist gerade da?"
+    },
+    "11": {
+      "target": "Weiter reflektieren",
+      "screen": "belief-system"
+    },
+    "15": {
+      "target": "Ich muss alles perfekt schaffen."
+    },
+    "16": {
+      "target": "Anhängen und weiter",
+      "screen": "guiding-belief"
+    },
+    "21": {
+      "target": "Speichern und abschließen",
+      "screen": "success"
+    },
+    "23": {
+      "capture": "success--reminder-offer.png",
+      "note": "Completed check-in offers an optional reminder for its exact unassigned Leitsatz"
+    },
+    "25": {
+      "target": "Erinnerung planen",
+      "screen": "leitsatz-reminder"
+    },
+    "27": {
+      "capture": "leitsatz-reminder--success-origin-schedule-picker.png",
+      "note": "Granted permission skips the explainer and opens the schedule picker"
+    },
+    "29": {
+      "target": "Zurück",
+      "screen": "success"
+    },
+    "31": {
+      "capture": "success--reminder-offer.png",
+      "note": "Back preserves the completed check-in and its optional reminder action"
+    }
+  }
+}

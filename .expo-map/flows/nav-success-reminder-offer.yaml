@@ -1,0 +1,42 @@
+steps:
+  - echo: Restart Youmotion and connect the development build.
+  - launch: com.youmotion.mobile
+  - tool: open-url
+    args:
+      url: exp+youmotion://expo-development-client/?url=http%3A%2F%2F127.0.0.1%3A8081
+  - await: { visible: { id: emotion-star }, timeout: 10000 }
+  - await: { idle: true }
+  - echo: Select a joyful emotion and expect the reflection screen.
+  - tool: gesture-swipe
+    args:
+      fromX: 0.5
+      fromY: 0.535
+      toX: 0.69
+      toY: 0.43
+      durationMs: 700
+      settle: true
+  - await: { visible: { id: reflection-note-input }, timeout: 5000 }
+  - await: { idle: true }
+  - echo: Dismiss the optional note keyboard and continue without a note.
+  - tap: { text: Was ist gerade da? }
+  - tap: { text: Weiter reflektieren }
+  - await: { visible: { id: belief-system-suggestion-perfect-everything }, timeout: 5000 }
+  - await: { idle: true }
+  - echo: Select the saved restrictive Leidsatz and continue to its supportive Leitsatz.
+  - tap: { id: belief-system-suggestion-perfect-everything }
+  - tap: { text: Anhängen und weiter }
+  - await: { visible: { id: guiding-source-belief }, timeout: 5000 }
+  - await: { idle: true }
+  - echo: Reuse the existing supportive Leitsatz and complete the reflection.
+  - scroll-to: { target: { id: guiding-belief-finish } }
+  - tap: { id: guiding-belief-finish }
+  - await: { visible: { text: Erinnerung planen }, timeout: 5000 }
+  - await: { idle: true }
+  - echo: Open reminder scheduling; permission is already granted in this capture state.
+  - tap: { text: Erinnerung planen }
+  - await: { visible: { text: Wann soll die Erinnerung wiederkommen? }, timeout: 5000 }
+  - await: { idle: true }
+  - echo: Go back before choosing a schedule and keep the completed check-in intact.
+  - tap: { text: Zurück }
+  - await: { visible: { text: Erinnerung planen }, timeout: 5000 }
+  - await: { idle: true }

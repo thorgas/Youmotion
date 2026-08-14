@@ -187,6 +187,8 @@ Persisted check-ins store stable emotion IDs, intensity, nuance levels, and an o
 
 The repository includes Callstack's project-local React Native, navigation, upgrade, GitHub, and GitHub Actions agent skills. The tooling dependencies are pinned in the pnpm lockfile rather than installed globally.
 
+The committed [Expo map guide](docs/expo-map.md) explains how to refresh the visual route map, replay its Argent flows, and upload the latest `.appmap` bundle to the AppMap Visualiser.
+
 Pressto provides consistent press feedback for the app's tap controls. A shared configuration uses subtle scale compression, a near-critically damped spring, and the system reduced-motion preference; direct-manipulation gestures such as the feeling pulse keep their gesture-specific feedback.
 
 Use a development build when working with native tooling. Expo Go cannot load Inspector, React Native Grab, Nitro Modules, or the Ottrelite Tracy backend.

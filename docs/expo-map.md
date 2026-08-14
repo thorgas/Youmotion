@@ -1,0 +1,34 @@
+# Expo map
+
+Youmotion keeps its visual navigation map under `.expo-map/`. The map combines the statically parsed Expo Router graph with iOS simulator screenshots and replayable Argent flows for runtime-only states.
+
+## Review the latest map
+
+1. Open [AppMap Visualiser](https://appmap-visualiser.vercel.app/).
+2. Upload the newest dated `.expo-map/Youmotion-YYYY-MM-DD.appmap` file.
+3. Inspect routes, screenshot variants, and recorded navigation flows in the visualiser.
+
+For a quick local contact sheet, open `.expo-map/map.html` in a browser. The `.appmap` file is the preferred review artifact because one upload contains the graph, screenshots, and flow metadata.
+
+## Refresh the map
+
+Run the `expo-map` skill from the repository root. It performs the following workflow:
+
+1. Parse `src/app/` into `.expo-map/graph.json`.
+2. Launch the iOS development build and verify deep links.
+3. Capture every route and meaningful runtime variant into `.expo-map/screens/`.
+4. Record the real tap path for each reachable screen as paired `.yaml` and `.meta.json` files in `.expo-map/flows/`.
+5. Replay every new or changed flow before accepting it.
+6. Regenerate `.expo-map/map.html` and the dated `.appmap` bundle.
+
+Runtime states that require hydrated local data must use realistic redacted test data. Keep the route capture even when a bare deep link cannot build the required XState context, and describe that limitation in `.expo-map/capture-status.json`.
+
+## Replay a flow
+
+With a compatible simulator and development build running, replay a saved flow from the repository root:
+
+```bash
+npx @swmansion/argent flow run .expo-map/flows/nav-success-reminder-offer.yaml
+```
+
+A map refresh is complete only when the route count is reconciled, every new screenshot is visually inspected, changed flows replay successfully, and the resulting `.appmap` bundle contains the new screenshots and flow files.
