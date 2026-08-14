@@ -451,9 +451,11 @@ function ScheduleEditorContent({
       ) : null}
       <Text style={styles.fieldLabel}><fbt desc="Required reminder schedule name label">NAME · REQUIRED</fbt></Text>
       <TextInput aria-label={String(fbs('Schedule name', 'Reminder schedule name input label'))} onChangeText={_changeName} placeholder={String(fbs('For example: Weekday mornings', 'Reminder schedule name placeholder'))} style={styles.input} testID="reminder-schedule-name" value={name} />
-      {nameMissing ? (
-        <Text style={styles.fieldHint}><fbt desc="Required reminder schedule name guidance">Add a name so you can recognize this reminder later.</fbt></Text>
-      ) : null}
+      <View style={styles.nameGuidanceSlot} testID="reminder-schedule-name-guidance-slot">
+        {nameMissing ? (
+          <Text style={styles.nameGuidanceText}><fbt desc="Required reminder schedule name guidance">Add a name so you can recognize this reminder later.</fbt></Text>
+        ) : null}
+      </View>
       <Text style={styles.fieldLabel}><fbt desc="Reminder schedule weekdays label">DAYS</fbt></Text>
       <View style={styles.weekdayRow}>
         {reminderWeekdayOptions().map(({ label, weekday }) => {
@@ -642,6 +644,8 @@ const styles = StyleSheet.create({
   scheduleCard: { minHeight: 80, justifyContent: 'center', borderWidth: 1, borderColor: palette.hairline, borderRadius: 20, borderCurve: 'continuous', padding: 18 },
   scheduleTitle: { fontFamily: type.semibold, color: palette.ink, fontSize: 17, marginBottom: 5 },
   input: { minHeight: 54, borderWidth: 1, borderColor: palette.hairline, borderRadius: 16, borderCurve: 'continuous', paddingHorizontal: 16, fontFamily: type.regular, color: palette.ink, fontSize: 16 },
+  nameGuidanceSlot: { minHeight: 38, marginTop: -8 },
+  nameGuidanceText: { fontFamily: type.regular, color: palette.inkMuted, fontSize: 13, lineHeight: 19 },
   fieldHint: { fontFamily: type.regular, color: palette.inkMuted, fontSize: 13, lineHeight: 19, marginTop: -8 },
   fieldLabel: { fontFamily: type.semibold, color: palette.inkMuted, fontSize: 11, letterSpacing: 1.2, marginTop: 8 },
   previewSection: { gap: 10 },

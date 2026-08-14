@@ -250,9 +250,15 @@ describe('Leitsatz reminder screen', () => {
       .toBeDisabled();
     expect(screen.getByText('Add a name so you can recognize this reminder later.'))
       .toBeOnTheScreen();
+    expect(screen.getByTestId('reminder-schedule-name-guidance-slot'))
+      .toHaveStyle({ minHeight: 38 });
     await fireEvent.changeText(screen.getByLabelText('Schedule name'), 'Morning and evening');
     expect(screen.getByRole('button', { name: 'Create and use schedule' }))
       .toBeEnabled();
+    expect(screen.queryByText('Add a name so you can recognize this reminder later.'))
+      .not.toBeOnTheScreen();
+    expect(screen.getByTestId('reminder-schedule-name-guidance-slot'))
+      .toHaveStyle({ minHeight: 38 });
     await fireEvent.press(screen.getByTestId('reminder-weekday-7'));
     await fireEvent.press(screen.getByRole('button', { name: 'Add another time' }));
     expect(screen.getByTestId('reminder-time-picker-0')).toBeOnTheScreen();
