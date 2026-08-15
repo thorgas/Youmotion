@@ -29,7 +29,7 @@ import {
   activeCustomBeliefStatements,
   beliefStatementForId,
 } from '@/features/check-in/domain/belief-statement';
-import { palette, type } from '@/features/check-in/ui/theme';
+import { actionColors, palette, type } from '@/features/check-in/ui/theme';
 import { useAppLocale } from '@/localization/app-locale-provider';
 import { formatWeekday } from '@/localization/date-copy';
 import { useAppNavigationActor } from '@/navigation/app-navigation.provider';
@@ -636,10 +636,10 @@ const styles = StyleSheet.create({
   statementCard: { minHeight: 150, justifyContent: 'center', backgroundColor: palette.paperRaised, borderColor: palette.hairline, borderWidth: 1, borderRadius: 24, borderCurve: 'continuous', padding: 22 },
   cardEyebrow: { fontFamily: type.semibold, color: palette.inkMuted, fontSize: 10, letterSpacing: 1.2, marginBottom: 14 },
   statement: { fontFamily: type.medium, color: palette.ink, fontSize: 23, lineHeight: 32, textAlign: 'center' },
-  action: { minHeight: 54, alignItems: 'center', justifyContent: 'center', borderRadius: 18, borderCurve: 'continuous', backgroundColor: palette.ink, paddingHorizontal: 18 },
+  action: { minHeight: 54, alignItems: 'center', justifyContent: 'center', borderRadius: 18, borderCurve: 'continuous', backgroundColor: actionColors.primaryBackground, paddingHorizontal: 18 },
   actionSecondary: { backgroundColor: 'transparent', borderWidth: 1, borderColor: palette.hairline },
   actionDisabled: { opacity: 0.38 },
-  actionText: { fontFamily: type.semibold, color: '#FFFFFF', fontSize: 15 },
+  actionText: { fontFamily: type.semibold, color: actionColors.primaryForeground, fontSize: 15 },
   actionTextSecondary: { color: palette.ink },
   scheduleCard: { minHeight: 80, justifyContent: 'center', borderWidth: 1, borderColor: palette.hairline, borderRadius: 20, borderCurve: 'continuous', padding: 18 },
   scheduleTitle: { fontFamily: type.semibold, color: palette.ink, fontSize: 17, marginBottom: 5 },

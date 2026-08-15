@@ -2,7 +2,7 @@ import type { ReactNode } from 'react';
 import { Modal, StyleSheet, Text, View } from 'react-native';
 import { PressableScale } from 'pressto';
 
-import { palette, type } from '@/features/check-in/ui/theme';
+import { actionColors, palette, type } from '@/features/check-in/ui/theme';
 
 export function ConfirmedPickerModal({
   children,
@@ -76,7 +76,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     borderRadius: 16,
     borderCurve: 'continuous',
-    backgroundColor: palette.ink,
+    backgroundColor: actionColors.primaryBackground,
   },
-  doneText: { color: '#FFFFFF', fontFamily: type.semibold, fontSize: 16 },
+  doneText: { color: actionColors.primaryForeground, fontFamily: type.semibold, fontSize: 16 },
 });

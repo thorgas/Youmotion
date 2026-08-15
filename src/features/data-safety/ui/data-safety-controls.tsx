@@ -7,7 +7,7 @@ import {
   DATA_SAFETY_STATES,
   NAVIGATION_STATES,
 } from '@/constants';
-import { palette, type } from '@/features/check-in/ui/theme';
+import { actionColors, palette, type } from '@/features/check-in/ui/theme';
 import { formatHistoryDate } from '@/localization/date-copy';
 import {
   type AppNavigationActor,
@@ -310,7 +310,7 @@ const styles = StyleSheet.create({
   confirmationActions: { flexDirection: 'row', gap: 10, marginTop: 16 },
   secondaryButton: { flex: 1, minHeight: 44, alignItems: 'center', justifyContent: 'center', borderColor: palette.hairline, borderRadius: 14, borderWidth: 1 },
   secondaryButtonText: { fontFamily: type.semibold, color: palette.ink, fontSize: 14 },
-  primaryButton: { flex: 1, minHeight: 44, alignItems: 'center', justifyContent: 'center', backgroundColor: palette.ink, borderRadius: 14 },
+  primaryButton: { flex: 1, minHeight: 44, alignItems: 'center', justifyContent: 'center', backgroundColor: actionColors.primaryBackground, borderRadius: 14 },
   destructiveButton: { flex: 1, minHeight: 44, alignItems: 'center', justifyContent: 'center', backgroundColor: '#8A3D35', borderRadius: 14 },
-  primaryButtonText: { fontFamily: type.semibold, color: '#FFFFFF', fontSize: 14 },
+  primaryButtonText: { fontFamily: type.semibold, color: actionColors.primaryForeground, fontSize: 14 },
 });

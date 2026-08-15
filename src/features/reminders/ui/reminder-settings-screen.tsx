@@ -10,7 +10,7 @@ import {
   REMINDER_TARGET_KINDS,
 } from '@/constants';
 import { AppBackButton } from '@/components/ui/app-back-button';
-import { palette, type } from '@/features/check-in/ui/theme';
+import { actionColors, palette, type } from '@/features/check-in/ui/theme';
 import { useAppLocale } from '@/localization/app-locale-provider';
 import { formatWeekday } from '@/localization/date-copy';
 import { useAppNavigationActor } from '@/navigation/app-navigation.provider';
@@ -206,6 +206,6 @@ const styles = StyleSheet.create({
   errorCard: { alignItems: 'flex-start', gap: 8 },
   retryAction: { minHeight: 40, justifyContent: 'center', borderWidth: 1, borderColor: palette.hairline, borderRadius: 14, borderCurve: 'continuous', paddingHorizontal: 14 },
   retryActionText: { fontFamily: type.semibold, color: palette.ink, fontSize: 13 },
-  action: { minHeight: 54, alignItems: 'center', justifyContent: 'center', borderRadius: 18, borderCurve: 'continuous', backgroundColor: palette.ink, paddingHorizontal: 18 },
-  actionText: { fontFamily: type.semibold, color: '#FFFFFF', fontSize: 15 },
+  action: { minHeight: 54, alignItems: 'center', justifyContent: 'center', borderRadius: 18, borderCurve: 'continuous', backgroundColor: actionColors.primaryBackground, paddingHorizontal: 18 },
+  actionText: { fontFamily: type.semibold, color: actionColors.primaryForeground, fontSize: 15 },
 });

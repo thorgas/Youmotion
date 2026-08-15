@@ -12,6 +12,11 @@ export const palette = Object.freeze({
   danger: '#9D4E42',
 });
 
+export const actionColors = Object.freeze({
+  primaryBackground: palette.ink,
+  primaryForeground: '#FFFFFF',
+});
+
 export const type = APP_TYPE;
 
 export const textSize = Object.freeze({

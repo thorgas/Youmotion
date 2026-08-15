@@ -35,7 +35,7 @@ import {
 } from './belief-card-label';
 import { CheckInProgressHeader } from './check-in-progress';
 import { GuidingBeliefWritingHelp } from './guiding-belief-writing-help';
-import { palette, type } from './theme';
+import { actionColors, palette, type } from './theme';
 
 type NavigationSnapshot = ReturnType<
   ReturnType<typeof useAppNavigationActor>['getSnapshot']
@@ -389,12 +389,12 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     borderRadius: 18,
     borderCurve: 'continuous',
-    backgroundColor: palette.ink,
+    backgroundColor: actionColors.primaryBackground,
     paddingHorizontal: 12,
   },
   primaryText: {
     fontFamily: type.semibold,
-    color: '#FFFFFF',
+    color: actionColors.primaryForeground,
     fontSize: 13,
     textAlign: 'center',
   },

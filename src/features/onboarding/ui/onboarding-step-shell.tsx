@@ -21,7 +21,7 @@ import {
   MOTION_DURATION,
 } from '@/constants';
 import { onboardingStepNumber } from '../application/onboarding-progress';
-import { palette, type } from '@/features/check-in/ui/theme';
+import { actionColors, palette, type } from '@/features/check-in/ui/theme';
 
 type OnboardingStep = typeof ONBOARDING_STATES[keyof typeof ONBOARDING_STATES];
 
@@ -238,14 +238,14 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     borderRadius: 18,
     borderCurve: 'continuous',
-    backgroundColor: palette.ink,
+    backgroundColor: actionColors.primaryBackground,
     paddingHorizontal: 20,
   },
   primaryButtonDisabled: {
     opacity: 0.42,
   },
   primaryButtonText: {
-    color: '#FFFFFF',
+    color: actionColors.primaryForeground,
     fontFamily: type.semibold,
     fontSize: 16,
   },

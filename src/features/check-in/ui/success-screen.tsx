@@ -18,7 +18,7 @@ import {
 import { useAppNavigationActor } from '@/navigation/app-navigation.provider';
 import { savedCheckInCopy } from './emotion-copy';
 import { guidingBeliefSystemText } from './belief-system-copy';
-import { palette, type } from './theme';
+import { actionColors, palette, type } from './theme';
 
 const _selectContext = (
   snapshot: ReturnType<ReturnType<typeof useAppNavigationActor>['getSnapshot']>,
@@ -215,6 +215,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 18,
   },
   reminderButtonText: { fontFamily: type.semibold, color: palette.moss, fontSize: 14 },
-  button: { minHeight: 50, backgroundColor: palette.ink, borderRadius: 16, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 28, marginTop: 28 },
-  buttonText: { fontFamily: type.semibold, color: '#FFFFFF', fontSize: 14 },
+  button: { minHeight: 50, backgroundColor: actionColors.primaryBackground, borderRadius: 16, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 28, marginTop: 28 },
+  buttonText: { fontFamily: type.semibold, color: actionColors.primaryForeground, fontSize: 14 },
 });

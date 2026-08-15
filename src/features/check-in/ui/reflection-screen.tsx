@@ -79,7 +79,7 @@ import { CheckInProgressHeader } from './check-in-progress';
 import { PersonalBeliefCreateButton } from './personal-belief-create-button';
 import { beginReflectionInputSession } from './reflection-input-session';
 import { reflectionResponsiveLayout } from './reflection-responsive-layout';
-import { palette, type } from './theme';
+import { actionColors, palette, type } from './theme';
 
 const _selectSnapshot = (
   snapshot: ReturnType<ReturnType<typeof useAppNavigationActor>['getSnapshot']>,
@@ -1188,7 +1188,7 @@ const styles = StyleSheet.create({
   momentTimeCancelText: { color: palette.ink, fontFamily: type.semibold, fontSize: 14 },
   momentTimeConfirm: {
     alignItems: 'center',
-    backgroundColor: palette.ink,
+    backgroundColor: actionColors.primaryBackground,
     borderCurve: 'continuous',
     borderRadius: 14,
     flex: 1.4,
@@ -1197,7 +1197,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
   },
   momentTimeConfirmText: {
-    color: palette.paper,
+    color: actionColors.primaryForeground,
     fontFamily: type.semibold,
     fontSize: 14,
     textAlign: 'center',
@@ -1420,14 +1420,14 @@ const styles = StyleSheet.create({
   nextStepCopy: { color: palette.inkMuted, fontFamily: type.regular, fontSize: 12, lineHeight: 18 },
   primaryButton: {
     minHeight: 50,
-    backgroundColor: palette.ink,
+    backgroundColor: actionColors.primaryBackground,
     borderRadius: 16,
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: 16,
   },
   standalonePrimaryButton: { marginTop: 14 },
-  primaryText: { fontFamily: type.semibold, color: '#FFFFFF', fontSize: 14 },
+  primaryText: { fontFamily: type.semibold, color: actionColors.primaryForeground, fontSize: 14 },
   secondaryButton: {
     minHeight: 50,
     paddingHorizontal: 20,

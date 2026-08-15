@@ -31,7 +31,7 @@ import {
 } from '@/features/check-in/ui/belief-card-label';
 import { GuidingBeliefWritingHelp } from '@/features/check-in/ui/guiding-belief-writing-help';
 import { PersonalBeliefCreateButton } from '@/features/check-in/ui/personal-belief-create-button';
-import { palette, type } from '@/features/check-in/ui/theme';
+import { actionColors, palette, type } from '@/features/check-in/ui/theme';
 import { useAppNavigationActor } from '@/navigation/app-navigation.provider';
 import { confirmBeliefRemoval } from './belief-library-removal';
 
@@ -429,9 +429,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: 14,
-    backgroundColor: palette.ink,
+    backgroundColor: actionColors.primaryBackground,
   },
-  editText: { fontFamily: type.semibold, color: '#FFFFFF', fontSize: 14 },
+  editText: { fontFamily: type.semibold, color: actionColors.primaryForeground, fontSize: 14 },
   removeButton: {
     minHeight: 44,
     flex: 1,
@@ -489,8 +489,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: 16,
-    backgroundColor: palette.ink,
+    backgroundColor: actionColors.primaryBackground,
   },
   saveButtonDisabled: { opacity: 0.45 },
-  saveText: { fontFamily: type.semibold, color: '#FFFFFF', fontSize: 15 },
+  saveText: { fontFamily: type.semibold, color: actionColors.primaryForeground, fontSize: 15 },
 });

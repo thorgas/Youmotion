@@ -18,7 +18,7 @@ import {
   FEEDBACK_KINDS,
   FEEDBACK_STATES,
 } from '@/constants';
-import { palette, type } from '@/features/check-in/ui/theme';
+import { actionColors, palette, type } from '@/features/check-in/ui/theme';
 import { feedbackMachine } from '../application/feedback.machine';
 
 type FeedbackActor = ReturnType<typeof useMachine<typeof feedbackMachine>>[2];
@@ -293,9 +293,12 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     paddingHorizontal: 16,
   },
-  primaryAction: { backgroundColor: palette.moss, borderColor: palette.moss },
+  primaryAction: {
+    backgroundColor: actionColors.primaryBackground,
+    borderColor: actionColors.primaryBackground,
+  },
   actionText: { color: palette.ink, fontFamily: type.medium, fontSize: 15 },
-  primaryActionText: { color: palette.paperRaised },
+  primaryActionText: { color: actionColors.primaryForeground },
   progress: { alignItems: 'center', gap: 14, paddingVertical: 14 },
   progressText: { color: palette.ink, fontFamily: type.medium, fontSize: 15 },
 });
