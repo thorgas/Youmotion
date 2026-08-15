@@ -1,0 +1,19 @@
+{
+  "formatVersion": 2,
+  "name": "nav-tabs-settings-feedback",
+  "route": "(tabs)/settings",
+  "title": "Open feedback and review screenshot consent",
+  "device": "iPhone 17 Pro",
+  "steps": {
+    "2": { "target": "Settings tab", "screen": "(tabs)/settings" },
+    "4": {
+      "target": "Questions and feedback",
+      "capture": "tabs_settings--feedback-choice.png"
+    },
+    "6": {
+      "target": "Send feedback",
+      "capture": "tabs_settings--screenshot-consent.png",
+      "note": "No screenshot is captured until the user explicitly consents"
+    }
+  }
+}

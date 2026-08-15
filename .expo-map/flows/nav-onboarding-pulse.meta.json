@@ -2,11 +2,21 @@
   "formatVersion": 2,
   "name": "nav-onboarding-pulse",
   "route": "onboarding-pulse",
-  "title": "Navigate to /onboarding-pulse",
+  "title": "Replay the short guide and exercise its Pulse example",
   "device": "iPhone 17 Pro",
   "steps": {
-    "1": {
+    "2": { "target": "Settings tab", "screen": "(tabs)/settings" },
+    "4": { "target": "Reveal the short-guide action" },
+    "5": { "target": "Open short guide", "screen": "onboarding" },
+    "7": {
+      "target": "See how it works",
+      "screen": "onboarding-pulse",
       "capture": "onboarding-pulse.png"
+    },
+    "9": {
+      "target": "Show the example",
+      "capture": "onboarding-pulse--example.png",
+      "note": "Practice selection is visible and is not persisted"
     }
   }
 }

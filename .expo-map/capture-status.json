@@ -1,9 +1,11 @@
 {
   "(tabs)/analytics": {
-    "status": "ok"
+    "status": "ok",
+    "note": "Includes an all-time populated-data variant rendered from the 133-moment E2E archive."
   },
   "(tabs)/history": {
-    "status": "ok"
+    "status": "ok",
+    "note": "Includes populated and expanded-filter variants rendered from the 133-moment E2E archive."
   },
   "(tabs)/settings": {
     "status": "ok"
@@ -15,8 +17,8 @@
     "status": "ok"
   },
   "belief-library": {
-    "status": "empty-state",
-    "note": "The local profile has no custom limiting beliefs yet."
+    "status": "ok",
+    "note": "Captured from Settings with the current saved-belief library state."
   },
   "belief-system-catalog": {
     "status": "error-boundary",
@@ -43,6 +45,10 @@
     "needsNavigation": true,
     "note": "The root route is an XState-to-Router synchronization entry and does not render a standalone screen from a bare deep link."
   },
+  "leitsatz-reminder": {
+    "status": "ok",
+    "note": "Includes preview, focused-notification, and success-origin schedule-picker variants."
+  },
   "onboarding-example": {
     "status": "ok"
   },
@@ -50,12 +56,15 @@
     "status": "ok"
   },
   "onboarding": {
-    "status": "loading",
-    "note": "The onboarding welcome screen rendered, but the retained capture includes Metro's transient Refreshing banner."
+    "status": "ok"
   },
   "reflection": {
     "status": "ok",
-    "note": "Captured through the real Today emotion-star interaction so the reflection actor context is present."
+    "note": "Captured through the real Today emotion-star interaction, including a keyboard-open variant."
+  },
+  "reminders": {
+    "status": "ok",
+    "note": "Captured through Settings; the simulator repository fallback remains visible when local persistence is unavailable."
   },
   "success": {
     "status": "error-boundary",

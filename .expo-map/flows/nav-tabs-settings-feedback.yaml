@@ -1,0 +1,11 @@
+steps:
+  - tool: open-url
+    args:
+      url: "youmotion://"
+  - wait: 1500
+  - tap: { x: 0.8756, y: 0.9336 }
+  - wait: 800
+  - tap: { x: 0.5000, y: 0.7208 }
+  - wait: 500
+  - tap: { x: 0.5000, y: 0.5618 }
+  - wait: 500

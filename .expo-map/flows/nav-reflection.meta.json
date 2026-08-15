@@ -2,12 +2,16 @@
   "formatVersion": 2,
   "name": "nav-reflection",
   "route": "reflection",
-  "title": "Navigate to /reflection",
+  "title": "Select a feeling and open reflection",
   "device": "iPhone 17 Pro",
   "steps": {
-    "1": {
+    "2": {
+      "target": "Drag the Feeling Pulse toward Joy",
+      "screen": "reflection"
+    },
+    "3": {
       "capture": "reflection.png",
-      "note": "The committed capture was reached through the Today emotion star so actor context was present"
+      "note": "The field is focused with the native keyboard visible; a filled state is captured as reflection--keyboard.png"
     }
   }
 }

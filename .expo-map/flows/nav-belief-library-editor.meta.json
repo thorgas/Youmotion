@@ -2,11 +2,16 @@
   "formatVersion": 2,
   "name": "nav-belief-library-editor",
   "route": "belief-library-editor",
-  "title": "Navigate to /belief-library-editor",
+  "title": "Navigate from Today to the personal core-belief editor",
   "device": "iPhone 17 Pro",
   "steps": {
-    "1": {
-      "capture": "belief-library-editor.png"
+    "2": { "target": "Settings tab", "screen": "(tabs)/settings" },
+    "4": { "target": "Reveal personalization settings" },
+    "5": { "target": "Manage personal core beliefs", "screen": "belief-library" },
+    "7": { "target": "Add your own core belief", "screen": "belief-library-editor" },
+    "8": {
+      "capture": "belief-library-editor.png",
+      "note": "The keyboard-open state is captured separately as belief-library-editor--keyboard.png"
     }
   }
 }

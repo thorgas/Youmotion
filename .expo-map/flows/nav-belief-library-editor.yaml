@@ -1,5 +1,13 @@
 steps:
   - tool: open-url
     args:
-      url: "youmotion://belief-library-editor"
+      url: "youmotion://"
   - wait: 1500
+  - tap: { x: 0.8756, y: 0.9336 }
+  - wait: 800
+  - tool: gesture-swipe
+    args: { fromX: 0.4975, fromY: 0.8009, toX: 0.4975, toY: 0.7094 }
+  - tap: { x: 0.5000, y: 0.8158 }
+  - wait: 800
+  - tap: { x: 0.5000, y: 0.3581 }
+  - wait: 800

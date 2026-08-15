@@ -1,5 +1,8 @@
 steps:
   - tool: open-url
     args:
-      url: "youmotion://reflection"
+      url: "youmotion://"
   - wait: 1500
+  - tool: gesture-swipe
+    args: { fromX: 0.5000, fromY: 0.5080, toX: 0.7338, toY: 0.3924 }
+  - wait: 1000
