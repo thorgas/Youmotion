@@ -104,7 +104,7 @@ describe('onboarding Pulse on the device runtime', () => {
         color: '#E7AD32',
       },
     });
-    await screen.findByAccessibilityLabel('Joy · Cheerfulness');
+    await screen.findByAccessibilityLabel('Feeling Pulse');
     await pressLaidOutUntil({
       isComplete: () => currentActor().getSnapshot().matches({
         [NAVIGATION_STATES.ONBOARDING]: ONBOARDING_STATES.EXAMPLE,

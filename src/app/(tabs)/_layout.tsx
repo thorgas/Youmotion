@@ -1,6 +1,7 @@
+import * as Haptics from 'expo-haptics';
 import { Tabs } from 'expo-router';
 
-import { APP_TYPE, NAVIGATION_EVENTS } from '@/constants';
+import { APP_TYPE, NAVIGATION_EVENTS, NAVIGATION_STATES } from '@/constants';
 import {
   analyticsTabTitle,
   historyTabTitle,
@@ -15,29 +16,45 @@ import {
   TodayTabIcon,
 } from '@/navigation/tab-bar-icon';
 
+const _provideSelectionFeedback = (selected: boolean) => {
+  if (!selected) void Haptics.selectionAsync().catch(() => undefined);
+};
+
 export default function TabLayout() {
   const actor = useAppNavigationActor();
   const _todayListeners = {
     tabPress: (event: { preventDefault: () => void }) => {
       event.preventDefault();
+      _provideSelectionFeedback(actor.getSnapshot().matches({
+        [NAVIGATION_STATES.TABS]: NAVIGATION_STATES.TODAY,
+      }));
       actor.send({ type: NAVIGATION_EVENTS.TODAY_OPENED });
     },
   };
   const _historyListeners = {
     tabPress: (event: { preventDefault: () => void }) => {
       event.preventDefault();
+      _provideSelectionFeedback(actor.getSnapshot().matches({
+        [NAVIGATION_STATES.TABS]: NAVIGATION_STATES.HISTORY,
+      }));
       actor.send({ type: NAVIGATION_EVENTS.HISTORY_OPENED });
     },
   };
   const _analyticsListeners = {
     tabPress: (event: { preventDefault: () => void }) => {
       event.preventDefault();
+      _provideSelectionFeedback(actor.getSnapshot().matches({
+        [NAVIGATION_STATES.TABS]: NAVIGATION_STATES.ANALYTICS,
+      }));
       actor.send({ type: NAVIGATION_EVENTS.ANALYTICS_OPENED });
     },
   };
   const _settingsListeners = {
     tabPress: (event: { preventDefault: () => void }) => {
       event.preventDefault();
+      _provideSelectionFeedback(actor.getSnapshot().matches({
+        [NAVIGATION_STATES.TABS]: NAVIGATION_STATES.SETTINGS,
+      }));
       actor.send({ type: NAVIGATION_EVENTS.SETTINGS_OPENED });
     },
   };

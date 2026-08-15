@@ -1,7 +1,18 @@
 import {
+  emotionSelectionWithAdjacentEmotion,
+  emotionSelectionWithAdjustedIntensity,
   pointConstrainedToRadius,
   selectionFromPoint,
 } from '../domain/emotion-selection';
+import { EMOTION_IDS } from '@/constants';
+import type { EmotionSelection } from '../domain/check-in';
+
+const joySelection = {
+  emotionId: EMOTION_IDS.JOY,
+  intensity: 0.5,
+  level: 3,
+  color: '#E7AD32',
+} satisfies EmotionSelection;
 
 describe('selectionFromPoint', () => {
   const center = { x: 100, y: 100 };
@@ -57,5 +68,36 @@ describe('pointConstrainedToRadius', () => {
 
     expect(Math.hypot(point.x - center.x, point.y - center.y)).toBeCloseTo(80);
     expect(point.x - center.x).toBeCloseTo(center.y - point.y);
+  });
+});
+
+describe('accessible emotion selection', () => {
+  it('starts with a valid selection and moves intensity within the same emotion', () => {
+    const initial = emotionSelectionWithAdjustedIntensity({ direction: 1, selection: null });
+    const stronger = emotionSelectionWithAdjustedIntensity({
+      direction: 1,
+      selection: joySelection,
+    });
+
+    expect(initial?.emotionId).toBe(EMOTION_IDS.JOY);
+    expect(stronger?.emotionId).toBe(EMOTION_IDS.JOY);
+    expect(stronger?.intensity).toBeGreaterThan(joySelection.intensity);
+    expect(stronger?.level).toBeGreaterThanOrEqual(joySelection.level);
+  });
+
+  it('wraps through adjacent emotions while preserving intensity', () => {
+    const previous = emotionSelectionWithAdjacentEmotion({
+      direction: -1,
+      selection: joySelection,
+    });
+    const next = emotionSelectionWithAdjacentEmotion({
+      direction: 1,
+      selection: joySelection,
+    });
+
+    expect(previous?.emotionId).toBe(EMOTION_IDS.FEAR);
+    expect(next?.emotionId).toBe(EMOTION_IDS.LOVE);
+    expect(previous?.intensity).toBe(joySelection.intensity);
+    expect(next?.intensity).toBe(joySelection.intensity);
   });
 });

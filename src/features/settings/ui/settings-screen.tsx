@@ -32,9 +32,11 @@ import {
   tabScreenEyebrowStyle,
   tabScreenTitleStyle,
 } from '@/components/ui/tab-screen-layout';
+import { SettingsActionRow } from '@/components/ui/settings-action-row';
 import { activeCustomBeliefStatements } from '@/features/check-in/domain/belief-statement';
 import { palette, type } from '@/features/check-in/ui/theme';
 import { DataSafetyControls } from '@/features/data-safety/ui/data-safety-controls';
+import { FeedbackSettingsAction } from '@/features/feedback/ui/feedback-screen';
 import { useAppNavigationActor } from '@/navigation/app-navigation.provider';
 import { appSettingsStore } from '../application/app-settings.store';
 
@@ -120,36 +122,6 @@ function AppReleaseInfoCard({
         </View>
       </View>
     </View>
-  );
-}
-
-function SettingsActionRow({
-  count,
-  description,
-  onPress,
-  testID,
-  title,
-}: {
-  count?: number;
-  description: string;
-  onPress: () => void;
-  testID: string;
-  title: string;
-}) {
-  return (
-    <PressableScale
-      accessibilityRole="button"
-      onPress={onPress}
-      style={styles.actionRow}
-      testID={testID}
-    >
-      <View style={styles.actionCopy}>
-        <Text style={styles.actionTitle}>{title}</Text>
-        <Text style={styles.actionDescription}>{description}</Text>
-      </View>
-      {count === undefined ? null : <Text style={styles.actionCount}>{count}</Text>}
-      <Text accessibilityElementsHidden style={styles.actionChevron}>›</Text>
-    </PressableScale>
   );
 }
 
@@ -242,6 +214,12 @@ export function SettingsScreen() {
             />
           </View>
           </View>
+        </View>
+        <Text style={styles.sectionHeading}>
+          <fbt desc="Heading grouping support links in settings">SUPPORT</fbt>
+        </Text>
+        <View style={styles.actionGroup}>
+          <FeedbackSettingsAction />
         </View>
         <Text style={styles.sectionHeading}>
           <fbt desc="Heading for the Settings onboarding replay action">UNDERSTAND YOUMOTION</fbt>
@@ -360,39 +338,6 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderColor: palette.hairline,
     marginBottom: 26,
-  },
-  actionRow: {
-    minHeight: 76,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-    paddingVertical: 14,
-  },
-  actionCopy: { flex: 1 },
-  actionTitle: { fontFamily: type.semibold, color: palette.ink, fontSize: 15 },
-  actionDescription: {
-    fontFamily: type.regular,
-    color: palette.inkMuted,
-    fontSize: 12,
-    lineHeight: 18,
-    marginTop: 3,
-  },
-  actionCount: {
-    minWidth: 28,
-    minHeight: 28,
-    borderRadius: 14,
-    backgroundColor: '#EDF0EB',
-    fontFamily: type.semibold,
-    color: palette.moss,
-    fontSize: 13,
-    textAlign: 'center',
-    lineHeight: 28,
-  },
-  actionChevron: {
-    fontFamily: type.regular,
-    color: palette.inkMuted,
-    fontSize: 24,
-    lineHeight: 24,
   },
   infoGroup: {
     borderRadius: 20,

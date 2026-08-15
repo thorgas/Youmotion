@@ -2,6 +2,7 @@ import { EMOTION_AXIS_START_ANGLE, EMOTION_AXIS_STEP } from '@/constants';
 import { emotions, type EmotionSelection } from './emotion';
 
 const TAU = Math.PI * 2;
+const DEFAULT_ACCESSIBLE_INTENSITY = 0.35;
 
 export type Point = Readonly<{ x: number; y: number }>;
 
@@ -76,4 +77,64 @@ export function selectionFromPoint({
     level,
     color: emotion.color,
   };
+}
+
+function _selectionForEmotion({
+  emotionIndex,
+  intensity,
+}: {
+  emotionIndex: number;
+  intensity: number;
+}) {
+  const emotion = emotions[emotionIndex];
+  if (!emotion) return null;
+  const clampedIntensity = _clamp({ value: intensity, min: 0, max: 1 });
+
+  return {
+    emotionId: emotion.id,
+    intensity: clampedIntensity,
+    level: Math.min(
+      Math.floor(clampedIntensity * emotion.nuanceCount),
+      emotion.nuanceCount - 1,
+    ),
+    color: emotion.color,
+  } satisfies EmotionSelection;
+}
+
+export function emotionSelectionWithAdjustedIntensity({
+  direction,
+  selection,
+}: {
+  direction: -1 | 1;
+  selection: EmotionSelection | null;
+}) {
+  const emotionIndex = selection
+    ? emotions.findIndex((emotion) => emotion.id === selection.emotionId)
+    : 0;
+  const emotion = emotions[emotionIndex];
+  if (!emotion) return null;
+  const intensity = selection?.intensity ?? DEFAULT_ACCESSIBLE_INTENSITY;
+
+  return _selectionForEmotion({
+    emotionIndex,
+    intensity: intensity + direction / emotion.nuanceCount,
+  });
+}
+
+export function emotionSelectionWithAdjacentEmotion({
+  direction,
+  selection,
+}: {
+  direction: -1 | 1;
+  selection: EmotionSelection | null;
+}) {
+  const currentIndex = selection
+    ? emotions.findIndex((emotion) => emotion.id === selection.emotionId)
+    : direction > 0 ? -1 : 0;
+  const emotionIndex = (currentIndex + direction + emotions.length) % emotions.length;
+
+  return _selectionForEmotion({
+    emotionIndex,
+    intensity: selection?.intensity ?? DEFAULT_ACCESSIBLE_INTENSITY,
+  });
 }

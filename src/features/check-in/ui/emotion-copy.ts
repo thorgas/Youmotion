@@ -139,9 +139,19 @@ export function emotionSummary(selection: LocalizedEmotionSelection) {
 }
 
 export function emotionStarAccessibility(selection: EmotionSelection | null) {
-  if (!selection) return String(fbs('Feeling pulse. Drag outward from the center.', 'Feeling pulse accessibility instructions'));
+  if (!selection) return String(fbs('No feeling selected', 'Feeling Pulse accessibility value before a feeling is selected'));
   return emotionSummary(selection);
 }
+
+export const emotionStarAccessibilityLabel = () => String(fbs(
+  'Feeling Pulse',
+  'Accessibility label for the Feeling Pulse control',
+));
+
+export const emotionStarAccessibilityHint = () => String(fbs(
+  'Swipe up or down to change intensity. Use actions to change the feeling or confirm.',
+  'Accessibility hint explaining the Feeling Pulse screen-reader controls',
+));
 
 export function savedCheckInCopy(selection: LocalizedEmotionSelection) {
   return String(fbs(

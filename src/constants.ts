@@ -349,6 +349,14 @@ export const EMOTION_LABEL_MODES = Object.freeze({
   BOTH: literal('both'),
 });
 
+export const EMOTION_STAR_ACCESSIBILITY_ACTIONS = Object.freeze({
+  CONFIRM: literal('activate'),
+  MORE_INTENSE: literal('increment'),
+  LESS_INTENSE: literal('decrement'),
+  NEXT_EMOTION: literal('nextEmotion'),
+  PREVIOUS_EMOTION: literal('previousEmotion'),
+});
+
 export const NAVIGATION_STATES = Object.freeze({
   STARTING: literal('starting'),
   ONBOARDING: literal('onboarding'),

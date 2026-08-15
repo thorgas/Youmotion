@@ -8,7 +8,11 @@ import { AppLocaleProvider } from '@/localization/app-locale-provider';
 import { FeedbackScreenshotUri } from '../domain/feedback-request';
 import { composeFeedbackEmail } from '../infrastructure/feedback-mail';
 import { captureFeedbackScreenshot } from '../infrastructure/feedback-screenshot';
-import { FeedbackOverlay } from '../ui/feedback-screen';
+import {
+  FeedbackOverlay,
+  FeedbackProvider,
+  FeedbackSettingsAction,
+} from '../ui/feedback-screen';
 
 jest.mock('../infrastructure/feedback-mail', () => ({
   composeFeedbackEmail: jest.fn(() => Promise.resolve()),
@@ -33,13 +37,16 @@ function renderFeedbackOverlay() {
   return render(
     <AppLocaleProvider>
       <SafeAreaProvider initialMetrics={safeAreaMetrics}>
-        <FeedbackOverlay />
+        <FeedbackProvider>
+          <FeedbackSettingsAction />
+          <FeedbackOverlay />
+        </FeedbackProvider>
       </SafeAreaProvider>
     </AppLocaleProvider>,
   );
 }
 
-describe('global feedback UI', () => {
+describe('settings feedback UI', () => {
   beforeEach(() => {
     mockComposeFeedbackEmail.mockReset();
     mockComposeFeedbackEmail.mockResolvedValue(undefined);

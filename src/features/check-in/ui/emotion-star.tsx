@@ -1,5 +1,6 @@
 import { useSelector } from '@xstate/store-react';
-import { PanResponder, StyleSheet, Text, useWindowDimensions, View, type StyleProp, type TextStyle } from 'react-native';
+import { fbs } from 'fbtee';
+import { PanResponder, StyleSheet, Text, useWindowDimensions, View, type AccessibilityActionEvent, type AccessibilityActionInfo, type StyleProp, type TextStyle } from 'react-native';
 import Animated, {
   FadeIn,
   FadeOut,
@@ -11,11 +12,13 @@ import Animated, {
 } from 'react-native-reanimated';
 import Svg, { Circle } from 'react-native-svg';
 
-import { MOTION_DURATION } from '@/constants';
+import { EMOTION_STAR_ACCESSIBILITY_ACTIONS, MOTION_DURATION } from '@/constants';
 import { appSettingsStore } from '@/features/settings/application/app-settings.store';
 import type { EmotionLabelMode } from '@/features/settings/domain/emotion-label-mode';
 import {
   emotionAngle,
+  emotionSelectionWithAdjacentEmotion,
+  emotionSelectionWithAdjustedIntensity,
   pointConstrainedToRadius,
   selectionFromPoint,
 } from '../domain/emotion-selection';
@@ -25,7 +28,7 @@ import {
   CenteredBaseStateRipples,
 } from './base-state-ripples';
 import { EmotionAxisLabel } from './emotion-axis-label';
-import { emotionName, emotionNuance, emotionStarAccessibility } from './emotion-copy';
+import { emotionName, emotionNuance, emotionStarAccessibility, emotionStarAccessibilityHint, emotionStarAccessibilityLabel } from './emotion-copy';
 import { palette, textSize, type } from './theme';
 
 type EmotionStarProps = {
@@ -70,6 +73,29 @@ const stateAnimation = {
   duration: MOTION_DURATION.STATE,
   reduceMotion: ReduceMotion.System,
 };
+
+const _accessibilityActions = (): readonly AccessibilityActionInfo[] => [
+  {
+    name: EMOTION_STAR_ACCESSIBILITY_ACTIONS.MORE_INTENSE,
+    label: String(fbs('More intense', 'Feeling Pulse accessibility action increasing intensity')),
+  },
+  {
+    name: EMOTION_STAR_ACCESSIBILITY_ACTIONS.LESS_INTENSE,
+    label: String(fbs('Less intense', 'Feeling Pulse accessibility action decreasing intensity')),
+  },
+  {
+    name: EMOTION_STAR_ACCESSIBILITY_ACTIONS.NEXT_EMOTION,
+    label: String(fbs('Next feeling', 'Feeling Pulse accessibility action selecting the next emotion')),
+  },
+  {
+    name: EMOTION_STAR_ACCESSIBILITY_ACTIONS.PREVIOUS_EMOTION,
+    label: String(fbs('Previous feeling', 'Feeling Pulse accessibility action selecting the previous emotion')),
+  },
+  {
+    name: EMOTION_STAR_ACCESSIBILITY_ACTIONS.CONFIRM,
+    label: String(fbs('Confirm feeling', 'Feeling Pulse accessibility action confirming the selected emotion')),
+  },
+];
 
 const _polar = ({ center, radius, angle }: { center: number; radius: number; angle: number }) => ({
   x: center + Math.cos(angle) * radius,
@@ -205,6 +231,26 @@ export function EmotionStar({
     onPanResponderRelease: onRelease,
     onPanResponderTerminate: onCancel,
   });
+  const _accessibilityAction = (event: AccessibilityActionEvent) => {
+    if (disabled) return;
+    const { actionName } = event.nativeEvent;
+    if (actionName === EMOTION_STAR_ACCESSIBILITY_ACTIONS.CONFIRM) {
+      if (selection) onRelease();
+      return;
+    }
+    const nextSelection = actionName === EMOTION_STAR_ACCESSIBILITY_ACTIONS.MORE_INTENSE
+      ? emotionSelectionWithAdjustedIntensity({ direction: 1, selection })
+      : actionName === EMOTION_STAR_ACCESSIBILITY_ACTIONS.LESS_INTENSE
+        ? emotionSelectionWithAdjustedIntensity({ direction: -1, selection })
+        : actionName === EMOTION_STAR_ACCESSIBILITY_ACTIONS.NEXT_EMOTION
+          ? emotionSelectionWithAdjacentEmotion({ direction: 1, selection })
+          : actionName === EMOTION_STAR_ACCESSIBILITY_ACTIONS.PREVIOUS_EMOTION
+            ? emotionSelectionWithAdjacentEmotion({ direction: -1, selection })
+            : null;
+    if (!nextSelection) return;
+    onTouchStart();
+    onSelectionChange(nextSelection);
+  };
 
   return (
     <View style={styles.frame} testID="emotion-star-frame">
@@ -216,21 +262,25 @@ export function EmotionStar({
           testID="emotion-readout-prompt">
           <Text style={styles.promptLead}>
             <fbt desc="Primary instruction above the feeling pulse">
-              Touch the point and move your finger.
+              Touch the point, then move.
             </fbt>
           </Text>
           <Text style={styles.promptSupport}>
-            <fbt desc="Supporting instruction asking the user to intuitively choose and confirm an emotion">
-              Choose the feeling that feels right to you, then release your finger.
+            <fbt desc="Supporting instruction explaining the Feeling Pulse direction and distance controls">
+              Direction chooses the feeling. Distance chooses its intensity.
             </fbt>
           </Text>
         </Animated.View>
         {selection ? <EmotionReadout selection={selection} /> : null}
       </View>
       <View
-        accessibilityLabel={emotionStarAccessibility(selection)}
+        accessibilityActions={_accessibilityActions()}
+        accessibilityHint={emotionStarAccessibilityHint()}
+        accessibilityLabel={emotionStarAccessibilityLabel()}
         accessibilityRole="adjustable"
-        accessibilityValue={{ text: labelMode }}
+        accessibilityState={{ disabled }}
+        accessibilityValue={{ text: emotionStarAccessibility(selection) }}
+        onAccessibilityAction={_accessibilityAction}
         style={[styles.canvas, { width: size, height: size }]}
         testID="emotion-star"
         {...responder.panHandlers}>

@@ -59,6 +59,7 @@ import { reflectionResponsiveLayout } from '../ui/reflection-responsive-layout';
 import { GuidingBeliefScreen } from '../ui/guiding-belief-screen';
 import { SuccessScreen } from '../ui/success-screen';
 import { SettingsScreen } from '@/features/settings/ui/settings-screen';
+import { FeedbackProvider } from '@/features/feedback/ui/feedback-screen';
 import { analyticsStore } from '@/features/analytics/application/analytics.store';
 import { AnalyticsScreen } from '@/features/analytics/ui/analytics-screen';
 import { BeliefLibraryScreen } from '@/features/settings/ui/belief-library-screen';
@@ -183,7 +184,11 @@ const _finishWithGuidingBelief = async ({
   ).toBe(true));
 };
 
-const _renderLocalized = (element: ReactElement) => render(<AppLocaleProvider>{element}</AppLocaleProvider>);
+const _renderLocalized = (element: ReactElement) => render(
+  <AppLocaleProvider>
+    <FeedbackProvider>{element}</FeedbackProvider>
+  </AppLocaleProvider>,
+);
 const _panEvent = ({ x, y, timestamp }: { x: number; y: number; timestamp: number }) => ({
   nativeEvent: { locationX: x, locationY: y },
   touchHistory: {
@@ -303,13 +308,13 @@ describe('check-in screens', () => {
       borderRadius: 30,
       borderWidth: 1,
     });
-    expect(screen.getByText('Touch the point and move your finger.')).toHaveStyle({
+    expect(screen.getByText('Touch the point, then move.')).toHaveStyle({
       fontSize: 16,
       letterSpacing: 0.3,
       lineHeight: 20,
     });
     expect(screen.getByText(
-      'Choose the feeling that feels right to you, then release your finger.',
+      'Direction chooses the feeling. Distance chooses its intensity.',
     )).toHaveStyle({
       fontSize: 12,
       letterSpacing: 0.3,
@@ -327,7 +332,7 @@ describe('check-in screens', () => {
     expect(screen.getByText('The farther you move from the center, the more intense the feeling.')).toBeTruthy();
     expect(screen.queryByTestId('emotion-word-help-toggle')).toBeNull();
     expect(screen.queryByTestId('emotion-word-help-content')).toBeNull();
-    expect(screen.getByLabelText('Feeling pulse. Drag outward from the center.')).toBeTruthy();
+    expect(screen.getByLabelText('Feeling Pulse')).toBeTruthy();
     expect(screen.getByTestId('base-state-ripples')).toHaveStyle({
       alignItems: 'center',
       justifyContent: 'center',
@@ -351,10 +356,10 @@ describe('check-in screens', () => {
     const screen = await _renderLocalized(<CheckInScreen />);
 
     expect(screen.getByText(
-      'Berühre den Punkt und bewege deinen Finger.',
+      'Berühre den Punkt und bewege dich.',
     )).toBeTruthy();
     expect(screen.getByText(
-      'Wähle das Gefühl aus, das sich für dich stimmig anfühlt, und lasse deinen Finger los.',
+      'Die Richtung wählt das Gefühl. Der Abstand wählt seine Intensität.',
     )).toBeTruthy();
   });
 
@@ -498,7 +503,7 @@ describe('check-in screens', () => {
         onRelease={onRelease}
       />,
     );
-    const star = screen.getByLabelText('Joy · Cheerfulness');
+    const star = screen.getByLabelText('Feeling Pulse');
     expect(screen.getByTestId('emotion-nuance-reveal')).toBeTruthy();
     expect(screen.getByTestId('emotion-name-reveal')).toBeTruthy();
     expect(screen.getByTestId('emotion-readout-prompt', { includeHiddenElements: true })).toHaveStyle({ opacity: 0 });
@@ -524,6 +529,76 @@ describe('check-in screens', () => {
     expect(onCancel).not.toHaveBeenCalled();
   });
 
+  it('offers discrete screen-reader actions without replacing the drag gesture', async () => {
+    const onTouchStart = jest.fn();
+    const onSelectionChange = jest.fn();
+    const onRelease = jest.fn();
+    const screen = await _renderLocalized(
+      <EmotionStar
+        selection={selection}
+        onCancel={jest.fn()}
+        onTouchStart={onTouchStart}
+        onSelectionChange={onSelectionChange}
+        onRelease={onRelease}
+      />,
+    );
+    const star = screen.getByLabelText('Feeling Pulse');
+
+    await fireEvent(star, 'accessibilityAction', {
+      nativeEvent: { actionName: 'increment' },
+    });
+    await fireEvent(star, 'accessibilityAction', {
+      nativeEvent: { actionName: 'nextEmotion' },
+    });
+    await fireEvent(star, 'accessibilityAction', {
+      nativeEvent: { actionName: 'activate' },
+    });
+    await fireEvent(star, 'accessibilityAction', {
+      nativeEvent: { actionName: 'unknown' },
+    });
+
+    expect(star.props['accessibilityRole']).toBe('adjustable');
+    expect(star.props['accessibilityHint']).toBe(
+      'Swipe up or down to change intensity. Use actions to change the feeling or confirm.',
+    );
+    expect(onTouchStart).toHaveBeenCalledTimes(2);
+    expect(onSelectionChange).toHaveBeenCalledTimes(2);
+    expect(onSelectionChange.mock.calls[0]?.[0]).toMatchObject({
+      emotionId: EMOTION_IDS.JOY,
+    });
+    expect(onSelectionChange.mock.calls[1]?.[0]).toMatchObject({
+      emotionId: EMOTION_IDS.LOVE,
+    });
+    expect(onRelease).toHaveBeenCalledTimes(1);
+  });
+
+  it('ignores screen-reader actions while the Pulse is disabled', async () => {
+    const onSelectionChange = jest.fn();
+    const onRelease = jest.fn();
+    const screen = await _renderLocalized(
+      <EmotionStar
+        disabled
+        selection={selection}
+        onCancel={jest.fn()}
+        onTouchStart={jest.fn()}
+        onSelectionChange={onSelectionChange}
+        onRelease={onRelease}
+      />,
+    );
+    const star = screen.getByLabelText('Feeling Pulse');
+
+    await fireEvent(star, 'accessibilityAction', {
+      nativeEvent: { actionName: 'increment' },
+    });
+    await fireEvent(star, 'accessibilityAction', {
+      nativeEvent: { actionName: 'activate' },
+    });
+
+    expect(star.props['accessibilityState']).toEqual({ disabled: true });
+    expect(onSelectionChange).not.toHaveBeenCalled();
+    expect(onRelease).not.toHaveBeenCalled();
+  });
+
   it('shows emoji, text, or both around the untouched star from the app setting', async () => {
     const screen = await _renderLocalized(
       <EmotionStar
@@ -534,21 +609,21 @@ describe('check-in screens', () => {
         onRelease={jest.fn()}
       />,
     );
-    expect(screen.getByTestId('emotion-star').props['accessibilityValue']).toEqual({ text: EMOTION_LABEL_MODES.EMOJI });
+    expect(screen.getByTestId('emotion-star').props['accessibilityValue']).toEqual({ text: 'No feeling selected' });
     expect(screen.getAllByTestId(/^base-emotion-emoji-/)).toHaveLength(7);
     expect(screen.queryAllByTestId(/^base-emotion-label-/)).toHaveLength(0);
 
     await act(() => appSettingsStore.trigger.emotionLabelModeChanged({
       mode: EMOTION_LABEL_MODES.TEXT,
     }));
-    expect(screen.getByTestId('emotion-star').props['accessibilityValue']).toEqual({ text: EMOTION_LABEL_MODES.TEXT });
+    expect(screen.getByTestId('emotion-star').props['accessibilityValue']).toEqual({ text: 'No feeling selected' });
     expect(screen.queryAllByTestId(/^base-emotion-emoji-/)).toHaveLength(0);
     expect(screen.getAllByTestId(/^base-emotion-label-/)).toHaveLength(7);
 
     await act(() => appSettingsStore.trigger.emotionLabelModeChanged({
       mode: EMOTION_LABEL_MODES.BOTH,
     }));
-    expect(screen.getByTestId('emotion-star').props['accessibilityValue']).toEqual({ text: EMOTION_LABEL_MODES.BOTH });
+    expect(screen.getByTestId('emotion-star').props['accessibilityValue']).toEqual({ text: 'No feeling selected' });
     expect(screen.getAllByTestId(/^base-emotion-emoji-/)).toHaveLength(7);
     expect(screen.getAllByTestId(/^base-emotion-label-/)).toHaveLength(7);
 
@@ -572,7 +647,7 @@ describe('check-in screens', () => {
       />,
     );
 
-    await fireEvent(screen.getByLabelText('Joy · Cheerfulness'), 'responderTerminate');
+    await fireEvent(screen.getByLabelText('Feeling Pulse'), 'responderTerminate');
 
     expect(onCancel).toHaveBeenCalledTimes(1);
     expect(onRelease).not.toHaveBeenCalled();
@@ -715,7 +790,7 @@ describe('check-in screens', () => {
     expect(history.getByText('Released core belief')).toBeTruthy();
     expect(history.getByText('Your guiding belief')).toBeTruthy();
     expect(history.getByTestId(`history-released-belief-${saved.id}`)).toHaveStyle({
-      color: '#9A8F87',
+      color: '#6F6760',
       fontSize: 12,
       textDecorationLine: 'line-through',
     });
@@ -911,7 +986,7 @@ describe('check-in screens', () => {
 
     const history = await _renderLocalized(<HistoryScreen />);
     expect(history.getByTestId(`history-released-belief-${checkInId}`)).toHaveStyle({
-      color: '#9A8F87',
+      color: '#6F6760',
       textDecorationLine: 'line-through',
     });
     expect(history.getByTestId(`history-guiding-belief-${checkInId}`)).toHaveStyle({
@@ -1123,7 +1198,7 @@ describe('check-in screens', () => {
     await fireEvent.press(library.getByText('Eigenen Leidsatz hinzufügen'));
     expect(library.getByText('LEIDSATZ HINZUFÜGEN')).toBeTruthy();
     expect(library.getByText(
-      'Benenne den Satz, der Leiden verursacht. Ein Leidsatz ist eine innere Regel, die dich in diesem Moment einengt. Oft enthalten Leidsätze Absolutismen wie “immer” und “alles” und “nie”. Du kannst direkt einen unterstützenden Leitsatz ergänzen oder das Feld leer lassen.',
+      'Schreibe die innere Regel auf, die dich einengt. Ein unterstützender Leitsatz ist optional.',
     )).toBeTruthy();
     expect(library.getByTestId('belief-library-harmful-card')).toBeTruthy();
     expect(library.getByTestId('belief-library-guiding-card')).toBeTruthy();
@@ -1653,7 +1728,7 @@ describe('check-in screens', () => {
     expect(today.queryByText(/50%/)).toBeNull();
     const gestureRegion = today.getByTestId('check-in-gesture-region');
     const detailsScroll = today.getByTestId('check-in-details-scroll');
-    expect(within(gestureRegion).getByLabelText('Feeling pulse. Drag outward from the center.')).toBeTruthy();
+    expect(within(gestureRegion).getByLabelText('Feeling Pulse')).toBeTruthy();
     expect(within(detailsScroll).getByText('Latest check-in')).toBeTruthy();
     expect(within(detailsScroll).getByText('Youmotion supports self-awareness and does not replace psychotherapeutic or medical treatment.')).toHaveStyle({ marginTop: 24 });
     expect(detailsScroll.props).toMatchObject({

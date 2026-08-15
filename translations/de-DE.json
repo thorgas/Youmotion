@@ -1,6 +1,96 @@
 {
   "fb-locale": "de-DE",
   "translations": {
+    "hOK6JsTWJUzdnvdeb5KlFQ==": {
+      "description": "Heading grouping support links in settings",
+      "tokens": [],
+      "translations": [{ "translation": "HILFE", "variations": {} }],
+      "types": []
+    },
+    "EH5sOAWVhvALUliZXyKL6Q==": {
+      "description": "Settings support and feedback entry explanation",
+      "tokens": [],
+      "translations": [{ "translation": "Stelle eine Frage oder teile Feedback über deine E-Mail-App.", "variations": {} }],
+      "types": []
+    },
+    "krINA3091PCkEPdSPMnpBA==": {
+      "description": "Settings support and feedback entry title",
+      "tokens": [],
+      "translations": [{ "translation": "Fragen und Feedback", "variations": {} }],
+      "types": []
+    },
+    "oQkDtsb9p4pk8/jVydQgtQ==": {
+      "description": "Title of personal core-belief creation in settings",
+      "tokens": [],
+      "translations": [{ "translation": "Benenne den Leidsatz.", "variations": {} }],
+      "types": []
+    },
+    "SnhtvTj3eln0s265K5zAlg==": {
+      "description": "Explanation of personal core-belief creation with optional guiding belief",
+      "tokens": [],
+      "translations": [{ "translation": "Schreibe die innere Regel auf, die dich einengt. Ein unterstützender Leitsatz ist optional.", "variations": {} }],
+      "types": []
+    },
+    "eNTEeVNGU0MmoS1ZyXbnog==": {
+      "description": "Feeling Pulse accessibility value before a feeling is selected",
+      "tokens": [],
+      "translations": [{ "translation": "Kein Gefühl ausgewählt", "variations": {} }],
+      "types": []
+    },
+    "YGFEjG8xN0qXFqjroJPCdg==": {
+      "description": "Accessibility label for the Feeling Pulse control",
+      "tokens": [],
+      "translations": [{ "translation": "Gefühlspuls", "variations": {} }],
+      "types": []
+    },
+    "TcFgW5mTTmBvh7trfIktpA==": {
+      "description": "Accessibility hint explaining the Feeling Pulse screen-reader controls",
+      "tokens": [],
+      "translations": [{ "translation": "Streiche nach oben oder unten, um die Intensität zu ändern. Verwende die Aktionen, um das Gefühl zu wechseln oder zu bestätigen.", "variations": {} }],
+      "types": []
+    },
+    "yjMgR++q6gK3/+SKeK91zw==": {
+      "description": "Feeling Pulse accessibility action increasing intensity",
+      "tokens": [],
+      "translations": [{ "translation": "Intensiver", "variations": {} }],
+      "types": []
+    },
+    "OVhIkIWk+tGgEOvDk5IYhA==": {
+      "description": "Feeling Pulse accessibility action decreasing intensity",
+      "tokens": [],
+      "translations": [{ "translation": "Weniger intensiv", "variations": {} }],
+      "types": []
+    },
+    "4Y0CSUkr6E8KH1F9o5OXHQ==": {
+      "description": "Feeling Pulse accessibility action selecting the next emotion",
+      "tokens": [],
+      "translations": [{ "translation": "Nächstes Gefühl", "variations": {} }],
+      "types": []
+    },
+    "GuV4ofBY/GMIJQ8duuch3A==": {
+      "description": "Feeling Pulse accessibility action selecting the previous emotion",
+      "tokens": [],
+      "translations": [{ "translation": "Vorheriges Gefühl", "variations": {} }],
+      "types": []
+    },
+    "EEmpVkU/DzV6XAT9fxgiyg==": {
+      "description": "Feeling Pulse accessibility action confirming the selected emotion",
+      "tokens": [],
+      "translations": [{ "translation": "Gefühl bestätigen", "variations": {} }],
+      "types": []
+    },
+    "4+9pdPXbMMbLvPk6Yfbo5Q==": {
+      "description": "Primary instruction above the feeling pulse",
+      "tokens": [],
+      "translations": [{ "translation": "Berühre den Punkt und bewege dich.", "variations": {} }],
+      "types": []
+    },
+    "xQsmqYC8WAk/R6oiW4RV1g==": {
+      "description": "Supporting instruction explaining the Feeling Pulse direction and distance controls",
+      "tokens": [],
+      "translations": [{ "translation": "Die Richtung wählt das Gefühl. Der Abstand wählt seine Intensität.", "variations": {} }],
+      "types": []
+    },
     "vAPmS1vO40flK/nnHOlT6w==": {
       "description": "Accessibility label for the global feedback button",
       "tokens": [],

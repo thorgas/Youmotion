@@ -1,6 +1,5 @@
-import { SymbolView, type SymbolViewProps } from 'expo-symbols';
 import { fbs } from 'fbtee';
-import { useMachine } from '@xstate/react';
+import { useMachine, useSelector } from '@xstate/react';
 import {
   ActivityIndicator,
   Modal,
@@ -10,9 +9,9 @@ import {
   Text,
   View,
 } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import type { PropsWithChildren } from 'react';
+import { createContext, type PropsWithChildren, useContext } from 'react';
 
+import { SettingsActionRow } from '@/components/ui/settings-action-row';
 import {
   FEEDBACK_EVENTS,
   FEEDBACK_FAILURE_REASONS,
@@ -22,11 +21,33 @@ import {
 import { palette, type } from '@/features/check-in/ui/theme';
 import { feedbackMachine } from '../application/feedback.machine';
 
-const feedbackSymbol: SymbolViewProps['name'] = {
-  android: 'feedback',
-  ios: 'questionmark.bubble',
-  web: 'question_answer',
-};
+type FeedbackActor = ReturnType<typeof useMachine<typeof feedbackMachine>>[2];
+
+const FeedbackContext = createContext<FeedbackActor | null>(null);
+
+export function FeedbackProvider({ children }: PropsWithChildren) {
+  const [, , actor] = useMachine(feedbackMachine);
+
+  return (
+    <FeedbackContext.Provider value={actor}>
+      {children}
+    </FeedbackContext.Provider>
+  );
+}
+
+function useFeedbackActor() {
+  const actor = useContext(FeedbackContext);
+  if (!actor) throw new Error('useFeedbackActor must be used inside FeedbackProvider.');
+  return actor;
+}
+
+const _selectSnapshot = (
+  snapshot: ReturnType<ReturnType<typeof useFeedbackActor>['getSnapshot']>,
+) => snapshot;
+
+const _selectIdle = (
+  snapshot: ReturnType<ReturnType<typeof useFeedbackActor>['getSnapshot']>,
+) => snapshot.matches(FEEDBACK_STATES.IDLE);
 
 function FeedbackAction({
   label,
@@ -85,16 +106,14 @@ function FeedbackDialog({
 }
 
 export function FeedbackOverlay() {
-  const insets = useSafeAreaInsets();
-  const [snapshot, , actor] = useMachine(feedbackMachine);
-  const idle = snapshot.matches(FEEDBACK_STATES.IDLE);
+  const actor = useFeedbackActor();
+  const snapshot = useSelector(actor, _selectSnapshot);
   const choosingKind = snapshot.matches(FEEDBACK_STATES.CHOOSING_KIND);
   const choosingScreenshot = snapshot.matches(FEEDBACK_STATES.CHOOSING_SCREENSHOT);
   const capturing = snapshot.matches(FEEDBACK_STATES.CAPTURING_SCREENSHOT);
   const composing = snapshot.matches(FEEDBACK_STATES.COMPOSING_EMAIL);
   const failed = snapshot.matches(FEEDBACK_STATES.FAILURE);
   const dialogVisible = choosingKind || choosingScreenshot || composing || failed;
-  const _open = () => actor.send({ type: FEEDBACK_EVENTS.OPENED });
   const _askQuestion = () => actor.send({
     type: FEEDBACK_EVENTS.KIND_SELECTED,
     kind: FEEDBACK_KINDS.QUESTION,
@@ -110,124 +129,119 @@ export function FeedbackOverlay() {
 
   return (
     <>
-      {idle ? (
-        <Pressable
-          accessibilityLabel={String(fbs('Ask a question or send feedback', 'Accessibility label for the global feedback button'))}
-          accessibilityRole="button"
-          hitSlop={8}
-          onPress={_open}
-          style={[styles.feedbackButton, { top: insets.top + 4 }]}
-          testID="feedback-button">
-          <SymbolView
-            name={feedbackSymbol}
-            resizeMode="scaleAspectFit"
-            size={20}
-            tintColor={palette.moss}
-            weight="medium"
-          />
-        </Pressable>
-      ) : null}
       <FeedbackDialog onRequestClose={_cancel} visible={dialogVisible}>
-            {choosingKind ? (
-              <>
-                <Text style={styles.title}><fbt desc="Feedback choice dialog title">How can we help?</fbt></Text>
-                <Text style={styles.copy}>
-                  <fbt desc="Feedback choice dialog explanation">Your email app will open so you can review and send the message yourself.</fbt>
-                </Text>
-                <View style={styles.actions}>
-                  <FeedbackAction
-                    label={String(fbs('Ask a question', 'Button starting a support question email'))}
-                    onPress={_askQuestion}
-                    primary
-                    testID="feedback-question"
-                  />
-                  <FeedbackAction
-                    label={String(fbs('Send feedback', 'Button starting a feedback email'))}
-                    onPress={_sendFeedback}
-                    testID="feedback-send"
-                  />
-                  <FeedbackAction
-                    label={String(fbs('Cancel', 'Button cancelling the feedback flow'))}
-                    onPress={_cancel}
-                    testID="feedback-cancel"
-                  />
-                </View>
-              </>
-            ) : null}
-            {choosingScreenshot ? (
-              <>
-                <Text style={styles.title}><fbt desc="Screenshot consent dialog title">Attach this screen?</fbt></Text>
-                <Text style={styles.copy}>
-                  <fbt desc="Screenshot consent privacy explanation">A screenshot can include private feelings or reflections. It will only be captured and attached if you choose “Attach screenshot.”</fbt>
-                </Text>
-                <View style={styles.actions}>
-                  <FeedbackAction
-                    label={String(fbs('Attach screenshot', 'Button consenting to capture and attach the current app screen'))}
-                    onPress={_includeScreenshot}
-                    primary
-                    testID="feedback-attach-screenshot"
-                  />
-                  <FeedbackAction
-                    label={String(fbs('Continue without screenshot', 'Button opening feedback email without a screenshot'))}
-                    onPress={_skipScreenshot}
-                    testID="feedback-without-screenshot"
-                  />
-                  <FeedbackAction
-                    label={String(fbs('Cancel', 'Button cancelling screenshot consent and feedback'))}
-                    onPress={_cancel}
-                    testID="feedback-screenshot-cancel"
-                  />
-                </View>
-              </>
-            ) : null}
-            {composing ? (
-              <View style={styles.progress}>
-                <ActivityIndicator color={palette.moss} />
-                <Text style={styles.progressText}><fbt desc="Email composer opening progress message">Opening your email app…</fbt></Text>
-              </View>
-            ) : null}
-            {failed ? (
-              <>
-                <Text style={styles.title}><fbt desc="Feedback flow failure dialog title">That did not work.</fbt></Text>
-                <Text style={styles.copy}>
-                  {snapshot.context.failureReason === FEEDBACK_FAILURE_REASONS.SCREENSHOT
-                    ? <fbt desc="Feedback screenshot failure explanation">The screenshot could not be created.</fbt>
-                    : snapshot.context.failureReason === FEEDBACK_FAILURE_REASONS.EMAIL_UNAVAILABLE
-                      ? <fbt desc="Feedback email unavailable explanation">No email app is configured on this device.</fbt>
-                      : <fbt desc="Feedback email composition failure explanation">The email composer could not be opened.</fbt>}
-                </Text>
-                <View style={styles.actions}>
-                  <FeedbackAction
-                    label={String(fbs('Try again', 'Button retrying screenshot capture or email composition'))}
-                    onPress={_retry}
-                    primary
-                    testID="feedback-retry"
-                  />
-                  <FeedbackAction
-                    label={String(fbs('Cancel', 'Button closing a feedback error'))}
-                    onPress={_cancel}
-                    testID="feedback-error-cancel"
-                  />
-                </View>
-              </>
-            ) : null}
+        {choosingKind ? (
+          <>
+            <Text style={styles.title}><fbt desc="Feedback choice dialog title">How can we help?</fbt></Text>
+            <Text style={styles.copy}>
+              <fbt desc="Feedback choice dialog explanation">Your email app will open so you can review and send the message yourself.</fbt>
+            </Text>
+            <View style={styles.actions}>
+              <FeedbackAction
+                label={String(fbs('Ask a question', 'Button starting a support question email'))}
+                onPress={_askQuestion}
+                primary
+                testID="feedback-question"
+              />
+              <FeedbackAction
+                label={String(fbs('Send feedback', 'Button starting a feedback email'))}
+                onPress={_sendFeedback}
+                testID="feedback-send"
+              />
+              <FeedbackAction
+                label={String(fbs('Cancel', 'Button cancelling the feedback flow'))}
+                onPress={_cancel}
+                testID="feedback-cancel"
+              />
+            </View>
+          </>
+        ) : null}
+        {choosingScreenshot ? (
+          <>
+            <Text style={styles.title}><fbt desc="Screenshot consent dialog title">Attach this screen?</fbt></Text>
+            <Text style={styles.copy}>
+              <fbt desc="Screenshot consent privacy explanation">A screenshot can include private feelings or reflections. It will only be captured and attached if you choose “Attach screenshot.”</fbt>
+            </Text>
+            <View style={styles.actions}>
+              <FeedbackAction
+                label={String(fbs('Attach screenshot', 'Button consenting to capture and attach the current app screen'))}
+                onPress={_includeScreenshot}
+                primary
+                testID="feedback-attach-screenshot"
+              />
+              <FeedbackAction
+                label={String(fbs('Continue without screenshot', 'Button opening feedback email without a screenshot'))}
+                onPress={_skipScreenshot}
+                testID="feedback-without-screenshot"
+              />
+              <FeedbackAction
+                label={String(fbs('Cancel', 'Button cancelling screenshot consent and feedback'))}
+                onPress={_cancel}
+                testID="feedback-screenshot-cancel"
+              />
+            </View>
+          </>
+        ) : null}
+        {composing ? (
+          <View style={styles.progress}>
+            <ActivityIndicator color={palette.moss} />
+            <Text style={styles.progressText}><fbt desc="Email composer opening progress message">Opening your email app…</fbt></Text>
+          </View>
+        ) : null}
+        {failed ? (
+          <>
+            <Text style={styles.title}><fbt desc="Feedback flow failure dialog title">That did not work.</fbt></Text>
+            <Text style={styles.copy}>
+              {snapshot.context.failureReason === FEEDBACK_FAILURE_REASONS.SCREENSHOT
+                ? <fbt desc="Feedback screenshot failure explanation">The screenshot could not be created.</fbt>
+                : snapshot.context.failureReason === FEEDBACK_FAILURE_REASONS.EMAIL_UNAVAILABLE
+                  ? <fbt desc="Feedback email unavailable explanation">No email app is configured on this device.</fbt>
+                  : <fbt desc="Feedback email composition failure explanation">The email composer could not be opened.</fbt>}
+            </Text>
+            <View style={styles.actions}>
+              <FeedbackAction
+                label={String(fbs('Try again', 'Button retrying screenshot capture or email composition'))}
+                onPress={_retry}
+                primary
+                testID="feedback-retry"
+              />
+              <FeedbackAction
+                label={String(fbs('Cancel', 'Button closing a feedback error'))}
+                onPress={_cancel}
+                testID="feedback-error-cancel"
+              />
+            </View>
+          </>
+        ) : null}
       </FeedbackDialog>
       {capturing ? <View pointerEvents="none" testID="feedback-capturing" /> : null}
     </>
   );
 }
 
+export function FeedbackSettingsAction() {
+  const actor = useFeedbackActor();
+  const idle = useSelector(actor, _selectIdle);
+  const _open = () => actor.send({ type: FEEDBACK_EVENTS.OPENED });
+
+  if (!idle) return null;
+  return (
+    <SettingsActionRow
+      description={String(fbs(
+        'Ask a question or share feedback through your email app.',
+        'Settings support and feedback entry explanation',
+      ))}
+      onPress={_open}
+      testID="feedback-button"
+      title={String(fbs(
+        'Questions and feedback',
+        'Settings support and feedback entry title',
+      ))}
+    />
+  );
+}
+
 const styles = StyleSheet.create({
-  feedbackButton: {
-    position: 'absolute',
-    right: 12,
-    zIndex: 20,
-    width: 40,
-    height: 40,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: palette.paper,
-  },
   overlay: {
     alignItems: 'center',
     bottom: 0,

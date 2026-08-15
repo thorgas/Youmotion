@@ -253,7 +253,7 @@ function BeliefLibraryEditor() {
           <Text style={styles.title}>
             {creating ? (
               <fbt desc="Title of personal core-belief creation in settings">
-                Put it in your own words.
+                Name the belief.
               </fbt>
             ) : (
               <fbt desc="Title of personal core-belief editing">Keep it true to you.</fbt>
@@ -262,7 +262,7 @@ function BeliefLibraryEditor() {
           <Text style={styles.copy}>
             {creating ? (
               <fbt desc="Explanation of personal core-belief creation with optional guiding belief">
-                Name the belief that causes suffering. You can add a supportive guiding belief now or leave it blank.
+                Write the inner rule that feels limiting. A supportive guiding belief is optional.
               </fbt>
             ) : (
               <fbt desc="Explanation that editing a shared personal belief updates earlier moments">
