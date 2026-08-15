@@ -1,8 +1,8 @@
 import { render } from '@testing-library/react-native';
 import type { ReactNode } from 'react';
 
+import TabLayout from '@/app/(tabs)/_layout';
 import { NAVIGATION_EVENTS } from '@/constants';
-import TabLayout from '../(tabs)/_layout';
 
 const mockSelectionAsync = jest.fn(() => Promise.resolve());
 const mockMatches = jest.fn();
