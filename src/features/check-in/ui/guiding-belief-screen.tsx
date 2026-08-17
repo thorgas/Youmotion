@@ -1,5 +1,4 @@
 import { useSelector } from '@xstate/react';
-import { fbs } from 'fbtee';
 import { PressableScale } from 'pressto';
 import {
   ActivityIndicator,
@@ -149,11 +148,6 @@ export function GuidingBeliefScreen() {
     }
     actor.send({ type: CHECK_IN_EVENTS.GUIDING_BELIEF_SKIPPED });
   };
-  const backLabel = String(fbs(
-    'Back',
-    'Button returning from guiding belief formulation to harmful belief selection',
-  ));
-
   if (!beliefSystemId) return null;
 
   return (
@@ -175,9 +169,7 @@ export function GuidingBeliefScreen() {
         >
           <View style={styles.header}>
             <AppBackButton
-              accessibilityLabel={backLabel}
               disabled={saving}
-              label={backLabel}
               onPress={_back}
               style={styles.backButton}
               testID="guiding-belief-back"

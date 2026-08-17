@@ -26,7 +26,6 @@ import { actionColors, palette, type } from '@/features/check-in/ui/theme';
 type OnboardingStep = typeof ONBOARDING_STATES[keyof typeof ONBOARDING_STATES];
 
 type OnboardingStepShellProps = PropsWithChildren<{
-  backLabel?: string;
   onBack?: () => void;
   onPrimary: () => void;
   onSkip: () => void;
@@ -59,7 +58,6 @@ function ProgressTrack({ active }: { active: boolean }) {
 }
 
 export function OnboardingStepShell({
-  backLabel,
   children,
   onBack,
   onPrimary,
@@ -83,10 +81,8 @@ export function OnboardingStepShell({
     <View style={styles.page} testID={`onboarding-${step}-step`}>
       <SafeAreaView edges={['top', 'bottom']} style={styles.safeArea}>
         <View style={styles.topBar}>
-          {onBack && backLabel ? (
+          {onBack ? (
             <AppBackButton
-              accessibilityLabel={backLabel}
-              label={backLabel}
               onPress={onBack}
               style={styles.quietAction}
               testID="onboarding-back"

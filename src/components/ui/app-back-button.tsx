@@ -1,4 +1,5 @@
 import { SymbolView, type SymbolViewProps } from 'expo-symbols';
+import { fbs } from 'fbtee';
 import { PressableScale } from 'pressto';
 import {
   StyleSheet,
@@ -10,9 +11,7 @@ import {
 import { palette } from '@/features/check-in/ui/theme';
 
 type AppBackButtonProps = {
-  accessibilityLabel: string;
   disabled?: boolean;
-  label: string;
   onPress: () => void;
   style?: StyleProp<ViewStyle>;
   testID: string;
@@ -25,16 +24,16 @@ const backSymbol: SymbolViewProps['name'] = {
 };
 
 export function AppBackButton({
-  accessibilityLabel,
   disabled = false,
-  label,
   onPress,
   style,
   testID,
 }: AppBackButtonProps) {
+  const label = String(fbs('Back', 'Label for the app-wide back navigation button'));
+
   return (
     <PressableScale
-      accessibilityLabel={accessibilityLabel}
+      accessibilityLabel={label}
       accessibilityRole="button"
       accessibilityState={{ disabled }}
       disabled={disabled}

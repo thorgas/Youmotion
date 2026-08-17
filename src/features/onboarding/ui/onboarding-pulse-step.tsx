@@ -94,7 +94,6 @@ export function OnboardingPulseStep() {
 
   return (
     <OnboardingStepShell
-      backLabel={String(fbs('Back', 'Button returning to the previous onboarding step'))}
       onBack={_back}
       onPrimary={_showOrContinue}
       onSkip={_skip}

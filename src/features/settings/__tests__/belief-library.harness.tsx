@@ -93,6 +93,7 @@ describe('personal belief library on the device runtime', () => {
           </AppNavigationActorProvider>
         </GestureHandlerRootView>,
       );
+      await screen.findByAccessibilityLabel('Back');
       stage = 'edit press';
       await pressLaidOutUntil({
         isComplete: () => currentActor().getSnapshot().matches(
@@ -102,6 +103,7 @@ describe('personal belief library on the device runtime', () => {
       });
 
       expect(currentActor().getSnapshot().matches(BELIEF_LIBRARY_STATES.EDITOR)).toBe(true);
+      await screen.findByAccessibilityLabel('Back');
       await screen.findByTestId('belief-library-harmful-draft');
       await screen.findByTestId('belief-library-guiding-draft');
       stage = 'cancel press';
