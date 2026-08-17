@@ -42,15 +42,9 @@ const selectSnapshot = (
 function LibraryBackButton() {
   const actor = useAppNavigationActor();
   const close = () => actor.send({ type: BELIEF_LIBRARY_EVENTS.CLOSED });
-  const label = String(fbs(
-    'Settings',
-    'Button returning from personal core-belief management to settings',
-  ));
 
   return (
     <AppBackButton
-      accessibilityLabel={label}
-      label={label}
       onPress={close}
       style={styles.backButton}
       testID="belief-library-close"
@@ -218,11 +212,6 @@ function BeliefLibraryEditor() {
     type: BELIEF_LIBRARY_EVENTS.GUIDING_HELP_TOGGLED,
   });
   const save = () => actor.send({ type: BELIEF_LIBRARY_EVENTS.SAVE_REQUESTED });
-  const backLabel = String(fbs(
-    'Your core beliefs',
-    'Button returning from personal core-belief editing to its library',
-  ));
-
   return (
     <View style={styles.page} testID="belief-library-editor">
       <SafeAreaView style={styles.safeArea}>
@@ -234,9 +223,7 @@ function BeliefLibraryEditor() {
           showsVerticalScrollIndicator
         >
           <AppBackButton
-            accessibilityLabel={backLabel}
             disabled={saving}
-            label={backLabel}
             onPress={cancel}
             style={styles.backButton}
             testID="belief-library-editor-cancel"

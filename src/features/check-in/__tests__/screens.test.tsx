@@ -667,6 +667,8 @@ describe('check-in screens', () => {
       accessibilityValue: { min: 1, max: 3, now: 1 },
     });
     expect(within(screen.getByTestId('check-in-progress')).queryByText('Optional')).toBeNull();
+    expect(screen.getByTestId('reflection-back').props['accessibilityLabel']).toBe('Back');
+    expect(screen.getByText('Back')).toBeTruthy();
     expect(screen.getByText(
       'Gently explore what may be underneath. You can stop at any time.',
     )).toBeTruthy();
@@ -1190,8 +1192,8 @@ describe('check-in screens', () => {
     await act(() => mockActor.send({ type: NAVIGATION_EVENTS.SETTINGS_OPENED }));
     await act(() => mockActor.send({ type: BELIEF_LIBRARY_EVENTS.OPENED }));
     const library = await _renderLocalized(<BeliefLibraryScreen />);
-    expect(library.getByText('Einstellungen')).toBeTruthy();
-    expect(library.queryByText('‹ Einstellungen')).toBeNull();
+    expect(library.getByTestId('belief-library-close').props['accessibilityLabel']).toBe('Zurück');
+    expect(library.getByText('Zurück')).toBeTruthy();
     expect(library.getByText('Eigenen Leidsatz hinzufügen')).toBeTruthy();
     expect(library.getByText('Formuliere ihn in deinen eigenen Worten.')).toBeTruthy();
     expect(library.getByText('+')).toBeTruthy();
@@ -1214,8 +1216,10 @@ describe('check-in screens', () => {
     expect(library.getByText('LEIDSATZ · EINENGEND')).toBeTruthy();
     expect(library.getByText('LEITSATZ · UNTERSTÜTZEND')).toBeTruthy();
     await fireEvent.press(library.getByText('Bearbeiten'));
-    expect(library.getByText('Deine Leidsätze')).toBeTruthy();
-    expect(library.queryByText('‹ Deine Leidsätze')).toBeNull();
+    expect(library.getByTestId('belief-library-editor-cancel').props['accessibilityLabel']).toBe(
+      'Zurück',
+    );
+    expect(library.getByText('Zurück')).toBeTruthy();
   });
 
   it('filters history moments with its all-time default preserved', async () => {

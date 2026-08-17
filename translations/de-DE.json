@@ -1,6 +1,12 @@
 {
   "fb-locale": "de-DE",
   "translations": {
+    "lLm1Q++Kto5oFR8N2G2kew==": {
+      "description": "Label for the app-wide back navigation button",
+      "tokens": [],
+      "translations": [{ "translation": "Zurück", "variations": {} }],
+      "types": []
+    },
     "hOK6JsTWJUzdnvdeb5KlFQ==": {
       "description": "Heading grouping support links in settings",
       "tokens": [],

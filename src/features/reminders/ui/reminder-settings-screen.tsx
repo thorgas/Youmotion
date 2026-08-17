@@ -1,5 +1,4 @@
 import { useSelector } from '@xstate/react';
-import { fbs } from 'fbtee';
 import { PressableScale } from 'pressto';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -42,8 +41,6 @@ export function ReminderSettingsScreen() {
       <SafeAreaView edges={['top', 'bottom']} style={styles.safeArea}>
         <View style={styles.header}>
           <AppBackButton
-            accessibilityLabel={String(fbs('Back', 'Reminder settings back button accessibility label'))}
-            label={String(fbs('Back', 'Reminder settings back button'))}
             onPress={_back}
             testID="reminder-settings-back"
           />

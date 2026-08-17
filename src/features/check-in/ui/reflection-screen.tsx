@@ -527,17 +527,11 @@ function ReflectionNoteStep() {
           testID="reflection-keyboard-scroll"
         >
           <View style={styles.reflectionHeading}>
-            <PressableScale
-              accessibilityRole="button"
+            <AppBackButton
               disabled={saving}
               onPress={_back}
-              style={styles.inlineBack}
               testID="reflection-back"
-            >
-              <Text style={styles.inlineBackText}>
-                <fbt desc="Button returning from reflection to the feeling pulse">‹ Back</fbt>
-              </Text>
-            </PressableScale>
+            />
             <View style={styles.momentMetadataRow}>
               <PressableScale
                 accessibilityRole={editing ? 'button' : undefined}
@@ -800,11 +794,6 @@ function BeliefSystemCatalogStep() {
   const _create = () => actor.send({
     type: CHECK_IN_EVENTS.CUSTOM_BELIEF_SYSTEM_REQUESTED,
   });
-  const backLabel = String(fbs(
-    'Back',
-    'Button returning from the core belief catalog',
-  ));
-
   if (!selection) return null;
 
   return (
@@ -818,8 +807,6 @@ function BeliefSystemCatalogStep() {
         >
           <View style={styles.catalogHeader}>
             <AppBackButton
-              accessibilityLabel={backLabel}
-              label={backLabel}
               onPress={_close}
               style={styles.catalogBack}
               testID="belief-system-catalog-back"
@@ -1036,13 +1023,6 @@ const styles = StyleSheet.create({
     gap: 8,
     marginBottom: 14,
   },
-  inlineBack: {
-    alignSelf: 'flex-start',
-    justifyContent: 'center',
-    minHeight: 36,
-    paddingRight: 12,
-  },
-  inlineBackText: { color: palette.inkMuted, fontFamily: type.medium, fontSize: 13 },
   catalogHeader: { marginTop: 8 },
   eyebrow: {
     fontFamily: type.semibold,

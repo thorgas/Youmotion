@@ -583,8 +583,6 @@ export function LeitsatzReminderScreen() {
       <SafeAreaView edges={['top', 'bottom']} style={styles.safeArea}>
         <View style={styles.header}>
           <AppBackButton
-            accessibilityLabel={String(fbs('Back', 'Reminder screen back button accessibility label'))}
-            label={String(fbs('Back', 'Reminder screen back button'))}
             onPress={_back}
             testID="reminder-back"
           />
