@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { Modal, StyleSheet, Text, View } from 'react-native';
+import { Modal, Pressable, StyleSheet, Text, View } from 'react-native';
 import { PressableScale } from 'pressto';
 
 import { actionColors, palette, type } from '@/features/check-in/ui/theme';
@@ -28,8 +28,15 @@ export function ConfirmedPickerModal({
       transparent
       visible={visible}
     >
-      <View accessibilityViewIsModal style={styles.backdrop} testID={testID}>
-        <View style={styles.card}>
+      <View style={styles.backdrop} testID={testID}>
+        <Pressable
+          accessibilityElementsHidden
+          importantForAccessibility="no"
+          onPress={onDone}
+          style={styles.dismissArea}
+          testID={`${testID}-backdrop`}
+        />
+        <View accessibilityViewIsModal style={styles.card}>
           <Text style={styles.title}>{title}</Text>
           <View style={styles.picker}>{children}</View>
           <PressableScale
@@ -53,6 +60,13 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(20, 23, 20, 0.34)',
     padding: 16,
     paddingBottom: 28,
+  },
+  dismissArea: {
+    position: 'absolute',
+    top: 0,
+    right: 0,
+    bottom: 0,
+    left: 0,
   },
   card: {
     backgroundColor: palette.paper,
