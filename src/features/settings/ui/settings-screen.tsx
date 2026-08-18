@@ -260,7 +260,7 @@ export function SettingsScreen() {
             onPress={_openBeliefLibrary}
             testID="open-belief-library"
             title={String(fbs(
-              'Manage Leitsätze',
+              'Manage guiding belief',
               'Button opening personal core-belief management',
             ))}
           />

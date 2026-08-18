@@ -1540,7 +1540,7 @@ describe('check-in screens', () => {
     await act(() => mockActor.send({ type: NAVIGATION_EVENTS.SETTINGS_OPENED }));
 
     const settings = await _renderLocalized(<SettingsScreen />);
-    expect(settings.getByText('Manage Leitsätze')).toBeTruthy();
+    expect(settings.getByText('Manage guiding belief')).toBeTruthy();
     expect(settings.getByText('1')).toBeTruthy();
     await fireEvent.press(settings.getByTestId('open-belief-library'));
     expect(mockActor.getSnapshot().matches(BELIEF_LIBRARY_STATES.LIBRARY)).toBe(true);

@@ -1,6 +1,198 @@
 {
   "fb-locale": "de-DE",
   "translations": {
+    "Qwd9WYh9d3mOxyDtzDQsKQ==": {
+      "description": "Leitsatz reminder label in Leitsatz management",
+      "tokens": [],
+      "translations": [{ "translation": "SANFTE ERINNERUNG", "variations": {} }],
+      "types": []
+    },
+    "pO+NlpXlerb12zg4Q0uuPQ==": {
+      "description": "Active Leitsatz reminder status",
+      "tokens": [],
+      "translations": [{ "translation": "Aktiv", "variations": {} }],
+      "types": []
+    },
+    "koYhvt8x9ktlKZuhq2+CFw==": {
+      "description": "Disabled Leitsatz reminder status",
+      "tokens": [],
+      "translations": [{ "translation": "Aus", "variations": {} }],
+      "types": []
+    },
+    "gKiiKCOsyHPaOCiLcVEJJw==": {
+      "description": "Missing Leitsatz reminder status",
+      "tokens": [],
+      "translations": [{ "translation": "Nicht eingerichtet", "variations": {} }],
+      "types": []
+    },
+    "eGXDmJlV04PTHO/7zivxbA==": {
+      "description": "Leitsatz visible notification content status",
+      "tokens": [],
+      "translations": [{ "translation": "Zeigt diesen Leitsatz in der Benachrichtigung", "variations": {} }],
+      "types": []
+    },
+    "Tq+IuMMtpGU/lCfGVCZCFw==": {
+      "description": "General notification content status",
+      "tokens": [],
+      "translations": [{ "translation": "Verwendet eine allgemeine Benachrichtigung", "variations": {} }],
+      "types": []
+    },
+    "pmeFfHi00llZjBbKGyPI0Q==": {
+      "description": "Create Leitsatz reminder button",
+      "tokens": [],
+      "translations": [{ "translation": "Erinnerung hinzufügen", "variations": {} }],
+      "types": []
+    },
+    "og++xPM0AA5ZExJATDJbww==": {
+      "description": "Disable Leitsatz reminder button",
+      "tokens": [],
+      "translations": [{ "translation": "Ausschalten", "variations": {} }],
+      "types": []
+    },
+    "nwbTaP7XE97F5R5H4d5Clg==": {
+      "description": "Enable Leitsatz reminder button",
+      "tokens": [],
+      "translations": [{ "translation": "Einschalten", "variations": {} }],
+      "types": []
+    },
+    "5hv1BWeacGKWW6OZw4j4Wg==": {
+      "description": "Delete Leitsatz reminder button",
+      "tokens": [],
+      "translations": [{ "translation": "Entfernen", "variations": {} }],
+      "types": []
+    },
+    "DTKBKoeCNuiSJty5HDHncw==": {
+      "description": "Reminder settings entry explanation",
+      "tokens": [],
+      "translations": [{ "translation": "Wähle Tage und Uhrzeiten für eine sanfte Pulse-Erinnerung.", "variations": {} }],
+      "types": []
+    },
+    "9lJ5va3Uo09oogXt4Mlxyw==": {
+      "description": "Pulse reminder settings entry title",
+      "tokens": [],
+      "translations": [{ "translation": "Pulse-Erinnerung", "variations": {} }],
+      "types": []
+    },
+    "Ol/cDxxdUy4Kgxx5lpkdfw==": {
+      "description": "Button opening personal core-belief management",
+      "tokens": [],
+      "translations": [{ "translation": "Geleitgedanken verwalten", "variations": {} }],
+      "types": []
+    },
+    "ATtJrWMfl/cFVGMYLfcP1Q==": {
+      "description": "Personal core-belief management setting explanation",
+      "tokens": [],
+      "translations": [{ "translation": "Bearbeite deine Leitsätze und verwalte die Erinnerung für jeden Leitsatz.", "variations": {} }],
+      "types": []
+    },
+    "mYBenkw/5iwND21TRhuhAw==": {
+      "description": "Reminder permission before timing explanation",
+      "tokens": [],
+      "translations": [{ "translation": "Nach der Erlaubnis kannst du Tage, Uhrzeiten und die Worte wählen, die erscheinen dürfen.", "variations": {} }],
+      "types": []
+    },
+    "CKmdo66bRZzBnj+e1cYUqw==": {
+      "description": "Pulse notification permission denied explanation",
+      "tokens": [],
+      "translations": [{ "translation": "Es wurde keine Erinnerung erstellt.", "variations": {} }],
+      "types": []
+    },
+    "vNXwZewCnOXMFlR6RX403Q==": {
+      "description": "Leitsatz notification permission denied explanation",
+      "tokens": [],
+      "translations": [{ "translation": "Dein Leitsatz ist gespeichert. Es wurde keine Erinnerung erstellt.", "variations": {} }],
+      "types": []
+    },
+    "f+A5YfSzLAAj2bFfiWcZnw==": {
+      "description": "Edit reminder eyebrow",
+      "tokens": [],
+      "translations": [{ "translation": "ERINNERUNG BEARBEITEN", "variations": {} }],
+      "types": []
+    },
+    "Pmx+fcJio7L7RQtlvwjY9Q==": {
+      "description": "New reminder eyebrow",
+      "tokens": [],
+      "translations": [{ "translation": "NEUE ERINNERUNG", "variations": {} }],
+      "types": []
+    },
+    "BBQ/bw6b8KYHnKfznEvQ2w==": {
+      "description": "Edit reminder title",
+      "tokens": [],
+      "translations": [{ "translation": "Passe diese Erinnerung an.", "variations": {} }],
+      "types": []
+    },
+    "91fTUtDEwNFTVw0J4RzGnQ==": {
+      "description": "New reminder title",
+      "tokens": [],
+      "translations": [{ "translation": "Wähle, wann sie zurückkehren soll.", "variations": {} }],
+      "types": []
+    },
+    "HlrlJBhuG81hclqqKPyUeQ==": {
+      "description": "Reminder timing editing explanation",
+      "tokens": [],
+      "translations": [{ "translation": "Diese Tage, Uhrzeiten und Benachrichtigungsworte gehören nur zu dieser Erinnerung.", "variations": {} }],
+      "types": []
+    },
+    "7H4gKW4VfRYSTYi84joV6Q==": {
+      "description": "Reminder weekdays label",
+      "tokens": [],
+      "translations": [{ "translation": "TAGE", "variations": {} }],
+      "types": []
+    },
+    "57b4osjdrZPrn1b96QZ33A==": {
+      "description": "Reminder time label",
+      "tokens": [],
+      "translations": [{ "translation": "UHRZEIT", "variations": {} }],
+      "types": []
+    },
+    "YQFIyYRRH7DeAqwnP0sjwQ==": {
+      "description": "Save reminder changes button",
+      "tokens": [],
+      "translations": [{ "translation": "Änderungen speichern", "variations": {} }],
+      "types": []
+    },
+    "Anv80170fqt+yrJk0Z+yNw==": {
+      "description": "Save and activate reminder button",
+      "tokens": [],
+      "translations": [{ "translation": "Erinnerung aktivieren", "variations": {} }],
+      "types": []
+    },
+    "Of2bQqa1MoQAEmGgMrXcfw==": {
+      "description": "Edit reminder button",
+      "tokens": [],
+      "translations": [{ "translation": "Bearbeiten", "variations": {} }],
+      "types": []
+    },
+    "2LAMHKxQfZ7ApdLLmgLU7Q==": {
+      "description": "Pulse reminder settings title",
+      "tokens": [],
+      "translations": [{ "translation": "Ein Moment zum Innehalten.", "variations": {} }],
+      "types": []
+    },
+    "s0hiqwnIC83q5tcetcGDnA==": {
+      "description": "Pulse reminder settings explanation",
+      "tokens": [],
+      "translations": [{ "translation": "Wähle, wann Youmotion dich sanft zu Pulse zurückholen darf. Leitsatz-Erinnerungen findest du bei jedem Leitsatz.", "variations": {} }],
+      "types": []
+    },
+    "1FVPR+32q/iBWB5Yg/nHzw==": {
+      "description": "Empty Pulse reminder settings title",
+      "tokens": [],
+      "translations": [{ "translation": "Noch keine Pulse-Erinnerung", "variations": {} }],
+      "types": []
+    },
+    "vHOk92yvQvL/1ncPk5fdhQ==": {
+      "description": "Empty Pulse reminder settings explanation",
+      "tokens": [],
+      "translations": [{ "translation": "Füge eine hinzu, wenn eine sanfte Einladung zum Innehalten helfen würde.", "variations": {} }],
+      "types": []
+    },
+    "cKq+r6x5xLAbeWF2OA8FRg==": {
+      "description": "New Pulse reminder setup button",
+      "tokens": [],
+      "translations": [{ "translation": "Pulse-Erinnerung hinzufügen", "variations": {} }],
+      "types": []
+    },
     "lLm1Q++Kto5oFR8N2G2kew==": {
       "description": "Label for the app-wide back navigation button",
       "tokens": [],
