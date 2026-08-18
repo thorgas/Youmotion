@@ -1,6 +1,12 @@
 {
   "fb-locale": "de-DE",
   "translations": {
+    "pxU3DuGXoYyJueKhl5vDiQ==": {
+      "description": "Explanation that a Leitsatz reminder sends a notification",
+      "tokens": [],
+      "translations": [{ "translation": "Wähle Tage und Uhrzeiten – dieser Leitsatz kehrt dann als sanfte Benachrichtigung zurück.", "variations": {} }],
+      "types": []
+    },
     "Q7RB2VM4cs7+6opUw1Pt1Q==": {
       "description": "Eyebrow above guiding-belief management",
       "tokens": [],

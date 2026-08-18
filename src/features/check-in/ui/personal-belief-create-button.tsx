@@ -39,7 +39,9 @@ export function PersonalBeliefCreateButton({
           </fbt>
         </Text>
       </View>
-      <Text style={styles.plus}>+</Text>
+      <View style={styles.badge}>
+        <Text style={styles.plus}>+</Text>
+      </View>
     </PressableScale>
   );
 }
@@ -49,11 +51,12 @@ const styles = StyleSheet.create({
     minHeight: 64,
     flexDirection: 'row',
     alignItems: 'center',
+    gap: 14,
     borderRadius: 18,
     borderCurve: 'continuous',
     borderWidth: 1,
-    borderColor: palette.moss,
-    backgroundColor: '#EDF0EB',
+    borderColor: 'rgba(94, 111, 97, 0.28)',
+    backgroundColor: 'transparent',
     paddingHorizontal: 16,
     paddingVertical: 12,
   },
@@ -65,10 +68,19 @@ const styles = StyleSheet.create({
     fontSize: 12,
     marginTop: 2,
   },
+  badge: {
+    width: 30,
+    height: 30,
+    borderRadius: 15,
+    borderCurve: 'continuous',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: palette.moss,
+  },
   plus: {
     fontFamily: type.regular,
-    color: palette.inkMuted,
-    fontSize: 28,
-    lineHeight: 30,
+    color: '#FFFFFF',
+    fontSize: 20,
+    lineHeight: 23,
   },
 });

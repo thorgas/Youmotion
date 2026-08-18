@@ -182,28 +182,63 @@ function BeliefLibraryReminderSection({
   reminder: GuidingBeliefReminderAssignment | undefined;
   statement: BeliefStatement;
 }) {
-  if (statement.guidingStatement === undefined && reminder === undefined) return null;
-
   return (
-    <View style={styles.guidingCard}>
-      <Text style={styles.guidingLabel}>
-        <fbt desc="Label above a personal positive guiding belief in settings">
-          GUIDING BELIEF · SUPPORTIVE
-        </fbt>
-      </Text>
-      {statement.guidingStatement !== undefined ? (
-        <Text style={styles.guidingStatement}>{statement.guidingStatement}</Text>
-      ) : null}
+    <View style={styles.reminderCard}>
       <View style={styles.reminderHeader}>
         <Text style={styles.reminderLabel}>
           <fbt desc="Leitsatz reminder label in Leitsatz management">GENTLE REMINDER</fbt>
         </Text>
         <Text style={styles.reminderStatus}>{reminderStatusLabel(reminder)}</Text>
       </View>
-      {reminder ? (
-        <Text style={styles.reminderCopy}>{reminderContentLabel(reminder)}</Text>
-      ) : null}
+      <Text style={styles.reminderCopy}>
+        {reminder
+          ? reminderContentLabel(reminder)
+          : (
+              <fbt desc="Explanation that a Leitsatz reminder sends a notification">
+                Choose days and times, and this guiding belief returns as a gentle notification.
+              </fbt>
+            )}
+      </Text>
       <BeliefLibraryReminderActions disabled={disabled} reminder={reminder} statement={statement} />
+    </View>
+  );
+}
+
+function BeliefLibraryStatementHeader({ statement }: { statement: BeliefStatement }) {
+  const limitingBelief = beliefSystemText({
+    id: statement.beliefSystemId,
+    statements: [statement],
+  });
+
+  if (statement.guidingStatement === undefined) {
+    return (
+      <View>
+        <Text style={styles.statementLabel}>
+          <fbt desc="Label above a personal restrictive core belief in settings">
+            CORE BELIEF · LIMITING
+          </fbt>
+        </Text>
+        <Text style={styles.guidingStatement}>{limitingBelief}</Text>
+      </View>
+    );
+  }
+
+  return (
+    <View>
+      <Text style={styles.guidingLabel}>
+        <fbt desc="Label above a personal positive guiding belief in settings">
+          GUIDING BELIEF · SUPPORTIVE
+        </fbt>
+      </Text>
+      <Text style={styles.guidingStatement}>{statement.guidingStatement}</Text>
+      <View style={styles.limitingRow}>
+        <Text style={styles.limitingLabel}>
+          <fbt desc="Label above a personal restrictive core belief in settings">
+            CORE BELIEF · LIMITING
+          </fbt>
+        </Text>
+        <Text style={styles.limitingStatement}>{limitingBelief}</Text>
+      </View>
     </View>
   );
 }
@@ -266,14 +301,7 @@ function BeliefLibraryRow({
 }) {
   return (
     <View style={styles.beliefCard} testID={`belief-library-row-${statement.beliefSystemId}`}>
-      <Text style={styles.statementLabel}>
-        <fbt desc="Label above a personal restrictive core belief in settings">
-          CORE BELIEF · LIMITING
-        </fbt>
-      </Text>
-      <Text style={styles.harmfulStatement}>
-        {beliefSystemText({ id: statement.beliefSystemId, statements: [statement] })}
-      </Text>
+      <BeliefLibraryStatementHeader statement={statement} />
       <BeliefLibraryReminderSection disabled={disabled} reminder={reminder} statement={statement} />
       <BeliefLibraryRowActions disabled={disabled} statement={statement} />
     </View>
@@ -554,41 +582,50 @@ const styles = StyleSheet.create({
     fontSize: 11,
     letterSpacing: 1.2,
   },
-  harmfulStatement: {
-    fontFamily: type.medium,
-    color: palette.ink,
-    fontSize: 19,
-    lineHeight: 27,
-    marginTop: 6,
-  },
-  guidingCard: {
-    backgroundColor: '#EDF0EB',
-    borderRadius: 18,
-    padding: 14,
-    marginTop: 16,
-  },
   guidingLabel: {
     fontFamily: type.semibold,
     color: palette.moss,
-    fontSize: 10,
-    letterSpacing: 1.1,
+    fontSize: 11,
+    letterSpacing: 1.2,
   },
   guidingStatement: {
     fontFamily: type.medium,
     color: palette.ink,
-    fontSize: 17,
-    lineHeight: 24,
-    marginTop: 5,
+    fontSize: 22,
+    lineHeight: 30,
+    marginTop: 7,
+  },
+  limitingRow: {
+    marginTop: 14,
+    paddingTop: 12,
+    borderTopWidth: 1,
+    borderTopColor: palette.hairline,
+  },
+  limitingLabel: {
+    fontFamily: type.semibold,
+    color: palette.inkMuted,
+    fontSize: 10,
+    letterSpacing: 1.1,
+  },
+  limitingStatement: {
+    fontFamily: type.regular,
+    color: palette.inkMuted,
+    fontSize: 15,
+    lineHeight: 21,
+    marginTop: 4,
+  },
+  reminderCard: {
+    backgroundColor: '#EDF0EB',
+    borderRadius: 18,
+    borderCurve: 'continuous',
+    padding: 14,
+    marginTop: 16,
   },
   reminderHeader: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     gap: 12,
-    marginTop: 18,
-    paddingTop: 14,
-    borderTopWidth: 1,
-    borderTopColor: palette.hairline,
   },
   reminderLabel: {
     fontFamily: type.semibold,
