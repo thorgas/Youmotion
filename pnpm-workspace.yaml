@@ -3,6 +3,7 @@ allowBuilds:
   '@ottrelite/core': true
   dtrace-provider: false
   esbuild: true
+pmOnFail: ignore
 minimumReleaseAgeExclude:
   - expo-dev-client@57.0.6
   - expo-dev-launcher@57.0.6
