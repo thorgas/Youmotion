@@ -22,7 +22,7 @@ This directory is a committed `expo-map` result set refreshed after the Checklis
 
 The route graph is unaffected: no route file was added, moved, or removed, so `graph.json` still matches `src/app/`.
 
-`map.html` and the dated `.appmap` bundle still carry the previous screenshots; regenerate them on the next full `expo-map` run.
+`map.html` and `Youmotion-2026-08-19.appmap` carry the re-captured screens. Both were assembled from the 2026-08-15 run with only these two screenshots and their capture notes replaced; every other screen and flow is unchanged from that run, and `manifest.json` records this in `regeneratedFrom`. Run the full `expo-map` skill for a clean end-to-end capture.
 
 Populate device captures only from `src/features/data-safety/__tests__/fixtures/legacy-archive.fixture.json`. Its text is synthetic, so it is safe in committed screenshots and in an uploaded `.appmap`; a personal export is not.
 
