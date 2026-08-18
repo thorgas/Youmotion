@@ -1629,6 +1629,42 @@ describe('check-in screens', () => {
     })).toBe(true);
   });
 
+  it('lists a suggested guiding belief that already has a reminder, without custom editing', async () => {
+    await act(() => mockActor.send({
+      type: CHECK_IN_EVENTS.BELIEF_STATEMENTS_HYDRATED,
+      statements: [{
+        kind: 'built-in',
+        beliefSystemId: BELIEF_SYSTEM_IDS.ALWAYS_FUNCTIONING,
+        guidingStatement: 'I may pause and still be enough.',
+      }] satisfies readonly BeliefStatement[],
+    }));
+    await act(() => mockActor.send({ type: NAVIGATION_EVENTS.SETTINGS_OPENED }));
+
+    const settings = await _renderLocalized(<SettingsScreen />);
+    expect(settings.getByText('1')).toBeTruthy();
+    await fireEvent.press(settings.getByTestId('open-belief-library'));
+
+    const library = await _renderLocalized(<BeliefLibraryScreen />);
+    expect(library.getByText('I always have to function.')).toBeTruthy();
+    expect(library.getByText('I may pause and still be enough.')).toBeTruthy();
+    expect(library.queryByTestId(
+      `edit-custom-belief-${BELIEF_SYSTEM_IDS.ALWAYS_FUNCTIONING}`,
+    )).toBeNull();
+    expect(library.queryByTestId(
+      `remove-custom-belief-${BELIEF_SYSTEM_IDS.ALWAYS_FUNCTIONING}`,
+    )).toBeNull();
+
+    await fireEvent.press(library.getByTestId(
+      `belief-reminder-edit-${BELIEF_SYSTEM_IDS.ALWAYS_FUNCTIONING}`,
+    ));
+    await waitFor(() => expect(
+      mockActor.getSnapshot().context.reminderTargetBeliefSystemId,
+    ).toBe(BELIEF_SYSTEM_IDS.ALWAYS_FUNCTIONING));
+    expect(mockActor.getSnapshot().context.reminderTargetKind).toBe(
+      REMINDER_TARGET_KINDS.GUIDING_BELIEF,
+    );
+  });
+
   it('opens the explanation guide from Settings and returns there when skipped', async () => {
     await act(() => mockActor.send({ type: NAVIGATION_EVENTS.SETTINGS_OPENED }));
     const settings = await _renderLocalized(<SettingsScreen />);

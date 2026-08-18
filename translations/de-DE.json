@@ -1,6 +1,42 @@
 {
   "fb-locale": "de-DE",
   "translations": {
+    "Q7RB2VM4cs7+6opUw1Pt1Q==": {
+      "description": "Eyebrow above guiding-belief management",
+      "tokens": [],
+      "translations": [{ "translation": "DEINE LEITSÄTZE", "variations": {} }],
+      "types": []
+    },
+    "MooIufWOvDpK6iMBZLXQbw==": {
+      "description": "Title of guiding-belief management",
+      "tokens": [],
+      "translations": [{ "translation": "Was dich trägt.", "variations": {} }],
+      "types": []
+    },
+    "rTiKMJ1h0YHjo9lF/Uj3NA==": {
+      "description": "Explanation of guiding-belief management including suggested beliefs",
+      "tokens": [],
+      "translations": [{ "translation": "Verwalte die sanfte Erinnerung für jeden Leitsatz. Selbst geschriebene Leitsätze kannst du außerdem bearbeiten oder entfernen.", "variations": {} }],
+      "types": []
+    },
+    "DFG0v0kftxUm6Cjrbp7EDw==": {
+      "description": "Title shown when no guiding beliefs exist",
+      "tokens": [],
+      "translations": [{ "translation": "Noch keine Leitsätze.", "variations": {} }],
+      "types": []
+    },
+    "DPJ2LcUQw+fVtvc6614ILw==": {
+      "description": "Explanation shown when no guiding beliefs exist",
+      "tokens": [],
+      "translations": [{ "translation": "Füge hier einen hinzu oder im optionalen Leitsatz-Schritt eines Check-ins.", "variations": {} }],
+      "types": []
+    },
+    "/oXRm1lw2Zc4SgjjCcrXlw==": {
+      "description": "Personal core-belief management setting explanation",
+      "tokens": [],
+      "translations": [{ "translation": "Verwalte jeden Leitsatz und seine sanfte Erinnerung.", "variations": {} }],
+      "types": []
+    },
     "Qwd9WYh9d3mOxyDtzDQsKQ==": {
       "description": "Leitsatz reminder label in Leitsatz management",
       "tokens": [],
@@ -76,7 +112,7 @@
     "Ol/cDxxdUy4Kgxx5lpkdfw==": {
       "description": "Button opening personal core-belief management",
       "tokens": [],
-      "translations": [{ "translation": "Geleitgedanken verwalten", "variations": {} }],
+      "translations": [{ "translation": "Leitsätze verwalten", "variations": {} }],
       "types": []
     },
     "ATtJrWMfl/cFVGMYLfcP1Q==": {

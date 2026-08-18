@@ -33,17 +33,20 @@ import {
   tabScreenTitleStyle,
 } from '@/components/ui/tab-screen-layout';
 import { SettingsActionRow } from '@/components/ui/settings-action-row';
-import { activeCustomBeliefStatements } from '@/features/check-in/domain/belief-statement';
 import { palette, type } from '@/features/check-in/ui/theme';
 import { DataSafetyControls } from '@/features/data-safety/ui/data-safety-controls';
 import { FeedbackSettingsAction } from '@/features/feedback/ui/feedback-screen';
 import { useAppNavigationActor } from '@/navigation/app-navigation.provider';
 import { appSettingsStore } from '../application/app-settings.store';
+import { guidingBeliefLibraryStatements } from '../domain/guiding-belief-library';
 
 const _selectSettings = (state: ReturnType<typeof appSettingsStore.getSnapshot>) => state.context;
-const _selectBeliefStatements = (
+const _selectGuidingBeliefCount = (
   snapshot: ReturnType<ReturnType<typeof useAppNavigationActor>['getSnapshot']>,
-) => snapshot.context.beliefStatements;
+) => guidingBeliefLibraryStatements({
+  assignments: snapshot.context.reminderAssignments,
+  statements: snapshot.context.beliefStatements,
+}).length;
 const selectionAnimation = {
   duration: MOTION_DURATION.STATE,
   reduceMotion: ReduceMotion.System,
@@ -134,8 +137,7 @@ export function SettingsScreen() {
     updateChannel,
     gitCommit,
   } = useSelector(appSettingsStore, _selectSettings);
-  const beliefStatements = useActorSelector(actor, _selectBeliefStatements);
-  const personalBeliefCount = activeCustomBeliefStatements(beliefStatements).length;
+  const guidingBeliefCount = useActorSelector(actor, _selectGuidingBeliefCount);
   const _setEnglish = () => actor.send({
     type: SETTINGS_EVENTS.LANGUAGE_CHANGED,
     locale: APP_LOCALES.ENGLISH,
@@ -252,9 +254,9 @@ export function SettingsScreen() {
             title={String(fbs('Pulse reminder', 'Pulse reminder settings entry title'))}
           />
           <SettingsActionRow
-            count={personalBeliefCount}
+            count={guidingBeliefCount}
             description={String(fbs(
-              'Edit your Leitsätze and manage each Leitsatz reminder.',
+              'Manage each guiding belief and its gentle reminder.',
               'Personal core-belief management setting explanation',
             ))}
             onPress={_openBeliefLibrary}

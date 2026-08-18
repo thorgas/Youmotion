@@ -23,11 +23,13 @@ import {
   REMINDER_TARGET_KINDS,
 } from '@/constants';
 import {
-  activeCustomBeliefStatements,
   beliefStatementForId,
-  type CustomBeliefStatement,
+  type BeliefStatement,
 } from '@/features/check-in/domain/belief-statement';
-import { guidingBeliefPlaceholder } from '@/features/check-in/ui/belief-system-copy';
+import {
+  beliefSystemText,
+  guidingBeliefPlaceholder,
+} from '@/features/check-in/ui/belief-system-copy';
 import {
   GuidingBeliefCardLabel,
   HarmfulBeliefCardLabel,
@@ -42,6 +44,7 @@ import type {
 import { confirmReminderDeletion } from '@/features/reminders/ui/reminder-deletion';
 import { useAppNavigationActor } from '@/navigation/app-navigation.provider';
 import { confirmBeliefRemoval } from './belief-library-removal';
+import { guidingBeliefLibraryStatements } from '../domain/guiding-belief-library';
 
 const selectSnapshot = (
   snapshot: ReturnType<ReturnType<typeof useAppNavigationActor>['getSnapshot']>,
@@ -52,7 +55,7 @@ function guidingBeliefReminderForStatement({
   beliefSystemId,
 }: {
   assignments: readonly ReminderAssignment[];
-  beliefSystemId: CustomBeliefStatement['beliefSystemId'];
+  beliefSystemId: BeliefStatement['beliefSystemId'];
 }): GuidingBeliefReminderAssignment | undefined {
   return assignments.find(
     (assignment): assignment is GuidingBeliefReminderAssignment => (
@@ -75,25 +78,29 @@ function LibraryBackButton() {
   );
 }
 
-function BeliefLibraryRow({
+function reminderStatusLabel(reminder: GuidingBeliefReminderAssignment | undefined) {
+  if (!reminder) return <fbt desc="Missing Leitsatz reminder status">Not set</fbt>;
+  return reminder.enabled
+    ? <fbt desc="Active Leitsatz reminder status">Active</fbt>
+    : <fbt desc="Disabled Leitsatz reminder status">Off</fbt>;
+}
+
+function reminderContentLabel(reminder: GuidingBeliefReminderAssignment) {
+  return reminder.notificationContent === REMINDER_NOTIFICATION_CONTENT.LEITSATZ
+    ? <fbt desc="Leitsatz visible notification content status">Shows this Leitsatz in the notification</fbt>
+    : <fbt desc="General notification content status">Uses a general notification message</fbt>;
+}
+
+function BeliefLibraryReminderActions({
   disabled,
   reminder,
   statement,
 }: {
   disabled: boolean;
   reminder: GuidingBeliefReminderAssignment | undefined;
-  statement: CustomBeliefStatement;
+  statement: BeliefStatement;
 }) {
   const actor = useAppNavigationActor();
-  const edit = () => actor.send({
-    type: BELIEF_LIBRARY_EVENTS.EDIT_REQUESTED,
-    beliefSystemId: statement.beliefSystemId,
-  });
-  const remove = () => actor.send({
-    type: BELIEF_LIBRARY_EVENTS.REMOVE_REQUESTED,
-    beliefSystemId: statement.beliefSystemId,
-  });
-  const confirmRemove = () => confirmBeliefRemoval(remove);
   const editReminder = () => actor.send(reminder
     ? {
         type: REMINDER_EVENTS.ASSIGNMENT_EDIT_REQUESTED,
@@ -120,109 +127,155 @@ function BeliefLibraryRow({
   const confirmDeleteReminder = () => confirmReminderDeletion(deleteReminder);
 
   return (
+    <View style={styles.reminderActions}>
+      <PressableScale
+        accessibilityRole="button"
+        disabled={disabled}
+        onPress={editReminder}
+        style={styles.reminderAction}
+        testID={`belief-reminder-edit-${statement.beliefSystemId}`}
+      >
+        <Text style={styles.reminderActionText}>
+          {reminder
+            ? <fbt desc="Edit Leitsatz reminder button">Edit reminder</fbt>
+            : <fbt desc="Create Leitsatz reminder button">Add reminder</fbt>}
+        </Text>
+      </PressableScale>
+      {reminder ? (
+        <PressableScale
+          accessibilityRole="button"
+          disabled={disabled}
+          onPress={toggleReminder}
+          style={styles.reminderAction}
+          testID={`belief-reminder-toggle-${statement.beliefSystemId}`}
+        >
+          <Text style={styles.reminderActionText}>
+            {reminder.enabled
+              ? <fbt desc="Disable Leitsatz reminder button">Turn off</fbt>
+              : <fbt desc="Enable Leitsatz reminder button">Turn on</fbt>}
+          </Text>
+        </PressableScale>
+      ) : null}
+      {reminder ? (
+        <PressableScale
+          accessibilityRole="button"
+          disabled={disabled}
+          onPress={confirmDeleteReminder}
+          style={styles.reminderAction}
+          testID={`belief-reminder-delete-${statement.beliefSystemId}`}
+        >
+          <Text style={styles.reminderDeleteText}>
+            <fbt desc="Delete Leitsatz reminder button">Remove</fbt>
+          </Text>
+        </PressableScale>
+      ) : null}
+    </View>
+  );
+}
+
+function BeliefLibraryReminderSection({
+  disabled,
+  reminder,
+  statement,
+}: {
+  disabled: boolean;
+  reminder: GuidingBeliefReminderAssignment | undefined;
+  statement: BeliefStatement;
+}) {
+  if (statement.guidingStatement === undefined && reminder === undefined) return null;
+
+  return (
+    <View style={styles.guidingCard}>
+      <Text style={styles.guidingLabel}>
+        <fbt desc="Label above a personal positive guiding belief in settings">
+          GUIDING BELIEF · SUPPORTIVE
+        </fbt>
+      </Text>
+      {statement.guidingStatement !== undefined ? (
+        <Text style={styles.guidingStatement}>{statement.guidingStatement}</Text>
+      ) : null}
+      <View style={styles.reminderHeader}>
+        <Text style={styles.reminderLabel}>
+          <fbt desc="Leitsatz reminder label in Leitsatz management">GENTLE REMINDER</fbt>
+        </Text>
+        <Text style={styles.reminderStatus}>{reminderStatusLabel(reminder)}</Text>
+      </View>
+      {reminder ? (
+        <Text style={styles.reminderCopy}>{reminderContentLabel(reminder)}</Text>
+      ) : null}
+      <BeliefLibraryReminderActions disabled={disabled} reminder={reminder} statement={statement} />
+    </View>
+  );
+}
+
+function BeliefLibraryRowActions({
+  disabled,
+  statement,
+}: {
+  disabled: boolean;
+  statement: BeliefStatement;
+}) {
+  const actor = useAppNavigationActor();
+  if (statement.kind !== 'custom') return null;
+  const edit = () => actor.send({
+    type: BELIEF_LIBRARY_EVENTS.EDIT_REQUESTED,
+    beliefSystemId: statement.beliefSystemId,
+  });
+  const remove = () => actor.send({
+    type: BELIEF_LIBRARY_EVENTS.REMOVE_REQUESTED,
+    beliefSystemId: statement.beliefSystemId,
+  });
+  const confirmRemove = () => confirmBeliefRemoval(remove);
+
+  return (
+    <View style={styles.rowActions}>
+      <PressableScale
+        accessibilityRole="button"
+        disabled={disabled}
+        onPress={edit}
+        style={styles.editButton}
+        testID={`edit-custom-belief-${statement.beliefSystemId}`}
+      >
+        <Text style={styles.editText}>
+          <fbt desc="Button editing a personal core belief">Edit</fbt>
+        </Text>
+      </PressableScale>
+      <PressableScale
+        accessibilityRole="button"
+        disabled={disabled}
+        onPress={confirmRemove}
+        style={styles.removeButton}
+        testID={`remove-custom-belief-${statement.beliefSystemId}`}
+      >
+        <Text style={styles.removeText}>
+          <fbt desc="Button removing a personal core belief">Remove</fbt>
+        </Text>
+      </PressableScale>
+    </View>
+  );
+}
+
+function BeliefLibraryRow({
+  disabled,
+  reminder,
+  statement,
+}: {
+  disabled: boolean;
+  reminder: GuidingBeliefReminderAssignment | undefined;
+  statement: BeliefStatement;
+}) {
+  return (
     <View style={styles.beliefCard} testID={`belief-library-row-${statement.beliefSystemId}`}>
       <Text style={styles.statementLabel}>
         <fbt desc="Label above a personal restrictive core belief in settings">
           CORE BELIEF · LIMITING
         </fbt>
       </Text>
-      <Text style={styles.harmfulStatement}>{statement.harmfulStatement}</Text>
-      {statement.guidingStatement ? (
-        <View style={styles.guidingCard}>
-          <Text style={styles.guidingLabel}>
-            <fbt desc="Label above a personal positive guiding belief in settings">
-              GUIDING BELIEF · SUPPORTIVE
-            </fbt>
-          </Text>
-          <Text style={styles.guidingStatement}>{statement.guidingStatement}</Text>
-          <View style={styles.reminderHeader}>
-            <Text style={styles.reminderLabel}>
-              <fbt desc="Leitsatz reminder label in Leitsatz management">GENTLE REMINDER</fbt>
-            </Text>
-            <Text style={styles.reminderStatus}>
-              {reminder?.enabled
-                ? <fbt desc="Active Leitsatz reminder status">Active</fbt>
-                : reminder
-                  ? <fbt desc="Disabled Leitsatz reminder status">Off</fbt>
-                  : <fbt desc="Missing Leitsatz reminder status">Not set</fbt>}
-            </Text>
-          </View>
-          {reminder ? (
-            <Text style={styles.reminderCopy}>
-              {reminder.notificationContent === REMINDER_NOTIFICATION_CONTENT.LEITSATZ
-                ? <fbt desc="Leitsatz visible notification content status">Shows this Leitsatz in the notification</fbt>
-                : <fbt desc="General notification content status">Uses a general notification message</fbt>}
-            </Text>
-          ) : null}
-          <View style={styles.reminderActions}>
-            <PressableScale
-              accessibilityRole="button"
-              disabled={disabled}
-              onPress={editReminder}
-              style={styles.reminderAction}
-              testID={`belief-reminder-edit-${statement.beliefSystemId}`}
-            >
-              <Text style={styles.reminderActionText}>
-                {reminder
-                  ? <fbt desc="Edit Leitsatz reminder button">Edit reminder</fbt>
-                  : <fbt desc="Create Leitsatz reminder button">Add reminder</fbt>}
-              </Text>
-            </PressableScale>
-            {reminder ? (
-              <PressableScale
-                accessibilityRole="button"
-                disabled={disabled}
-                onPress={toggleReminder}
-                style={styles.reminderAction}
-                testID={`belief-reminder-toggle-${statement.beliefSystemId}`}
-              >
-                <Text style={styles.reminderActionText}>
-                  {reminder.enabled
-                    ? <fbt desc="Disable Leitsatz reminder button">Turn off</fbt>
-                    : <fbt desc="Enable Leitsatz reminder button">Turn on</fbt>}
-                </Text>
-              </PressableScale>
-            ) : null}
-            {reminder ? (
-              <PressableScale
-                accessibilityRole="button"
-                disabled={disabled}
-                onPress={confirmDeleteReminder}
-                style={styles.reminderAction}
-                testID={`belief-reminder-delete-${statement.beliefSystemId}`}
-              >
-                <Text style={styles.reminderDeleteText}>
-                  <fbt desc="Delete Leitsatz reminder button">Remove</fbt>
-                </Text>
-              </PressableScale>
-            ) : null}
-          </View>
-        </View>
-      ) : null}
-      <View style={styles.rowActions}>
-        <PressableScale
-          accessibilityRole="button"
-          disabled={disabled}
-          onPress={edit}
-          style={styles.editButton}
-          testID={`edit-custom-belief-${statement.beliefSystemId}`}
-        >
-          <Text style={styles.editText}>
-            <fbt desc="Button editing a personal core belief">Edit</fbt>
-          </Text>
-        </PressableScale>
-        <PressableScale
-          accessibilityRole="button"
-          disabled={disabled}
-          onPress={confirmRemove}
-          style={styles.removeButton}
-          testID={`remove-custom-belief-${statement.beliefSystemId}`}
-        >
-          <Text style={styles.removeText}>
-            <fbt desc="Button removing a personal core belief">Remove</fbt>
-          </Text>
-        </PressableScale>
-      </View>
+      <Text style={styles.harmfulStatement}>
+        {beliefSystemText({ id: statement.beliefSystemId, statements: [statement] })}
+      </Text>
+      <BeliefLibraryReminderSection disabled={disabled} reminder={reminder} statement={statement} />
+      <BeliefLibraryRowActions disabled={disabled} statement={statement} />
     </View>
   );
 }
@@ -230,7 +283,10 @@ function BeliefLibraryRow({
 function BeliefLibraryList() {
   const actor = useAppNavigationActor();
   const snapshot = useSelector(actor, selectSnapshot);
-  const statements = activeCustomBeliefStatements(snapshot.context.beliefStatements);
+  const statements = guidingBeliefLibraryStatements({
+    assignments: snapshot.context.reminderAssignments,
+    statements: snapshot.context.beliefStatements,
+  });
   const retiring = snapshot.matches(BELIEF_LIBRARY_STATES.RETIRING);
   const create = () => actor.send({ type: BELIEF_LIBRARY_EVENTS.CREATE_REQUESTED });
 
@@ -244,14 +300,14 @@ function BeliefLibraryList() {
         >
           <LibraryBackButton />
           <Text style={styles.eyebrow}>
-            <fbt desc="Eyebrow above personal core-belief management">YOUR CORE BELIEFS</fbt>
+            <fbt desc="Eyebrow above guiding-belief management">YOUR GUIDING BELIEFS</fbt>
           </Text>
           <Text style={styles.title}>
-            <fbt desc="Title of personal core-belief management">Your own words.</fbt>
+            <fbt desc="Title of guiding-belief management">What supports you.</fbt>
           </Text>
           <Text style={styles.copy}>
-            <fbt desc="Explanation of personal core-belief management">
-              Create and edit your own beliefs, or remove them from future suggestions.
+            <fbt desc="Explanation of guiding-belief management including suggested beliefs">
+              Manage the gentle reminder for each guiding belief. Beliefs you wrote yourself can also be edited or removed.
             </fbt>
           </Text>
           {snapshot.context.error ? (
@@ -270,13 +326,13 @@ function BeliefLibraryList() {
           {statements.length === 0 ? (
             <View style={styles.emptyCard} testID="belief-library-empty">
               <Text style={styles.emptyTitle}>
-                <fbt desc="Title shown when no personal core beliefs exist">
-                  No personal core beliefs yet.
+                <fbt desc="Title shown when no guiding beliefs exist">
+                  No guiding beliefs yet.
                 </fbt>
               </Text>
               <Text style={styles.emptyCopy}>
-                <fbt desc="Explanation shown when no personal core beliefs exist">
-                  Create one here or during the optional core-belief step of a check-in.
+                <fbt desc="Explanation shown when no guiding beliefs exist">
+                  Add one here, or during the optional belief step of a check-in.
                 </fbt>
               </Text>
             </View>

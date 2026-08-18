@@ -660,7 +660,7 @@ export const appNavigationMachine = setup({
       [REMINDER_EVENTS.SETTINGS_REQUESTED]: EmptyEventSchema,
       [REMINDER_EVENTS.SETTINGS_RETURNED]: EmptyEventSchema,
       [REMINDER_EVENTS.TARGET_SELECTED]: Schema.standardSchemaV1(Schema.Struct({
-        beliefSystemId: CustomBeliefSystemId,
+        beliefSystemId: BeliefSystemId,
       })),
       [REMINDER_EVENTS.ASSIGNMENT_EDIT_REQUESTED]: Schema.standardSchemaV1(Schema.Struct({
         assignmentId: ReminderAssignmentId,

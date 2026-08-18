@@ -12,6 +12,18 @@ This directory is a committed `expo-map` result set refreshed after the Checklis
 
 `capture-status.json` is the source of truth for captures that need an active XState reflection context. Twenty-two flows cover route visits, the Settings feedback consent path, and reminder runtime variants. The focused-notification flow records its validated-notification prerequisite; context-dependent routes are deliberately retained as findings instead of being mislabeled as successful screens.
 
+## Pending refresh
+
+Guiding-belief management changed after this capture set, so `(tabs)/settings` and `belief-library` are marked `stale` in `capture-status.json`. The screenshots, `map.html`, and the dated `.appmap` bundle still show the previous behaviour:
+
+- Settings renames its PERSONALIZE entry to "Manage guiding belief", replaces its description, and counts every belief that has a guiding belief or a reminder.
+- The library lists suggested beliefs too, not only self-authored ones, and hides Edit/Remove for them while keeping their reminder controls.
+- The library eyebrow, title, explanation, and empty state were rewritten, because the previous copy described a screen that only held self-authored beliefs.
+
+The route graph is unaffected: no route file was added, moved, or removed, so `graph.json` still matches `src/app/`.
+
+Re-capture on an iOS simulator; none exists for Youmotion on this machine. A capture attempt on the Pixel 9 emulator could not persist a check-in, so the new library state could not be rendered there. That emulator still held the app data left by earlier failed migrations and was never cleared before the attempt, so the failure is not established as a native limitation.
+
 ## Review the map
 
 1. Use `map.html` for the self-contained visual contact sheet.

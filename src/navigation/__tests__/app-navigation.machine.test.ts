@@ -665,6 +665,41 @@ describe('app navigation model', () => {
     expect(mockRequestReminderPermission).not.toHaveBeenCalled();
   });
 
+  it('starts a reminder for a suggested belief selected from the library', async () => {
+    const actor = createActor(appNavigationMachine).start();
+    actor.send({
+      type: CHECK_IN_EVENTS.BELIEF_STATEMENTS_HYDRATED,
+      statements: [{
+        kind: 'built-in',
+        beliefSystemId: BELIEF_SYSTEM_IDS.ALWAYS_FUNCTIONING,
+        guidingStatement: 'I may pause and still be enough.',
+      }],
+    });
+    actor.send({ type: NAVIGATION_EVENTS.SETTINGS_OPENED });
+    actor.send({ type: BELIEF_LIBRARY_EVENTS.OPENED });
+    await waitFor(actor, (candidate) => candidate.matches(BELIEF_LIBRARY_STATES.LIBRARY));
+
+    mockGetReminderPermission.mockResolvedValue(REMINDER_PERMISSION_STATES.GRANTED);
+    actor.send({
+      type: REMINDER_EVENTS.TARGET_SELECTED,
+      beliefSystemId: BELIEF_SYSTEM_IDS.ALWAYS_FUNCTIONING,
+    });
+
+    const editor = await waitFor(
+      actor,
+      (candidate) => candidate.matches(REMINDER_STATES.EDITOR),
+      { timeout: 3_000 },
+    );
+    expect(editor.context).toMatchObject({
+      reminderTargetKind: REMINDER_TARGET_KINDS.GUIDING_BELIEF,
+      reminderTargetBeliefSystemId: BELIEF_SYSTEM_IDS.ALWAYS_FUNCTIONING,
+      reminderEntryPoint: REMINDER_ENTRY_POINTS.BELIEF_LIBRARY,
+    });
+
+    actor.send({ type: NAVIGATION_EVENTS.BACK_REQUESTED });
+    expect(actor.getSnapshot().matches(BELIEF_LIBRARY_STATES.LIBRARY)).toBe(true);
+  });
+
   it('returns every optional success-screen permission exit to the completed check-in', async () => {
     const actor = createActor(appNavigationMachine).start();
     await finishWithGuidingBelief({ actor });
