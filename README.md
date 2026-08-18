@@ -94,7 +94,7 @@ pnpm install
 pnpm start
 ```
 
-The repository pins pnpm 11.12.0 through the `packageManager` field and commits a pnpm lockfile. Do not generate npm or Yarn lockfiles.
+The repository pins pnpm 11.18.0 through the `packageManager` field and commits a pnpm lockfile. Do not generate npm or Yarn lockfiles.
 `pnpm start` targets the Youmotion development client and displays a QR code. Use `pnpm start:tunnel` when a physical device cannot reach the computer over the local network.
 
 Install a development client once on each physical device before scanning Metro QR codes. Android internal builds produce an installable APK. iOS device builds require an Apple Developer account and a registered device:
