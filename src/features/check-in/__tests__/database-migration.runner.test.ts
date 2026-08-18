@@ -3,6 +3,7 @@ import * as Effect from 'effect/Effect';
 import { DATABASE_MIGRATION_TABLE } from '@/constants';
 import { occurrenceTimeDatabaseMigration } from '../infrastructure/migrations/occurrence-time.database-migration';
 import { reminderTablesDatabaseMigration } from '../infrastructure/migrations/reminder-tables.database-migration';
+import { inlineReminderTimingDatabaseMigration } from '../infrastructure/migrations/inline-reminder-timing.database-migration';
 import { runDatabaseMigrations } from '../infrastructure/migrations/database-migration.runner';
 
 const query = jest.fn();
@@ -18,6 +19,7 @@ describe('database migration runner', () => {
       .mockResolvedValueOnce([{ statementIndex: 0, value: null }])
       .mockResolvedValueOnce([{ statementIndex: 0, value: [] }])
       .mockResolvedValueOnce([{ statementIndex: 0, value: null }])
+      .mockResolvedValueOnce([{ statementIndex: 0, value: null }])
       .mockResolvedValueOnce([{ statementIndex: 0, value: null }]);
 
     const applied = await Effect.runPromise(runDatabaseMigrations(database));
@@ -25,6 +27,7 @@ describe('database migration runner', () => {
     expect(applied).toEqual([
       occurrenceTimeDatabaseMigration.id,
       reminderTablesDatabaseMigration.id,
+      inlineReminderTimingDatabaseMigration.id,
     ]);
     expect(query).toHaveBeenNthCalledWith(
       1,
@@ -37,7 +40,7 @@ describe('database migration runner', () => {
     expect(query).toHaveBeenNthCalledWith(
       3,
       expect.stringMatching(
-        /BEGIN TRANSACTION;[\s\S]*UPDATE check_in[\s\S]*WHERE occurredAt = NONE;[\s\S]*UPSERT \$migrationRecord[\s\S]*COMMIT TRANSACTION;/,
+        /BEGIN TRANSACTION;[\s\S]*DEFINE TABLE IF NOT EXISTS check_in SCHEMALESS;[\s\S]*UPDATE check_in[\s\S]*WHERE occurredAt = NONE;[\s\S]*UPSERT \$migrationRecord[\s\S]*COMMIT TRANSACTION;/,
       ),
       expect.objectContaining({
         ledgerEntry: expect.objectContaining({
@@ -68,6 +71,19 @@ describe('database migration runner', () => {
         }),
       }),
     );
+    expect(query).toHaveBeenNthCalledWith(
+      5,
+      expect.stringMatching(
+        /BEGIN TRANSACTION;[\s\S]*FROM reminder_assignment[\s\S]*FROM reminder_schedule[\s\S]*THROW 'Cannot migrate reminder assignment without its reminder schedule'[\s\S]*notificationContent[\s\S]*UNSET scheduleId, showFullText[\s\S]*DELETE type::record\('reminder_schedule'[\s\S]*UPSERT \$migrationRecord[\s\S]*COMMIT TRANSACTION;/,
+      ),
+      expect.objectContaining({
+        ledgerEntry: expect.objectContaining({
+          migrationId: inlineReminderTimingDatabaseMigration.id,
+          description: inlineReminderTimingDatabaseMigration.description,
+          appliedAt: expect.any(String),
+        }),
+      }),
+    );
   });
 
   it('does not rerun a migration already recorded in the ledger', async () => {
@@ -78,6 +94,7 @@ describe('database migration runner', () => {
         value: [
           { migrationId: occurrenceTimeDatabaseMigration.id },
           { migrationId: reminderTablesDatabaseMigration.id },
+          { migrationId: inlineReminderTimingDatabaseMigration.id },
         ],
       }]);
 

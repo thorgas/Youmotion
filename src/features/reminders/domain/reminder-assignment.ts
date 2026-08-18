@@ -1,8 +1,11 @@
 import * as Schema from 'effect/Schema';
 
-import { REMINDER_TARGET_KINDS } from '@/constants';
+import {
+  REMINDER_NOTIFICATION_CONTENT,
+  REMINDER_TARGET_KINDS,
+} from '@/constants';
 import { BeliefSystemId } from '@/features/check-in/domain/belief-statement';
-import { ReminderScheduleId, ReminderScheduleTimestamp } from './reminder-schedule';
+import { ReminderTimingSchema } from './reminder-timing';
 
 export const ReminderAssignmentId = Schema.String.pipe(
   Schema.minLength(1),
@@ -10,26 +13,40 @@ export const ReminderAssignmentId = Schema.String.pipe(
 );
 export type ReminderAssignmentId = typeof ReminderAssignmentId.Type;
 
+export const ReminderTimestamp = Schema.String.pipe(
+  Schema.minLength(1),
+  Schema.brand('ReminderTimestamp'),
+);
+export type ReminderTimestamp = typeof ReminderTimestamp.Type;
+
 const ReminderAssignmentBase = {
   id: ReminderAssignmentId,
-  schemaVersion: Schema.Literal(1),
-  scheduleId: ReminderScheduleId,
+  schemaVersion: Schema.Literal(2),
+  ...ReminderTimingSchema.fields,
   enabled: Schema.Boolean,
-  createdAt: ReminderScheduleTimestamp,
-  updatedAt: ReminderScheduleTimestamp,
+  createdAt: ReminderTimestamp,
+  updatedAt: ReminderTimestamp,
 };
+
+export const ReminderNotificationContent = Schema.Literal(
+  ...Object.values(REMINDER_NOTIFICATION_CONTENT),
+);
+export type ReminderNotificationContent = typeof ReminderNotificationContent.Type;
 
 export const PulseReminderAssignmentSchema = Schema.Struct({
   ...ReminderAssignmentBase,
   targetKind: Schema.Literal(REMINDER_TARGET_KINDS.PULSE),
 });
+export type PulseReminderAssignment = typeof PulseReminderAssignmentSchema.Type;
 
 export const GuidingBeliefReminderAssignmentSchema = Schema.Struct({
   ...ReminderAssignmentBase,
   targetKind: Schema.Literal(REMINDER_TARGET_KINDS.GUIDING_BELIEF),
   beliefSystemId: BeliefSystemId,
-  showFullText: Schema.Boolean,
+  notificationContent: ReminderNotificationContent,
 });
+export type GuidingBeliefReminderAssignment =
+  typeof GuidingBeliefReminderAssignmentSchema.Type;
 
 export const ReminderAssignmentSchema = Schema.Union(
   PulseReminderAssignmentSchema,

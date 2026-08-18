@@ -244,23 +244,23 @@ export function SettingsScreen() {
         <View style={styles.actionGroup}>
           <SettingsActionRow
             description={String(fbs(
-              'Choose days and times for the Pulse or a positive Leitsatz.',
+              'Choose days and times for a gentle Pulse invitation.',
               'Reminder settings entry explanation',
             ))}
             onPress={_openReminders}
             testID="open-reminders"
-            title={String(fbs('Gentle reminders', 'Reminder settings entry title'))}
+            title={String(fbs('Pulse reminder', 'Pulse reminder settings entry title'))}
           />
           <SettingsActionRow
             count={personalBeliefCount}
             description={String(fbs(
-              'Edit or remove the core beliefs you wrote yourself.',
+              'Edit your Leitsätze and manage each Leitsatz reminder.',
               'Personal core-belief management setting explanation',
             ))}
             onPress={_openBeliefLibrary}
             testID="open-belief-library"
             title={String(fbs(
-              'Manage personal core beliefs',
+              'Manage Leitsätze',
               'Button opening personal core-belief management',
             ))}
           />

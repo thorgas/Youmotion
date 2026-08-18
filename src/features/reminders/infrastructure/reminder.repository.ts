@@ -4,7 +4,6 @@ import { SurrealRecordId } from 'react-native-surrealdb';
 
 import {
   REMINDER_ASSIGNMENT_TABLE,
-  REMINDER_SCHEDULE_TABLE,
   REMINDER_TARGET_KINDS,
 } from '@/constants';
 import { queryDatabase } from '@/features/check-in/infrastructure/surrealdb.database';
@@ -16,33 +15,26 @@ import {
   type ReminderAssignment,
   type ReminderAssignmentId,
 } from '../domain/reminder-assignment';
-import {
-  ReminderScheduleListSchema,
-  ReminderScheduleSchema,
-  type ReminderSchedule,
-  type ReminderScheduleId,
-} from '../domain/reminder-schedule';
 
 const SurrealNoneSchema = Schema.Struct({ kind: Schema.Literal('none') });
 const SurrealIntegerSchema = Schema.Union(Schema.Int, Schema.BigIntFromSelf);
-const ReminderScheduleDatabaseSchema = Schema.Struct({
-  ...ReminderScheduleSchema.fields,
-  schemaVersion: SurrealIntegerSchema,
+const ReminderTimingDatabaseFields = {
   weekdays: Schema.NonEmptyArray(SurrealIntegerSchema),
   times: Schema.NonEmptyArray(Schema.Struct({
     hour: SurrealIntegerSchema,
     minute: SurrealIntegerSchema,
   })),
-});
-const ReminderScheduleDatabaseListSchema = Schema.Array(ReminderScheduleDatabaseSchema);
+};
 const PulseReminderAssignmentDatabaseSchema = Schema.Struct({
   ...PulseReminderAssignmentSchema.fields,
+  ...ReminderTimingDatabaseFields,
   schemaVersion: SurrealIntegerSchema,
   beliefSystemId: Schema.optional(SurrealNoneSchema),
-  showFullText: Schema.optional(SurrealNoneSchema),
+  notificationContent: Schema.optional(SurrealNoneSchema),
 });
 const GuidingBeliefReminderAssignmentDatabaseSchema = Schema.Struct({
   ...GuidingBeliefReminderAssignmentSchema.fields,
+  ...ReminderTimingDatabaseFields,
   schemaVersion: SurrealIntegerSchema,
 });
 const ReminderAssignmentDatabaseListSchema = Schema.Array(Schema.Union(
@@ -50,28 +42,33 @@ const ReminderAssignmentDatabaseListSchema = Schema.Array(Schema.Union(
   GuidingBeliefReminderAssignmentDatabaseSchema,
 ));
 
-function reminderScheduleFromDatabase(
-  schedule: typeof ReminderScheduleDatabaseSchema.Type,
-) {
-  return {
-    ...schedule,
-    schemaVersion: Number(schedule.schemaVersion),
-    weekdays: schedule.weekdays.map(Number),
-    times: schedule.times.map(({ hour, minute }) => ({
+function reminderAssignmentFromDatabase(
+  assignment: typeof ReminderAssignmentDatabaseListSchema.Type[number],
+): object {
+  const timing = {
+    weekdays: assignment.weekdays.map(Number),
+    times: assignment.times.map(({ hour, minute }) => ({
       hour: Number(hour),
       minute: Number(minute),
     })),
   };
-}
-
-function reminderAssignmentFromDatabase(
-  assignment: typeof ReminderAssignmentDatabaseListSchema.Type[number],
-): object {
   if (assignment.targetKind === REMINDER_TARGET_KINDS.GUIDING_BELIEF) {
-    return { ...assignment, schemaVersion: Number(assignment.schemaVersion) };
+    return {
+      ...assignment,
+      ...timing,
+      schemaVersion: Number(assignment.schemaVersion),
+    };
   }
-  const { beliefSystemId: _beliefSystemId, showFullText: _showFullText, ...pulse } = assignment;
-  return { ...pulse, schemaVersion: Number(pulse.schemaVersion) };
+  const {
+    beliefSystemId: _beliefSystemId,
+    notificationContent: _notificationContent,
+    ...pulse
+  } = assignment;
+  return {
+    ...pulse,
+    ...timing,
+    schemaVersion: Number(pulse.schemaVersion),
+  };
 }
 
 export class ReminderStorageError extends Schema.TaggedError<ReminderStorageError>()(
@@ -102,30 +99,18 @@ function readTable(query: string) {
 }
 
 export const loadReminderData = Effect.gen(function*() {
-  const schedules = yield* readTable(
-    'SELECT scheduleId AS id, schemaVersion, name, weekdays, times, createdAt, updatedAt FROM reminder_schedule',
-  );
   const assignments = yield* readTable(
-    'SELECT assignmentId AS id, schemaVersion, scheduleId, targetKind, beliefSystemId, enabled, showFullText, createdAt, updatedAt FROM reminder_assignment',
+    'SELECT assignmentId AS id, schemaVersion, targetKind, beliefSystemId, enabled, weekdays, times, notificationContent, createdAt, updatedAt FROM reminder_assignment',
   );
-  return { schedules, assignments };
+  return assignments;
 }).pipe(
-  Effect.flatMap(({ schedules, assignments }) => Effect.all({
-    schedules: Schema.decodeUnknown(ReminderScheduleDatabaseListSchema)(
-      schedules[0]?.value ?? [],
-    ).pipe(
-      Effect.flatMap((decoded) => Schema.decodeUnknown(ReminderScheduleListSchema)(
-        decoded.map(reminderScheduleFromDatabase),
-      )),
-    ),
-    assignments: Schema.decodeUnknown(ReminderAssignmentDatabaseListSchema)(
-      assignments[0]?.value ?? [],
-    ).pipe(
-      Effect.flatMap((decoded) => Schema.decodeUnknown(ReminderAssignmentListSchema)(
-        decoded.map(reminderAssignmentFromDatabase),
-      )),
-    ),
-  })),
+  Effect.flatMap((assignments) => Schema.decodeUnknown(
+    ReminderAssignmentDatabaseListSchema,
+  )(assignments[0]?.value ?? []).pipe(
+    Effect.flatMap((decoded) => Schema.decodeUnknown(ReminderAssignmentListSchema)(
+      decoded.map(reminderAssignmentFromDatabase),
+    )),
+  )),
   Effect.mapError((cause) => (
     cause instanceof ReminderStorageError
       ? cause
@@ -157,24 +142,6 @@ function persistRecord({
   });
 }
 
-export const persistReminderSchedule = Effect.fn('ReminderRepository.persistSchedule')(
-  (schedule: ReminderSchedule) => Schema.encode(ReminderScheduleSchema)(schedule).pipe(
-    Effect.mapError((cause) => ReminderDataError.make({ operation: 'encode', cause })),
-    Effect.flatMap((encoded) => persistRecord({
-    encoded: {
-      scheduleId: encoded.id,
-      schemaVersion: encoded.schemaVersion,
-      name: encoded.name,
-      weekdays: encoded.weekdays,
-      times: encoded.times,
-      createdAt: encoded.createdAt,
-      updatedAt: encoded.updatedAt,
-    },
-    id: schedule.id,
-    table: REMINDER_SCHEDULE_TABLE,
-  }))),
-);
-
 export const persistReminderAssignment = Effect.fn('ReminderRepository.persistAssignment')(
   (assignment: ReminderAssignment) => Schema.encode(ReminderAssignmentSchema)(assignment).pipe(
     Effect.mapError((cause) => ReminderDataError.make({ operation: 'encode', cause })),
@@ -183,20 +150,22 @@ export const persistReminderAssignment = Effect.fn('ReminderRepository.persistAs
       ? {
           assignmentId: encoded.id,
           schemaVersion: encoded.schemaVersion,
-          scheduleId: encoded.scheduleId,
           targetKind: encoded.targetKind,
           enabled: encoded.enabled,
+          weekdays: encoded.weekdays,
+          times: encoded.times,
           createdAt: encoded.createdAt,
           updatedAt: encoded.updatedAt,
         }
       : {
           assignmentId: encoded.id,
           schemaVersion: encoded.schemaVersion,
-          scheduleId: encoded.scheduleId,
           targetKind: encoded.targetKind,
           beliefSystemId: encoded.beliefSystemId,
           enabled: encoded.enabled,
-          showFullText: encoded.showFullText,
+          weekdays: encoded.weekdays,
+          times: encoded.times,
+          notificationContent: encoded.notificationContent,
           createdAt: encoded.createdAt,
           updatedAt: encoded.updatedAt,
         },
@@ -214,10 +183,6 @@ function deleteRecord({ table, id }: { table: string; id: string }) {
     catch: (cause) => ReminderStorageError.make({ operation: 'delete', cause }),
   });
 }
-
-export const deleteReminderSchedule = Effect.fn('ReminderRepository.deleteSchedule')(
-  (id: ReminderScheduleId) => deleteRecord({ table: REMINDER_SCHEDULE_TABLE, id }),
-);
 
 export const deleteReminderAssignment = Effect.fn('ReminderRepository.deleteAssignment')(
   (id: ReminderAssignmentId) => deleteRecord({ table: REMINDER_ASSIGNMENT_TABLE, id }),

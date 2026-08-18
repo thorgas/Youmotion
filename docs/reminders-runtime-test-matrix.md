@@ -1,63 +1,72 @@
 # Local reminder runtime test matrix
 
-This matrix defines the user-visible contract for device-local Pulse and positive-Leitsatz reminders. A persisted reminder assignment is the source of truth. Native scheduled requests are a derived projection that reconciliation may safely rebuild.
+This matrix defines the device-local Pulse and positive-Leitsatz reminder contract. A persisted reminder assignment is the source of truth and owns its weekdays and times. A Leitsatz assignment additionally owns `notificationContent: "general" | "leitsatz"`. Native scheduled requests are a derived projection that reconciliation may safely rebuild.
 
 | Boundary | Starting condition | Input or transition | User-visible result |
 | --- | --- | --- | --- |
 | Module initialization | Notification response arrives before the navigation actor binds | Cold launch from a Youmotion reminder | One validated target is buffered, delivered once after binding, and opens the Pulse or positive Leitsatz destination |
-| Module initialization | Foreign, malformed, or repeated response | Cold or warm notification open | No navigation occurs for foreign/malformed data; a repeated fingerprint is ignored |
-| Focused notification | A Leitsatz notification is tapped before belief or reminder hydration finishes | Cold launch | The app stays on a loading focused-Leitsatz destination, then resolves the one assignment and never falls back to the full Leitsatz library |
-| Focused notification | Several supportive Leitsätze exist | User taps one Leitsatz reminder | Only that positive Leitsatz is shown; Back returns to Today and the surface remains available for later per-Leitsatz patterns or analytics |
-| Focused reminder edit | The tapped assignment and schedule have hydrated | User taps Edit reminder | Its owned days, times, name, and preview choice open directly without another permission prompt |
-| Permission | Undetermined | User accepts the explanatory screen | Native permission is requested before any schedule can be selected or persisted |
-| Permission | Denied or permanently denied | Permission check finishes | The saved Leitsatz remains intact, no assignment is created, and repair actions expose system settings and a recheck |
-| Permission | Granted | Permission check finishes | Existing schedules and the create-new choice become available |
-| Permission reuse | Granted before setup starts | User creates a second reminder or returns from native Settings | The permission explanation and native prompt are skipped; setup continues directly to scheduling |
-| Permission history | Granted, then revoked in iOS Settings | User starts reminder setup again | Current native status wins over the earlier grant; setup opens the denied repair path because iOS cannot show the system prompt again |
-| Permission history | Denied on Android | User starts reminder setup again | Youmotion asks again only while the native `canAskAgain` flag is true; otherwise setup opens the denied repair path |
-| Navigation history | Permission was granted and the schedule picker is visible | User presses Back | Setup exits to reminder Settings or the Leitsatz library without re-entering the permission explanation |
-| Persistence | Schedule and assignment storage succeed | User activates an existing or new schedule | The chosen values are copied into a schedule owned by that reminder; the assignment becomes active and native requests reconcile to every selected weekday/time |
-| Persistence | Schedule or assignment storage fails | User activates a schedule | Setup reports failure and does not claim success; no unpersisted assignment becomes the source of truth |
-| Hydration | Valid persisted schedules and assignments | App starts | Reminders appear in Settings; granted permission triggers idempotent native reconciliation |
-| Hydration concurrency | Realistic 133-entry redacted archive and empty reminder tables | App starts and all repositories hydrate | Shared embedded-database queries run one at a time; reminder Settings stays usable instead of losing a concurrent-client race |
-| Hydration query boundary | Schedules and assignments exist | Reminder Settings loads | The embedded client receives two serialized single-statement reads without an explicit undefined variables argument |
-| Hydration | Malformed reminder data | App starts | Reminder settings expose a load error while the rest of the journal remains usable |
-| Hydration recovery | A reminder read fails transiently | User taps Try again | The screen reloads the snapshot and replaces the error with the current reminder list |
-| Reminder target | Active custom supportive Leitsätze exist | User starts a new reminder from Settings | The user selects the exact positive Leitsatz to receive; emotions and restrictive Leidsätze are not offered |
-| Reminder target | No active custom supportive Leitsatz exists | User starts a new reminder from Settings | An explanatory empty state directs the user to create a supportive Leitsatz first |
-| Check-in completion | The saved emotion has a positive Leitsatz and reminder data loaded without an assignment for it | Success screen appears | The completed reflection stays primary and offers an optional reminder action for that exact Leitsatz |
-| Check-in completion | The positive Leitsatz already has an enabled or disabled assignment | Success screen appears | The reminder offer is omitted because a reminder is already attached |
-| Check-in completion | No positive Leitsatz exists, reminder hydration is pending, or reminder hydration failed | Success screen appears | No reminder offer is shown and Done remains available |
-| Success-origin permission | Permission is undetermined, granted, or denied | User chooses Plan reminder | Setup respectively explains and requests permission, skips directly to schedules, or opens the repair path without losing the completed check-in |
-| Success-origin navigation | Offer, denied repair, or schedule picker is visible | User presses Back or Not now | The app returns to “You arrived with yourself” with the saved emotion and Leitsatz intact |
-| Success-origin persistence | Existing or new schedule activation succeeds | User finishes reminder setup | The assignment is attached to the exact Leitsatz, setup returns to the completed check-in, and the offer no longer appears |
-| Required name | Reminder name is blank or whitespace | User reaches the schedule editor | Required guidance is visible and Create/Save stays disabled until a nonblank name is entered |
-| iOS time input | The native wheel picker is open | User scrolls the hour or minute wheel | The picker remains mounted during the gesture, the displayed value changes, and Done explicitly confirms it |
+| Module initialization | Foreign, malformed, or repeated response | Cold or warm notification open | No navigation occurs for foreign or malformed data; a repeated fingerprint is ignored |
+| Focused notification | A Leitsatz notification is tapped before hydration finishes | Cold launch | A loading focused-Leitsatz destination resolves that assignment and never falls back to the full library |
+| Focused reminder edit | The assignment has hydrated | User taps Edit reminder | Its own days, times, and notification-content choice open directly without another permission prompt |
+| Permission | Undetermined | User accepts the explanation | Native permission is requested before a reminder can be persisted |
+| Permission | Denied or permanently denied | Permission check finishes | The Leitsatz remains intact, no assignment is created, and repair actions expose system settings and a recheck |
+| Permission | Granted | Setup starts | The reminder editor opens directly |
+| Permission reuse | Granted before setup starts | User creates another reminder or returns from native Settings | The explanation and prompt are skipped; setup continues directly to the editor |
+| Navigation history | Reminder editor is visible | User presses Back | Setup returns to reminder settings, Leitsatz management, or the completed reflection that opened it |
+| Persistence | Assignment storage succeeds | User activates or edits a reminder | Weekdays, times, enablement, and content choice persist together; native requests reconcile for every selected weekday and time |
+| Persistence | Assignment storage fails | User activates or edits a reminder | Setup reports failure and does not claim an unpersisted reminder is active |
+| Hydration | Valid version-2 assignments exist | App starts | Reminders appear in their owning Pulse or Leitsatz surface; granted permission triggers idempotent reconciliation |
+| Hydration query boundary | Assignments exist | Reminder data loads | The embedded client receives one serialized assignment read without an explicit undefined variables argument |
+| Hydration | Malformed reminder data | App starts | Reminder surfaces expose a load error while the journal remains usable |
+| Hydration recovery | A reminder read fails transiently | User taps Try again | The app reloads and replaces the error with current assignments |
+| Pulse management | No Pulse assignment exists | User opens Pulse reminder from Settings | Create reminder opens an editor containing only Pulse timing controls |
+| Leitsatz management | A supportive custom Leitsatz exists | User opens Manage Leitsätze | Its card owns Add/Edit reminder, Turn on/off, and Remove actions plus timing/content summary |
+| Leitsatz independence | Two Leitsätze have equal initial timing | User edits one reminder | Only that assignment changes; the other keeps its own days and times |
+| Check-in completion | A saved reflection has a positive Leitsatz without an assignment | Success appears | The reflection stays primary and offers an optional reminder for that exact Leitsatz |
+| Check-in completion | The positive Leitsatz already has an assignment | Success appears | The reminder offer is omitted because that reminder is managed with the Leitsatz |
+| Post-flow content choice | Permission is granted after a reflection | User chooses Plan reminder | The editor immediately offers General message or Show Leitsatz together with days and times |
+| Post-flow navigation | Offer, denied repair, or editor is visible | User presses Back or Not now | The completed reflection remains intact |
+| iOS time input | Native wheel picker is open | User scrolls a wheel | The picker remains mounted, the displayed value changes, and Done confirms it |
+| Modal dismissal | A time picker or confirmed picker is open | User taps its backdrop | The modal closes without changing the confirmed value |
 | Native projection | Owned requests match fingerprints | Reconciliation runs | Matching requests remain; missing requests are added; obsolete or duplicate owned requests are canceled; foreign requests are untouched |
-| Native projection | Permission is denied | App starts or foregrounds | Reconciliation does not schedule notifications |
-| Content privacy | Positive Leitsatz assignment uses the default preview setting | Notification is delivered | Notification contains neutral copy and a stable identifier, never the restrictive Leidsatz or positive text |
-| Content privacy | User enables the full preview for one Leitsatz reminder | Notification is delivered | Only that reminder displays its positive Leitsatz; other reminders retain their own preview choices |
-| Content projection | A reminder changes between general and full preview | Native reconciliation runs | Its fingerprint changes, old native requests are replaced, and the new copy is used on every selected day and time |
-| Content lifecycle | Positive Leitsatz changes or is archived | App is running or next returns to foreground | Content fingerprint changes or target disappears, so stale native requests are replaced or canceled |
-| Schedule lifecycle | Assignment is turned off | User taps Turn off | Persisted assignment becomes disabled and all derived requests for it are canceled |
-| Reminder deletion | An active reminder exists | User taps Delete | A native confirmation offers Cancel and a destructive Delete action; Cancel preserves the reminder and its native requests |
-| Reminder deletion | The user confirms deletion | Assignment storage succeeds | Only that reminder disappears, its derived native requests are canceled, and an unused owned schedule is removed |
-| Legacy schedule deletion | Two assignments still reference one shared schedule | The user deletes one reminder | The selected assignment is removed while the shared schedule and other reminder remain intact |
-| Reminder deletion failure | The user confirms deletion | Assignment storage fails | The reminder remains visible and an error is shown instead of claiming that deletion succeeded |
-| Schedule ownership | Two reminders were created from the same schedule values | User edits one reminder | Only that reminder's owned copy changes; the other reminder keeps its existing days and times |
-| Legacy schedule ownership | Persisted assignments still reference one shared schedule | User edits one of them | A private copy is created for the edited reminder before native requests are reconciled |
-| Clock change | Locale, time zone, or UTC offset changes | App next starts or returns to foreground | Fingerprints change and weekly wall-clock requests are rebuilt for the current device context |
-| Process death | App is swiped away after scheduling | A selected day/time arrives | The operating system delivers the local notification without JavaScript or a backend running |
-| Reboot or app update | Active local requests exist | Android device reboots or the installed app is replaced | `expo-notifications` restores stored requests through its boot/update receiver; opening Youmotion reconciles them again |
+| Native projection | Permission is denied | App starts or foregrounds | Reconciliation schedules nothing |
+| Content privacy | Leitsatz assignment uses `general` | Notification is delivered | Neutral copy appears and neither restrictive belief nor Leitsatz is exposed on the lock screen |
+| Content privacy | Leitsatz assignment uses `leitsatz` | Notification is delivered | Only that reminder displays its positive Leitsatz; other reminders retain their choices |
+| Content projection | Content changes | Native reconciliation runs | The fingerprint changes, old requests are replaced, and new copy is used for every selected day/time |
+| Content lifecycle | Positive Leitsatz changes or is archived | App runs or foregrounds | Stale native requests are replaced or canceled |
+| Assignment lifecycle | Assignment is turned off | User taps Turn off | It becomes disabled and all derived requests are canceled |
+| Reminder deletion | An active reminder exists | User taps Remove | Native confirmation offers Cancel and destructive Remove; Cancel preserves assignment and requests |
+| Reminder deletion | User confirms removal | Storage succeeds | Only that assignment disappears and its derived requests are canceled |
+| Reminder deletion failure | User confirms removal | Storage fails | The reminder remains visible and an error appears |
+| Clock change | Locale, time zone, or UTC offset changes | App starts or foregrounds | Fingerprints change and weekly wall-clock requests rebuild |
+| Process death | App is swiped away after scheduling | Selected time arrives | The operating system delivers the local notification without JavaScript or a backend |
+| Reboot or update | Active local requests exist | Android reboots or app is replaced | `expo-notifications` restores requests; opening Youmotion reconciles them again |
+
+## Version-1 migration matrix
+
+| Persisted legacy state | Required version-2 result |
+| --- | --- |
+| No reminder assignments | Migration records success and leaves no assignments or schedule rows |
+| One assignment with a valid schedule row | It receives that row's weekdays/times and drops `scheduleId` |
+| Multiple assignments sharing one schedule row | Every assignment receives an independent timing copy before the legacy row is deleted |
+| Guiding assignment with `showFullText: true` | `notificationContent` becomes `leitsatz` |
+| Guiding assignment with `showFullText: false` | `notificationContent` becomes `general` |
+| Pulse assignment | It remains valid without `notificationContent` |
+| Missing legacy schedule row | Migration throws and records no partial version-2 assignment; verify with `pnpm test -- --runTestsByPath src/features/check-in/__tests__/database-migration.runner.test.ts` |
+| Malformed migrated data | Strict Effect Schema decoding fails closed and schedules nothing |
 
 ## Android device checks
 
 - Fresh install on Android 13 or newer: grant, deny, and permanent-denial repair.
-- Schedule two times on several weekdays; verify scheduled-request count and “Send test notification.”
-- Force-stop or swipe away the app, then verify a near-future local reminder fires.
+- Configure two times on several weekdays for one reminder; verify scheduled-request count and Send test notification.
+- Create two Leitsatz reminders with different times, edit one, and verify the other remains unchanged.
+- Complete a reflection with a Leitsatz and choose notification content before leaving the flow.
+- Open Manage Leitsätze and exercise Add/Edit, Turn on/off, and Remove reminder actions.
+- Open each modal, tap its backdrop, and verify it closes without applying an unconfirmed value.
+- Force-stop the app, then verify a near-future reminder fires.
 - Reboot and install an updated build, then verify reminders remain scheduled.
-- Change device locale, time zone, and clock offset; foreground the app and verify requests are rebuilt.
-- Tap Pulse and Leitsatz notifications from background and terminated states; verify the relevant action, not a generic landing screen.
-- Verify silent/default-importance copy contains neither streak pressure nor the restrictive Leidsatz.
+- Change locale, time zone, and clock offset; foreground and verify requests rebuild.
+- Tap Pulse and Leitsatz notifications from background and terminated states; verify the relevant destination.
+- Verify default copy contains neither streak pressure nor the restrictive belief.
 
-Exact-alarm special access is intentionally not requested. Expo uses exact alarms when Android permits them and falls back to an inexact idle-safe alarm otherwise, which avoids an inappropriate alarm-clock permission for a wellbeing reminder.
+Exact-alarm special access is intentionally not requested. Expo uses exact alarms when Android permits them and otherwise falls back to an inexact idle-safe alarm.

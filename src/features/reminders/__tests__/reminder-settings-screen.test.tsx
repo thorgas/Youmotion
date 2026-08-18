@@ -1,5 +1,4 @@
-import { act, fireEvent, render, screen } from '@testing-library/react-native';
-import { Alert } from 'react-native';
+import { fireEvent, render, screen } from '@testing-library/react-native';
 import { createActor, waitFor, type Actor } from 'xstate';
 
 import {
@@ -7,13 +6,11 @@ import {
   EMOTION_LABEL_MODES,
   NAVIGATION_EVENTS,
   REMINDER_EVENTS,
+  REMINDER_NOTIFICATION_CONTENT,
   REMINDER_STATES,
   REMINDER_TARGET_KINDS,
 } from '@/constants';
-import {
-  CustomBeliefSystemId,
-  type BeliefStatement,
-} from '@/features/check-in/domain/belief-statement';
+import { CustomBeliefSystemId } from '@/features/check-in/domain/belief-statement';
 import { appSettingsStore } from '@/features/settings/application/app-settings.store';
 import { configureAppLocale } from '@/localization/app-locale.configuration';
 import { appNavigationMachine } from '@/navigation/app-navigation.machine';
@@ -25,22 +22,13 @@ import {
 } from '@/test-utils/surrealdb.repository.mock';
 import {
   ReminderAssignmentId,
+  ReminderTimestamp,
   type ReminderAssignment,
 } from '../domain/reminder-assignment';
-import {
-  ReminderScheduleId,
-  ReminderScheduleTimestamp,
-  type ReminderSchedule,
-} from '../domain/reminder-schedule';
 import { ReminderSettingsScreen } from '../ui/reminder-settings-screen';
-import { LeitsatzReminderScreen } from '../ui/leitsatz-reminder-screen';
 
 jest.mock('expo-router', () => ({
-  router: {
-    dismissTo: jest.fn(),
-    push: jest.fn(),
-    replace: jest.fn(),
-  },
+  router: { dismissTo: jest.fn(), push: jest.fn(), replace: jest.fn() },
 }));
 
 jest.mock('@/features/check-in/infrastructure/surrealdb.database', () => ({
@@ -60,60 +48,30 @@ jest.mock('../infrastructure/local-reminder.scheduler', () => ({
   sendTestReminder: jest.fn(() => Promise.resolve(true)),
 }));
 
-const timestamp = ReminderScheduleTimestamp.make('2026-08-13T08:00:00.000Z');
-const scheduleId = ReminderScheduleId.make('gentle-rhythm');
-const firstBeliefSystemId = CustomBeliefSystemId.make('custom-support');
-const secondBeliefSystemId = CustomBeliefSystemId.make('custom-rest');
-const pulseAssignmentId = ReminderAssignmentId.make('pulse');
-const schedule = {
-  id: scheduleId,
-  schemaVersion: 1,
-  name: 'Sanfter Rhythmus',
-  weekdays: [2, 3, 4, 5, 6, 7],
-  times: [{ hour: 9, minute: 0 }, { hour: 18, minute: 0 }],
-  createdAt: timestamp,
-  updatedAt: timestamp,
-} satisfies ReminderSchedule;
-const statements = [{
-  kind: 'custom',
-  beliefSystemId: firstBeliefSystemId,
-  harmfulStatement: 'I must do everything alone.',
-  guidingStatement: 'I can ask for support.',
-}, {
-  kind: 'custom',
-  beliefSystemId: secondBeliefSystemId,
-  harmfulStatement: 'I must always keep going.',
-  guidingStatement: 'Rest belongs in my life.',
-}] satisfies readonly BeliefStatement[];
-const assignments = [{
-  id: pulseAssignmentId,
-  schemaVersion: 1,
-  scheduleId,
+const timestamp = ReminderTimestamp.make('2026-08-18T08:00:00.000Z');
+const beliefSystemId = CustomBeliefSystemId.make('custom-support');
+const pulse = {
+  id: ReminderAssignmentId.make('pulse'),
+  schemaVersion: 2,
   targetKind: REMINDER_TARGET_KINDS.PULSE,
   enabled: true,
+  weekdays: [2, 3, 4, 5, 6],
+  times: [{ hour: 9, minute: 0 }],
   createdAt: timestamp,
   updatedAt: timestamp,
-}, {
-  id: ReminderAssignmentId.make('support'),
-  schemaVersion: 1,
-  scheduleId,
+} satisfies ReminderAssignment;
+const leitsatz = {
+  id: ReminderAssignmentId.make('leitsatz'),
+  schemaVersion: 2,
   targetKind: REMINDER_TARGET_KINDS.GUIDING_BELIEF,
-  beliefSystemId: firstBeliefSystemId,
+  beliefSystemId,
   enabled: true,
-  showFullText: false,
+  weekdays: [7],
+  times: [{ hour: 18, minute: 0 }],
+  notificationContent: REMINDER_NOTIFICATION_CONTENT.LEITSATZ,
   createdAt: timestamp,
   updatedAt: timestamp,
-}, {
-  id: ReminderAssignmentId.make('rest'),
-  schemaVersion: 1,
-  scheduleId,
-  targetKind: REMINDER_TARGET_KINDS.GUIDING_BELIEF,
-  beliefSystemId: secondBeliefSystemId,
-  enabled: false,
-  showFullText: false,
-  createdAt: timestamp,
-  updatedAt: timestamp,
-}] satisfies readonly ReminderAssignment[];
+} satisfies ReminderAssignment;
 
 async function actorAtReminderSettings() {
   const actor = createActor(appNavigationMachine).start();
@@ -121,8 +79,7 @@ async function actorAtReminderSettings() {
   actor.send({ type: REMINDER_EVENTS.OPENED });
   await waitFor(actor, (snapshot) => (
     snapshot.matches(REMINDER_STATES.SETTINGS)
-    && snapshot.context.reminderSchedules.length === 1
-    && snapshot.context.beliefStatements.length === 2
+    && snapshot.context.reminderAssignments.length === 2
   ));
   return actor;
 }
@@ -135,167 +92,53 @@ async function renderSettings(actor: Actor<typeof appNavigationMachine>) {
   );
 }
 
-describe('reminder settings screen', () => {
+describe('Pulse reminder settings', () => {
   beforeAll(() => configureAppLocale(appSettingsStore));
-
-  afterEach(() => jest.restoreAllMocks());
 
   beforeEach(() => {
     resetSurrealDatabaseMock();
     mockSurrealQuery.mockImplementation((surql: string) => {
-      if (surql.includes('FROM reminder_schedule')) {
-        return Promise.resolve([{ statementIndex: 0, value: [schedule] }]);
-      }
       if (surql.includes('FROM reminder_assignment')) {
-        return Promise.resolve([{ statementIndex: 0, value: assignments }]);
-      }
-      if (surql.includes('FROM belief_statement')) {
-        return Promise.resolve([{ statementIndex: 0, value: statements }]);
-      }
-      if (surql.includes('SELECT locale, emotionLabelMode')) {
-        return Promise.resolve([{ statementIndex: 0, value: [{
-          locale: APP_LOCALES.GERMAN,
-          emotionLabelMode: EMOTION_LABEL_MODES.BOTH,
-          onboardingCompleted: true,
-        }] }]);
+        return Promise.resolve([{ statementIndex: 0, value: [pulse, leitsatz] }]);
       }
       return Promise.resolve([{ statementIndex: 0, value: [] }]);
     });
-    appSettingsStore.trigger.hydrated({
-      settings: {
-        locale: APP_LOCALES.GERMAN,
-        emotionLabelMode: EMOTION_LABEL_MODES.BOTH,
-        onboardingCompleted: true,
-      },
-    });
+    appSettingsStore.trigger.hydrated({ settings: {
+      locale: APP_LOCALES.ENGLISH,
+      emotionLabelMode: EMOTION_LABEL_MODES.BOTH,
+      onboardingCompleted: true,
+    } });
   });
 
-  it('names weekdays and identifies every scheduled reminder target', async () => {
-    const actor = await actorAtReminderSettings();
-    appSettingsStore.trigger.languageChanged({ locale: APP_LOCALES.GERMAN });
-    await renderSettings(actor);
-
-    expect(screen.getAllByText(
-      'Montag, Dienstag, Mittwoch, Donnerstag, Freitag, Samstag · 09:00, 18:00',
-    )).toHaveLength(3);
-    expect(screen.getByText('Bei dir einchecken')).toBeOnTheScreen();
-    expect(screen.getByText('“I can ask for support.”')).toBeOnTheScreen();
-    expect(screen.getByText('“Rest belongs in my life.”')).toBeOnTheScreen();
-  });
-
-  it('starts new reminders by choosing one of the custom supportive Leitsätze', async () => {
+  it('shows only Pulse timing because Leitsatz reminders live in Leitsatz management', async () => {
     const actor = await actorAtReminderSettings();
     await renderSettings(actor);
 
-    await fireEvent.press(screen.getByRole('button', { name: 'Leitsatz-Erinnerung erstellen' }));
-    expect(actor.getSnapshot().matches(REMINDER_STATES.TARGET_PICKER)).toBe(true);
-    expect(screen.queryByText('Gefühl auswählen')).not.toBeOnTheScreen();
-  });
-
-  it('opens the selected reminder schedule as a prefilled draft', async () => {
-    const actor = await actorAtReminderSettings();
-    await renderSettings(actor);
-
-    await fireEvent.press(screen.getByTestId('reminder-schedule-edit-pulse'));
-    expect(actor.getSnapshot().context).toMatchObject({
-      reminderAssignmentDraftId: assignments[0]?.id,
-      reminderScheduleNameDraft: schedule.name,
-      reminderWeekdaysDraft: schedule.weekdays,
-      reminderTimesDraft: schedule.times,
-    });
-  });
-
-  it('opens a Leitsatz reminder with its target and preview choice', async () => {
-    const actor = await actorAtReminderSettings();
-    const assignment = assignments[1];
-    if (!assignment || assignment.targetKind !== REMINDER_TARGET_KINDS.GUIDING_BELIEF) {
-      throw new Error('Expected the second fixture to be a Leitsatz reminder');
-    }
-
-    actor.send({
-      type: REMINDER_EVENTS.SCHEDULE_EDIT_REQUESTED,
-      assignmentId: assignment.id,
-    });
-
-    expect(actor.getSnapshot().context).toMatchObject({
-      reminderAssignmentDraftId: assignment.id,
-      reminderTargetKind: REMINDER_TARGET_KINDS.GUIDING_BELIEF,
-      reminderTargetBeliefSystemId: assignment.beliefSystemId,
-      reminderShowFullTextDraft: false,
-    });
-  });
-
-  it('saves a copied schedule for only the selected reminder', async () => {
-    const actor = await actorAtReminderSettings();
-    actor.send({
-      type: REMINDER_EVENTS.SCHEDULE_EDIT_REQUESTED,
-      assignmentId: pulseAssignmentId,
-    });
-    await render(
-      <AppNavigationActorProvider actor={actor}>
-        <LeitsatzReminderScreen />
-      </AppNavigationActorProvider>,
-    );
-    expect(screen.getByText('Diese Änderungen gelten nur für diese Erinnerung.'))
+    expect(screen.getByText('Check in with yourself')).toBeOnTheScreen();
+    expect(screen.getByText('Monday, Tuesday, Wednesday, Thursday, Friday · 09:00'))
       .toBeOnTheScreen();
-    await fireEvent.changeText(screen.getByLabelText('Name des Zeitplans'), 'Nur morgens');
-    await fireEvent.press(screen.getByRole('button', { name: 'Änderungen speichern' }));
-    await waitFor(actor, (snapshot) => snapshot.matches(REMINDER_STATES.SETTINGS));
-
-    const updated = actor.getSnapshot().context;
-    const pulseAssignment = updated.reminderAssignments.find(
-      (assignment) => assignment.id === assignments[0]?.id,
-    );
-    expect(pulseAssignment?.scheduleId).not.toBe(schedule.id);
-    expect(updated.reminderAssignments[1]?.scheduleId).toBe(schedule.id);
-    expect(updated.reminderAssignments[2]?.scheduleId).toBe(schedule.id);
-    expect(updated.reminderSchedules.find(
-      (candidate) => candidate.id === pulseAssignment?.scheduleId,
-    )?.name).toBe('Nur morgens');
+    expect(screen.queryByText('18:00')).not.toBeOnTheScreen();
   });
 
-  it('requires destructive confirmation before deleting only one reminder', async () => {
-    const alert = jest.spyOn(Alert, 'alert');
+  it('opens the Pulse reminder as an assignment-owned timing draft', async () => {
     const actor = await actorAtReminderSettings();
     await renderSettings(actor);
 
-    await fireEvent.press(screen.getByRole('button', {
-      name: 'Erinnerung löschen: “I can ask for support.”',
-    }));
-
-    expect(alert).toHaveBeenLastCalledWith(
-      'Diese Erinnerung löschen?',
-      'Die geplanten Mitteilungen werden beendet und diese Erinnerung wird dauerhaft von diesem Gerät entfernt.',
-      expect.any(Array),
-    );
-    expect(actor.getSnapshot().context.reminderAssignments).toHaveLength(3);
-    const buttons = alert.mock.calls[alert.mock.calls.length - 1]?.[2];
-    expect(buttons).toEqual([
-      expect.objectContaining({ text: 'Abbrechen', style: 'cancel' }),
-      expect.objectContaining({ text: 'Löschen', style: 'destructive' }),
-    ]);
-    await act(() => buttons?.[1]?.onPress?.());
-    await waitFor(actor, (snapshot) => snapshot.context.reminderAssignments.length === 2);
-
-    expect(actor.getSnapshot().context.reminderAssignments.some(
-      (assignment) => assignment.id === assignments[1]?.id,
-    )).toBe(false);
-    expect(actor.getSnapshot().context.reminderSchedules).toEqual([schedule]);
+    await fireEvent.press(screen.getByTestId('reminder-edit-pulse'));
+    expect(actor.getSnapshot().matches(REMINDER_STATES.EDITOR)).toBe(true);
+    expect(actor.getSnapshot().context).toMatchObject({
+      reminderAssignmentDraftId: pulse.id,
+      reminderWeekdaysDraft: pulse.weekdays,
+      reminderTimesDraft: pulse.times,
+    });
   });
 
-  it('keeps the reminder visible when its local deletion fails', async () => {
-    const alert = jest.spyOn(Alert, 'alert');
+  it('starts a new Pulse reminder without asking for a schedule name', async () => {
     const actor = await actorAtReminderSettings();
     await renderSettings(actor);
-    mockSurrealQuery.mockRejectedValueOnce(new Error('storage unavailable'));
 
-    await fireEvent.press(screen.getByTestId('reminder-assignment-delete-support'));
-    const buttons = alert.mock.calls[alert.mock.calls.length - 1]?.[2];
-    await act(() => buttons?.[1]?.onPress?.());
-    await waitFor(actor, (snapshot) => snapshot.context.reminderError !== null);
-
-    expect(actor.getSnapshot().context.reminderAssignments).toHaveLength(3);
-    expect(screen.getByText('Deine Änderung an der Erinnerung konnte nicht gespeichert werden.'))
-      .toBeOnTheScreen();
+    await fireEvent.press(screen.getByTestId('reminder-settings-new'));
+    await waitFor(actor, (snapshot) => snapshot.matches(REMINDER_STATES.EDITOR));
+    expect(actor.getSnapshot().context.reminderTargetKind).toBe(REMINDER_TARGET_KINDS.PULSE);
   });
 });

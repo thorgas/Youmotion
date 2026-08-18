@@ -4,6 +4,33 @@ This file records source-of-truth examples and continuity rules for this repo.
 
 ## Active Patterns
 
+### Pattern: leitsatz-owned-reminder-configuration
+
+- **Status:** active
+- **Scope:** `src/features/reminders/**`, `src/features/settings/ui/belief-library-screen.tsx`, `src/navigation/app-navigation.machine.ts`
+- **Enforcement:** changed-files
+- **Default check:** changed-files
+- **Source of truth:**
+  - `src/features/reminders/domain/reminder-assignment.ts` - one assignment owns its timing and notification content.
+  - `src/features/reminders/ui/leitsatz-reminder-screen.tsx` - configures timing and content immediately after a Leitsatz or from Leitsatz management.
+  - `src/features/settings/ui/belief-library-screen.tsx` - exposes each Leitsatz reminder's status and actions beside that Leitsatz.
+- **Applies to:**
+  - Gentle reminders attached to one Leitsatz.
+- **Do not apply to:**
+  - Pulse reminder configuration, which remains a general setting.
+- **Rule summary:** A Leitsatz reminder is an assignment with private timing and content preferences, not a reference to a named reusable schedule. Create and manage it in the Leitsatz flow; keep Settings focused on the general Pulse reminder.
+- **Required shape:**
+  - Persist weekdays, local times, and notification content on the reminder assignment.
+  - Offer general or full-Leitsatz notification content when the assignment is first configured and when it is edited.
+  - Manage assignment status, timing, content, and removal from the owning Leitsatz card.
+- **Violation signals:**
+  - A schedule picker or schedule name is introduced for Leitsatz reminders.
+  - Leitsatz reminder management is available only from the general Settings reminder screen.
+- **CI behavior:** Fail changed Leitsatz reminder flows that reintroduce shared schedule ownership.
+- **Fix strategy:** Move timing and content into the assignment boundary and project its actions through Leitsatz management.
+- **Open questions:**
+  - None.
+
 ### Pattern: destructive-action-confirmation
 
 - **Status:** active

@@ -26,6 +26,7 @@ import {
   MAX_NOTE_LENGTH,
   MOMENT_TIME_PICKER_MODES,
   REMINDER_EVENTS,
+  REMINDER_NOTIFICATION_CONTENT,
   REMINDER_STATES,
   REMINDER_TARGET_KINDS,
 } from '@/constants';
@@ -71,12 +72,9 @@ import {
 import { palette } from '../ui/theme';
 import {
   ReminderAssignmentId,
+  ReminderTimestamp,
   type ReminderAssignment,
 } from '@/features/reminders/domain/reminder-assignment';
-import {
-  ReminderScheduleId,
-  ReminderScheduleTimestamp,
-} from '@/features/reminders/domain/reminder-schedule';
 
 let mockActor: Actor<typeof appNavigationMachine>;
 
@@ -162,7 +160,6 @@ const _finishWithGuidingBelief = async ({
   });
   mockActor.send({
     type: REMINDER_EVENTS.HYDRATED,
-    schedules: [],
     assignments,
   });
   _reachReflection();
@@ -1215,6 +1212,7 @@ describe('check-in screens', () => {
     await fireEvent.press(library.getByTestId('belief-library-editor-cancel'));
     expect(library.getByText('LEIDSATZ · EINENGEND')).toBeTruthy();
     expect(library.getByText('LEITSATZ · UNTERSTÜTZEND')).toBeTruthy();
+    expect(library.getByTestId(/belief-reminder-edit-/)).toBeTruthy();
     await fireEvent.press(library.getByText('Bearbeiten'));
     expect(library.getByTestId('belief-library-editor-cancel').props['accessibilityLabel']).toBe(
       'Zurück',
@@ -1490,15 +1488,16 @@ describe('check-in screens', () => {
   });
 
   it('does not repeat the offer when the completed Leitsatz already has a reminder', async () => {
-    const timestamp = ReminderScheduleTimestamp.make('2026-08-13T09:00:00.000Z');
+    const timestamp = ReminderTimestamp.make('2026-08-13T09:00:00.000Z');
     await _finishWithGuidingBelief({
       assignments: [{
         id: ReminderAssignmentId.make('existing-success-reminder'),
-        schemaVersion: 1,
-        scheduleId: ReminderScheduleId.make('existing-success-schedule'),
+        schemaVersion: 2,
         targetKind: REMINDER_TARGET_KINDS.GUIDING_BELIEF,
         beliefSystemId: BELIEF_SYSTEM_IDS.ALWAYS_FUNCTIONING,
-        showFullText: false,
+        weekdays: [2, 3, 4, 5, 6],
+        times: [{ hour: 9, minute: 0 }],
+        notificationContent: REMINDER_NOTIFICATION_CONTENT.GENERAL,
         enabled: false,
         createdAt: timestamp,
         updatedAt: timestamp,
@@ -1541,7 +1540,7 @@ describe('check-in screens', () => {
     await act(() => mockActor.send({ type: NAVIGATION_EVENTS.SETTINGS_OPENED }));
 
     const settings = await _renderLocalized(<SettingsScreen />);
-    expect(settings.getByText('Manage personal core beliefs')).toBeTruthy();
+    expect(settings.getByText('Manage Leitsätze')).toBeTruthy();
     expect(settings.getByText('1')).toBeTruthy();
     await fireEvent.press(settings.getByTestId('open-belief-library'));
     expect(mockActor.getSnapshot().matches(BELIEF_LIBRARY_STATES.LIBRARY)).toBe(true);

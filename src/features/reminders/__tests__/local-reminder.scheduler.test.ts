@@ -4,6 +4,7 @@ import { Platform } from 'react-native';
 
 import {
   REMINDER_NOTIFICATION_CHANNEL_ID,
+  REMINDER_NOTIFICATION_CONTENT,
   REMINDER_NOTIFICATION_OWNER,
   REMINDER_TARGET_KINDS,
 } from '@/constants';
@@ -13,13 +14,9 @@ import {
 } from '@/features/check-in/domain/belief-statement';
 import {
   ReminderAssignmentId,
+  ReminderTimestamp,
   type ReminderAssignment,
 } from '../domain/reminder-assignment';
-import {
-  ReminderScheduleId,
-  ReminderScheduleTimestamp,
-  type ReminderSchedule,
-} from '../domain/reminder-schedule';
 import {
   requestReminderPermission,
   reconcileReminderNotifications,
@@ -47,25 +44,17 @@ jest.mock('expo-notifications', () => ({
 }));
 
 const mockedNotifications = jest.mocked(Notifications);
-const now = ReminderScheduleTimestamp.make('2026-08-13T12:00:00.000Z');
+const now = ReminderTimestamp.make('2026-08-13T12:00:00.000Z');
 const beliefSystemId = CustomBeliefSystemId.make('custom-support');
-const schedule = {
-  id: ReminderScheduleId.make('weekday'),
-  schemaVersion: 1,
-  name: 'Weekdays',
-  weekdays: [2, 4],
-  times: [{ hour: 9, minute: 0 }, { hour: 20, minute: 0 }],
-  createdAt: now,
-  updatedAt: now,
-} satisfies ReminderSchedule;
 const assignment = {
   id: ReminderAssignmentId.make('positive'),
-  schemaVersion: 1,
-  scheduleId: schedule.id,
+  schemaVersion: 2,
   targetKind: REMINDER_TARGET_KINDS.GUIDING_BELIEF,
   beliefSystemId,
   enabled: true,
-  showFullText: false,
+  weekdays: [2, 4],
+  times: [{ hour: 9, minute: 0 }, { hour: 20, minute: 0 }],
+  notificationContent: REMINDER_NOTIFICATION_CONTENT.GENERAL,
   createdAt: now,
   updatedAt: now,
 } satisfies ReminderAssignment;
@@ -147,7 +136,6 @@ describe('local reminder scheduler', () => {
     await reconcileReminderNotifications({
       assignments: [assignment],
       locale: 'en-US',
-      schedules: [schedule],
       statements,
     });
 
@@ -164,7 +152,6 @@ describe('local reminder scheduler', () => {
     await reconcileReminderNotifications({
       assignments: [assignment],
       locale: 'en-US',
-      schedules: [schedule],
       statements,
     });
     const matchingFingerprint = mockedNotifications.scheduleNotificationAsync
@@ -214,7 +201,6 @@ describe('local reminder scheduler', () => {
     await reconcileReminderNotifications({
       assignments: [assignment],
       locale: 'en-US',
-      schedules: [schedule],
       statements,
     });
 
@@ -226,7 +212,10 @@ describe('local reminder scheduler', () => {
 
   it('can show the positive Leitsatz only when full previews are explicitly enabled', async () => {
     await sendTestReminder({
-      assignment: { ...assignment, showFullText: true },
+      assignment: {
+        ...assignment,
+        notificationContent: REMINDER_NOTIFICATION_CONTENT.LEITSATZ,
+      },
       locale: 'en-US',
       statements,
     });
@@ -249,7 +238,6 @@ describe('local reminder scheduler', () => {
     await reconcileReminderNotifications({
       assignments: [assignment],
       locale: 'en-US',
-      schedules: [schedule],
       statements,
     });
     const generalFingerprint = mockedNotifications.scheduleNotificationAsync
@@ -270,9 +258,11 @@ describe('local reminder scheduler', () => {
     }]);
 
     await reconcileReminderNotifications({
-      assignments: [{ ...assignment, showFullText: true }],
+      assignments: [{
+        ...assignment,
+        notificationContent: REMINDER_NOTIFICATION_CONTENT.LEITSATZ,
+      }],
       locale: 'en-US',
-      schedules: [schedule],
       statements,
     });
 

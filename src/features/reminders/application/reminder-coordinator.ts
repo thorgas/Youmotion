@@ -1,8 +1,6 @@
 import * as Effect from 'effect/Effect';
 
-import {
-  REMINDER_TARGET_KINDS,
-} from '@/constants';
+import { REMINDER_TARGET_KINDS } from '@/constants';
 import type {
   BeliefStatement,
   BeliefSystemId,
@@ -10,18 +8,17 @@ import type {
 import type { AppLocale } from '@/features/settings/domain/app-locale';
 import {
   createReminderAssignmentId,
+  ReminderTimestamp,
   type ReminderAssignment,
+  type ReminderNotificationContent,
 } from '../domain/reminder-assignment';
 import {
-  createReminderScheduleId,
-  ReminderScheduleTimestamp,
-  type ReminderSchedule,
-} from '../domain/reminder-schedule';
+  normalizedReminderTiming,
+  type ReminderTiming,
+} from '../domain/reminder-timing';
 import {
   deleteReminderAssignment,
-  deleteReminderSchedule,
   persistReminderAssignment,
-  persistReminderSchedule,
 } from '../infrastructure/reminder.repository';
 import { reconcileReminderNotifications } from '../infrastructure/local-reminder.scheduler';
 
@@ -35,30 +32,20 @@ export type ReminderTarget =
 export async function activateReminder({
   assignments,
   locale,
-  schedule,
-  schedules,
-  showFullText,
+  notificationContent,
   statements,
   target,
+  timing,
 }: {
   assignments: readonly ReminderAssignment[];
   locale: AppLocale;
-  schedule: ReminderSchedule;
-  schedules: readonly ReminderSchedule[];
-  showFullText: boolean;
+  notificationContent: ReminderNotificationContent;
   statements: readonly BeliefStatement[];
   target: ReminderTarget;
+  timing: ReminderTiming;
 }) {
-  const now = ReminderScheduleTimestamp.make(new Date().toISOString());
-  const ownedSchedule: ReminderSchedule = {
-    ...schedule,
-    id: createReminderScheduleId({
-      timestamp: Date.now(),
-      nonce: Math.random().toString(16).slice(2),
-    }),
-    createdAt: now,
-    updatedAt: now,
-  };
+  const now = ReminderTimestamp.make(new Date().toISOString());
+  const normalizedTiming = normalizedReminderTiming(timing);
   const existing = assignments.find((candidate) => (
     candidate.targetKind === target.targetKind
     && (
@@ -72,8 +59,8 @@ export async function activateReminder({
   const assignment: ReminderAssignment = target.targetKind === REMINDER_TARGET_KINDS.PULSE
     ? {
         id: existing?.id ?? createReminderAssignmentId({ timestamp: Date.now(), nonce: Math.random().toString(16).slice(2) }),
-        schemaVersion: 1,
-        scheduleId: ownedSchedule.id,
+        schemaVersion: 2,
+        ...normalizedTiming,
         targetKind: target.targetKind,
         enabled: true,
         createdAt: existing?.createdAt ?? now,
@@ -81,18 +68,16 @@ export async function activateReminder({
       }
     : {
         id: existing?.id ?? createReminderAssignmentId({ timestamp: Date.now(), nonce: Math.random().toString(16).slice(2) }),
-        schemaVersion: 1,
-        scheduleId: ownedSchedule.id,
+        schemaVersion: 2,
+        ...normalizedTiming,
         targetKind: target.targetKind,
         beliefSystemId: target.beliefSystemId,
         enabled: true,
-        showFullText,
+        notificationContent,
         createdAt: existing?.createdAt ?? now,
         updatedAt: now,
       };
-  await Effect.runPromise(persistReminderSchedule(ownedSchedule));
   await Effect.runPromise(persistReminderAssignment(assignment));
-  const nextSchedules = [...schedules, ownedSchedule];
   const nextAssignments = assignments
     .filter((candidate) => (
       candidate.targetKind !== target.targetKind
@@ -106,76 +91,47 @@ export async function activateReminder({
   await reconcileReminderNotifications({
     assignments: nextAssignments,
     locale,
-    schedules: nextSchedules,
     statements,
   });
-  return { assignment, schedules: nextSchedules, assignments: nextAssignments };
+  return { assignment, assignments: nextAssignments };
 }
 
-export async function updateReminderSchedule({
+export async function updateReminder({
   assignment,
   assignments,
   locale,
-  schedule,
-  schedules,
-  showFullText,
+  notificationContent,
   statements,
+  timing,
 }: {
   assignment: ReminderAssignment;
   assignments: readonly ReminderAssignment[];
   locale: AppLocale;
-  schedule: ReminderSchedule;
-  schedules: readonly ReminderSchedule[];
-  showFullText: boolean;
+  notificationContent: ReminderNotificationContent;
   statements: readonly BeliefStatement[];
+  timing: ReminderTiming;
 }) {
-  const now = ReminderScheduleTimestamp.make(new Date().toISOString());
-  const shared = assignments.some((candidate) => (
-    candidate.id !== assignment.id && candidate.scheduleId === assignment.scheduleId
-  ));
-  const updatedSchedule: ReminderSchedule = shared
-    ? {
-        ...schedule,
-        id: createReminderScheduleId({
-          timestamp: Date.now(),
-          nonce: Math.random().toString(16).slice(2),
-        }),
-        createdAt: now,
-        updatedAt: now,
-      }
-    : schedule;
-  const previewChanged = assignment.targetKind === REMINDER_TARGET_KINDS.GUIDING_BELIEF
-    && assignment.showFullText !== showFullText;
+  const now = ReminderTimestamp.make(new Date().toISOString());
+  const normalizedTiming = normalizedReminderTiming(timing);
   const updatedAssignment: ReminderAssignment = assignment.targetKind
     === REMINDER_TARGET_KINDS.GUIDING_BELIEF
     ? {
         ...assignment,
-        scheduleId: updatedSchedule.id,
-        showFullText,
-        updatedAt: shared || previewChanged ? now : assignment.updatedAt,
+        ...normalizedTiming,
+        notificationContent,
+        updatedAt: now,
       }
-    : shared
-      ? { ...assignment, scheduleId: updatedSchedule.id, updatedAt: now }
-      : assignment;
-  await Effect.runPromise(persistReminderSchedule(updatedSchedule));
-  if (shared || previewChanged) {
-    await Effect.runPromise(persistReminderAssignment(updatedAssignment));
-  }
-  const nextSchedules = shared
-    ? [...schedules, updatedSchedule]
-    : schedules.map((candidate) => (
-        candidate.id === updatedSchedule.id ? updatedSchedule : candidate
-      ));
+    : { ...assignment, ...normalizedTiming, updatedAt: now };
+  await Effect.runPromise(persistReminderAssignment(updatedAssignment));
   const nextAssignments = assignments.map((candidate) => (
     candidate.id === updatedAssignment.id ? updatedAssignment : candidate
   ));
   await reconcileReminderNotifications({
     assignments: nextAssignments,
     locale,
-    schedules: nextSchedules,
     statements,
   });
-  return { assignments: nextAssignments, schedules: nextSchedules };
+  return nextAssignments;
 }
 
 export function assignmentForTarget({
@@ -196,20 +152,18 @@ export async function setReminderAssignmentEnabled({
   assignments,
   enabled,
   locale,
-  schedules,
   statements,
 }: {
   assignment: ReminderAssignment;
   assignments: readonly ReminderAssignment[];
   enabled: boolean;
   locale: AppLocale;
-  schedules: readonly ReminderSchedule[];
   statements: readonly BeliefStatement[];
 }) {
   const updated: ReminderAssignment = {
     ...assignment,
     enabled,
-    updatedAt: ReminderScheduleTimestamp.make(new Date().toISOString()),
+    updatedAt: ReminderTimestamp.make(new Date().toISOString()),
   };
   await Effect.runPromise(persistReminderAssignment(updated));
   const nextAssignments = assignments.map((candidate) => (
@@ -218,7 +172,6 @@ export async function setReminderAssignmentEnabled({
   await reconcileReminderNotifications({
     assignments: nextAssignments,
     locale,
-    schedules,
     statements,
   });
   return nextAssignments;
@@ -228,31 +181,19 @@ export async function deleteReminder({
   assignment,
   assignments,
   locale,
-  schedules,
   statements,
 }: {
   assignment: ReminderAssignment;
   assignments: readonly ReminderAssignment[];
   locale: AppLocale;
-  schedules: readonly ReminderSchedule[];
   statements: readonly BeliefStatement[];
 }) {
   const nextAssignments = assignments.filter((candidate) => candidate.id !== assignment.id);
-  const scheduleStillUsed = nextAssignments.some(
-    (candidate) => candidate.scheduleId === assignment.scheduleId,
-  );
-  const nextSchedules = scheduleStillUsed
-    ? schedules
-    : schedules.filter((schedule) => schedule.id !== assignment.scheduleId);
   await Effect.runPromise(deleteReminderAssignment(assignment.id));
-  if (!scheduleStillUsed) {
-    await Effect.runPromise(deleteReminderSchedule(assignment.scheduleId));
-  }
   await reconcileReminderNotifications({
     assignments: nextAssignments,
     locale,
-    schedules: nextSchedules,
     statements,
   });
-  return { assignments: nextAssignments, schedules: nextSchedules };
+  return nextAssignments;
 }

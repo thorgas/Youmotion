@@ -18,6 +18,9 @@ import {
   BELIEF_LIBRARY_STATES,
   MAX_BELIEF_STATEMENT_LENGTH,
   REFLECTION_KEYBOARD_BOTTOM_OFFSET,
+  REMINDER_EVENTS,
+  REMINDER_NOTIFICATION_CONTENT,
+  REMINDER_TARGET_KINDS,
 } from '@/constants';
 import {
   activeCustomBeliefStatements,
@@ -32,12 +35,32 @@ import {
 import { GuidingBeliefWritingHelp } from '@/features/check-in/ui/guiding-belief-writing-help';
 import { PersonalBeliefCreateButton } from '@/features/check-in/ui/personal-belief-create-button';
 import { actionColors, palette, type } from '@/features/check-in/ui/theme';
+import type {
+  GuidingBeliefReminderAssignment,
+  ReminderAssignment,
+} from '@/features/reminders/domain/reminder-assignment';
+import { confirmReminderDeletion } from '@/features/reminders/ui/reminder-deletion';
 import { useAppNavigationActor } from '@/navigation/app-navigation.provider';
 import { confirmBeliefRemoval } from './belief-library-removal';
 
 const selectSnapshot = (
   snapshot: ReturnType<ReturnType<typeof useAppNavigationActor>['getSnapshot']>,
 ) => snapshot;
+
+function guidingBeliefReminderForStatement({
+  assignments,
+  beliefSystemId,
+}: {
+  assignments: readonly ReminderAssignment[];
+  beliefSystemId: CustomBeliefStatement['beliefSystemId'];
+}): GuidingBeliefReminderAssignment | undefined {
+  return assignments.find(
+    (assignment): assignment is GuidingBeliefReminderAssignment => (
+      assignment.targetKind === REMINDER_TARGET_KINDS.GUIDING_BELIEF
+      && assignment.beliefSystemId === beliefSystemId
+    ),
+  );
+}
 
 function LibraryBackButton() {
   const actor = useAppNavigationActor();
@@ -54,9 +77,11 @@ function LibraryBackButton() {
 
 function BeliefLibraryRow({
   disabled,
+  reminder,
   statement,
 }: {
   disabled: boolean;
+  reminder: GuidingBeliefReminderAssignment | undefined;
   statement: CustomBeliefStatement;
 }) {
   const actor = useAppNavigationActor();
@@ -69,6 +94,30 @@ function BeliefLibraryRow({
     beliefSystemId: statement.beliefSystemId,
   });
   const confirmRemove = () => confirmBeliefRemoval(remove);
+  const editReminder = () => actor.send(reminder
+    ? {
+        type: REMINDER_EVENTS.ASSIGNMENT_EDIT_REQUESTED,
+        assignmentId: reminder.id,
+      }
+    : {
+        type: REMINDER_EVENTS.TARGET_SELECTED,
+        beliefSystemId: statement.beliefSystemId,
+      });
+  const toggleReminder = () => {
+    if (!reminder) return;
+    actor.send({
+      type: REMINDER_EVENTS.ASSIGNMENT_TOGGLED,
+      assignmentId: reminder.id,
+    });
+  };
+  const deleteReminder = () => {
+    if (!reminder) return;
+    actor.send({
+      type: REMINDER_EVENTS.ASSIGNMENT_DELETE_REQUESTED,
+      assignmentId: reminder.id,
+    });
+  };
+  const confirmDeleteReminder = () => confirmReminderDeletion(deleteReminder);
 
   return (
     <View style={styles.beliefCard} testID={`belief-library-row-${statement.beliefSystemId}`}>
@@ -86,6 +135,68 @@ function BeliefLibraryRow({
             </fbt>
           </Text>
           <Text style={styles.guidingStatement}>{statement.guidingStatement}</Text>
+          <View style={styles.reminderHeader}>
+            <Text style={styles.reminderLabel}>
+              <fbt desc="Leitsatz reminder label in Leitsatz management">GENTLE REMINDER</fbt>
+            </Text>
+            <Text style={styles.reminderStatus}>
+              {reminder?.enabled
+                ? <fbt desc="Active Leitsatz reminder status">Active</fbt>
+                : reminder
+                  ? <fbt desc="Disabled Leitsatz reminder status">Off</fbt>
+                  : <fbt desc="Missing Leitsatz reminder status">Not set</fbt>}
+            </Text>
+          </View>
+          {reminder ? (
+            <Text style={styles.reminderCopy}>
+              {reminder.notificationContent === REMINDER_NOTIFICATION_CONTENT.LEITSATZ
+                ? <fbt desc="Leitsatz visible notification content status">Shows this Leitsatz in the notification</fbt>
+                : <fbt desc="General notification content status">Uses a general notification message</fbt>}
+            </Text>
+          ) : null}
+          <View style={styles.reminderActions}>
+            <PressableScale
+              accessibilityRole="button"
+              disabled={disabled}
+              onPress={editReminder}
+              style={styles.reminderAction}
+              testID={`belief-reminder-edit-${statement.beliefSystemId}`}
+            >
+              <Text style={styles.reminderActionText}>
+                {reminder
+                  ? <fbt desc="Edit Leitsatz reminder button">Edit reminder</fbt>
+                  : <fbt desc="Create Leitsatz reminder button">Add reminder</fbt>}
+              </Text>
+            </PressableScale>
+            {reminder ? (
+              <PressableScale
+                accessibilityRole="button"
+                disabled={disabled}
+                onPress={toggleReminder}
+                style={styles.reminderAction}
+                testID={`belief-reminder-toggle-${statement.beliefSystemId}`}
+              >
+                <Text style={styles.reminderActionText}>
+                  {reminder.enabled
+                    ? <fbt desc="Disable Leitsatz reminder button">Turn off</fbt>
+                    : <fbt desc="Enable Leitsatz reminder button">Turn on</fbt>}
+                </Text>
+              </PressableScale>
+            ) : null}
+            {reminder ? (
+              <PressableScale
+                accessibilityRole="button"
+                disabled={disabled}
+                onPress={confirmDeleteReminder}
+                style={styles.reminderAction}
+                testID={`belief-reminder-delete-${statement.beliefSystemId}`}
+              >
+                <Text style={styles.reminderDeleteText}>
+                  <fbt desc="Delete Leitsatz reminder button">Remove</fbt>
+                </Text>
+              </PressableScale>
+            ) : null}
+          </View>
         </View>
       ) : null}
       <View style={styles.rowActions}>
@@ -175,6 +286,10 @@ function BeliefLibraryList() {
                 <BeliefLibraryRow
                   disabled={retiring}
                   key={statement.beliefSystemId}
+                  reminder={guidingBeliefReminderForStatement({
+                    assignments: snapshot.context.reminderAssignments,
+                    beliefSystemId: statement.beliefSystemId,
+                  })}
                   statement={statement}
                 />
               ))}
@@ -409,6 +524,41 @@ const styles = StyleSheet.create({
     lineHeight: 24,
     marginTop: 5,
   },
+  reminderHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: 12,
+    marginTop: 18,
+    paddingTop: 14,
+    borderTopWidth: 1,
+    borderTopColor: palette.hairline,
+  },
+  reminderLabel: {
+    fontFamily: type.semibold,
+    color: palette.inkMuted,
+    fontSize: 10,
+    letterSpacing: 1.1,
+  },
+  reminderStatus: { fontFamily: type.semibold, color: palette.moss, fontSize: 13 },
+  reminderCopy: {
+    fontFamily: type.regular,
+    color: palette.inkMuted,
+    fontSize: 13,
+    lineHeight: 19,
+    marginTop: 6,
+  },
+  reminderActions: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: 12 },
+  reminderAction: {
+    minHeight: 40,
+    justifyContent: 'center',
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: palette.hairline,
+    paddingHorizontal: 12,
+  },
+  reminderActionText: { fontFamily: type.semibold, color: palette.ink, fontSize: 13 },
+  reminderDeleteText: { fontFamily: type.semibold, color: palette.danger, fontSize: 13 },
   rowActions: { flexDirection: 'row', gap: 10, marginTop: 18 },
   editButton: {
     minHeight: 44,

@@ -4,13 +4,13 @@ import { Platform } from 'react-native';
 import {
   APP_LOCALES,
   REMINDER_NOTIFICATION_CHANNEL_ID,
+  REMINDER_NOTIFICATION_CONTENT,
   REMINDER_NOTIFICATION_OWNER,
   REMINDER_PERMISSION_STATES,
   REMINDER_TARGET_KINDS,
 } from '@/constants';
 import type { BeliefStatement } from '@/features/check-in/domain/belief-statement';
 import type { ReminderAssignment } from '../domain/reminder-assignment';
-import type { ReminderSchedule } from '../domain/reminder-schedule';
 
 export type ReminderPermissionState = typeof REMINDER_PERMISSION_STATES[
   keyof typeof REMINDER_PERMISSION_STATES
@@ -130,7 +130,7 @@ function notificationContent({
     title: locale === APP_LOCALES.GERMAN
       ? 'Dein Leitsatz ist für dich da'
       : 'Your Leitsatz is here for you',
-    body: assignment.showFullText
+    body: assignment.notificationContent === REMINDER_NOTIFICATION_CONTENT.LEITSATZ
       ? guidingStatement
       : locale === APP_LOCALES.GERMAN
         ? 'Öffne Youmotion, wenn es sich richtig anfühlt.'
@@ -151,7 +151,6 @@ function textFingerprint(value: string) {
 
 function fingerprint({
   assignment,
-  schedule,
   weekday,
   hour,
   minute,
@@ -160,7 +159,6 @@ function fingerprint({
   timeZone,
 }: {
   assignment: ReminderAssignment;
-  schedule: ReminderSchedule;
   weekday: number;
   hour: number;
   minute: number;
@@ -172,11 +170,11 @@ function fingerprint({
     ? assignment.beliefSystemId
     : '-';
   const contentIdentity = assignment.targetKind === REMINDER_TARGET_KINDS.GUIDING_BELIEF
-    ? `${assignment.showFullText ? 'full' : 'general'}-${textFingerprint(
+    ? `${assignment.notificationContent}-${textFingerprint(
         statementForAssignment({ assignment, statements }) ?? '',
       )}`
     : '-';
-  return [assignment.id, schedule.id, assignment.targetKind, belief, contentIdentity, weekday, hour, minute, locale, timeZone, 1]
+  return [assignment.id, assignment.targetKind, belief, contentIdentity, weekday, hour, minute, locale, timeZone, 2]
     .join(':');
 }
 
@@ -188,20 +186,17 @@ type ExpectedNotification = {
 function expectedNotificationsForAssignment({
   assignment,
   locale,
-  schedule,
   statements,
   timeZone,
 }: {
   assignment: ReminderAssignment;
   locale: string;
-  schedule: ReminderSchedule;
   statements: readonly BeliefStatement[];
   timeZone: string;
 }) {
-  return schedule.weekdays.flatMap((weekday) => schedule.times.flatMap((time) => {
+  return assignment.weekdays.flatMap((weekday) => assignment.times.flatMap((time) => {
     const key = fingerprint({
       assignment,
-      schedule,
       weekday,
       hour: time.hour,
       minute: time.minute,
@@ -233,26 +228,22 @@ function expectedNotificationsForAssignment({
 function expectedNotifications({
   assignments,
   locale,
-  schedules,
   statements,
   timeZone,
 }: {
   assignments: readonly ReminderAssignment[];
   locale: string;
-  schedules: readonly ReminderSchedule[];
   statements: readonly BeliefStatement[];
   timeZone: string;
 }) {
   const entries = assignments.flatMap((assignment) => {
     if (!assignment.enabled) return [];
-    const schedule = schedules.find((candidate) => candidate.id === assignment.scheduleId);
-    return schedule ? expectedNotificationsForAssignment({
+    return expectedNotificationsForAssignment({
       assignment,
       locale,
-      schedule,
       statements,
       timeZone,
-    }) : [];
+    });
   });
   return new Map<string, ExpectedNotification>(entries);
 }
@@ -286,12 +277,10 @@ function reconcileActions({
 export async function reconcileReminderNotifications({
   assignments,
   locale,
-  schedules,
   statements,
 }: {
   assignments: readonly ReminderAssignment[];
   locale: string;
-  schedules: readonly ReminderSchedule[];
   statements: readonly BeliefStatement[];
 }) {
   await ensureReminderChannel();
@@ -299,7 +288,6 @@ export async function reconcileReminderNotifications({
   const expected = expectedNotifications({
     assignments,
     locale,
-    schedules,
     statements,
     timeZone,
   });

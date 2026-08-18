@@ -275,6 +275,11 @@ export const REMINDER_TARGET_KINDS = Object.freeze({
   GUIDING_BELIEF: literal('guidingBelief'),
 });
 
+export const REMINDER_NOTIFICATION_CONTENT = Object.freeze({
+  GENERAL: literal('general'),
+  LEITSATZ: literal('leitsatz'),
+});
+
 export const REMINDER_PERMISSION_STATES = Object.freeze({
   UNDETERMINED: literal('undetermined'),
   GRANTED: literal('granted'),
@@ -301,11 +306,9 @@ export const REMINDER_EVENTS = Object.freeze({
   SETTINGS_REQUESTED: literal('reminder.settingsRequested'),
   SETTINGS_RETURNED: literal('reminder.settingsReturned'),
   TARGET_SELECTED: literal('reminder.targetSelected'),
-  SCHEDULE_SELECTED: literal('reminder.scheduleSelected'),
-  SCHEDULE_EDIT_REQUESTED: literal('reminder.scheduleEditRequested'),
-  NEW_SCHEDULE_REQUESTED: literal('reminder.newScheduleRequested'),
-  SCHEDULE_NAME_CHANGED: literal('reminder.scheduleNameChanged'),
-  PREVIEW_CHANGED: literal('reminder.previewChanged'),
+  ASSIGNMENT_EDIT_REQUESTED: literal('reminder.assignmentEditRequested'),
+  CREATE_REQUESTED: literal('reminder.createRequested'),
+  CONTENT_CHANGED: literal('reminder.contentChanged'),
   WEEKDAY_TOGGLED: literal('reminder.weekdayToggled'),
   TIME_SHIFTED: literal('reminder.timeShifted'),
   TIME_PICKER_REQUESTED: literal('reminder.timePickerRequested'),
@@ -313,9 +316,8 @@ export const REMINDER_EVENTS = Object.freeze({
   TIME_CHANGED: literal('reminder.timeChanged'),
   TIME_ADDED: literal('reminder.timeAdded'),
   TIME_REMOVED: literal('reminder.timeRemoved'),
-  SCHEDULE_SAVE_REQUESTED: literal('reminder.scheduleSaveRequested'),
-  SCHEDULE_SAVED: literal('reminder.scheduleSaved'),
-  SCHEDULE_UPDATED: literal('reminder.scheduleUpdated'),
+  SAVE_REQUESTED: literal('reminder.saveRequested'),
+  SAVED: literal('reminder.saved'),
   ASSIGNMENT_TOGGLED: literal('reminder.assignmentToggled'),
   ASSIGNMENT_UPDATED: literal('reminder.assignmentUpdated'),
   ASSIGNMENT_DELETE_REQUESTED: literal('reminder.assignmentDeleteRequested'),
@@ -331,14 +333,12 @@ export const REMINDER_EVENTS = Object.freeze({
 
 export const REMINDER_STATES = Object.freeze({
   SETTINGS: literal('reminderSettings'),
-  TARGET_PICKER: literal('reminderTargetPicker'),
   CHECKING_PERMISSION: literal('checkingReminderPermission'),
   OFFER: literal('leitsatzReminderOffer'),
   REQUESTING_PERMISSION: literal('requestingReminderPermission'),
   PERMISSION_DENIED: literal('reminderPermissionDenied'),
-  SCHEDULE_PICKER: literal('reminderSchedulePicker'),
-  SCHEDULE_EDITOR: literal('reminderScheduleEditor'),
-  SAVING: literal('savingReminderSchedule'),
+  EDITOR: literal('reminderEditor'),
+  SAVING: literal('savingReminder'),
   ACTIVE: literal('leitsatzReminderActive'),
   GUIDING_BELIEF: literal('reminderGuidingBelief'),
 });

@@ -21,6 +21,7 @@ import {
   ONBOARDING_STATES,
   REMINDER_EVENTS,
   REMINDER_ENTRY_POINTS,
+  REMINDER_NOTIFICATION_CONTENT,
   REMINDER_PERMISSION_STATES,
   REMINDER_STATES,
   REMINDER_TARGET_KINDS,
@@ -56,12 +57,8 @@ import * as reminderScheduler from '@/features/reminders/infrastructure/local-re
 import {
   ReminderAssignmentId,
   ReminderAssignmentSchema,
+  ReminderTimestamp,
 } from '@/features/reminders/domain/reminder-assignment';
-import {
-  ReminderScheduleId,
-  ReminderScheduleSchema,
-  ReminderScheduleTimestamp,
-} from '@/features/reminders/domain/reminder-schedule';
 
 jest.mock('@/features/check-in/infrastructure/surrealdb.database', () => ({
   getDatabase: jest.fn(() => Promise.resolve(mockSurrealDatabase)),
@@ -163,11 +160,9 @@ async function finishWithoutBeliefSystem(actor: Actor<typeof appNavigationMachin
 async function finishWithGuidingBelief({
   actor,
   assignments = [],
-  schedules = [],
 }: {
   actor: Actor<typeof appNavigationMachine>;
   assignments?: readonly typeof ReminderAssignmentSchema.Type[];
-  schedules?: readonly typeof ReminderScheduleSchema.Type[];
 }) {
   await waitFor(
     actor,
@@ -183,7 +178,7 @@ async function finishWithGuidingBelief({
       guidingStatement: 'I may pause and still be enough.',
     }],
   });
-  actor.send({ type: REMINDER_EVENTS.HYDRATED, assignments, schedules });
+  actor.send({ type: REMINDER_EVENTS.HYDRATED, assignments });
   actor.send({ type: CHECK_IN_EVENTS.TOUCH_STARTED });
   actor.send({ type: CHECK_IN_EVENTS.SELECTION_CHANGED, selection });
   actor.send({ type: CHECK_IN_EVENTS.SELECTION_RELEASED });
@@ -565,7 +560,7 @@ describe('app navigation model', () => {
     actor.send({ type: REMINDER_EVENTS.OFFER_ACCEPTED });
     await waitFor(
       actor,
-      (candidate) => candidate.matches(REMINDER_STATES.SCHEDULE_PICKER),
+      (candidate) => candidate.matches(REMINDER_STATES.EDITOR),
       { timeout: 3_000 },
     );
     actor.send({ type: NAVIGATION_EVENTS.BACK_REQUESTED });
@@ -615,9 +610,8 @@ describe('app navigation model', () => {
       { timeout: 1_000 },
     );
     expect(mockRequestReminderPermission).toHaveBeenCalledTimes(1);
-    expect(denied.context.reminderSchedules).toEqual([]);
     expect(denied.context.reminderAssignments).toEqual([]);
-    expect(denied.can({ type: REMINDER_EVENTS.SCHEDULE_SAVE_REQUESTED })).toBe(false);
+    expect(denied.can({ type: REMINDER_EVENTS.SAVE_REQUESTED })).toBe(false);
   });
 
   it('skips the offer after a grant and rechecks permission after a later denial', async () => {
@@ -635,26 +629,24 @@ describe('app navigation model', () => {
     actor.send({ type: NAVIGATION_EVENTS.SETTINGS_OPENED });
     actor.send({ type: REMINDER_EVENTS.OPENED });
     await waitFor(actor, (candidate) => candidate.matches(REMINDER_STATES.SETTINGS));
+    actor.send({ type: NAVIGATION_EVENTS.BACK_REQUESTED });
+    actor.send({ type: BELIEF_LIBRARY_EVENTS.OPENED });
+    await waitFor(actor, (candidate) => candidate.matches(BELIEF_LIBRARY_STATES.LIBRARY));
 
     mockGetReminderPermission.mockResolvedValue(REMINDER_PERMISSION_STATES.GRANTED);
-    actor.send({ type: REMINDER_EVENTS.NEW_SCHEDULE_REQUESTED });
-    expect(actor.getSnapshot().matches(REMINDER_STATES.TARGET_PICKER)).toBe(true);
     actor.send({ type: REMINDER_EVENTS.TARGET_SELECTED, beliefSystemId });
 
     await waitFor(
       actor,
-      (candidate) => candidate.matches(REMINDER_STATES.SCHEDULE_PICKER),
+      (candidate) => candidate.matches(REMINDER_STATES.EDITOR),
       { timeout: 3_000 },
     );
     expect(mockRequestReminderPermission).not.toHaveBeenCalled();
     actor.send({ type: NAVIGATION_EVENTS.BACK_REQUESTED });
-    expect(actor.getSnapshot().matches(REMINDER_STATES.TARGET_PICKER)).toBe(true);
-    actor.send({ type: NAVIGATION_EVENTS.BACK_REQUESTED });
-    expect(actor.getSnapshot().matches(REMINDER_STATES.SETTINGS)).toBe(true);
+    expect(actor.getSnapshot().matches(BELIEF_LIBRARY_STATES.LIBRARY)).toBe(true);
     expect(actor.getSnapshot().matches(REMINDER_STATES.OFFER)).toBe(false);
 
     mockGetReminderPermission.mockResolvedValue(REMINDER_PERMISSION_STATES.DENIED);
-    actor.send({ type: REMINDER_EVENTS.NEW_SCHEDULE_REQUESTED });
     actor.send({ type: REMINDER_EVENTS.TARGET_SELECTED, beliefSystemId });
     await waitFor(
       actor,
@@ -665,7 +657,7 @@ describe('app navigation model', () => {
     actor.send({ type: REMINDER_EVENTS.SETTINGS_RETURNED });
     await waitFor(
       actor,
-      (candidate) => candidate.matches(REMINDER_STATES.SCHEDULE_PICKER),
+      (candidate) => candidate.matches(REMINDER_STATES.EDITOR),
       { timeout: 3_000 },
     );
 
@@ -704,36 +696,14 @@ describe('app navigation model', () => {
     );
   });
 
-  it('returns to success after activating an existing schedule for its Leitsatz', async () => {
+  it('returns to success after activating assignment-owned timing for its Leitsatz', async () => {
     mockGetReminderPermission.mockResolvedValue(REMINDER_PERMISSION_STATES.GRANTED);
-    const timestamp = ReminderScheduleTimestamp.make('2026-08-13T09:00:00.000Z');
-    const schedule = ReminderScheduleSchema.make({
-      id: ReminderScheduleId.make('success-existing-schedule'),
-      schemaVersion: 1,
-      name: 'Quiet morning',
-      weekdays: [2, 3, 4, 5, 6],
-      times: [{ hour: 9, minute: 0 }],
-      createdAt: timestamp,
-      updatedAt: timestamp,
-    });
     const actor = createActor(appNavigationMachine).start();
-    await finishWithGuidingBelief({
-      actor,
-      schedules: [schedule],
-      assignments: [{
-        id: ReminderAssignmentId.make('success-pulse-assignment'),
-        schemaVersion: 1,
-        scheduleId: schedule.id,
-        targetKind: REMINDER_TARGET_KINDS.PULSE,
-        enabled: true,
-        createdAt: timestamp,
-        updatedAt: timestamp,
-      }],
-    });
+    await finishWithGuidingBelief({ actor });
 
     actor.send({ type: REMINDER_EVENTS.SUCCESS_OFFER_ACCEPTED });
-    await waitFor(actor, (candidate) => candidate.matches(REMINDER_STATES.SCHEDULE_PICKER));
-    actor.send({ type: REMINDER_EVENTS.SCHEDULE_SELECTED, scheduleId: schedule.id });
+    await waitFor(actor, (candidate) => candidate.matches(REMINDER_STATES.EDITOR));
+    actor.send({ type: REMINDER_EVENTS.SAVE_REQUESTED });
     const active = await waitFor(
       actor,
       (candidate) => candidate.matches(REMINDER_STATES.ACTIVE),
@@ -799,28 +769,19 @@ describe('app navigation model', () => {
   it('edits the tapped reminder directly without requesting permission again', () => {
     const actor = createActor(appNavigationMachine).start();
     const assignmentId = ReminderAssignmentId.make('editable-notification-assignment');
-    const scheduleId = ReminderScheduleId.make('editable-notification-schedule');
     const beliefSystemId = CustomBeliefSystemId.make('custom-editable-notification-belief');
-    const timestamp = ReminderScheduleTimestamp.make('2026-08-13T18:00:00.000Z');
+    const timestamp = ReminderTimestamp.make('2026-08-13T18:00:00.000Z');
     actor.send({
       type: REMINDER_EVENTS.HYDRATED,
-      schedules: [{
-        id: scheduleId,
-        schemaVersion: 1,
-        name: 'Quiet evening',
-        weekdays: [2, 4],
-        times: [{ hour: 20, minute: 0 }],
-        createdAt: timestamp,
-        updatedAt: timestamp,
-      }],
       assignments: [{
         id: assignmentId,
-        schemaVersion: 1,
-        scheduleId,
+        schemaVersion: 2,
         targetKind: REMINDER_TARGET_KINDS.GUIDING_BELIEF,
         beliefSystemId,
         enabled: true,
-        showFullText: true,
+        weekdays: [2, 4],
+        times: [{ hour: 20, minute: 0 }],
+        notificationContent: REMINDER_NOTIFICATION_CONTENT.LEITSATZ,
         createdAt: timestamp,
         updatedAt: timestamp,
       }],
@@ -833,10 +794,9 @@ describe('app navigation model', () => {
     });
     actor.send({ type: REMINDER_EVENTS.EDIT_REQUESTED });
 
-    expect(actor.getSnapshot().matches(REMINDER_STATES.SCHEDULE_EDITOR)).toBe(true);
+    expect(actor.getSnapshot().matches(REMINDER_STATES.EDITOR)).toBe(true);
     expect(actor.getSnapshot().context).toMatchObject({
-      reminderScheduleNameDraft: 'Quiet evening',
-      reminderShowFullTextDraft: true,
+      reminderNotificationContentDraft: REMINDER_NOTIFICATION_CONTENT.LEITSATZ,
       reminderWeekdaysDraft: [2, 4],
       reminderTimesDraft: [{ hour: 20, minute: 0 }],
     });

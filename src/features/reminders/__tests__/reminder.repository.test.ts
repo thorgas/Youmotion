@@ -1,6 +1,9 @@
 import * as Effect from 'effect/Effect';
 
-import { REMINDER_TARGET_KINDS } from '@/constants';
+import {
+  REMINDER_NOTIFICATION_CONTENT,
+  REMINDER_TARGET_KINDS,
+} from '@/constants';
 import { CustomBeliefSystemId } from '@/features/check-in/domain/belief-statement';
 import {
   failNextSurrealUpsert,
@@ -10,17 +13,12 @@ import {
 } from '@/test-utils/surrealdb.repository.mock';
 import {
   ReminderAssignmentId,
+  ReminderTimestamp,
   type ReminderAssignment,
 } from '../domain/reminder-assignment';
 import {
-  ReminderScheduleId,
-  ReminderScheduleTimestamp,
-  type ReminderSchedule,
-} from '../domain/reminder-schedule';
-import {
   loadReminderData,
   persistReminderAssignment,
-  persistReminderSchedule,
 } from '../infrastructure/reminder.repository';
 
 jest.mock('@/features/check-in/infrastructure/surrealdb.database', () => ({
@@ -33,33 +31,26 @@ jest.mock('@/features/check-in/infrastructure/surrealdb.database', () => ({
     : mockSurrealDatabase.query(surql, variables)),
 }));
 
-const timestamp = ReminderScheduleTimestamp.make('2026-08-13T12:00:00.000Z');
-const schedule = {
-  id: ReminderScheduleId.make('schedule-weekday'),
-  schemaVersion: 1,
-  name: 'Unter der Woche',
-  weekdays: [2, 3, 4, 5, 6],
-  times: [{ hour: 9, minute: 0 }],
-  createdAt: timestamp,
-  updatedAt: timestamp,
-} satisfies ReminderSchedule;
+const timestamp = ReminderTimestamp.make('2026-08-18T12:00:00.000Z');
 const assignment = {
   id: ReminderAssignmentId.make('assignment-leitsatz'),
-  schemaVersion: 1,
-  scheduleId: schedule.id,
+  schemaVersion: 2,
   targetKind: REMINDER_TARGET_KINDS.GUIDING_BELIEF,
   beliefSystemId: CustomBeliefSystemId.make('custom-support'),
   enabled: true,
-  showFullText: false,
+  weekdays: [2, 3, 4, 5, 6],
+  times: [{ hour: 9, minute: 0 }],
+  notificationContent: REMINDER_NOTIFICATION_CONTENT.GENERAL,
   createdAt: timestamp,
   updatedAt: timestamp,
 } satisfies ReminderAssignment;
 const pulseAssignment = {
   id: ReminderAssignmentId.make('assignment-pulse'),
-  schemaVersion: 1,
-  scheduleId: schedule.id,
+  schemaVersion: 2,
   targetKind: REMINDER_TARGET_KINDS.PULSE,
   enabled: true,
+  weekdays: [2, 4, 6],
+  times: [{ hour: 18, minute: 30 }],
   createdAt: timestamp,
   updatedAt: timestamp,
 } satisfies ReminderAssignment;
@@ -67,71 +58,44 @@ const pulseAssignment = {
 describe('Effect reminder repository', () => {
   beforeEach(() => resetSurrealDatabaseMock());
 
-  it('persists schedules and positive-target assignments independently', async () => {
-    await Effect.runPromise(persistReminderSchedule(schedule));
+  it('persists assignment-owned timing and notification content', async () => {
     await Effect.runPromise(persistReminderAssignment(assignment));
 
     expect(mockSurrealQuery).toHaveBeenCalledWith(
       'UPSERT $record CONTENT $value',
       expect.objectContaining({
-        value: expect.objectContaining({ scheduleId: schedule.id }),
+        value: expect.objectContaining({
+          assignmentId: assignment.id,
+          weekdays: assignment.weekdays,
+          times: assignment.times,
+          notificationContent: REMINDER_NOTIFICATION_CONTENT.GENERAL,
+        }),
       }),
     );
-    expect(mockSurrealQuery).toHaveBeenCalledWith(
-      'UPSERT $record CONTENT $value',
-      expect.objectContaining({
-        value: expect.objectContaining({ assignmentId: assignment.id }),
-      }),
-    );
   });
 
-  it('loads both tables through their current schemas', async () => {
-    mockSurrealQuery
-      .mockResolvedValueOnce([{ statementIndex: 0, value: [{
-        ...schedule,
-        schemaVersion: 1n,
-        weekdays: schedule.weekdays.map(BigInt),
-        times: schedule.times.map(({ hour, minute }) => ({
-          hour: BigInt(hour),
-          minute: BigInt(minute),
-        })),
-      }] }])
-      .mockResolvedValueOnce([{ statementIndex: 0, value: [{
-        ...pulseAssignment,
-        schemaVersion: 1n,
-        beliefSystemId: { kind: 'none' },
-        showFullText: { kind: 'none' },
-      }] }]);
+  it('loads the assignment table through the strict v2 schema', async () => {
+    mockSurrealQuery.mockResolvedValueOnce([{ statementIndex: 0, value: [{
+      ...pulseAssignment,
+      schemaVersion: 2n,
+      weekdays: pulseAssignment.weekdays.map(BigInt),
+      times: pulseAssignment.times.map(({ hour, minute }) => ({
+        hour: BigInt(hour),
+        minute: BigInt(minute),
+      })),
+      beliefSystemId: { kind: 'none' },
+      notificationContent: { kind: 'none' },
+    }] }]);
 
-    await expect(Effect.runPromise(loadReminderData)).resolves.toEqual({
-      schedules: [schedule],
-      assignments: [pulseAssignment],
-    });
+    await expect(Effect.runPromise(loadReminderData)).resolves.toEqual([pulseAssignment]);
+    expect(mockSurrealQuery).toHaveBeenCalledTimes(1);
   });
 
-  it('serializes the two native-compatible table reads', async () => {
-    let scheduleReadCompleted = false;
-    mockSurrealQuery
-      .mockImplementationOnce(async () => {
-        await Promise.resolve();
-        scheduleReadCompleted = true;
-        return [{ statementIndex: 0, value: [schedule] }];
-      })
-      .mockImplementationOnce(async () => {
-        expect(scheduleReadCompleted).toBe(true);
-        return [{ statementIndex: 0, value: [assignment] }];
-      });
-
-    await expect(Effect.runPromise(loadReminderData)).resolves.toEqual({
-      schedules: [schedule],
-      assignments: [assignment],
-    });
-  });
-
-  it('rejects malformed persisted assignments and tags write failures', async () => {
-    mockSurrealQuery
-      .mockResolvedValueOnce([{ statementIndex: 0, value: [schedule] }])
-      .mockResolvedValueOnce([{ statementIndex: 0, value: [{ ...assignment, beliefSystemId: null }] }]);
+  it('rejects legacy persisted assignments and tags write failures', async () => {
+    mockSurrealQuery.mockResolvedValueOnce([{ statementIndex: 0, value: [{
+      ...assignment,
+      schemaVersion: 1n,
+    }] }]);
 
     await expect(Effect.runPromise(Effect.flip(loadReminderData))).resolves.toMatchObject({
       _tag: 'ReminderDataError',
@@ -140,7 +104,7 @@ describe('Effect reminder repository', () => {
 
     failNextSurrealUpsert(new Error('storage unavailable'));
     await expect(
-      Effect.runPromise(Effect.flip(persistReminderSchedule(schedule))),
+      Effect.runPromise(Effect.flip(persistReminderAssignment(assignment))),
     ).resolves.toMatchObject({
       _tag: 'ReminderStorageError',
       operation: 'write',

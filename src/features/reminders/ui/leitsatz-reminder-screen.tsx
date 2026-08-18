@@ -11,7 +11,6 @@ import {
   ScrollView,
   StyleSheet,
   Text,
-  TextInput,
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -20,24 +19,22 @@ import {
   NAVIGATION_EVENTS,
   MAX_REMINDER_TIMES,
   REMINDER_EVENTS,
+  REMINDER_NOTIFICATION_CONTENT,
   REMINDER_STATES,
   REMINDER_TARGET_KINDS,
 } from '@/constants';
 import { AppBackButton } from '@/components/ui/app-back-button';
 import { ConfirmedPickerModal } from '@/components/ui/confirmed-picker-modal';
 import {
-  activeCustomBeliefStatements,
   beliefStatementForId,
 } from '@/features/check-in/domain/belief-statement';
 import { actionColors, palette, type } from '@/features/check-in/ui/theme';
-import { useAppLocale } from '@/localization/app-locale-provider';
-import { formatWeekday } from '@/localization/date-copy';
 import { useAppNavigationActor } from '@/navigation/app-navigation.provider';
 import type {
   ReminderLocalTime,
-  ReminderSchedule,
   ReminderWeekday,
-} from '../domain/reminder-schedule';
+} from '../domain/reminder-timing';
+import type { ReminderNotificationContent } from '../domain/reminder-assignment';
 
 function reminderWeekdayOptions() {
   return [
@@ -92,48 +89,6 @@ function ActionButton({
   );
 }
 
-function TargetPickerContent({
-  actor,
-  statements,
-}: {
-  actor: ReminderActor;
-  statements: ReturnType<typeof activeCustomBeliefStatements>;
-}) {
-  const selectable = statements.filter((statement) => statement.guidingStatement !== undefined);
-  return (
-    <>
-      <Text style={styles.eyebrow}><fbt desc="Leitsatz reminder target picker eyebrow">NEW REMINDER</fbt></Text>
-      <Text style={styles.title}><fbt desc="Leitsatz reminder target picker title">Which Leitsatz should accompany you?</fbt></Text>
-      <Text style={styles.copy}><fbt desc="Leitsatz reminder target picker explanation">Choose one of your supportive Leitsätze. The notification will remind you of these exact words.</fbt></Text>
-      {selectable.map((statement) => {
-        const _select = () => actor.send({
-          type: REMINDER_EVENTS.TARGET_SELECTED,
-          beliefSystemId: statement.beliefSystemId,
-        });
-        return (
-          <PressableScale
-            accessibilityRole="button"
-            key={statement.beliefSystemId}
-            onPress={_select}
-            style={styles.targetCard}
-            testID={`reminder-target-${statement.beliefSystemId}`}
-          >
-            <Text style={styles.targetLabel}><fbt desc="Selectable supportive Leitsatz label">YOUR LEITSATZ</fbt></Text>
-            <Text style={styles.targetText}>{statement.guidingStatement}</Text>
-            <Text accessibilityElementsHidden style={styles.targetDisclosure}>›</Text>
-          </PressableScale>
-        );
-      })}
-      {selectable.length === 0 ? (
-        <View style={styles.emptyCard}>
-          <Text style={styles.scheduleTitle}><fbt desc="No custom Leitsatz reminder target title">No supportive Leitsatz yet</fbt></Text>
-          <Text style={styles.copy}><fbt desc="No custom Leitsatz reminder target explanation">Create a personal Leitsatz first, then you can schedule it here.</fbt></Text>
-        </View>
-      ) : null}
-    </>
-  );
-}
-
 function PositiveStatementCard({
   newStatement = true,
   statement,
@@ -150,33 +105,6 @@ function PositiveStatementCard({
       </Text>
       <Text style={styles.statement}>“{statement}”</Text>
     </View>
-  );
-}
-
-function ScheduleRow({
-  locale,
-  onPress,
-  schedule,
-}: {
-  locale: string;
-  onPress: () => void;
-  schedule: ReminderSchedule;
-}) {
-  const times = schedule.times.map(({ hour, minute }) => (
-    `${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}`
-  )).join(', ');
-  return (
-    <PressableScale
-      accessibilityRole="button"
-      onPress={onPress}
-      style={styles.scheduleCard}
-      testID={`reminder-schedule-${schedule.id}`}
-    >
-      <Text style={styles.scheduleTitle}>{schedule.name}</Text>
-      <Text style={styles.copy}>
-        {schedule.weekdays.map((weekday) => formatWeekday({ locale, weekday })).join(', ')} · {times}
-      </Text>
-    </PressableScale>
   );
 }
 
@@ -276,7 +204,7 @@ function OfferContent({
       </Text>
       {statement ? <PositiveStatementCard statement={statement} /> : null}
       <Text style={styles.copy}>
-        <fbt desc="Reminder permission before schedule explanation">You can choose when the notification arrives. Youmotion will ask for notification permission before you select a schedule.</fbt>
+        <fbt desc="Reminder permission before timing explanation">After permission, you can choose the days, times, and words that may appear.</fbt>
       </Text>
       <ActionButton label={String(fbs('Allow notifications and continue', 'Button requesting reminder permission'))} onPress={_accept} testID="reminder-offer-accept" />
       <ActionButton label={String(fbs('Not now', 'Button declining reminder setup'))} onPress={_decline} secondary testID="reminder-offer-decline" />
@@ -302,8 +230,8 @@ function PermissionDeniedContent({
       <Text style={styles.title}><fbt desc="Notification permission denied title">Notifications are turned off.</fbt></Text>
       <Text style={styles.copy}>
         {pulseTarget
-          ? <fbt desc="Pulse notification permission denied explanation">No reminder schedule has been selected.</fbt>
-          : <fbt desc="Leitsatz notification permission denied explanation">Your Leitsatz is saved. No reminder schedule has been selected.</fbt>}
+          ? <fbt desc="Pulse notification permission denied explanation">No reminder was created.</fbt>
+          : <fbt desc="Leitsatz notification permission denied explanation">Your Leitsatz is saved. No reminder was created.</fbt>}
       </Text>
       {statement ? <PositiveStatementCard statement={statement} /> : null}
       <ActionButton label={String(fbs('Open system settings', 'Open notification system settings button'))} onPress={_openSettings} testID="reminder-open-settings" />
@@ -313,58 +241,19 @@ function PermissionDeniedContent({
   );
 }
 
-function SchedulePickerContent({
-  actor,
-  error,
-  locale,
-  pulseTarget,
-  schedules,
-  showFullText,
-}: {
+function NotificationContentChoice({ actor, notificationContent }: {
   actor: ReminderActor;
-  error: string | null;
-  locale: string;
-  pulseTarget: boolean;
-  schedules: readonly ReminderSchedule[];
-  showFullText: boolean;
-}) {
-  const _newSchedule = () => actor.send({ type: REMINDER_EVENTS.NEW_SCHEDULE_REQUESTED });
-  return (
-    <>
-      <Text style={styles.eyebrow}><fbt desc="Reminder schedule picker eyebrow">NOTIFICATIONS ALLOWED</fbt></Text>
-      <Text style={styles.title}><fbt desc="Reminder schedule picker title">When should it return?</fbt></Text>
-      {schedules.length > 0 ? (
-        <Text style={styles.copy}>
-          <fbt desc="Reminder schedule copy explanation">Choosing a schedule copies its days and times for this reminder.</fbt>
-        </Text>
-      ) : null}
-      {schedules.map((schedule) => {
-        const _selectSchedule = () => actor.send({
-          type: REMINDER_EVENTS.SCHEDULE_SELECTED,
-          scheduleId: schedule.id,
-        });
-        return <ScheduleRow key={schedule.id} locale={locale} onPress={_selectSchedule} schedule={schedule} />;
-      })}
-      {schedules.length === 0 ? <Text style={styles.copy}><fbt desc="Empty reminder schedule picker">Create your first schedule and choose its days and time.</fbt></Text> : null}
-      {!pulseTarget ? <PreviewChoice actor={actor} showFullText={showFullText} /> : null}
-      {error ? <Text style={styles.error}>{error}</Text> : null}
-      <ActionButton label={String(fbs('Create new schedule', 'Create a reminder schedule button'))} onPress={_newSchedule} testID="reminder-create-schedule" />
-    </>
-  );
-}
-
-function PreviewChoice({ actor, showFullText }: {
-  actor: ReminderActor;
-  showFullText: boolean;
+  notificationContent: ReminderNotificationContent;
 }) {
   const _selectGeneral = () => actor.send({
-    type: REMINDER_EVENTS.PREVIEW_CHANGED,
-    showFullText: false,
+    type: REMINDER_EVENTS.CONTENT_CHANGED,
+    notificationContent: REMINDER_NOTIFICATION_CONTENT.GENERAL,
   });
   const _selectFull = () => actor.send({
-    type: REMINDER_EVENTS.PREVIEW_CHANGED,
-    showFullText: true,
+    type: REMINDER_EVENTS.CONTENT_CHANGED,
+    notificationContent: REMINDER_NOTIFICATION_CONTENT.LEITSATZ,
   });
+  const showsLeitsatz = notificationContent === REMINDER_NOTIFICATION_CONTENT.LEITSATZ;
   return (
     <View style={styles.previewSection}>
       <Text style={styles.fieldLabel}>
@@ -375,9 +264,9 @@ function PreviewChoice({ actor, showFullText }: {
       </Text>
       <PressableScale
         accessibilityRole="radio"
-        accessibilityState={{ checked: !showFullText }}
+        accessibilityState={{ checked: !showsLeitsatz }}
         onPress={_selectGeneral}
-        style={[styles.previewChoice, !showFullText && styles.previewChoiceSelected]}
+        style={[styles.previewChoice, !showsLeitsatz && styles.previewChoiceSelected]}
         testID="reminder-preview-general"
       >
         <Text style={styles.previewTitle}>
@@ -389,9 +278,9 @@ function PreviewChoice({ actor, showFullText }: {
       </PressableScale>
       <PressableScale
         accessibilityRole="radio"
-        accessibilityState={{ checked: showFullText }}
+        accessibilityState={{ checked: showsLeitsatz }}
         onPress={_selectFull}
-        style={[styles.previewChoice, showFullText && styles.previewChoiceSelected]}
+        style={[styles.previewChoice, showsLeitsatz && styles.previewChoiceSelected]}
         testID="reminder-preview-full"
       >
         <Text style={styles.previewTitle}>
@@ -405,58 +294,44 @@ function PreviewChoice({ actor, showFullText }: {
   );
 }
 
-function ScheduleEditorContent({
+function ReminderEditorContent({
   actor,
   editing,
-  name,
+  notificationContent,
   pickerIndex,
   pulseTarget,
-  showFullText,
   times,
   weekdays,
 }: {
   actor: ReminderActor;
   editing: boolean;
-  name: string;
+  notificationContent: ReminderNotificationContent;
   pickerIndex: number | null;
   pulseTarget: boolean;
-  showFullText: boolean;
   times: readonly ReminderLocalTime[];
   weekdays: readonly ReminderWeekday[];
 }) {
-  const _changeName = (nextName: string) => actor.send({
-    type: REMINDER_EVENTS.SCHEDULE_NAME_CHANGED,
-    name: nextName,
-  });
   const _addTime = () => actor.send({ type: REMINDER_EVENTS.TIME_ADDED });
-  const _saveSchedule = () => actor.send({ type: REMINDER_EVENTS.SCHEDULE_SAVE_REQUESTED });
-  const nameMissing = name.trim().length === 0;
+  const _saveReminder = () => actor.send({ type: REMINDER_EVENTS.SAVE_REQUESTED });
   const selectedWeekdays = new Set(weekdays);
   return (
     <>
       <Text style={styles.eyebrow}>
         {editing
-          ? <fbt desc="Edit reminder schedule eyebrow">EDIT SCHEDULE</fbt>
-          : <fbt desc="New reminder schedule eyebrow">NEW SCHEDULE</fbt>}
+          ? <fbt desc="Edit reminder eyebrow">EDIT REMINDER</fbt>
+          : <fbt desc="New reminder eyebrow">NEW REMINDER</fbt>}
       </Text>
       <Text style={styles.title}>
         {editing
-          ? <fbt desc="Edit reminder schedule title">Adjust this reminder.</fbt>
-          : <fbt desc="New reminder schedule title">Create a rhythm that fits you.</fbt>}
+          ? <fbt desc="Edit reminder title">Adjust this reminder.</fbt>
+          : <fbt desc="New reminder title">Choose when it should return.</fbt>}
       </Text>
       {editing ? (
         <Text style={styles.copy}>
-          <fbt desc="Reminder-owned schedule editing explanation">These changes apply only to this reminder.</fbt>
+          <fbt desc="Reminder timing editing explanation">These days, times, and notification words belong only to this reminder.</fbt>
         </Text>
       ) : null}
-      <Text style={styles.fieldLabel}><fbt desc="Required reminder schedule name label">NAME · REQUIRED</fbt></Text>
-      <TextInput aria-label={String(fbs('Schedule name', 'Reminder schedule name input label'))} onChangeText={_changeName} placeholder={String(fbs('For example: Weekday mornings', 'Reminder schedule name placeholder'))} style={styles.input} testID="reminder-schedule-name" value={name} />
-      <View style={styles.nameGuidanceSlot} testID="reminder-schedule-name-guidance-slot">
-        {nameMissing ? (
-          <Text style={styles.nameGuidanceText}><fbt desc="Required reminder schedule name guidance">Add a name so you can recognize this reminder later.</fbt></Text>
-        ) : null}
-      </View>
-      <Text style={styles.fieldLabel}><fbt desc="Reminder schedule weekdays label">DAYS</fbt></Text>
+      <Text style={styles.fieldLabel}><fbt desc="Reminder weekdays label">DAYS</fbt></Text>
       <View style={styles.weekdayRow}>
         {reminderWeekdayOptions().map(({ label, weekday }) => {
           const selected = selectedWeekdays.has(weekday);
@@ -468,7 +343,7 @@ function ScheduleEditorContent({
           );
         })}
       </View>
-      <Text style={styles.fieldLabel}><fbt desc="Reminder schedule time label">TIME</fbt></Text>
+      <Text style={styles.fieldLabel}><fbt desc="Reminder time label">TIME</fbt></Text>
       {times.map(({ hour, minute }, index) => {
         const _open = () => actor.send({ type: REMINDER_EVENTS.TIME_PICKER_REQUESTED, index });
         const _dismiss = () => actor.send({ type: REMINDER_EVENTS.TIME_PICKER_DISMISSED });
@@ -485,14 +360,15 @@ function ScheduleEditorContent({
         return <TimeRow canRemove={times.length > 1} hour={hour} index={index} key={timeSlotKey(index)} minute={minute} onChange={_change} onDismiss={_dismiss} onOpen={_open} onRemove={_remove} pickerOpen={pickerIndex === index} />;
       })}
       {times.length < MAX_REMINDER_TIMES ? <ActionButton label={String(fbs('Add another time', 'Add reminder time button'))} onPress={_addTime} secondary testID="reminder-time-add" /> : null}
-      {!pulseTarget ? <PreviewChoice actor={actor} showFullText={showFullText} /> : null}
+      {!pulseTarget ? (
+        <NotificationContentChoice actor={actor} notificationContent={notificationContent} />
+      ) : null}
       <ActionButton
         label={editing
-          ? String(fbs('Save changes', 'Save reminder schedule changes button'))
-          : String(fbs('Create and use schedule', 'Save and activate reminder schedule button'))}
-        onPress={_saveSchedule}
-        disabled={nameMissing}
-        testID="reminder-save-schedule"
+          ? String(fbs('Save changes', 'Save reminder changes button'))
+          : String(fbs('Activate reminder', 'Save and activate reminder button'))}
+        onPress={_saveReminder}
+        testID="reminder-save"
       />
     </>
   );
@@ -553,7 +429,6 @@ function reminderScreenLoading(
 
 export function LeitsatzReminderScreen() {
   const actor = useAppNavigationActor();
-  const locale = useAppLocale();
   const snapshot = useSelector(actor, _selectSnapshot);
   const context = snapshot.context;
   const statement = context.reminderTargetBeliefSystemId
@@ -562,11 +437,7 @@ export function LeitsatzReminderScreen() {
         statements: context.beliefStatements,
       })?.guidingStatement
     : undefined;
-  const selectableSchedules = context.reminderSchedules.filter((schedule) => (
-    context.reminderAssignments.some((assignment) => assignment.scheduleId === schedule.id)
-  ));
   const pulseTarget = context.reminderTargetKind === REMINDER_TARGET_KINDS.PULSE;
-  const customStatements = activeCustomBeliefStatements(context.beliefStatements);
   const _back = () => actor.send({ type: NAVIGATION_EVENTS.BACK_REQUESTED });
 
   if (reminderScreenLoading(snapshot)) {
@@ -591,9 +462,6 @@ export function LeitsatzReminderScreen() {
           contentContainerStyle={styles.content}
           scrollEnabled={context.reminderTimePickerIndex === null}
         >
-          {snapshot.matches(REMINDER_STATES.TARGET_PICKER) ? (
-            <TargetPickerContent actor={actor} statements={customStatements} />
-          ) : null}
           {snapshot.matches(REMINDER_STATES.OFFER) ? (
             <OfferContent actor={actor} pulseTarget={pulseTarget} statement={statement} />
           ) : null}
@@ -604,11 +472,8 @@ export function LeitsatzReminderScreen() {
               statement={statement}
             />
           ) : null}
-          {snapshot.matches(REMINDER_STATES.SCHEDULE_PICKER) ? (
-            <SchedulePickerContent actor={actor} error={context.reminderError} locale={locale} pulseTarget={pulseTarget} schedules={selectableSchedules} showFullText={context.reminderShowFullTextDraft} />
-          ) : null}
-          {snapshot.matches(REMINDER_STATES.SCHEDULE_EDITOR) ? (
-            <ScheduleEditorContent actor={actor} editing={context.reminderAssignmentDraftId !== null} name={context.reminderScheduleNameDraft} pickerIndex={context.reminderTimePickerIndex} pulseTarget={pulseTarget} showFullText={context.reminderShowFullTextDraft} times={context.reminderTimesDraft} weekdays={context.reminderWeekdaysDraft} />
+          {snapshot.matches(REMINDER_STATES.EDITOR) ? (
+            <ReminderEditorContent actor={actor} editing={context.reminderAssignmentDraftId !== null} notificationContent={context.reminderNotificationContentDraft} pickerIndex={context.reminderTimePickerIndex} pulseTarget={pulseTarget} times={context.reminderTimesDraft} weekdays={context.reminderWeekdaysDraft} />
           ) : null}
           {snapshot.matches(REMINDER_STATES.ACTIVE) ? (
             <ActiveContent actor={actor} statement={statement} />
@@ -639,11 +504,6 @@ const styles = StyleSheet.create({
   actionDisabled: { opacity: 0.38 },
   actionText: { fontFamily: type.semibold, color: actionColors.primaryForeground, fontSize: 15 },
   actionTextSecondary: { color: palette.ink },
-  scheduleCard: { minHeight: 80, justifyContent: 'center', borderWidth: 1, borderColor: palette.hairline, borderRadius: 20, borderCurve: 'continuous', padding: 18 },
-  scheduleTitle: { fontFamily: type.semibold, color: palette.ink, fontSize: 17, marginBottom: 5 },
-  input: { minHeight: 54, borderWidth: 1, borderColor: palette.hairline, borderRadius: 16, borderCurve: 'continuous', paddingHorizontal: 16, fontFamily: type.regular, color: palette.ink, fontSize: 16 },
-  nameGuidanceSlot: { minHeight: 38, marginTop: -8 },
-  nameGuidanceText: { fontFamily: type.regular, color: palette.inkMuted, fontSize: 13, lineHeight: 19 },
   fieldHint: { fontFamily: type.regular, color: palette.inkMuted, fontSize: 13, lineHeight: 19, marginTop: -8 },
   fieldLabel: { fontFamily: type.semibold, color: palette.inkMuted, fontSize: 11, letterSpacing: 1.2, marginTop: 8 },
   previewSection: { gap: 10 },
@@ -662,9 +522,5 @@ const styles = StyleSheet.create({
   timePickerButton: { minHeight: 54, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   timeDisclosure: { fontFamily: type.regular, color: palette.inkMuted, fontSize: 28 },
   loading: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 14, backgroundColor: palette.paper },
-  targetCard: { minHeight: 92, justifyContent: 'center', borderWidth: 1, borderColor: palette.hairline, borderRadius: 20, borderCurve: 'continuous', padding: 18, paddingRight: 42, gap: 6 },
-  targetLabel: { fontFamily: type.semibold, color: palette.moss, fontSize: 10, letterSpacing: 1.1 },
-  targetText: { fontFamily: type.medium, color: palette.ink, fontSize: 17, lineHeight: 24 },
-  targetDisclosure: { position: 'absolute', right: 18, color: palette.inkMuted, fontSize: 28 },
   emptyCard: { borderWidth: 1, borderColor: palette.hairline, borderRadius: 20, borderCurve: 'continuous', padding: 18, gap: 6 },
 });
