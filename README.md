@@ -90,12 +90,12 @@ The edit screen provides a full-width destructive action. History keeps a visibl
 
 ```bash
 corepack enable
+pnpm --version
 pnpm install
 pnpm start
 ```
 
-The repository pins pnpm 11.18.0 through the `packageManager` field and commits a pnpm lockfile. Do not generate npm or Yarn lockfiles.
-When the npm registry cannot verify that exact pnpm release, the workspace permits an already installed compatible pnpm to continue so local verification remains available offline.
+The project pin is pnpm 11.18.0. Run `pnpm --version`; a compatible pnpm 11 installation may continue when registry signature verification prevents Corepack from installing the exact pin. The repository commits a pnpm lockfile; do not generate npm or Yarn lockfiles.
 `pnpm start` targets the Youmotion development client and displays a QR code. Use `pnpm start:tunnel` when a physical device cannot reach the computer over the local network.
 
 Install a development client once on each physical device before scanning Metro QR codes. Android internal builds produce an installable APK. iOS device builds require an Apple Developer account and a registered device:
@@ -236,7 +236,7 @@ The rule suite lives beside the plugin and should be extended whenever a new inv
 - Navigation tests drive the actual root actor through persistence, Leidsatz attachment, custom entry creation, dedicated guiding-belief navigation, complete saved-moment editing, Leitsatz persistence and removal, deletion, and route event paths.
 - Screen tests render the painterly star and exercise reflection, built-in and custom Leidsatz selection, the dedicated guiding-belief page, Leitsatz display, persistence, history deletion, success, and settings.
 - Harness tests exercise custom Leidsatz persistence through the separate guiding-belief state and verify emotion-label SVG nodes on the native React Native runtime.
-- Maestro tests exercise tab navigation, reflection cancellation, a persisted check-in save-and-delete journey, and language switching through the installed development app.
+- Maestro tests exercise tab navigation, reflection cancellation, a persisted check-in save-and-delete journey, and language switching through the installed development app. Reminder-specific device evidence currently follows the runtime matrix below until a stable saved flow passes twice.
 - The pre-release Android locale gate builds and clean-installs the release APK, then verifies first-launch onboarding before and after an app-process restart. Run both cases on dedicated emulators configured through Android Settings:
 
   ```bash
@@ -249,7 +249,7 @@ The rule suite lives beside the plugin and should be extended whenever a new inv
 
 The current Jest coverage gate is enforced globally and must not be lowered.
 
-Use `pnpm test:harness:ios` and `pnpm test:harness:android` for the native simulator and emulator gates. Both start Harness on dedicated ports and launch the Expo development client directly into that server. The Android command starts its configured API 36 Pixel 9 AVD and installs `android/app/build/outputs/apk/debug/app-debug.apk` when that artifact exists; run `pnpm android` once after a clean native checkout to create it. With a Google Pixel 6a connected, `pnpm test:harness:android:pixel` runs the same suite on that physical-device profile. `pnpm test:harness` uses the default web runner and must not be treated as evidence that Hermes, native SVG behavior, or native bindings work.
+Use `pnpm test:harness:ios` and `pnpm test:harness:android` for the native simulator and emulator gates. Both start Harness on dedicated ports and launch the Expo development client directly into that server. The Android command starts its configured API 36 Pixel 9 AVD and installs `android/app/build/outputs/apk/debug/app-debug.apk` when that artifact exists; run `pnpm android` once after a clean native checkout to create it. With a Google Pixel 6a connected, `pnpm test:harness:android:pixel` runs the same suite on that physical-device profile. `pnpm test:harness` uses the default web runner and must not be treated as evidence that Hermes, native SVG behavior, or native bindings work. Harness uses ports 8083 and 8084 and searches upward when one is occupied; stop stale Harness/Metro processes if its complete range is unavailable.
 
 The emotion-label regression suite asserts the rendered React Native text node set for emoji-only, text-only, and combined modes at both the component and React Native Harness layers. It covers every active/inactive layout, verifies the combined-mode vertical separation, and rerenders the seven-label ring through every active emotion. A native image snapshot then verifies the pixels after those transitions, catching native rendering defects that are already absent from React's query tree.
 
@@ -257,14 +257,33 @@ Run the focused Android regression on an emulator with `pnpm test:harness:androi
 
 ### Maestro end-to-end tests
 
-Install the [Maestro CLI](https://docs.maestro.dev/getting-started/installing-maestro), boot an iOS simulator or Android emulator, and install the Youmotion development client with `pnpm ios` or `pnpm android`. Keep Metro running in another terminal:
+Install the [Maestro CLI](https://docs.maestro.dev/getting-started/installing-maestro), boot an iOS simulator or Android emulator, and install the Youmotion development client with `pnpm ios` or `pnpm android`. A development client must be installed before the flow can connect to Metro. Keep Metro running in another terminal:
 
 ```bash
 pnpm start:maestro
 pnpm test:maestro
 ```
 
-The dedicated Metro mode disables the development-only React Native Grab inspection overlay so iOS and Android expose the application accessibility tree to the test runner. Run `pnpm test:maestro:smoke` for the short tab-navigation gate. The flows connect the development client to Metro at `127.0.0.1:8082`; on Android, first run `adb reverse tcp:8082 tcp:8082`. Failure output is written to the ignored `artifacts/maestro` directory.
+The app id is `com.youmotion.mobile`. Normal Metro uses port 8081; Maestro uses 8082; Harness starts at 8083/8084. When several Android targets are connected, choose one explicitly and keep every command scoped to it:
+
+```bash
+adb devices
+export YOUMOTION_ANDROID_SERIAL=emulator-5556
+ANDROID_SERIAL="$YOUMOTION_ANDROID_SERIAL" pnpm exec expo run:android --device "$YOUMOTION_ANDROID_SERIAL"
+adb -s "$YOUMOTION_ANDROID_SERIAL" reverse tcp:8082 tcp:8082
+```
+
+The intended emulator must appear as `device`, not `offline` or `unauthorized`. If ADB is unavailable, run `adb start-server`, then `adb devices` again. Do not restart a shared ADB daemon while another agent or device session is active, and do not let Expo silently select another agent's emulator. Native installation may still require the normal Android SDK or Xcode setup. The dedicated Metro mode disables the development-only React Native Grab overlay so the application accessibility tree remains available. Run `pnpm test:maestro:smoke` for the short navigation gate. Failure output is written to the ignored `artifacts/maestro` directory.
+
+Reminder changes should additionally run the focused Jest suites, then follow [the reminder runtime matrix](docs/reminders-runtime-test-matrix.md). Device evidence must cover assignment-owned timing, the post-reflection General message/Show Leitsatz choice, Leitsatz-management actions, and backdrop dismissal with redacted text.
+
+The redacted reminder lifecycle flow is `.maestro/flows/reminder-owned-timing.yaml`. Run it on the selected Android target with:
+
+```bash
+maestro --device "$YOUMOTION_ANDROID_SERIAL" test .maestro/flows/reminder-owned-timing.yaml
+```
+
+It creates unique local test text, configures and edits one Leitsatz reminder, verifies outside-tap time-dialog dismissal, then removes the reminder. Notification permission must be grantable; reset it before the run when testing the first-request path.
 
 ## Local Codex skills
 
