@@ -4,6 +4,7 @@ import { DATABASE_MIGRATION_TABLE } from '@/constants';
 import { occurrenceTimeDatabaseMigration } from '../infrastructure/migrations/occurrence-time.database-migration';
 import { reminderTablesDatabaseMigration } from '../infrastructure/migrations/reminder-tables.database-migration';
 import { inlineReminderTimingDatabaseMigration } from '../infrastructure/migrations/inline-reminder-timing.database-migration';
+import { journalTablesDatabaseMigration } from '../infrastructure/migrations/journal-tables.database-migration';
 import { runDatabaseMigrations } from '../infrastructure/migrations/database-migration.runner';
 
 const query = jest.fn();
@@ -20,6 +21,7 @@ describe('database migration runner', () => {
       .mockResolvedValueOnce([{ statementIndex: 0, value: [] }])
       .mockResolvedValueOnce([{ statementIndex: 0, value: null }])
       .mockResolvedValueOnce([{ statementIndex: 0, value: null }])
+      .mockResolvedValueOnce([{ statementIndex: 0, value: null }])
       .mockResolvedValueOnce([{ statementIndex: 0, value: null }]);
 
     const applied = await Effect.runPromise(runDatabaseMigrations(database));
@@ -28,6 +30,7 @@ describe('database migration runner', () => {
       occurrenceTimeDatabaseMigration.id,
       reminderTablesDatabaseMigration.id,
       inlineReminderTimingDatabaseMigration.id,
+      journalTablesDatabaseMigration.id,
     ]);
     expect(query).toHaveBeenNthCalledWith(
       1,
@@ -84,6 +87,19 @@ describe('database migration runner', () => {
         }),
       }),
     );
+    expect(query).toHaveBeenNthCalledWith(
+      6,
+      expect.stringMatching(
+        /BEGIN TRANSACTION;[\s\S]*DEFINE TABLE IF NOT EXISTS belief_statement SCHEMALESS;[\s\S]*DEFINE TABLE IF NOT EXISTS app_settings SCHEMALESS;[\s\S]*UPSERT \$migrationRecord[\s\S]*COMMIT TRANSACTION;/,
+      ),
+      expect.objectContaining({
+        ledgerEntry: expect.objectContaining({
+          migrationId: journalTablesDatabaseMigration.id,
+          description: journalTablesDatabaseMigration.description,
+          appliedAt: expect.any(String),
+        }),
+      }),
+    );
   });
 
   it('does not rerun a migration already recorded in the ledger', async () => {
@@ -95,6 +111,7 @@ describe('database migration runner', () => {
           { migrationId: occurrenceTimeDatabaseMigration.id },
           { migrationId: reminderTablesDatabaseMigration.id },
           { migrationId: inlineReminderTimingDatabaseMigration.id },
+          { migrationId: journalTablesDatabaseMigration.id },
         ],
       }]);
 

@@ -80,7 +80,15 @@ pnpm test:harness:ios
 pnpm test:harness:android
 ```
 
-The supplied archive remains outside Git because it contains private journal data. Run its opt-in test with its local path:
+A synthetic archive fixture is committed at `src/features/data-safety/__tests__/fixtures/legacy-archive.fixture.json`. It carries the same shape as a real export — 133 moments and 15 guiding beliefs, 12 suggested and 3 authored — with neutral text, so it is safe to commit and safe to screenshot. Its test runs by default:
+
+```bash
+CI=true pnpm exec jest \
+  src/features/data-safety/__tests__/supplied-legacy-archive.e2e.test.js \
+  --runInBand --no-watchman
+```
+
+Use the committed fixture for device runs, restores, and map captures. A private export can still be checked against the same test without ever entering Git:
 
 ```bash
 YOUMOTION_LEGACY_ARCHIVE_PATH=/absolute/path/to/youmotion-backup.json \

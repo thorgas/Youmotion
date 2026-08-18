@@ -21,7 +21,7 @@ Run the `expo-map` skill from the repository root. It performs the following wor
 5. Replay every new or changed flow before accepting it.
 6. Regenerate `.expo-map/map.html` and the dated `.appmap` bundle.
 
-Runtime states that require hydrated local data must use realistic redacted test data. Keep the route capture even when a bare deep link cannot build the required XState context, and describe that limitation in `.expo-map/capture-status.json`.
+Runtime states that require hydrated local data must be populated by restoring the committed archive fixture at `src/features/data-safety/__tests__/fixtures/legacy-archive.fixture.json` through Settings → Restore from a backup. It holds 133 moments and 15 guiding beliefs, 12 suggested and 3 authored, with neutral text. Never capture the map from a personal backup: the screenshots and the `.appmap` bundle are committed and uploaded to a web visualiser. Keep the route capture even when a bare deep link cannot build the required XState context, and describe that limitation in `.expo-map/capture-status.json`.
 
 ## Replay a flow
 

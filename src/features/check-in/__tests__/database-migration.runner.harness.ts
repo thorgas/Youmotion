@@ -15,6 +15,7 @@ import {
   SURREAL_DATABASE_ENDPOINT_PREFIX,
 } from '@/constants';
 import { occurrenceTimeDatabaseMigration } from '../infrastructure/migrations/occurrence-time.database-migration';
+import { DATABASE_MIGRATIONS } from '../infrastructure/migrations/database-migrations';
 import { runDatabaseMigrations } from '../infrastructure/migrations/database-migration.runner';
 
 const suppliedArchiveCheckInCount = 133;
@@ -123,9 +124,8 @@ COMMIT TRANSACTION;`,
       operation: () => Effect.runPromise(runDatabaseMigrations(database)),
       stage: 'apply migration',
     });
-    expect(firstRun).toEqual([
-      occurrenceTimeDatabaseMigration.id,
-    ]);
+    expect(firstRun).toEqual(DATABASE_MIGRATIONS.map((migration) => migration.id));
+    expect(firstRun).toContain(occurrenceTimeDatabaseMigration.id);
     const secondRun = await runStage({
       operation: () => Effect.runPromise(runDatabaseMigrations(database)),
       stage: 'rerun migration',

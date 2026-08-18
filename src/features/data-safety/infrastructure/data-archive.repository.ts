@@ -51,11 +51,11 @@ DELETE ${BELIEF_STATEMENT_TABLE};
 DELETE ${APP_SETTINGS_TABLE};
 FOR $checkIn IN $checkIns {
   UPSERT type::record('${CHECK_IN_TABLE}', $checkIn.id)
-    CONTENT object::merge($checkIn, { checkInId: $checkIn.id });
+    CONTENT object::extend($checkIn, { checkInId: $checkIn.id });
 };
 FOR $statement IN $beliefStatements {
   UPSERT type::record('${BELIEF_STATEMENT_TABLE}', $statement.beliefSystemId)
-    CONTENT object::merge($statement, { statementId: $statement.beliefSystemId });
+    CONTENT object::extend($statement, { statementId: $statement.beliefSystemId });
 };
 UPSERT type::record('${APP_SETTINGS_TABLE}', '${APP_SETTINGS_RECORD_ID}') CONTENT $settings;
 COMMIT TRANSACTION;

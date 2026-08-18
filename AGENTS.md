@@ -27,6 +27,8 @@ Read the exact Expo SDK 57 documentation at https://docs.expo.dev/versions/v57.0
 - Run `pnpm verify` for lint, TypeScript 7, and Jest.
 - Run `pnpm test:coverage`; never lower the configured coverage thresholds.
 - Before implementing behavior that crosses runtime boundaries, define a user-observable test matrix. Cover each applicable combination of module-initialized state, native or platform inputs, hydration or persistence success and failure, and fallbacks visible before asynchronous initialization completes. Add consumer-boundary tests for every meaningful case rather than testing producers only in isolation.
+- Never let a SurrealQL statement reach production covered only by a string assertion against a mocked client. A mocked `query` never parses the statement, so an unsupported construct passes Jest and fails on every device. Execute every migration and every persisted-data transaction against the native runtime with React Native Harness.
+- Populate device runs from the committed archive fixture at `src/features/data-safety/__tests__/fixtures/legacy-archive.fixture.json` — 133 moments and 15 guiding beliefs, 12 suggested and 3 authored. It is synthetic by design; never replace it with a personal backup, and never capture screenshots from real journal data.
 - Add model-path coverage when changing navigation states or events.
 - Add or update a custom Oxlint rule test when changing an architectural invariant.
 - Use React Native Harness for device-level component interactions.

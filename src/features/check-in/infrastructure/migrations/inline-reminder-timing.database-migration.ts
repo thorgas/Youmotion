@@ -13,11 +13,13 @@ export const inlineReminderTimingDatabaseMigration = {
   WHERE schemaVersion = 1
 );
 
-FOR $assignment IN (
+LET $legacyAssignments = (
   SELECT *
   FROM ${REMINDER_ASSIGNMENT_TABLE}
   WHERE schemaVersion = 1
-) {
+);
+
+FOR $assignment IN $legacyAssignments {
   LET $schedule = (
     SELECT *
     FROM ${REMINDER_SCHEDULE_TABLE}

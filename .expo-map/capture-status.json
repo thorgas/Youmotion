@@ -8,8 +8,8 @@
     "note": "Includes populated and expanded-filter variants rendered from the 133-moment E2E archive."
   },
   "(tabs)/settings": {
-    "status": "stale",
-    "note": "The PERSONALIZE entry was renamed to \"Manage guiding belief\" and its count now includes every belief with a guiding belief or a reminder. The committed screenshot predates that change and needs a re-capture."
+    "status": "ok",
+    "note": "PERSONALIZE shows \"Manage guiding belief\" with its count of every belief carrying a guiding belief or a reminder. Captured from the committed archive fixture (15 beliefs)."
   },
   "(tabs)/today": {
     "status": "ok"
@@ -18,9 +18,8 @@
     "status": "ok"
   },
   "belief-library": {
-    "status": "stale",
-    "needsNavigation": true,
-    "note": "The library now lists every belief carrying a guiding belief or a reminder, not only self-authored ones, hides Edit/Remove for suggested beliefs, and carries new eyebrow, title, and empty-state copy. Capturing that variant needs a persisted suggested belief. A capture attempt on the Pixel 9 emulator failed to persist a check-in, but the app data left behind by earlier failed migrations was never cleared before that attempt, so the cause is unconfirmed. Re-capture on an iOS simulator."
+    "status": "ok",
+    "note": "Lists suggested and authored beliefs, hides Edit/Remove for suggested ones, and keeps their reminder controls. Captured from the committed archive fixture after a real Settings restore."
   },
   "belief-system-catalog": {
     "status": "error-boundary",

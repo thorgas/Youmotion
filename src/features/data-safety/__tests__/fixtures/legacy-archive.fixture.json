@@ -1,0 +1,1155 @@
+{
+  "version": 1,
+  "exportedAt": "2026-08-03T17:38:00.000Z",
+  "checkIns": [
+    {
+      "id": "1785758333000-0000000000000",
+      "createdAt": "2026-08-03T11:58:53Z",
+      "emotionId": "freude",
+      "intensity": 0.12,
+      "level": 1,
+      "note": "Sample note for the visual stress test."
+    },
+    {
+      "id": "1785739913000-0000000000001",
+      "createdAt": "2026-08-03T06:51:53Z",
+      "emotionId": "liebe",
+      "intensity": 0.17,
+      "level": 2,
+      "note": "A short placeholder reflection."
+    },
+    {
+      "id": "1785721493000-0000000000002",
+      "createdAt": "2026-08-03T01:44:53Z",
+      "emotionId": "scham",
+      "intensity": 0.22,
+      "level": 3,
+      "note": "Placeholder text for a captured moment."
+    },
+    {
+      "id": "1785703073000-0000000000003",
+      "createdAt": "2026-08-02T20:37:53Z",
+      "emotionId": "ekel",
+      "intensity": 0.27,
+      "level": 1,
+      "note": "Neutral filler note used only for screenshots."
+    },
+    {
+      "id": "1785684653000-0000000000004",
+      "createdAt": "2026-08-02T15:30:53Z",
+      "emotionId": "trauer",
+      "intensity": 0.32,
+      "level": 2,
+      "note": "Synthetic note, no personal content."
+    },
+    {
+      "id": "1785666233000-0000000000005",
+      "createdAt": "2026-08-02T10:23:53Z",
+      "emotionId": "wut",
+      "intensity": 0.37,
+      "level": 3,
+      "note": "Test fixture note."
+    },
+    {
+      "id": "1785647813000-0000000000006",
+      "createdAt": "2026-08-02T05:16:53Z",
+      "emotionId": "furcht",
+      "intensity": 0.42,
+      "level": 1,
+      "note": "Placeholder reflection for map captures."
+    },
+    {
+      "id": "1785629393000-0000000000007",
+      "createdAt": "2026-08-02T00:09:53Z",
+      "emotionId": "freude",
+      "intensity": 0.47,
+      "level": 2,
+      "note": "Generated sample entry."
+    },
+    {
+      "id": "1785610973000-0000000000008",
+      "createdAt": "2026-08-01T19:02:53Z",
+      "emotionId": "liebe",
+      "intensity": 0.52,
+      "level": 3,
+      "note": ""
+    },
+    {
+      "id": "1785596153000-0000000000009",
+      "createdAt": "2026-08-01T14:55:53Z",
+      "emotionId": "scham",
+      "intensity": 0.57,
+      "level": 1,
+      "note": "Sample note for the visual stress test."
+    },
+    {
+      "id": "1785577733000-000000000000a",
+      "createdAt": "2026-08-01T09:48:53Z",
+      "emotionId": "ekel",
+      "intensity": 0.62,
+      "level": 2,
+      "note": "A short placeholder reflection."
+    },
+    {
+      "id": "1785559313000-000000000000b",
+      "createdAt": "2026-08-01T04:41:53Z",
+      "emotionId": "trauer",
+      "intensity": 0.67,
+      "level": 3,
+      "note": "Placeholder text for a captured moment."
+    },
+    {
+      "id": "1785540893000-000000000000c",
+      "createdAt": "2026-07-31T23:34:53Z",
+      "emotionId": "wut",
+      "intensity": 0.72,
+      "level": 1,
+      "note": "Neutral filler note used only for screenshots."
+    },
+    {
+      "id": "1785522473000-000000000000d",
+      "createdAt": "2026-07-31T18:27:53Z",
+      "emotionId": "furcht",
+      "intensity": 0.77,
+      "level": 2,
+      "note": "Synthetic note, no personal content."
+    },
+    {
+      "id": "1785504053000-000000000000e",
+      "createdAt": "2026-07-31T13:20:53Z",
+      "emotionId": "freude",
+      "intensity": 0.82,
+      "level": 3,
+      "note": "Test fixture note."
+    },
+    {
+      "id": "1785485633000-000000000000f",
+      "createdAt": "2026-07-31T08:13:53Z",
+      "emotionId": "liebe",
+      "intensity": 0.87,
+      "level": 1,
+      "note": "Placeholder reflection for map captures."
+    },
+    {
+      "id": "1785467213000-0000000000010",
+      "createdAt": "2026-07-31T03:06:53Z",
+      "emotionId": "scham",
+      "intensity": 0.92,
+      "level": 2,
+      "note": "Generated sample entry."
+    },
+    {
+      "id": "1785448793000-0000000000011",
+      "createdAt": "2026-07-30T21:59:53Z",
+      "emotionId": "ekel",
+      "intensity": 0.12,
+      "level": 3,
+      "note": ""
+    },
+    {
+      "id": "1785433973000-0000000000012",
+      "createdAt": "2026-07-30T17:52:53Z",
+      "emotionId": "trauer",
+      "intensity": 0.17,
+      "level": 1,
+      "note": "Sample note for the visual stress test."
+    },
+    {
+      "id": "1785415553000-0000000000013",
+      "createdAt": "2026-07-30T12:45:53Z",
+      "emotionId": "wut",
+      "intensity": 0.22,
+      "level": 2,
+      "note": "A short placeholder reflection."
+    },
+    {
+      "id": "1785397133000-0000000000014",
+      "createdAt": "2026-07-30T07:38:53Z",
+      "emotionId": "furcht",
+      "intensity": 0.27,
+      "level": 3,
+      "note": "Placeholder text for a captured moment."
+    },
+    {
+      "id": "1785378713000-0000000000015",
+      "createdAt": "2026-07-30T02:31:53Z",
+      "emotionId": "freude",
+      "intensity": 0.32,
+      "level": 1,
+      "note": "Neutral filler note used only for screenshots."
+    },
+    {
+      "id": "1785360293000-0000000000016",
+      "createdAt": "2026-07-29T21:24:53Z",
+      "emotionId": "liebe",
+      "intensity": 0.37,
+      "level": 2,
+      "note": "Synthetic note, no personal content."
+    },
+    {
+      "id": "1785341873000-0000000000017",
+      "createdAt": "2026-07-29T16:17:53Z",
+      "emotionId": "scham",
+      "intensity": 0.42,
+      "level": 3,
+      "note": "Test fixture note."
+    },
+    {
+      "id": "1785323453000-0000000000018",
+      "createdAt": "2026-07-29T11:10:53Z",
+      "emotionId": "ekel",
+      "intensity": 0.47,
+      "level": 1,
+      "note": "Placeholder reflection for map captures."
+    },
+    {
+      "id": "1785305033000-0000000000019",
+      "createdAt": "2026-07-29T06:03:53Z",
+      "emotionId": "trauer",
+      "intensity": 0.52,
+      "level": 2,
+      "note": "Generated sample entry."
+    },
+    {
+      "id": "1785290213000-000000000001a",
+      "createdAt": "2026-07-29T01:56:53Z",
+      "emotionId": "wut",
+      "intensity": 0.57,
+      "level": 3,
+      "note": ""
+    },
+    {
+      "id": "1785271793000-000000000001b",
+      "createdAt": "2026-07-28T20:49:53Z",
+      "emotionId": "furcht",
+      "intensity": 0.62,
+      "level": 1,
+      "note": "Sample note for the visual stress test."
+    },
+    {
+      "id": "1785253373000-000000000001c",
+      "createdAt": "2026-07-28T15:42:53Z",
+      "emotionId": "freude",
+      "intensity": 0.67,
+      "level": 2,
+      "note": "A short placeholder reflection."
+    },
+    {
+      "id": "1785234953000-000000000001d",
+      "createdAt": "2026-07-28T10:35:53Z",
+      "emotionId": "liebe",
+      "intensity": 0.72,
+      "level": 3,
+      "note": "Placeholder text for a captured moment."
+    },
+    {
+      "id": "1785216533000-000000000001e",
+      "createdAt": "2026-07-28T05:28:53Z",
+      "emotionId": "scham",
+      "intensity": 0.77,
+      "level": 1,
+      "note": "Neutral filler note used only for screenshots."
+    },
+    {
+      "id": "1785198113000-000000000001f",
+      "createdAt": "2026-07-28T00:21:53Z",
+      "emotionId": "ekel",
+      "intensity": 0.82,
+      "level": 2,
+      "note": "Synthetic note, no personal content."
+    },
+    {
+      "id": "1785179693000-0000000000020",
+      "createdAt": "2026-07-27T19:14:53Z",
+      "emotionId": "trauer",
+      "intensity": 0.87,
+      "level": 3,
+      "note": "Test fixture note."
+    },
+    {
+      "id": "1785161273000-0000000000021",
+      "createdAt": "2026-07-27T14:07:53Z",
+      "emotionId": "wut",
+      "intensity": 0.92,
+      "level": 1,
+      "note": "Placeholder reflection for map captures."
+    },
+    {
+      "id": "1785142853000-0000000000022",
+      "createdAt": "2026-07-27T09:00:53Z",
+      "emotionId": "furcht",
+      "intensity": 0.12,
+      "level": 2,
+      "note": "Generated sample entry."
+    },
+    {
+      "id": "1785128033000-0000000000023",
+      "createdAt": "2026-07-27T04:53:53Z",
+      "emotionId": "freude",
+      "intensity": 0.17,
+      "level": 3,
+      "note": ""
+    },
+    {
+      "id": "1785109613000-0000000000024",
+      "createdAt": "2026-07-26T23:46:53Z",
+      "emotionId": "liebe",
+      "intensity": 0.22,
+      "level": 1,
+      "note": "Sample note for the visual stress test."
+    },
+    {
+      "id": "1785091193000-0000000000025",
+      "createdAt": "2026-07-26T18:39:53Z",
+      "emotionId": "scham",
+      "intensity": 0.27,
+      "level": 2,
+      "note": "A short placeholder reflection."
+    },
+    {
+      "id": "1785072773000-0000000000026",
+      "createdAt": "2026-07-26T13:32:53Z",
+      "emotionId": "ekel",
+      "intensity": 0.32,
+      "level": 3,
+      "note": "Placeholder text for a captured moment."
+    },
+    {
+      "id": "1785054353000-0000000000027",
+      "createdAt": "2026-07-26T08:25:53Z",
+      "emotionId": "trauer",
+      "intensity": 0.37,
+      "level": 1,
+      "note": "Neutral filler note used only for screenshots."
+    },
+    {
+      "id": "1785035933000-0000000000028",
+      "createdAt": "2026-07-26T03:18:53Z",
+      "emotionId": "wut",
+      "intensity": 0.42,
+      "level": 2,
+      "note": "Synthetic note, no personal content."
+    },
+    {
+      "id": "1785017513000-0000000000029",
+      "createdAt": "2026-07-25T22:11:53Z",
+      "emotionId": "furcht",
+      "intensity": 0.47,
+      "level": 3,
+      "note": "Test fixture note."
+    },
+    {
+      "id": "1784999093000-000000000002a",
+      "createdAt": "2026-07-25T17:04:53Z",
+      "emotionId": "freude",
+      "intensity": 0.52,
+      "level": 1,
+      "note": "Placeholder reflection for map captures."
+    },
+    {
+      "id": "1784984273000-000000000002b",
+      "createdAt": "2026-07-25T12:57:53Z",
+      "emotionId": "liebe",
+      "intensity": 0.57,
+      "level": 2,
+      "note": "Generated sample entry."
+    },
+    {
+      "id": "1784965853000-000000000002c",
+      "createdAt": "2026-07-25T07:50:53Z",
+      "emotionId": "scham",
+      "intensity": 0.62,
+      "level": 3,
+      "note": ""
+    },
+    {
+      "id": "1784947433000-000000000002d",
+      "createdAt": "2026-07-25T02:43:53Z",
+      "emotionId": "ekel",
+      "intensity": 0.67,
+      "level": 1,
+      "note": "Sample note for the visual stress test."
+    },
+    {
+      "id": "1784929013000-000000000002e",
+      "createdAt": "2026-07-24T21:36:53Z",
+      "emotionId": "trauer",
+      "intensity": 0.72,
+      "level": 2,
+      "note": "A short placeholder reflection."
+    },
+    {
+      "id": "1784910593000-000000000002f",
+      "createdAt": "2026-07-24T16:29:53Z",
+      "emotionId": "wut",
+      "intensity": 0.77,
+      "level": 3,
+      "note": "Placeholder text for a captured moment."
+    },
+    {
+      "id": "1784892173000-0000000000030",
+      "createdAt": "2026-07-24T11:22:53Z",
+      "emotionId": "furcht",
+      "intensity": 0.82,
+      "level": 1,
+      "note": "Neutral filler note used only for screenshots."
+    },
+    {
+      "id": "1784873753000-0000000000031",
+      "createdAt": "2026-07-24T06:15:53Z",
+      "emotionId": "freude",
+      "intensity": 0.87,
+      "level": 2,
+      "note": "Synthetic note, no personal content."
+    },
+    {
+      "id": "1784855333000-0000000000032",
+      "createdAt": "2026-07-24T01:08:53Z",
+      "emotionId": "liebe",
+      "intensity": 0.92,
+      "level": 3,
+      "note": "Test fixture note."
+    },
+    {
+      "id": "1784836913000-0000000000033",
+      "createdAt": "2026-07-23T20:01:53Z",
+      "emotionId": "scham",
+      "intensity": 0.12,
+      "level": 1,
+      "note": "Placeholder reflection for map captures."
+    },
+    {
+      "id": "1784822093000-0000000000034",
+      "createdAt": "2026-07-23T15:54:53Z",
+      "emotionId": "ekel",
+      "intensity": 0.17,
+      "level": 2,
+      "note": "Generated sample entry."
+    },
+    {
+      "id": "1784803673000-0000000000035",
+      "createdAt": "2026-07-23T10:47:53Z",
+      "emotionId": "trauer",
+      "intensity": 0.22,
+      "level": 3,
+      "note": ""
+    },
+    {
+      "id": "1784785253000-0000000000036",
+      "createdAt": "2026-07-23T05:40:53Z",
+      "emotionId": "wut",
+      "intensity": 0.27,
+      "level": 1,
+      "note": "Sample note for the visual stress test."
+    },
+    {
+      "id": "1784766833000-0000000000037",
+      "createdAt": "2026-07-23T00:33:53Z",
+      "emotionId": "furcht",
+      "intensity": 0.32,
+      "level": 2,
+      "note": "A short placeholder reflection."
+    },
+    {
+      "id": "1784748413000-0000000000038",
+      "createdAt": "2026-07-22T19:26:53Z",
+      "emotionId": "freude",
+      "intensity": 0.37,
+      "level": 3,
+      "note": "Placeholder text for a captured moment."
+    },
+    {
+      "id": "1784729993000-0000000000039",
+      "createdAt": "2026-07-22T14:19:53Z",
+      "emotionId": "liebe",
+      "intensity": 0.42,
+      "level": 1,
+      "note": "Neutral filler note used only for screenshots."
+    },
+    {
+      "id": "1784711573000-000000000003a",
+      "createdAt": "2026-07-22T09:12:53Z",
+      "emotionId": "scham",
+      "intensity": 0.47,
+      "level": 2,
+      "note": "Synthetic note, no personal content."
+    },
+    {
+      "id": "1784693153000-000000000003b",
+      "createdAt": "2026-07-22T04:05:53Z",
+      "emotionId": "ekel",
+      "intensity": 0.52,
+      "level": 3,
+      "note": "Test fixture note."
+    },
+    {
+      "id": "1784678333000-000000000003c",
+      "createdAt": "2026-07-21T23:58:53Z",
+      "emotionId": "trauer",
+      "intensity": 0.57,
+      "level": 1,
+      "note": "Placeholder reflection for map captures."
+    },
+    {
+      "id": "1784659913000-000000000003d",
+      "createdAt": "2026-07-21T18:51:53Z",
+      "emotionId": "wut",
+      "intensity": 0.62,
+      "level": 2,
+      "note": "Generated sample entry."
+    },
+    {
+      "id": "1784641493000-000000000003e",
+      "createdAt": "2026-07-21T13:44:53Z",
+      "emotionId": "furcht",
+      "intensity": 0.67,
+      "level": 3,
+      "note": ""
+    },
+    {
+      "id": "1784623073000-000000000003f",
+      "createdAt": "2026-07-21T08:37:53Z",
+      "emotionId": "freude",
+      "intensity": 0.72,
+      "level": 1,
+      "note": "Sample note for the visual stress test."
+    },
+    {
+      "id": "1784604653000-0000000000040",
+      "createdAt": "2026-07-21T03:30:53Z",
+      "emotionId": "liebe",
+      "intensity": 0.77,
+      "level": 2,
+      "note": "A short placeholder reflection."
+    },
+    {
+      "id": "1784586233000-0000000000041",
+      "createdAt": "2026-07-20T22:23:53Z",
+      "emotionId": "scham",
+      "intensity": 0.82,
+      "level": 3,
+      "note": "Placeholder text for a captured moment."
+    },
+    {
+      "id": "1784567813000-0000000000042",
+      "createdAt": "2026-07-20T17:16:53Z",
+      "emotionId": "ekel",
+      "intensity": 0.87,
+      "level": 1,
+      "note": "Neutral filler note used only for screenshots."
+    },
+    {
+      "id": "1784549393000-0000000000043",
+      "createdAt": "2026-07-20T12:09:53Z",
+      "emotionId": "trauer",
+      "intensity": 0.92,
+      "level": 2,
+      "note": "Synthetic note, no personal content."
+    },
+    {
+      "id": "1784530973000-0000000000044",
+      "createdAt": "2026-07-20T07:02:53Z",
+      "emotionId": "wut",
+      "intensity": 0.12,
+      "level": 3,
+      "note": "Test fixture note."
+    },
+    {
+      "id": "1784516153000-0000000000045",
+      "createdAt": "2026-07-20T02:55:53Z",
+      "emotionId": "furcht",
+      "intensity": 0.17,
+      "level": 1,
+      "note": "Placeholder reflection for map captures."
+    },
+    {
+      "id": "1784497733000-0000000000046",
+      "createdAt": "2026-07-19T21:48:53Z",
+      "emotionId": "freude",
+      "intensity": 0.22,
+      "level": 2,
+      "note": "Generated sample entry."
+    },
+    {
+      "id": "1784479313000-0000000000047",
+      "createdAt": "2026-07-19T16:41:53Z",
+      "emotionId": "liebe",
+      "intensity": 0.27,
+      "level": 3,
+      "note": ""
+    },
+    {
+      "id": "1784460893000-0000000000048",
+      "createdAt": "2026-07-19T11:34:53Z",
+      "emotionId": "scham",
+      "intensity": 0.32,
+      "level": 1,
+      "note": "Sample note for the visual stress test."
+    },
+    {
+      "id": "1784442473000-0000000000049",
+      "createdAt": "2026-07-19T06:27:53Z",
+      "emotionId": "ekel",
+      "intensity": 0.37,
+      "level": 2,
+      "note": "A short placeholder reflection."
+    },
+    {
+      "id": "1784424053000-000000000004a",
+      "createdAt": "2026-07-19T01:20:53Z",
+      "emotionId": "trauer",
+      "intensity": 0.42,
+      "level": 3,
+      "note": "Placeholder text for a captured moment."
+    },
+    {
+      "id": "1784405633000-000000000004b",
+      "createdAt": "2026-07-18T20:13:53Z",
+      "emotionId": "wut",
+      "intensity": 0.47,
+      "level": 1,
+      "note": "Neutral filler note used only for screenshots."
+    },
+    {
+      "id": "1784387213000-000000000004c",
+      "createdAt": "2026-07-18T15:06:53Z",
+      "emotionId": "furcht",
+      "intensity": 0.52,
+      "level": 2,
+      "note": "Synthetic note, no personal content."
+    },
+    {
+      "id": "1784368793000-000000000004d",
+      "createdAt": "2026-07-18T09:59:53Z",
+      "emotionId": "freude",
+      "intensity": 0.57,
+      "level": 3,
+      "note": "Test fixture note."
+    },
+    {
+      "id": "1784353973000-000000000004e",
+      "createdAt": "2026-07-18T05:52:53Z",
+      "emotionId": "liebe",
+      "intensity": 0.62,
+      "level": 1,
+      "note": "Placeholder reflection for map captures."
+    },
+    {
+      "id": "1784335553000-000000000004f",
+      "createdAt": "2026-07-18T00:45:53Z",
+      "emotionId": "scham",
+      "intensity": 0.67,
+      "level": 2,
+      "note": "Generated sample entry."
+    },
+    {
+      "id": "1784317133000-0000000000050",
+      "createdAt": "2026-07-17T19:38:53Z",
+      "emotionId": "ekel",
+      "intensity": 0.72,
+      "level": 3,
+      "note": ""
+    },
+    {
+      "id": "1784298713000-0000000000051",
+      "createdAt": "2026-07-17T14:31:53Z",
+      "emotionId": "trauer",
+      "intensity": 0.77,
+      "level": 1,
+      "note": "Sample note for the visual stress test."
+    },
+    {
+      "id": "1784280293000-0000000000052",
+      "createdAt": "2026-07-17T09:24:53Z",
+      "emotionId": "wut",
+      "intensity": 0.82,
+      "level": 2,
+      "note": "A short placeholder reflection."
+    },
+    {
+      "id": "1784261873000-0000000000053",
+      "createdAt": "2026-07-17T04:17:53Z",
+      "emotionId": "furcht",
+      "intensity": 0.87,
+      "level": 3,
+      "note": "Placeholder text for a captured moment."
+    },
+    {
+      "id": "1784243453000-0000000000054",
+      "createdAt": "2026-07-16T23:10:53Z",
+      "emotionId": "freude",
+      "intensity": 0.92,
+      "level": 1,
+      "note": "Neutral filler note used only for screenshots."
+    },
+    {
+      "id": "1784225033000-0000000000055",
+      "createdAt": "2026-07-16T18:03:53Z",
+      "emotionId": "liebe",
+      "intensity": 0.12,
+      "level": 2,
+      "note": "Synthetic note, no personal content."
+    },
+    {
+      "id": "1784210213000-0000000000056",
+      "createdAt": "2026-07-16T13:56:53Z",
+      "emotionId": "scham",
+      "intensity": 0.17,
+      "level": 3,
+      "note": "Test fixture note."
+    },
+    {
+      "id": "1784191793000-0000000000057",
+      "createdAt": "2026-07-16T08:49:53Z",
+      "emotionId": "ekel",
+      "intensity": 0.22,
+      "level": 1,
+      "note": "Placeholder reflection for map captures."
+    },
+    {
+      "id": "1784173373000-0000000000058",
+      "createdAt": "2026-07-16T03:42:53Z",
+      "emotionId": "trauer",
+      "intensity": 0.27,
+      "level": 2,
+      "note": "Generated sample entry."
+    },
+    {
+      "id": "1784154953000-0000000000059",
+      "createdAt": "2026-07-15T22:35:53Z",
+      "emotionId": "wut",
+      "intensity": 0.32,
+      "level": 3,
+      "note": ""
+    },
+    {
+      "id": "1784136533000-000000000005a",
+      "createdAt": "2026-07-15T17:28:53Z",
+      "emotionId": "furcht",
+      "intensity": 0.37,
+      "level": 1,
+      "note": "Sample note for the visual stress test."
+    },
+    {
+      "id": "1784118113000-000000000005b",
+      "createdAt": "2026-07-15T12:21:53Z",
+      "emotionId": "freude",
+      "intensity": 0.42,
+      "level": 2,
+      "note": "A short placeholder reflection."
+    },
+    {
+      "id": "1784099693000-000000000005c",
+      "createdAt": "2026-07-15T07:14:53Z",
+      "emotionId": "liebe",
+      "intensity": 0.47,
+      "level": 3,
+      "note": "Placeholder text for a captured moment."
+    },
+    {
+      "id": "1784081273000-000000000005d",
+      "createdAt": "2026-07-15T02:07:53Z",
+      "emotionId": "scham",
+      "intensity": 0.52,
+      "level": 1,
+      "note": "Neutral filler note used only for screenshots."
+    },
+    {
+      "id": "1784062853000-000000000005e",
+      "createdAt": "2026-07-14T21:00:53Z",
+      "emotionId": "ekel",
+      "intensity": 0.57,
+      "level": 2,
+      "note": "Synthetic note, no personal content."
+    },
+    {
+      "id": "1784048033000-000000000005f",
+      "createdAt": "2026-07-14T16:53:53Z",
+      "emotionId": "trauer",
+      "intensity": 0.62,
+      "level": 3,
+      "note": "Test fixture note."
+    },
+    {
+      "id": "1784029613000-0000000000060",
+      "createdAt": "2026-07-14T11:46:53Z",
+      "emotionId": "wut",
+      "intensity": 0.67,
+      "level": 1,
+      "note": "Placeholder reflection for map captures."
+    },
+    {
+      "id": "1784011193000-0000000000061",
+      "createdAt": "2026-07-14T06:39:53Z",
+      "emotionId": "furcht",
+      "intensity": 0.72,
+      "level": 2,
+      "note": "Generated sample entry."
+    },
+    {
+      "id": "1783992773000-0000000000062",
+      "createdAt": "2026-07-14T01:32:53Z",
+      "emotionId": "freude",
+      "intensity": 0.77,
+      "level": 3,
+      "note": ""
+    },
+    {
+      "id": "1783974353000-0000000000063",
+      "createdAt": "2026-07-13T20:25:53Z",
+      "emotionId": "liebe",
+      "intensity": 0.82,
+      "level": 1,
+      "note": "Sample note for the visual stress test."
+    },
+    {
+      "id": "1783955933000-0000000000064",
+      "createdAt": "2026-07-13T15:18:53Z",
+      "emotionId": "scham",
+      "intensity": 0.87,
+      "level": 2,
+      "note": "A short placeholder reflection."
+    },
+    {
+      "id": "1783937513000-0000000000065",
+      "createdAt": "2026-07-13T10:11:53Z",
+      "emotionId": "ekel",
+      "intensity": 0.92,
+      "level": 3,
+      "note": "Placeholder text for a captured moment."
+    },
+    {
+      "id": "1783919093000-0000000000066",
+      "createdAt": "2026-07-13T05:04:53Z",
+      "emotionId": "trauer",
+      "intensity": 0.12,
+      "level": 1,
+      "note": "Neutral filler note used only for screenshots."
+    },
+    {
+      "id": "1783904273000-0000000000067",
+      "createdAt": "2026-07-13T00:57:53Z",
+      "emotionId": "wut",
+      "intensity": 0.17,
+      "level": 2,
+      "note": "Synthetic note, no personal content."
+    },
+    {
+      "id": "1783885853000-0000000000068",
+      "createdAt": "2026-07-12T19:50:53Z",
+      "emotionId": "furcht",
+      "intensity": 0.22,
+      "level": 3,
+      "note": "Test fixture note."
+    },
+    {
+      "id": "1783867433000-0000000000069",
+      "createdAt": "2026-07-12T14:43:53Z",
+      "emotionId": "freude",
+      "intensity": 0.27,
+      "level": 1,
+      "note": "Placeholder reflection for map captures."
+    },
+    {
+      "id": "1783849013000-000000000006a",
+      "createdAt": "2026-07-12T09:36:53Z",
+      "emotionId": "liebe",
+      "intensity": 0.32,
+      "level": 2,
+      "note": "Generated sample entry."
+    },
+    {
+      "id": "1783830593000-000000000006b",
+      "createdAt": "2026-07-12T04:29:53Z",
+      "emotionId": "scham",
+      "intensity": 0.37,
+      "level": 3,
+      "note": ""
+    },
+    {
+      "id": "1783812173000-000000000006c",
+      "createdAt": "2026-07-11T23:22:53Z",
+      "emotionId": "ekel",
+      "intensity": 0.42,
+      "level": 1,
+      "note": "Sample note for the visual stress test."
+    },
+    {
+      "id": "1783793753000-000000000006d",
+      "createdAt": "2026-07-11T18:15:53Z",
+      "emotionId": "trauer",
+      "intensity": 0.47,
+      "level": 2,
+      "note": "A short placeholder reflection."
+    },
+    {
+      "id": "1783775333000-000000000006e",
+      "createdAt": "2026-07-11T13:08:53Z",
+      "emotionId": "wut",
+      "intensity": 0.52,
+      "level": 3,
+      "note": "Placeholder text for a captured moment."
+    },
+    {
+      "id": "1783756913000-000000000006f",
+      "createdAt": "2026-07-11T08:01:53Z",
+      "emotionId": "furcht",
+      "intensity": 0.57,
+      "level": 1,
+      "note": "Neutral filler note used only for screenshots."
+    },
+    {
+      "id": "1783742093000-0000000000070",
+      "createdAt": "2026-07-11T03:54:53Z",
+      "emotionId": "freude",
+      "intensity": 0.62,
+      "level": 2,
+      "note": "Synthetic note, no personal content."
+    },
+    {
+      "id": "1783723673000-0000000000071",
+      "createdAt": "2026-07-10T22:47:53Z",
+      "emotionId": "liebe",
+      "intensity": 0.67,
+      "level": 3,
+      "note": "Test fixture note."
+    },
+    {
+      "id": "1783705253000-0000000000072",
+      "createdAt": "2026-07-10T17:40:53Z",
+      "emotionId": "scham",
+      "intensity": 0.72,
+      "level": 1,
+      "note": "Placeholder reflection for map captures."
+    },
+    {
+      "id": "1783686833000-0000000000073",
+      "createdAt": "2026-07-10T12:33:53Z",
+      "emotionId": "ekel",
+      "intensity": 0.77,
+      "level": 2,
+      "note": "Generated sample entry."
+    },
+    {
+      "id": "1783668413000-0000000000074",
+      "createdAt": "2026-07-10T07:26:53Z",
+      "emotionId": "trauer",
+      "intensity": 0.82,
+      "level": 3,
+      "note": ""
+    },
+    {
+      "id": "1783649993000-0000000000075",
+      "createdAt": "2026-07-10T02:19:53Z",
+      "emotionId": "wut",
+      "intensity": 0.87,
+      "level": 1,
+      "note": "Sample note for the visual stress test."
+    },
+    {
+      "id": "1783631573000-0000000000076",
+      "createdAt": "2026-07-09T21:12:53Z",
+      "emotionId": "furcht",
+      "intensity": 0.92,
+      "level": 2,
+      "note": "A short placeholder reflection."
+    },
+    {
+      "id": "1783613153000-0000000000077",
+      "createdAt": "2026-07-09T16:05:53Z",
+      "emotionId": "freude",
+      "intensity": 0.12,
+      "level": 3,
+      "note": "Placeholder text for a captured moment."
+    },
+    {
+      "id": "1783598333000-0000000000078",
+      "createdAt": "2026-07-09T11:58:53Z",
+      "emotionId": "liebe",
+      "intensity": 0.17,
+      "level": 1,
+      "note": "Neutral filler note used only for screenshots."
+    },
+    {
+      "id": "1783579913000-0000000000079",
+      "createdAt": "2026-07-09T06:51:53Z",
+      "emotionId": "scham",
+      "intensity": 0.22,
+      "level": 2,
+      "note": "Synthetic note, no personal content."
+    },
+    {
+      "id": "1783561493000-000000000007a",
+      "createdAt": "2026-07-09T01:44:53Z",
+      "emotionId": "ekel",
+      "intensity": 0.27,
+      "level": 3,
+      "note": "Test fixture note."
+    },
+    {
+      "id": "1783543073000-000000000007b",
+      "createdAt": "2026-07-08T20:37:53Z",
+      "emotionId": "trauer",
+      "intensity": 0.32,
+      "level": 1,
+      "note": "Placeholder reflection for map captures."
+    },
+    {
+      "id": "1783524653000-000000000007c",
+      "createdAt": "2026-07-08T15:30:53Z",
+      "emotionId": "wut",
+      "intensity": 0.37,
+      "level": 2,
+      "note": "Generated sample entry."
+    },
+    {
+      "id": "1783506233000-000000000007d",
+      "createdAt": "2026-07-08T10:23:53Z",
+      "emotionId": "furcht",
+      "intensity": 0.42,
+      "level": 3,
+      "note": ""
+    },
+    {
+      "id": "1783487813000-000000000007e",
+      "createdAt": "2026-07-08T05:16:53Z",
+      "emotionId": "freude",
+      "intensity": 0.47,
+      "level": 1,
+      "note": "Sample note for the visual stress test."
+    },
+    {
+      "id": "1783469393000-000000000007f",
+      "createdAt": "2026-07-08T00:09:53Z",
+      "emotionId": "liebe",
+      "intensity": 0.52,
+      "level": 2,
+      "note": "A short placeholder reflection."
+    },
+    {
+      "id": "1783450973000-0000000000080",
+      "createdAt": "2026-07-07T19:02:53Z",
+      "emotionId": "scham",
+      "intensity": 0.57,
+      "level": 3,
+      "note": "Placeholder text for a captured moment."
+    },
+    {
+      "id": "1783436153000-0000000000081",
+      "createdAt": "2026-07-07T14:55:53Z",
+      "emotionId": "ekel",
+      "intensity": 0.62,
+      "level": 1,
+      "note": "Neutral filler note used only for screenshots."
+    },
+    {
+      "id": "1783417733000-0000000000082",
+      "createdAt": "2026-07-07T09:48:53Z",
+      "emotionId": "trauer",
+      "intensity": 0.67,
+      "level": 2,
+      "note": "Synthetic note, no personal content."
+    },
+    {
+      "id": "1783399313000-0000000000083",
+      "createdAt": "2026-07-07T04:41:53Z",
+      "emotionId": "wut",
+      "intensity": 0.72,
+      "level": 3,
+      "note": "Test fixture note."
+    },
+    {
+      "id": "1783380893000-0000000000084",
+      "createdAt": "2026-07-06T23:34:53Z",
+      "emotionId": "furcht",
+      "intensity": 0.77,
+      "level": 1,
+      "note": "Placeholder reflection for map captures."
+    }
+  ],
+  "beliefStatements": [
+    {
+      "kind": "built-in",
+      "beliefSystemId": "always-functioning",
+      "guidingStatement": "A supportive sentence for the always functioning belief."
+    },
+    {
+      "kind": "built-in",
+      "beliefSystemId": "no-mistakes",
+      "guidingStatement": "A supportive sentence for the no mistakes belief."
+    },
+    {
+      "kind": "built-in",
+      "beliefSystemId": "responsible-for-everything",
+      "guidingStatement": "A supportive sentence for the responsible for everything belief."
+    },
+    {
+      "kind": "built-in",
+      "beliefSystemId": "do-everything-alone",
+      "guidingStatement": "A supportive sentence for the do everything alone belief."
+    },
+    {
+      "kind": "built-in",
+      "beliefSystemId": "perfect-everything",
+      "guidingStatement": "A supportive sentence for the perfect everything belief."
+    },
+    {
+      "kind": "built-in",
+      "beliefSystemId": "there-for-others",
+      "guidingStatement": "A supportive sentence for the there for others belief."
+    },
+    {
+      "kind": "built-in",
+      "beliefSystemId": "perfect-expect-others",
+      "guidingStatement": "A supportive sentence for the perfect expect others belief."
+    },
+    {
+      "kind": "built-in",
+      "beliefSystemId": "love-requires-conformity",
+      "guidingStatement": "A supportive sentence for the love requires conformity belief."
+    },
+    {
+      "kind": "built-in",
+      "beliefSystemId": "always-considerate",
+      "guidingStatement": "A supportive sentence for the always considerate belief."
+    },
+    {
+      "kind": "built-in",
+      "beliefSystemId": "must-adapt",
+      "guidingStatement": "A supportive sentence for the must adapt belief."
+    },
+    {
+      "kind": "built-in",
+      "beliefSystemId": "loved-by-everyone",
+      "guidingStatement": "A supportive sentence for the loved by everyone belief."
+    },
+    {
+      "kind": "built-in",
+      "beliefSystemId": "cannot-burden-others",
+      "guidingStatement": "A supportive sentence for the cannot burden others belief."
+    },
+    {
+      "kind": "custom",
+      "beliefSystemId": "custom-1784504134321-fixture1",
+      "harmfulStatement": "A limiting rule number 1.",
+      "guidingStatement": "A kinder alternative number 1."
+    },
+    {
+      "kind": "custom",
+      "beliefSystemId": "custom-1784504134322-fixture2",
+      "harmfulStatement": "A limiting rule number 2.",
+      "guidingStatement": "A kinder alternative number 2."
+    },
+    {
+      "kind": "custom",
+      "beliefSystemId": "custom-1784504134323-fixture3",
+      "harmfulStatement": "A limiting rule number 3.",
+      "guidingStatement": "A kinder alternative number 3."
+    }
+  ],
+  "settings": {
+    "locale": "en-US",
+    "emotionLabelMode": "both",
+    "onboardingCompleted": true
+  }
+}
