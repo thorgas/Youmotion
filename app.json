@@ -28,7 +28,7 @@
       "favicon": "./assets/images/favicon.png"
     },
     "plugins": [
-      "./plugins/without-push-notifications-entitlement",
+      "expo-no-push-entitlement",
       "expo-router",
       "expo-localization",
       "expo-mail-composer",

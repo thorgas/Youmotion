@@ -59,6 +59,7 @@ minimumReleaseAgeExclude:
   - expo-web-browser@57.0.1
   - jest-expo@57.0.2
   - expo-updates@57.0.8
+  - expo-no-push-entitlement@1.0.0
 overrides:
   tslib: 2.8.1
 patchedDependencies:

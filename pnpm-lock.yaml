@@ -263,6 +263,9 @@ importers:
       eslint:
         specifier: ^9.39.5
         version: 9.39.5(jiti@2.7.0)(supports-color@8.1.1)
+      expo-no-push-entitlement:
+        specifier: 1.0.0
+        version: 1.0.0(expo@57.0.6)
       jest:
         specifier: ~29.7.0
         version: 29.7.0(@types/node@26.1.1)(supports-color@8.1.1)(ts-node@10.9.2(@types/node@26.1.1)(typescript@6.0.3))
@@ -4705,6 +4708,11 @@ packages:
     resolution: {integrity: sha512-B+iXJCC5OIXjFKkLLSY2DZ8BGS+hC3PBTrALpV43pHqhXqqZrRH3uTEylZgsoKQO8N8tjmjAua2ucTFHtr1o0w==}
     peerDependencies:
       react-native: '*'
+
+  expo-no-push-entitlement@1.0.0:
+    resolution: {integrity: sha512-5eiA/WylRHNxBFNvvqUxLdt7Afj1q1cpVZ1IKUKeS7Ad+9drqoVlQ/amoUI3G8qi6UALvTl6IHPOD/TVVQYF8Q==}
+    peerDependencies:
+      expo: '>=50'
 
   expo-notifications@57.0.10:
     resolution: {integrity: sha512-Zrwwd2eGzSuk3LyD01P5QzhiE/oXNNWaUq/NLQnPoeo63Ek2R6sWA00b0o0rl47uIqdmMtuQUfWbXgJJyc3Uag==}
@@ -12987,6 +12995,10 @@ snapshots:
   expo-modules-jsi@57.0.3(patch_hash=a1d0b64ba32038661be429a8003a78ac98bcdb7a44afd488bad3af643d8b9408)(react-native@0.86.0(@babel/core@7.29.7(supports-color@8.1.1))(@react-native/jest-preset@0.86.0(@babel/core@7.29.7(supports-color@8.1.1))(react@19.2.3)(supports-color@8.1.1))(@react-native/metro-config@0.86.0(@babel/core@7.29.7(supports-color@8.1.1))(supports-color@8.1.1))(@types/react@19.2.17)(react@19.2.3)(supports-color@8.1.1)):
     dependencies:
       react-native: 0.86.0(@babel/core@7.29.7(supports-color@8.1.1))(@react-native/jest-preset@0.86.0(@babel/core@7.29.7(supports-color@8.1.1))(react@19.2.3)(supports-color@8.1.1))(@react-native/metro-config@0.86.0(@babel/core@7.29.7(supports-color@8.1.1))(supports-color@8.1.1))(@types/react@19.2.17)(react@19.2.3)(supports-color@8.1.1)
+
+  expo-no-push-entitlement@1.0.0(expo@57.0.6):
+    dependencies:
+      expo: 57.0.6(5f896496585d613c19f7e1a64536359b)
 
   expo-notifications@57.0.10(expo@57.0.6)(react-native@0.86.0(@babel/core@7.29.7(supports-color@8.1.1))(@react-native/jest-preset@0.86.0(@babel/core@7.29.7(supports-color@8.1.1))(react@19.2.3)(supports-color@8.1.1))(@react-native/metro-config@0.86.0(@babel/core@7.29.7(supports-color@8.1.1))(supports-color@8.1.1))(@types/react@19.2.17)(react@19.2.3)(supports-color@8.1.1))(react@19.2.3)(supports-color@8.1.1)(typescript@6.0.3):
     dependencies:
