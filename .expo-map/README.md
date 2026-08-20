@@ -1,6 +1,6 @@
 # Youmotion Expo map
 
-This directory is a committed `expo-map` result set refreshed after the Checklist Design improvements on 2026-08-15.
+This directory is a committed `expo-map` result set refreshed on 2026-08-20.
 
 - Source routes: 18 Expo Router routes across a root Stack and tab navigator
 - Primary capture device: iPhone 17 Pro simulator, iOS 26.1
@@ -22,7 +22,7 @@ This directory is a committed `expo-map` result set refreshed after the Checklis
 
 The route graph is unaffected: no route file was added, moved, or removed, so `graph.json` still matches `src/app/`.
 
-`map.html` and `Youmotion-2026-08-19.appmap` carry the re-captured screens. Both were assembled from the 2026-08-15 run with only these two screenshots and their capture notes replaced; every other screen and flow is unchanged from that run, and `manifest.json` records this in `regeneratedFrom`. Run the full `expo-map` skill for a clean end-to-end capture.
+`Youmotion-2026-08-20.appmap` carries the current route graph and the re-captured screens. It was assembled from the verified 2026-08-19 capture set because the intervening commits only changed iOS signing; every screen and flow is unchanged. `map.html` remains the fallback contact sheet from that capture set because the current standalone renderer cannot consume the format-v2 object-shaped flow steps; the `.appmap` bundle is the current primary artifact.
 
 Populate device captures only from `src/features/data-safety/__tests__/fixtures/legacy-archive.fixture.json`. Its text is synthetic, so it is safe in committed screenshots and in an uploaded `.appmap`; a personal export is not.
 
