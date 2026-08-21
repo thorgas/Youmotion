@@ -55,7 +55,7 @@
     "react-native-reanimated": "4.5.0",
     "react-native-safe-area-context": "~5.7.0",
     "react-native-screens": "4.25.2",
-    "react-native-surrealdb": "link:vendor/react-native-surrealdb",
+    "react-native-surrealdb": "0.1.0-alpha.1",
     "react-native-svg": "15.15.4",
     "react-native-view-shot": "5.1.0",
     "react-native-web": "~0.21.0",
@@ -124,7 +124,6 @@
     "eas:whoami": "eas whoami",
     "eas:init": "eas init",
     "eas:open": "eas open",
-    "eas-build-pre-install": "node scripts/verify-vendored-surrealdb.mjs",
     "eas:credentials:ios": "eas credentials --platform ios",
     "eas:credentials:android": "eas credentials --platform android",
     "eas:builds": "eas build:list",
@@ -175,8 +174,7 @@
     "test:harness:android": "node scripts/run-android-harness.mjs android 8084",
     "test:harness:android:pixel": "node scripts/run-android-harness.mjs android-pixel-6a 8084",
     "test:harness:ios": "RN_HARNESS_METRO_PORT=8083 harness --config jest.harness.config.mjs --no-watchman --harnessRunner ios",
-    "verify": "pnpm lint && pnpm typecheck && pnpm test",
-    "verify:surrealdb-vendor": "node scripts/verify-vendored-surrealdb.mjs"
+    "verify": "pnpm lint && pnpm typecheck && pnpm test"
   },
   "private": true
 }
