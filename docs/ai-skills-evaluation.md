@@ -94,7 +94,7 @@ rerun with multiple repetitions before upgrading their pinned revisions.
   long-running reviewer, so the failed trigger is expensive rather than benign.
 - **Lint Rule Miner** was described as an internal skill in the bookmarked post
   and no public installable skill was linked.
-- **Pure JSI/C++ and Nitro skills** are specialist tools for the vendored
+- **Pure JSI/C++ and Nitro skills** are specialist tools for the
   `react-native-surrealdb` module. Evaluate them in that package's repository
   when native-module work is active, not as general Youmotion skills.
 

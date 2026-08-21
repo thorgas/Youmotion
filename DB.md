@@ -303,33 +303,13 @@ Any change to the statement that data stays exclusively on the device requires a
 
 ## Native package setup
 
-`react-native-surrealdb` is currently consumed from:
+`react-native-surrealdb` is installed from npm's `next` channel:
 
 ```json
-"react-native-surrealdb": "link:vendor/react-native-surrealdb"
+"react-native-surrealdb": "0.1.0-alpha.1"
 ```
 
-The vendored package is pinned in `vendor/README.md` to upstream commit `13cf061bbeca15fe5cfd3e3089146dbedbb2f61b`. It uses the official Rust SDK through generated UniFFI/Hermes JSI bindings and requires a native development build. Expo Go cannot load it.
-
-Required ignored native artifacts are:
-
-```text
-vendor/react-native-surrealdb/SurrealDbRnFramework.xcframework/
-vendor/react-native-surrealdb/android/src/main/jniLibs/arm64-v8a/libsurrealdb_rn_core.so
-vendor/react-native-surrealdb/android/src/main/jniLibs/armeabi-v7a/libsurrealdb_rn_core.so
-vendor/react-native-surrealdb/android/src/main/jniLibs/x86/libsurrealdb_rn_core.so
-vendor/react-native-surrealdb/android/src/main/jniLibs/x86_64/libsurrealdb_rn_core.so
-```
-
-The large binaries are excluded from normal Git history. `.easignore` explicitly includes local copies in EAS upload archives. `eas-build-pre-install` runs the vendor verification script and fails early when the artifacts required for the target platform are missing or empty.
-
-Validate the local vendor before a native build:
-
-```bash
-pnpm verify:surrealdb-vendor
-```
-
-To refresh the vendor, build release artifacts in the source package repository, copy the publishable package into `vendor/react-native-surrealdb`, update the pinned commit in `vendor/README.md`, and rerun verification. After the package is published, replace the `link:` dependency with an exact compatible package version and remove vendor-only build plumbing.
+The package uses the official Rust SDK through generated UniFFI/Hermes JSI bindings and includes its native iOS and Android artifacts. It requires a native development build; Expo Go cannot load it. Rebuild the native app after changing the package version.
 
 ## Development and testing
 
@@ -363,7 +343,6 @@ Run the standard gates:
 ```bash
 pnpm verify
 pnpm test:coverage
-pnpm verify:surrealdb-vendor
 ```
 
 Run `pnpm test:harness:ios` or `pnpm test:harness:android` to exercise the React Native runtime and native engine on the configured simulator or emulator. The scripts reserve dedicated Metro ports so an existing development server does not intercept Harness. A connected Google Pixel 6a can run the same suite through `pnpm test:harness:android:pixel`. A plain web environment cannot validate Hermes, Android SVG rendering, or the native SurrealDB binding.

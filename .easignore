@@ -53,13 +53,3 @@ example
 # generated native folders
 /ios
 /android
-
-# Exclude local Android build output from the vendored package.
-/vendor/react-native-surrealdb/android/.cxx/
-/vendor/react-native-surrealdb/android/build/
-
-# Include the untracked vendored native binaries in local EAS uploads.
-!/vendor/react-native-surrealdb/SurrealDbRnFramework.xcframework/
-!/vendor/react-native-surrealdb/SurrealDbRnFramework.xcframework/**
-!/vendor/react-native-surrealdb/android/src/main/jniLibs/
-!/vendor/react-native-surrealdb/android/src/main/jniLibs/**
