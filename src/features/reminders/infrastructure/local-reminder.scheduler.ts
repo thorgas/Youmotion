@@ -116,10 +116,10 @@ function notificationContent({
       };
   if (assignment.targetKind === REMINDER_TARGET_KINDS.PULSE) {
     return {
-      title: locale === APP_LOCALES.GERMAN ? 'Ein Moment für dich' : 'A moment for you',
+      title: locale === APP_LOCALES.GERMAN ? 'Wie fühlst du dich gerade?' : 'How are you feeling?',
       body: locale === APP_LOCALES.GERMAN
-        ? 'Öffne Youmotion, wenn du bereit bist wahrzunehmen, was gerade da ist.'
-        : 'Open Youmotion when you are ready to notice what is here.',
+        ? 'Öffne Youmotion für einen sanften Gefühls-Check-in.'
+        : 'Open Youmotion for a gentle emotion check-in.',
       data,
       sound: false,
     };

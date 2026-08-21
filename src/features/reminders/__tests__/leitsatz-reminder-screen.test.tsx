@@ -6,6 +6,7 @@ import {
   BELIEF_LIBRARY_EVENTS,
   EMOTION_LABEL_MODES,
   NAVIGATION_EVENTS,
+  REMINDER_EVENTS,
   REMINDER_NOTIFICATION_CONTENT,
   REMINDER_PERMISSION_STATES,
   REMINDER_STATES,
@@ -63,6 +64,16 @@ async function actorAtReminderOffer() {
   return actor;
 }
 
+async function actorAtEmotionCheckInReminderOffer() {
+  const actor = createActor(appNavigationMachine).start();
+  actor.send({ type: NAVIGATION_EVENTS.SETTINGS_OPENED });
+  actor.send({ type: REMINDER_EVENTS.OPENED });
+  await waitFor(actor, (snapshot) => snapshot.matches(REMINDER_STATES.SETTINGS));
+  actor.send({ type: REMINDER_EVENTS.CREATE_REQUESTED });
+  await waitFor(actor, (snapshot) => snapshot.matches(REMINDER_STATES.OFFER));
+  return actor;
+}
+
 async function renderReminder(actor: Actor<typeof appNavigationMachine>) {
   return render(
     <AppNavigationActorProvider actor={actor}>
@@ -93,6 +104,17 @@ describe('Leitsatz reminder screen', () => {
       .toBeOnTheScreen();
     expect(screen.getByText('“I can ask for support.”')).toBeOnTheScreen();
     expect(actor.getSnapshot().context.reminderAssignments).toEqual([]);
+  });
+
+  it('describes only the timing choices available for an emotion check-in reminder', async () => {
+    const actor = await actorAtEmotionCheckInReminderOffer();
+    await renderReminder(actor);
+
+    expect(screen.getByText('EMOTION CHECK-IN')).toBeOnTheScreen();
+    expect(screen.getByText(
+      'After permission, you can choose the days and times for this reminder.',
+    )).toBeOnTheScreen();
+    expect(screen.queryByText(/words that may appear/)).not.toBeOnTheScreen();
   });
 
   it('lets the user choose general or Leitsatz content immediately after permission', async () => {

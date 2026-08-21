@@ -5888,6 +5888,84 @@
       "tokens": [],
       "translations": [{ "translation": "Erinnerung planen", "variations": {} }],
       "types": []
+    },
+    "73wUb0rAsE/JAZA8/a0Ueg==": {
+      "description": "Emotion check-in reminder settings entry explanation",
+      "tokens": [],
+      "translations": [{ "translation": "Wähle Tage und Uhrzeiten für eine sanfte Einladung, wahrzunehmen, wie du dich fühlst.", "variations": {} }],
+      "types": []
+    },
+    "FuYFnor1KxYgVc2smP5clg==": {
+      "description": "Emotion check-in reminder settings entry title",
+      "tokens": [],
+      "translations": [{ "translation": "Erinnerung zum Gefühls-Check-in", "variations": {} }],
+      "types": []
+    },
+    "7lkSgVKiogsiZRXaCXvrxw==": {
+      "description": "Emotion check-in reminder offer eyebrow",
+      "tokens": [],
+      "translations": [{ "translation": "GEFÜHLS-CHECK-IN", "variations": {} }],
+      "types": []
+    },
+    "9R4cGJmpSY8OnEKVdMMf1A==": {
+      "description": "Emotion check-in reminder permission before timing explanation",
+      "tokens": [],
+      "translations": [{ "translation": "Nach deiner Zustimmung kannst du Tage und Uhrzeiten für diese Erinnerung wählen.", "variations": {} }],
+      "types": []
+    },
+    "zIGs7g3JdiFvAeLQ6Rf+sg==": {
+      "description": "Leitsatz reminder permission before timing and content explanation",
+      "tokens": [],
+      "translations": [{ "translation": "Nach deiner Zustimmung kannst du Tage, Uhrzeiten und die Wörter wählen, die angezeigt werden dürfen.", "variations": {} }],
+      "types": []
+    },
+    "Fa63RefMF9NFlHFtXJdlBg==": {
+      "description": "Emotion check-in reminder assignment kind",
+      "tokens": [],
+      "translations": [{ "translation": "GEFÜHLS-CHECK-IN", "variations": {} }],
+      "types": []
+    },
+    "LWnELwsP5DaLimcAsh1u+g==": {
+      "description": "Emotion check-in reminder content description",
+      "tokens": [],
+      "translations": [{ "translation": "Nimm deine Gefühle wahr", "variations": {} }],
+      "types": []
+    },
+    "Gz08lrnBAnyHUOHEoR84KQ==": {
+      "description": "Emotion check-in reminder settings eyebrow",
+      "tokens": [],
+      "translations": [{ "translation": "GEFÜHLS-CHECK-IN", "variations": {} }],
+      "types": []
+    },
+    "tufrAs/QQbk3nG2cFxfRaQ==": {
+      "description": "Emotion check-in reminder settings title",
+      "tokens": [],
+      "translations": [{ "translation": "Ein Moment, um wahrzunehmen, wie du dich fühlst.", "variations": {} }],
+      "types": []
+    },
+    "R9uhe68gRv69kfdf/P7QEg==": {
+      "description": "Emotion check-in reminder settings explanation",
+      "tokens": [],
+      "translations": [{ "translation": "Wähle, wann Youmotion dich sanft einladen darf, die App zu öffnen und deine Gefühle wahrzunehmen. Leitsatz-Erinnerungen findest du beim jeweiligen Leitsatz.", "variations": {} }],
+      "types": []
+    },
+    "ODIkH/5vMuKRFejZCqpT0A==": {
+      "description": "Empty emotion check-in reminder settings title",
+      "tokens": [],
+      "translations": [{ "translation": "Noch keine Erinnerung zum Gefühls-Check-in", "variations": {} }],
+      "types": []
+    },
+    "YDX6fW/kKwxZQYhNlA+QBQ==": {
+      "description": "Empty emotion check-in reminder settings explanation",
+      "tokens": [],
+      "translations": [{ "translation": "Füge eine hinzu, wenn eine sanfte Einladung, deine Gefühle wahrzunehmen, hilfreich wäre.", "variations": {} }],
+      "types": []
+    },
+    "B9E5Co6vy7iCrPQ5pqBMpA==": {
+      "description": "New emotion check-in reminder setup button",
+      "tokens": [],
+      "translations": [{ "translation": "Check-in-Erinnerung hinzufügen", "variations": {} }],
+      "types": []
     }
   }
 }

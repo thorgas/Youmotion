@@ -246,12 +246,15 @@ export function SettingsScreen() {
         <View style={styles.actionGroup}>
           <SettingsActionRow
             description={String(fbs(
-              'Choose days and times for a gentle Pulse invitation.',
-              'Reminder settings entry explanation',
+              'Choose days and times for a gentle invitation to notice how you feel.',
+              'Emotion check-in reminder settings entry explanation',
             ))}
             onPress={_openReminders}
             testID="open-reminders"
-            title={String(fbs('Pulse reminder', 'Pulse reminder settings entry title'))}
+            title={String(fbs(
+              'Emotion check-in reminder',
+              'Emotion check-in reminder settings entry title',
+            ))}
           />
           <SettingsActionRow
             count={guidingBeliefCount}

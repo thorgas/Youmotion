@@ -58,6 +58,16 @@ const assignment = {
   createdAt: now,
   updatedAt: now,
 } satisfies ReminderAssignment;
+const checkInAssignment = {
+  id: ReminderAssignmentId.make('emotion-check-in'),
+  schemaVersion: 2,
+  targetKind: REMINDER_TARGET_KINDS.PULSE,
+  enabled: true,
+  weekdays: [2, 3, 4, 5, 6],
+  times: [{ hour: 19, minute: 0 }],
+  createdAt: now,
+  updatedAt: now,
+} satisfies ReminderAssignment;
 const statements = [{
   kind: 'custom',
   beliefSystemId,
@@ -232,6 +242,44 @@ describe('local reminder scheduler', () => {
     );
     expect(JSON.stringify(mockedNotifications.scheduleNotificationAsync.mock.calls))
       .not.toContain('I must never need help.');
+  });
+
+  it('invites an emotion check-in without exposing journal content', async () => {
+    await sendTestReminder({
+      assignment: checkInAssignment,
+      locale: 'en-US',
+      statements,
+    });
+
+    expect(mockedNotifications.scheduleNotificationAsync).toHaveBeenCalledWith(
+      expect.objectContaining({
+        content: expect.objectContaining({
+          title: 'How are you feeling?',
+          body: 'Open Youmotion for a gentle emotion check-in.',
+        }),
+      }),
+    );
+    expect(JSON.stringify(mockedNotifications.scheduleNotificationAsync.mock.calls))
+      .not.toContain('I must never need help.');
+    expect(JSON.stringify(mockedNotifications.scheduleNotificationAsync.mock.calls))
+      .not.toContain('I may receive support.');
+  });
+
+  it('localizes the emotion check-in notification in German', async () => {
+    await sendTestReminder({
+      assignment: checkInAssignment,
+      locale: 'de-DE',
+      statements,
+    });
+
+    expect(mockedNotifications.scheduleNotificationAsync).toHaveBeenCalledWith(
+      expect.objectContaining({
+        content: expect.objectContaining({
+          title: 'Wie fühlst du dich gerade?',
+          body: 'Öffne Youmotion für einen sanften Gefühls-Check-in.',
+        }),
+      }),
+    );
   });
 
   it('replaces native requests when one reminder enables a full preview', async () => {

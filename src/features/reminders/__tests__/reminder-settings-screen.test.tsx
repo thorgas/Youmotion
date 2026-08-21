@@ -92,7 +92,7 @@ async function renderSettings(actor: Actor<typeof appNavigationMachine>) {
   );
 }
 
-describe('Pulse reminder settings', () => {
+describe('emotion check-in reminder settings', () => {
   beforeAll(() => configureAppLocale(appSettingsStore));
 
   beforeEach(() => {
@@ -110,11 +110,12 @@ describe('Pulse reminder settings', () => {
     } });
   });
 
-  it('shows only Pulse timing because Leitsatz reminders live in Leitsatz management', async () => {
+  it('presents the Pulse assignment as an emotion check-in reminder', async () => {
     const actor = await actorAtReminderSettings();
     await renderSettings(actor);
 
-    expect(screen.getByText('Check in with yourself')).toBeOnTheScreen();
+    expect(screen.getAllByText('EMOTION CHECK-IN')).toHaveLength(2);
+    expect(screen.getByText('Check in with your emotions')).toBeOnTheScreen();
     expect(screen.getByText('Monday, Tuesday, Wednesday, Thursday, Friday · 09:00'))
       .toBeOnTheScreen();
     expect(screen.queryByText('18:00')).not.toBeOnTheScreen();
@@ -133,7 +134,7 @@ describe('Pulse reminder settings', () => {
     });
   });
 
-  it('starts a new Pulse reminder without asking for a schedule name', async () => {
+  it('starts a new emotion check-in reminder without asking for a schedule name', async () => {
     const actor = await actorAtReminderSettings();
     await renderSettings(actor);
 

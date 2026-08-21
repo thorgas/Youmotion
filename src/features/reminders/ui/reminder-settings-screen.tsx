@@ -48,9 +48,9 @@ function PulseReminderCard({ assignment }: { assignment: PulseReminderAssignment
   const deleteAccessibilityLabel = deleteReminderAccessibilityLabel();
 
   return (
-    <View style={styles.reminderCard}>
-      <Text style={styles.assignmentSectionLabel}><fbt desc="Pulse reminder assignment kind">PULSE</fbt></Text>
-      <Text style={styles.assignmentTitle}><fbt desc="Pulse reminder content description">Check in with yourself</fbt></Text>
+    <View style={styles.reminderCard} testID="reminder-assignment-card">
+      <Text style={styles.assignmentSectionLabel}><fbt desc="Emotion check-in reminder assignment kind">EMOTION CHECK-IN</fbt></Text>
+      <Text style={styles.assignmentTitle}><fbt desc="Emotion check-in reminder content description">Check in with your emotions</fbt></Text>
       <PressableScale accessibilityRole="button" onPress={editReminder} style={styles.reminderEdit} testID={`reminder-edit-${assignment.id}`}>
         <View style={styles.assignmentCopy}>
           <Text style={styles.reminderTiming}>
@@ -99,14 +99,14 @@ export function ReminderSettingsScreen() {
           />
         </View>
         <ScrollView contentContainerStyle={styles.content}>
-          <Text style={styles.eyebrow}><fbt desc="Reminder settings eyebrow">GENTLE REMINDERS</fbt></Text>
-          <Text style={styles.title}><fbt desc="Pulse reminder settings title">A moment to check in.</fbt></Text>
-          <Text style={styles.copy}><fbt desc="Pulse reminder settings explanation">Choose when Youmotion may gently invite you back to Pulse. Leitsatz reminders live with each Leitsatz.</fbt></Text>
+          <Text style={styles.eyebrow}><fbt desc="Emotion check-in reminder settings eyebrow">EMOTION CHECK-IN</fbt></Text>
+          <Text style={styles.title}><fbt desc="Emotion check-in reminder settings title">A moment to notice how you feel.</fbt></Text>
+          <Text style={styles.copy}><fbt desc="Emotion check-in reminder settings explanation">Choose when Youmotion may gently invite you to open the app and check in with your emotions. Leitsatz reminders live with each Leitsatz.</fbt></Text>
           {assignment ? <PulseReminderCard assignment={assignment} /> : null}
           {!assignment ? (
-            <View style={styles.empty}>
-              <Text style={styles.reminderTitle}><fbt desc="Empty Pulse reminder settings title">No Pulse reminder yet</fbt></Text>
-              <Text style={styles.copy}><fbt desc="Empty Pulse reminder settings explanation">Add one when a gentle invitation to check in would help.</fbt></Text>
+            <View style={styles.empty} testID="reminder-settings-empty">
+              <Text style={styles.reminderTitle}><fbt desc="Empty emotion check-in reminder settings title">No emotion check-in reminder yet</fbt></Text>
+              <Text style={styles.copy}><fbt desc="Empty emotion check-in reminder settings explanation">Add one when a gentle invitation to notice how you feel would help.</fbt></Text>
             </View>
           ) : null}
           {error ? (
@@ -132,7 +132,7 @@ export function ReminderSettingsScreen() {
             style={styles.action}
             testID="reminder-settings-new"
           >
-            <Text style={styles.actionText}><fbt desc="New Pulse reminder setup button">Add Pulse reminder</fbt></Text>
+            <Text style={styles.actionText}><fbt desc="New emotion check-in reminder setup button">Add check-in reminder</fbt></Text>
           </PressableScale>
         </ScrollView>
       </SafeAreaView>

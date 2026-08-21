@@ -194,7 +194,7 @@ function OfferContent({
     <>
       <Text style={styles.eyebrow}>
         {pulseTarget
-          ? <fbt desc="Pulse reminder offer eyebrow">PULSE REMINDER</fbt>
+          ? <fbt desc="Emotion check-in reminder offer eyebrow">EMOTION CHECK-IN</fbt>
           : <fbt desc="Saved positive Leitsatz eyebrow">LEITSATZ SAVED</fbt>}
       </Text>
       <Text style={styles.title}>
@@ -204,7 +204,9 @@ function OfferContent({
       </Text>
       {statement ? <PositiveStatementCard statement={statement} /> : null}
       <Text style={styles.copy}>
-        <fbt desc="Reminder permission before timing explanation">After permission, you can choose the days, times, and words that may appear.</fbt>
+        {pulseTarget
+          ? <fbt desc="Emotion check-in reminder permission before timing explanation">After permission, you can choose the days and times for this reminder.</fbt>
+          : <fbt desc="Leitsatz reminder permission before timing and content explanation">After permission, you can choose the days, times, and words that may appear.</fbt>}
       </Text>
       <ActionButton label={String(fbs('Allow notifications and continue', 'Button requesting reminder permission'))} onPress={_accept} testID="reminder-offer-accept" />
       <ActionButton label={String(fbs('Not now', 'Button declining reminder setup'))} onPress={_decline} secondary testID="reminder-offer-decline" />
