@@ -1,6 +1,6 @@
 # Local reminder runtime test matrix
 
-This matrix defines the device-local Pulse and positive-Leitsatz reminder contract. A persisted reminder assignment is the source of truth and owns its weekdays and times. A Leitsatz assignment additionally owns `notificationContent: "general" | "leitsatz"`. Native scheduled requests are a derived projection that reconciliation may safely rebuild.
+This matrix defines the device-local emotion check-in (internally Pulse) and positive-Leitsatz reminder contract. A persisted reminder assignment is the source of truth and owns its weekdays and times. A Leitsatz assignment additionally owns `notificationContent: "general" | "leitsatz"`. Native scheduled requests are a derived projection that reconciliation may safely rebuild.
 
 | Boundary | Starting condition | Input or transition | User-visible result |
 | --- | --- | --- | --- |
@@ -20,6 +20,8 @@ This matrix defines the device-local Pulse and positive-Leitsatz reminder contra
 | Hydration | Malformed reminder data | App starts | Reminder surfaces expose a load error while the journal remains usable |
 | Hydration recovery | A reminder read fails transiently | User taps Try again | The app reloads and replaces the error with current assignments |
 | Pulse management | No Pulse assignment exists | User opens Pulse reminder from Settings | Create reminder opens an editor containing only Pulse timing controls |
+| Existing Pulse compatibility | A version-2 Pulse assignment exists | User opens Emotion check-in reminder after updating | The same assignment appears under the clearer user-facing name without migration or duplicate scheduling |
+| Emotion check-in content | An enabled Pulse assignment is scheduled | Notification is delivered | Neutral copy explicitly invites the user to open Youmotion and check in with their emotions without exposing journal data |
 | Leitsatz management | A supportive custom Leitsatz exists | User opens Manage Leitsätze | Its card owns Add/Edit reminder, Turn on/off, and Remove actions plus timing/content summary |
 | Leitsatz independence | Two Leitsätze have equal initial timing | User edits one reminder | Only that assignment changes; the other keeps its own days and times |
 | Check-in completion | A saved reflection has a positive Leitsatz without an assignment | Success appears | The reflection stays primary and offers an optional reminder for that exact Leitsatz |
