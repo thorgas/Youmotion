@@ -37,7 +37,9 @@ Make the existing device-local Pulse reminder a clear notification type in Setti
 1. `4e5e10d` documents the emotion check-in reminder contract and test matrix.
 2. `ecf49c4` adds localized notification copy and Settings/reminder UI wording with focused tests and English/German screenshots.
 3. `671e11f` adds the redacted installed-app Maestro lifecycle.
-4. The final documentation commit records executable QA commands and verification evidence.
+4. `6d4260b` records executable QA commands and verification evidence.
+5. `6375ed5` routes bounded command work to the optional Spark worker.
+6. The final app-map commit refreshes the mapped Settings and Reminders states without changing the route graph.
 
 ## Verification contract
 
@@ -46,6 +48,7 @@ Make the existing device-local Pulse reminder a clear notification type in Setti
 - React Native Harness should cover an affected native component boundary when its native query tree exposes it; use the shared modal unit test plus saved installed-app E2E when iOS presents the modal in a separate native root.
 - The saved device journey must cover creation, outside-tap modal dismissal, activation, test notification, and return to Settings using synthetic data only.
 - Every UI-changing commit includes durable screenshots under `docs/screenshots/reminders/`.
+- The Expo app map keeps its 18-route graph and refreshes the Settings and Reminders captures, including empty and active emotion check-in reminder states, in `.expo-map/Youmotion-2026-08-21.appmap`.
 
 ## Reproduce the verification
 

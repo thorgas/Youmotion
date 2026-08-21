@@ -6,12 +6,12 @@
   "device": "iPhone 17 Pro",
   "steps": {
     "4": {
-      "target": "Sanfte Erinnerungen",
+      "target": "Emotion check-in reminder",
       "screen": "reminders"
     },
     "5": {
       "capture": "reminders.png",
-      "note": "Persisted local Leitsatz reminder with written weekdays and exact target text"
+      "note": "Emotion check-in reminder empty state; the active assignment is captured as the active variant"
     }
   }
 }

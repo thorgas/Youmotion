@@ -9,7 +9,7 @@
   },
   "(tabs)/settings": {
     "status": "ok",
-    "note": "PERSONALIZE shows \"Manage guiding belief\" with its count of every belief carrying a guiding belief or a reminder. Captured from the committed archive fixture (15 beliefs)."
+    "note": "PERSONALIZE shows the emotion check-in reminder entry and \"Manage guiding belief\" with its count of every belief carrying a guiding belief or a reminder. Captured from the committed synthetic archive fixture (15 beliefs)."
   },
   "(tabs)/today": {
     "status": "ok"
@@ -65,7 +65,7 @@
   },
   "reminders": {
     "status": "ok",
-    "note": "Captured through Settings; the simulator repository fallback remains visible when local persistence is unavailable."
+    "note": "Captured through Settings with both empty and active emotion check-in reminder states."
   },
   "success": {
     "status": "error-boundary",
