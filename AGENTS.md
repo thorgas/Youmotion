@@ -2,6 +2,13 @@
 
 Read the exact Expo SDK 57 documentation at https://docs.expo.dev/versions/v57.0.0/ before changing Expo or React Native code.
 
+## Subagents
+
+- Use the `spark_worker` subagent for clear, repetitive, low-judgment work such as running tests, lint, coverage, E2E flows, command verification, log summarization, and narrow mechanical audits.
+- Keep architecture, implementation strategy, debugging decisions, security review, and ambiguous work with the primary model.
+- If `spark_worker` reports an unclear failure, the primary model must investigate it.
+- If `spark_worker` or GPT-5.3-Codex-Spark is unavailable in the current runtime, use the cheapest available subagent model for the same bounded work and report the substitution.
+
 ## Architecture
 
 - Organize by vertical feature: `domain`, `application`, `infrastructure`, and `ui`.
