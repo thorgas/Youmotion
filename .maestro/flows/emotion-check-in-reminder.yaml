@@ -1,0 +1,83 @@
+appId: com.youmotion.mobile
+name: Create and manage an emotion check-in reminder
+tags:
+  - reminders
+  - settings
+  - privacy
+---
+- runFlow: ../helpers/open-app.yaml
+- tapOn:
+    id: tab-settings
+- scrollUntilVisible:
+    element:
+      id: language-english
+    direction: UP
+    timeout: 10000
+- tapOn:
+    id: language-english
+- scrollUntilVisible:
+    element:
+      id: open-reminders
+    direction: DOWN
+    timeout: 10000
+- tapOn:
+    id: open-reminders
+- extendedWaitUntil:
+    visible:
+      id: reminder-settings-screen
+    timeout: 10000
+- tapOn:
+    id: reminder-assignment-delete-.*
+    optional: true
+- tapOn:
+    text: Delete
+    optional: true
+- extendedWaitUntil:
+    visible:
+      id: reminder-settings-empty
+    timeout: 10000
+- tapOn:
+    id: reminder-settings-new
+- tapOn:
+    id: reminder-offer-accept
+    optional: true
+- tapOn:
+    text: Allow
+    optional: true
+- tapOn:
+    id: com.android.permissioncontroller:id/permission_allow_button
+    optional: true
+- extendedWaitUntil:
+    visible:
+      id: reminder-save
+    timeout: 10000
+- tapOn:
+    id: reminder-time-picker-0
+- tapOn:
+    point: 10%,10%
+- assertVisible: Reminder time 09:00
+- tapOn:
+    id: reminder-save
+- extendedWaitUntil:
+    visible:
+      id: reminder-send-test
+    timeout: 10000
+- tapOn:
+    id: reminder-send-test
+- tapOn:
+    id: reminder-done
+- extendedWaitUntil:
+    visible:
+      id: reminder-settings-screen
+    timeout: 10000
+- assertVisible:
+    id: reminder-assignment-card
+- assertVisible: EMOTION CHECK-IN
+- assertVisible: Check in with your emotions
+- tapOn:
+    id: reminder-assignment-delete-.*
+- tapOn: Delete
+- extendedWaitUntil:
+    visible:
+      id: reminder-settings-empty
+    timeout: 10000
