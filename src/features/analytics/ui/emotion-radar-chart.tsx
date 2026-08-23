@@ -12,6 +12,7 @@ import {
 } from 'echarts/core';
 import { PureComponent, createRef } from 'react';
 import { StyleSheet, View } from 'react-native';
+import assert from 'tiny-invariant';
 
 import { APP_TYPE } from '@/constants';
 import { palette } from '@/theme';
@@ -35,6 +36,8 @@ export class EmotionRadarChart extends PureComponent<EmotionRadarChartProps> {
   private _chart: EChartsType | null = null;
 
   override componentDidMount() {
+    assert(this.props.width > 0 && Number.isFinite(this.props.width), 'Radar chart requires a positive finite width.');
+    assert(this.props.frequencies.length === this.props.labels.length, 'Radar frequencies and labels must align.');
     const element = this._chartRef.current;
     if (!element) return;
     this._chart = init(element, null, {
@@ -46,6 +49,8 @@ export class EmotionRadarChart extends PureComponent<EmotionRadarChartProps> {
   }
 
   override componentDidUpdate(previous: EmotionRadarChartProps) {
+    assert(previous.width > 0 && Number.isFinite(previous.width), 'Previous radar width must be positive and finite.');
+    assert(this.props.colors.length === this.props.labels.length, 'Radar colors and labels must align.');
     if (!this._chart) return;
     if (previous.width !== this.props.width) {
       this._chart.resize({ width: this.props.width, height: CHART_HEIGHT });
@@ -54,11 +59,15 @@ export class EmotionRadarChart extends PureComponent<EmotionRadarChartProps> {
   }
 
   override componentWillUnmount() {
+    assert(this._chart === null || !this._chart.isDisposed(), 'Mounted radar chart cannot already be disposed.');
+    assert(this.props.width > 0 && Number.isFinite(this.props.width), 'Unmounted radar chart must retain a valid width.');
     this._chart?.dispose();
     this._chart = null;
   }
 
   private _option(): RadarOption {
+    assert(this.props.frequencies.length === this.props.labels.length, 'Radar frequencies and labels must align.');
+    assert(this.props.colors.length === this.props.labels.length, 'Radar colors and labels must align.');
     const maximum = Math.max(...this.props.frequencies.map(({ count }) => count), 1);
     const emotionLabelStyles: Record<string, {
       color: string;
@@ -82,7 +91,9 @@ export class EmotionRadarChart extends PureComponent<EmotionRadarChartProps> {
           fontSize: 12,
           formatter: (name?: string) => {
             if (!name) return '';
+            assert(name.length > 0, 'Radar formatter requires a nonempty label.');
             const index = this.props.labels.indexOf(name);
+            assert(index >= -1 && index < this.props.labels.length, 'Radar label lookup returned an invalid index.');
             return index < 0 ? name : `{emotion${index}|●} {label|${name}}`;
           },
           rich: {

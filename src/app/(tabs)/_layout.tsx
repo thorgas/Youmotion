@@ -1,5 +1,6 @@
 import * as Haptics from 'expo-haptics';
 import { Tabs } from 'expo-router';
+import assert from 'tiny-invariant';
 
 import { APP_TYPE, NAVIGATION_EVENTS, NAVIGATION_STATES } from '@/constants';
 import {
@@ -22,8 +23,12 @@ const _provideSelectionFeedback = (selected: boolean) => {
 
 export default function TabLayout() {
   const actor = useAppNavigationActor();
+  assert(actor.getSnapshot().status !== 'stopped', 'Tab layout requires an active navigation actor.');
+  assert('matches' in actor.getSnapshot(), 'Tab layout requires a matchable navigation snapshot.');
   const _todayListeners = {
     tabPress: (event: { preventDefault: () => void }) => {
+      assert(actor.getSnapshot().status !== 'stopped', 'Today tab requires an active navigation actor.');
+      assert('matches' in actor.getSnapshot(), 'Today tab requires a matchable navigation snapshot.');
       event.preventDefault();
       _provideSelectionFeedback(actor.getSnapshot().matches({
         [NAVIGATION_STATES.TABS]: NAVIGATION_STATES.TODAY,
@@ -33,6 +38,8 @@ export default function TabLayout() {
   };
   const _historyListeners = {
     tabPress: (event: { preventDefault: () => void }) => {
+      assert(actor.getSnapshot().status !== 'stopped', 'History tab requires an active navigation actor.');
+      assert('matches' in actor.getSnapshot(), 'History tab requires a matchable navigation snapshot.');
       event.preventDefault();
       _provideSelectionFeedback(actor.getSnapshot().matches({
         [NAVIGATION_STATES.TABS]: NAVIGATION_STATES.HISTORY,
@@ -42,6 +49,8 @@ export default function TabLayout() {
   };
   const _analyticsListeners = {
     tabPress: (event: { preventDefault: () => void }) => {
+      assert(actor.getSnapshot().status !== 'stopped', 'Analytics tab requires an active navigation actor.');
+      assert('matches' in actor.getSnapshot(), 'Analytics tab requires a matchable navigation snapshot.');
       event.preventDefault();
       _provideSelectionFeedback(actor.getSnapshot().matches({
         [NAVIGATION_STATES.TABS]: NAVIGATION_STATES.ANALYTICS,
@@ -51,6 +60,8 @@ export default function TabLayout() {
   };
   const _settingsListeners = {
     tabPress: (event: { preventDefault: () => void }) => {
+      assert(actor.getSnapshot().status !== 'stopped', 'Settings tab requires an active navigation actor.');
+      assert('matches' in actor.getSnapshot(), 'Settings tab requires a matchable navigation snapshot.');
       event.preventDefault();
       _provideSelectionFeedback(actor.getSnapshot().matches({
         [NAVIGATION_STATES.TABS]: NAVIGATION_STATES.SETTINGS,

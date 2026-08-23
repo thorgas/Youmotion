@@ -1,4 +1,5 @@
 import { fbs } from 'fbtee';
+import assert from 'tiny-invariant';
 
 import { ANALYTICS_TIMEFRAMES, APP_LOCALES } from '@/constants';
 import type { BeliefStatement } from '@/features/check-in/domain/belief-statement';
@@ -102,6 +103,8 @@ export function analyticsTimeframeRangeLabel({
   range: AnalyticsDateRange;
   timeframe: AnalyticsTimeframe;
 }) {
+  assert(Object.values(ANALYTICS_TIMEFRAMES).includes(timeframe), 'Analytics timeframe must be supported.');
+  assert(range.end.getTime() >= (range.start?.getTime() ?? range.end.getTime()), 'Analytics range cannot end before it starts.');
   if (timeframe === ANALYTICS_TIMEFRAMES.ALL_TIME || range.start === null) {
     return String(fbs('All recorded moments', 'Date range label for all-time analytics'));
   }
@@ -124,6 +127,8 @@ export function topLeitsatzEvidenceCopy({
   range: AnalyticsDateRange;
   timeframe: AnalyticsTimeframe;
 }) {
+  assert(leitsatz.count > 0, 'Top guiding-belief evidence requires a positive count.');
+  assert(leitsatz.supportingIds.length >= leitsatz.count, 'Guiding-belief evidence must support its displayed count.');
   const rangeLabel = analyticsTimeframeRangeLabel({ locale, range, timeframe });
   return String(fbs(
     'Selected '
@@ -141,8 +146,9 @@ export function topLeitsatzLabel({
   multiple: boolean;
   timeframe: AnalyticsTimeframe;
 }) {
-  if (timeframe === ANALYTICS_TIMEFRAMES.LAST_WEEK) {
-    return multiple
+  assert(Object.values(ANALYTICS_TIMEFRAMES).includes(timeframe), 'Guiding-belief label timeframe must be supported.');
+  const label = timeframe === ANALYTICS_TIMEFRAMES.LAST_WEEK
+    ? multiple
       ? String(fbs(
         "LAST WEEK'S GUIDING BELIEFS",
         'Label for equally most frequently selected positive guiding statements last week',
@@ -150,10 +156,9 @@ export function topLeitsatzLabel({
       : String(fbs(
         "LAST WEEK'S GUIDING BELIEF",
         'Label for the most frequently selected positive guiding statement last week',
-      ));
-  }
-  if (timeframe === ANALYTICS_TIMEFRAMES.LAST_FOUR_WEEKS) {
-    return multiple
+      ))
+    : timeframe === ANALYTICS_TIMEFRAMES.LAST_FOUR_WEEKS
+      ? multiple
       ? String(fbs(
         "LAST 4 WEEKS' GUIDING BELIEFS",
         'Label for equally most frequently selected positive guiding statements in the last four weeks',
@@ -161,17 +166,18 @@ export function topLeitsatzLabel({
       : String(fbs(
         "LAST 4 WEEKS' GUIDING BELIEF",
         'Label for the most frequently selected positive guiding statement in the last four weeks',
-      ));
-  }
-  return multiple
-    ? String(fbs(
-      'ALL-TIME GUIDING BELIEFS',
-      'Label for equally most frequently selected positive guiding statements across all recorded moments',
-    ))
-    : String(fbs(
-      'ALL-TIME GUIDING BELIEF',
-      'Label for the most frequently selected positive guiding statement across all recorded moments',
-    ));
+      ))
+      : multiple
+        ? String(fbs(
+          'ALL-TIME GUIDING BELIEFS',
+          'Label for equally most frequently selected positive guiding statements across all recorded moments',
+        ))
+        : String(fbs(
+          'ALL-TIME GUIDING BELIEF',
+          'Label for the most frequently selected positive guiding statement across all recorded moments',
+        ));
+  assert(label.length > 0, 'Guiding-belief label cannot be empty.');
+  return label;
 }
 
 export function additionalTopLeitsaetzeCopy(count: number) {
@@ -185,6 +191,8 @@ export function observationCopy({ observation, statements }: {
   observation: AnalyticsObservation;
   statements: readonly BeliefStatement[];
 }) {
+  assert(observation.kind === 'history' ? observation.momentCount > 0 : observation.count > 0, 'Analytics observation requires positive evidence.');
+  assert(observation.kind !== 'history' || observation.dayCount <= observation.momentCount, 'History observation cannot have more days than moments.');
   if (observation.kind === 'history') {
     return String(fbs(
       'You recorded '
@@ -281,6 +289,8 @@ export function calendarDayAccessibilityLabel({
   frequencies: readonly CalendarEmotionFrequency[];
   locale: AppLocale;
 }) {
+  assert(Number.isFinite(date.getTime()), 'Calendar accessibility requires a valid date.');
+  assert(frequencies.every(({ count }) => count > 0), 'Calendar emotion frequencies must be positive.');
   const dateLabel = localeFormatter({
     english: englishCalendarDateFormatter,
     german: germanCalendarDateFormatter,

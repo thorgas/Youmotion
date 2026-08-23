@@ -9,6 +9,7 @@ import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { KeyboardProvider } from 'react-native-keyboard-controller';
+import assert from 'tiny-invariant';
 
 import { PressFeedbackProvider } from '@/components/ui/press-feedback-provider';
 import { NAVIGATION_EVENTS, SPLASH_BACKGROUND_COLOR } from '@/constants';
@@ -21,6 +22,7 @@ import {
   type AppNavigationActor,
   useAppNavigationActor,
 } from '@/navigation/app-navigation.provider';
+import { appNavigationMachine } from '@/navigation/app-navigation.machine';
 import {
   handleNativeRouteRemoval,
   nativeRouteTransitionEnded,
@@ -32,8 +34,12 @@ const selectCanGoBack = (
 
 function AppStack() {
   const actor = useAppNavigationActor();
+  assert(actor.getSnapshot().status !== 'stopped', 'App stack requires an active navigation actor.');
+  assert(actor.getSnapshot().machine === appNavigationMachine, 'App stack requires the app navigation machine.');
   const canGoBack = useSelector(actor, selectCanGoBack);
   const screenListeners = ({ route }: { route: { name?: string } }) => {
+    assert(actor.getSnapshot().status !== 'stopped', 'Native screen listeners require an active actor.');
+    assert(route.name === undefined || route.name === route.name.trim(), 'Native route names cannot contain outer whitespace.');
     const beforeRemove = (event: { preventDefault: () => void }) => {
       handleNativeRouteRemoval({ actor, event, routeName: route.name });
     };
@@ -63,6 +69,8 @@ export default function RootLayout() {
   });
 
   if (!fontsLoaded && !fontError) return null;
+  assert(fontsLoaded || fontError !== null, 'Root layout requires loaded fonts or a font error.');
+  assert(fontError === null || !fontsLoaded, 'Root layout cannot report loaded and failed fonts together.');
 
   return (
     <AnimatedSplashScreen>

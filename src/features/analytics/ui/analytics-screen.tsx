@@ -1,6 +1,7 @@
 import { useSelector as useActorSelector } from '@xstate/react';
 import { useSelector } from '@xstate/store-react';
 import { fbs } from 'fbtee';
+import assert from 'tiny-invariant';
 import {
   Pressable,
   ScrollView,
@@ -154,6 +155,8 @@ function resolvedInsightTab({
   pattern: PrimaryAnalyticsInsight | null;
   selectedTab: typeof ANALYTICS_INSIGHT_TABS[keyof typeof ANALYTICS_INSIGHT_TABS];
 }) {
+  assert(Object.values(ANALYTICS_INSIGHT_TABS).includes(selectedTab), 'Selected insight tab must be supported.');
+  assert(guidingBelief === undefined || guidingBelief.count > 0, 'Guiding-belief insight requires positive evidence.');
   if (!guidingBelief) return ANALYTICS_INSIGHT_TABS.PATTERN;
   if (!pattern) return ANALYTICS_INSIGHT_TABS.GUIDING_BELIEF;
   return selectedTab;
@@ -249,6 +252,8 @@ function InsightHeading({ group, showingPattern, timeframe }: {
   showingPattern: boolean;
   timeframe: AnalyticsTimeframe;
 }) {
+  assert(Object.values(ANALYTICS_TIMEFRAMES).includes(timeframe), 'Insight heading timeframe must be supported.');
+  assert(group === null || group.leitsaetze.every(({ count }) => count > 0), 'Insight heading requires positive guiding-belief evidence.');
   const multiple = (group?.leitsaetze.length ?? 0) > 1 || (group?.additionalCount ?? 0) > 0;
   const label = showingPattern
     ? String(fbs('ONE PATTERN', 'Primary evidence-linked insight label'))
@@ -315,6 +320,8 @@ function InsightActions({
   showingPattern: boolean;
   timeframe: AnalyticsTimeframe;
 }) {
+  assert(patternCount === 0 ? patternPosition === 0 : patternPosition >= 0 && patternPosition < patternCount, 'Pattern position must be inside the available patterns.');
+  assert(!showingPattern || pattern !== null, 'Visible pattern actions require a selected pattern.');
   const _openEvidence = () => {
     if (!onEvidencePress) return;
     if (showingPattern && pattern) {
@@ -384,6 +391,8 @@ function InsightHero({
   statements: readonly BeliefStatement[];
   timeframe: AnalyticsTimeframe;
 }) {
+  assert(Number.isFinite(now.getTime()), 'Insight hero requires a valid current date.');
+  assert(new Set(entries.map(({ id }) => id)).size === entries.length, 'Insight hero entries require unique identifiers.');
   const analytics = useSelector(analyticsStore, _selectCalendar);
   const patterns = primaryAnalyticsInsights(entries);
   const patternPosition = patterns.length > 0
@@ -454,6 +463,8 @@ function InsightHero({
 }
 
 function observationLabel(observation: AnalyticsObservation) {
+  assert(['history', 'emotion', 'belief', 'notes'].includes(observation.kind), 'Observation label requires a supported kind.');
+  assert(observation.kind !== 'history' || observation.momentCount >= observation.dayCount, 'History observation cannot have more days than moments.');
   if (observation.kind === 'history') {
     return String(fbs('All moments', 'Label for the analytics history summary observation'));
   }
@@ -467,6 +478,8 @@ function observationLabel(observation: AnalyticsObservation) {
 }
 
 function observationKey(observation: AnalyticsObservation) {
+  assert(['history', 'emotion', 'belief', 'notes'].includes(observation.kind), 'Observation key requires a supported kind.');
+  assert(observation.kind !== 'emotion' || observation.count > 0, 'Emotion observation key requires positive evidence.');
   if (observation.kind === 'emotion') return `${observation.kind}-${observation.emotionId}`;
   if (observation.kind === 'belief') {
     return `${observation.kind}-${observation.emotionId}-${observation.beliefSystemId}`;
@@ -498,6 +511,8 @@ function ObservationSection({ entries, statements }: {
   entries: readonly CheckIn[];
   statements: readonly BeliefStatement[];
 }) {
+  assert(new Set(entries.map(({ id }) => id)).size === entries.length, 'Observation entries require unique identifiers.');
+  assert(new Set(statements.map(({ beliefSystemId }) => beliefSystemId)).size === statements.length, 'Observation beliefs require unique identifiers.');
   const primaryKeys = new Set(primaryAnalyticsInsights(entries).map(observationKey));
   const observations = analyticsObservations(entries).filter(
     (observation) => !primaryKeys.has(observationKey(observation)),
@@ -562,10 +577,12 @@ function CalendarDayCell({ date, entries, locale, today }: {
   locale: AppLocale;
   today: Date;
 }) {
+  assert(Number.isFinite(date.getTime()) && Number.isFinite(today.getTime()), 'Calendar cell requires valid dates.');
   const isToday = date.getFullYear() === today.getFullYear()
     && date.getMonth() === today.getMonth()
     && date.getDate() === today.getDate();
   const frequencies = calendarEmotionFrequencies(entries);
+  assert(frequencies.reduce((total, { count }) => total + count, 0) === entries.length, 'Calendar frequencies must account for every daily entry.');
   return (
     <View
       accessible
@@ -618,6 +635,8 @@ function PeriodCalendar({
   now: Date;
   timeframe: AnalyticsTimeframe;
 }) {
+  assert(Number.isFinite(now.getTime()), 'Period calendar requires a valid current date.');
+  assert(timeframe !== ANALYTICS_TIMEFRAMES.ALL_TIME, 'Period calendar requires a bounded timeframe.');
   const range = analyticsDateRange({ now, timeframe });
   const days = periodCalendarDays({ entries, range });
   return (
@@ -651,6 +670,8 @@ function CalendarSection({ entries, locale, now }: {
   locale: AppLocale;
   now: Date;
 }) {
+  assert(Number.isFinite(now.getTime()), 'Calendar section requires a valid current date.');
+  assert(new Set(entries.map(({ id }) => id)).size === entries.length, 'Calendar entries require unique identifiers.');
   const calendar = useSelector(analyticsStore, _selectCalendar);
   if (calendar.timeframe !== ANALYTICS_TIMEFRAMES.ALL_TIME) {
     return (
@@ -736,6 +757,8 @@ export function AnalyticsContent({ entries, locale, now, onEvidencePress, statem
   onEvidencePress?: (selection: InsightEvidenceSelection) => void;
   statements: readonly BeliefStatement[];
 }) {
+  assert(Number.isFinite(now.getTime()), 'Analytics content requires a valid current date.');
+  assert(new Set(entries.map(({ id }) => id)).size === entries.length, 'Analytics entries require unique identifiers.');
   const analytics = useSelector(analyticsStore, _selectCalendar);
   const dimensions = useWindowDimensions();
   const chartWidth = Math.min(Math.max(dimensions.width - 44, 280), 476);
@@ -749,6 +772,8 @@ export function AnalyticsContent({ entries, locale, now, onEvidencePress, statem
   const colors = frequencies.map(({ emotionId }) => (
     emotionColors.get(emotionId) ?? palette.inkMuted
   ));
+  assert(labels.length === frequencies.length, 'Radar labels must align with emotion frequencies.');
+  assert(colors.length === frequencies.length, 'Radar colors must align with emotion frequencies.');
 
   return (
     <View style={styles.page} testID="analytics-screen">
@@ -818,6 +843,8 @@ export function AnalyticsContent({ entries, locale, now, onEvidencePress, statem
 
 export function AnalyticsScreen({ now }: { now?: Date }) {
   const actor = useAppNavigationActor();
+  assert(actor.getSnapshot().status !== 'stopped', 'Analytics screen requires an active navigation actor.');
+  assert(now === undefined || Number.isFinite(now.getTime()), 'Analytics screen override requires a valid date.');
   const statements = useActorSelector(actor, _selectBeliefStatements);
   const history = useSelector(checkInHistoryStore, _selectHistory);
   const locale = useAppLocale();
