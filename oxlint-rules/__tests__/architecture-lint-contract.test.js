@@ -5,7 +5,6 @@ const packageJson = require('../../package.json');
 
 const pendingDesignSystemRules = new Set([
   'prefer-design-system-components',
-  'require-dismissible-modal-backdrop',
 ]);
 
 const cwd = path.resolve(__dirname, '../..');
@@ -62,7 +61,7 @@ describe('architecture lint contract', () => {
       .filter((ruleName) => ruleName !== 'require-assertions')
       .filter((ruleName) => !pendingDesignSystemRules.has(ruleName));
 
-    expect(applicableRules).toHaveLength(20);
+    expect(applicableRules).toHaveLength(21);
     for (const ruleName of applicableRules) {
       expect(configuredRules[`code-architecture/${ruleName}`]?.[0]).toBe(2);
     }
@@ -337,6 +336,23 @@ describe('architecture lint contract', () => {
     expect(messages).toEqual(expect.arrayContaining([
       expect.objectContaining({
         ruleId: 'code-architecture/no-raw-design-properties',
+        severity: 2,
+      }),
+    ]));
+  });
+
+  it('requires transparent modals to dismiss through the backdrop', () => {
+    const messages = messagesFor({
+      code: `
+        import { Modal, View } from 'react-native';
+        const view = <Modal onRequestClose={close} transparent><View /></Modal>;
+      `,
+      filePath: 'src/features/settings/ui/contract-fixture.tsx',
+    });
+
+    expect(messages).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        ruleId: 'code-architecture/require-dismissible-modal-backdrop',
         severity: 2,
       }),
     ]));

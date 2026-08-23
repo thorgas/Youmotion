@@ -1,0 +1,20 @@
+steps:
+  - echo: Open the feedback dialog and dismiss it by pressing outside the card.
+  - launch: com.youmotion.mobile
+  - tool: open-url
+    args:
+      url: exp+youmotion://expo-development-client/?url=http%3A%2F%2F127.0.0.1%3A8091
+  - await: { visible: { id: tab-settings }, timeout: 30000 }
+  - when:
+      visible: { id: xmark }
+    steps:
+      - tap: { id: xmark }
+      - await: { hidden: { id: xmark }, timeout: 5000 }
+  - tap: { id: tab-settings }
+  - await: { visible: { id: feedback-button }, timeout: 5000 }
+  - tap: { id: feedback-button }
+  - await: { visible: { id: feedback-question }, timeout: 5000 }
+  - echo: Tap the exposed upper backdrop outside the centered dialog card.
+  - tap: { x: 0.5, y: 0.2 }
+  - await: { hidden: { id: feedback-question }, timeout: 5000 }
+  - assert: { visible: { id: feedback-button } }

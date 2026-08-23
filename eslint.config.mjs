@@ -107,6 +107,20 @@ export default tseslint.config(
           ],
         },
       ],
+      'code-architecture/require-dismissible-modal-backdrop': [
+        'error',
+        {
+          surfaces: [
+            {
+              backdropElements: ['Pressable'],
+              name: 'Modal',
+              outsidePressAttributes: ['onPress'],
+              requestCloseAttributes: ['onRequestClose'],
+              transparentAttribute: 'transparent',
+            },
+          ],
+        },
+      ],
       'code-architecture/no-root-owned-compound-parts': 'error',
       'code-architecture/no-unsafe-type-assertions': 'error',
       'code-architecture/no-unvalidated-json-parse': 'error',

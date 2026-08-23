@@ -106,7 +106,17 @@ function FeedbackDialog({
       onRequestClose={onRequestClose}
       transparent
       visible={visible}>
-      {content}
+      <View style={styles.overlay} testID="feedback-dialog">
+        <Pressable
+          accessible={false}
+          onPress={onRequestClose}
+          style={styles.backdrop}
+          testID="feedback-backdrop"
+        />
+        <View accessibilityViewIsModal style={styles.dialog}>
+          {children}
+        </View>
+      </View>
     </Modal>
   );
 }
