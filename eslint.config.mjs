@@ -109,7 +109,10 @@ export default tseslint.config(
           literals: domainLiterals,
         },
       ],
-      'code-architecture/max-function-lines': ['error', { max: 200 }],
+      'code-architecture/max-function-lines': [
+        'error',
+        { ignoreJSX: true, max: 70 },
+      ],
     },
   },
   {

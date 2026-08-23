@@ -43,7 +43,7 @@ const exportedRuleNames = () => {
 describe('architecture lint contract', () => {
   it('keeps the alpha plugin in the main verification path', () => {
     expect(packageJson.devDependencies['eslint-plugin-code-architecture']).toBe(
-      '0.4.0-alpha.1',
+      '0.4.0-alpha.2',
     );
     expect(packageJson.scripts.lint).toContain('pnpm lint:architecture');
     expect(packageJson.scripts.verify).toContain('pnpm lint');
@@ -60,7 +60,42 @@ describe('architecture lint contract', () => {
     for (const ruleName of applicableRules) {
       expect(configuredRules[`code-architecture/${ruleName}`]?.[0]).toBe(2);
     }
+    expect(configuredRules['code-architecture/max-function-lines']).toEqual([
+      2,
+      { ignoreJSX: true, max: 70, skipBlankLines: false },
+    ]);
     expect(configuredRules['code-architecture/require-assertions']).toBeUndefined();
+  });
+
+  it('limits logic functions without forcing JSX component extraction', () => {
+    const logicBody = Array.from(
+      { length: 70 },
+      (_, index) => `const value${index} = ${index};`,
+    ).join('\n');
+    const jsxBody = Array.from(
+      { length: 70 },
+      (_, index) => `<Text key="${index}">${index}</Text>`,
+    ).join('\n');
+    const logicMessages = messagesFor({
+      code: `function TooLong() {\n${logicBody}\nreturn value69;\n}`,
+      filePath: 'src/components/ui/contract-fixture.tsx',
+    });
+    const jsxMessages = messagesFor({
+      code: `function LongScreen() {\nreturn <>\n${jsxBody}\n</>;\n}`,
+      filePath: 'src/components/ui/contract-fixture.tsx',
+    });
+
+    expect(logicMessages).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        ruleId: 'code-architecture/max-function-lines',
+        severity: 2,
+      }),
+    ]));
+    expect(jsxMessages).not.toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        ruleId: 'code-architecture/max-function-lines',
+      }),
+    ]));
   });
 
   it.each([

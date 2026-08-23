@@ -1,6 +1,6 @@
 # Code architecture ESLint policy
 
-Youmotion uses `eslint-plugin-code-architecture@0.4.0-alpha.1` as a blocking part of
+Youmotion uses `eslint-plugin-code-architecture@0.4.0-alpha.2` as a blocking part of
 `pnpm verify`. The effective configuration is in `eslint.config.mjs`, and its
 repository contract is tested in
 `oxlint-rules/__tests__/architecture-lint-contract.test.js`.
@@ -14,7 +14,7 @@ repository contract is tested in
 | `effect-error-handling` | Error | Effect failures must remain explicit and typed. |
 | `enforce-module-boundaries` | Error | Shared UI cannot import feature-owned code. |
 | `imports-first` | Error | Static imports precede declarations and executable statements. |
-| `max-function-lines` | Error | Production functions are capped at 200 physical lines. Test callbacks and migration fixtures are excluded; their readability is enforced by Jest and Oxlint complexity rules instead. |
+| `max-function-lines` | Error | Production logic functions are capped at 70 physical lines. JSX-bearing functions are ignored so components are not extracted solely to satisfy a line count. Test callbacks and migration fixtures remain excluded. |
 | `max-function-parameters` | Error | The plugin caps functions at five parameters. The local Oxlint rule keeps Youmotion's stricter one-object-parameter convention and its framework callback exceptions. |
 | `no-barrel-files` | Error | Re-exports are forbidden; import concrete owners directly. |
 | `no-barrel-imports` | Error | Local index imports and Effect package barrels are forbidden. |
