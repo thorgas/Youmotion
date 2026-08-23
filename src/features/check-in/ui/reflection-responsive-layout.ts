@@ -23,7 +23,8 @@ export function reflectionResponsiveLayout({
   platform: string;
   width: number;
 }) {
-  assert(width > 0 && height > 0, 'Reflection viewport dimensions must be positive.');
+  assert(width > 0, 'Reflection viewport width must be positive.');
+  assert(height > 0, 'Reflection viewport height must be positive.');
   assert(keyboardHeight >= 0, 'Reflection keyboard height must not be negative.');
   const widthScale = clamp({
     maximum: 1,

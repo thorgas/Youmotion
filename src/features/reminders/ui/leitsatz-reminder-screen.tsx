@@ -464,8 +464,11 @@ export function LeitsatzReminderScreen() {
       })?.guidingStatement
     : undefined;
   const pulseTarget = context.reminderTargetKind === REMINDER_TARGET_KINDS.PULSE;
-  assert(context.reminderTargetKind === REMINDER_TARGET_KINDS.PULSE || context.reminderTargetKind === REMINDER_TARGET_KINDS.GUIDING_BELIEF, 'Reminder screen target must be supported');
-  assert(context.reminderTimePickerIndex === null || context.reminderTimePickerIndex < context['reminderTimes'].length, 'Open time picker must reference an existing time');
+  assert(new Set(Object.values(REMINDER_TARGET_KINDS)).has(context.reminderTargetKind), 'Reminder screen target must be supported');
+  if (context.reminderTimePickerIndex !== null) {
+    assert(context.reminderTimePickerIndex >= 0, 'Open time picker index cannot be negative');
+    assert(context.reminderTimePickerIndex < context.reminderTimesDraft.length, 'Open time picker must reference an existing time');
+  }
   const _back = () => actor.send({ type: NAVIGATION_EVENTS.BACK_REQUESTED });
 
   if (reminderScreenLoading(snapshot)) {

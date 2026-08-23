@@ -1923,8 +1923,11 @@ export const appNavigationMachine = setup({
         },
         [REMINDER_EVENTS.RETRY_REQUESTED]: ({ self }, enq) => {
           enq(() => {
-            assert(self.getSnapshot().status !== 'stopped', 'Reminder retry requires an active actor.');
             assert(appSettingsStore.getSnapshot().context.hydrated, 'Reminder retry requires hydrated app settings.');
+            assert(
+              Object.values(APP_LOCALES).includes(appSettingsStore.getSnapshot().context.locale),
+              'Reminder retry requires a supported locale.',
+            );
             void Effect.runPromise(loadReminderData).then(
               (assignments) => self.send({
                 type: REMINDER_EVENTS.HYDRATED,
@@ -3140,14 +3143,16 @@ function reminderRouteForStateValue(value: StateValue) {
       || (typeof value === 'object' && value !== null),
     'Reminder routing requires a supported XState value shape.',
   );
-  const editorMatches = matchesState(REMINDER_STATES.CHECKING_PERMISSION, value)
-    || matchesState(REMINDER_STATES.OFFER, value)
-    || matchesState(REMINDER_STATES.REQUESTING_PERMISSION, value)
-    || matchesState(REMINDER_STATES.PERMISSION_DENIED, value)
-    || matchesState(REMINDER_STATES.EDITOR, value)
-    || matchesState(REMINDER_STATES.SAVING, value)
-    || matchesState(REMINDER_STATES.ACTIVE, value)
-    || matchesState(REMINDER_STATES.GUIDING_BELIEF, value);
+  const editorMatches = [
+    REMINDER_STATES.CHECKING_PERMISSION,
+    REMINDER_STATES.OFFER,
+    REMINDER_STATES.REQUESTING_PERMISSION,
+    REMINDER_STATES.PERMISSION_DENIED,
+    REMINDER_STATES.EDITOR,
+    REMINDER_STATES.SAVING,
+    REMINDER_STATES.ACTIVE,
+    REMINDER_STATES.GUIDING_BELIEF,
+  ].some((state) => matchesState(state, value));
   const route = [
     { matches: matchesState(REMINDER_STATES.SETTINGS, value), route: APP_ROUTES.REMINDERS },
     { matches: editorMatches, route: APP_ROUTES.LEITSATZ_REMINDER },

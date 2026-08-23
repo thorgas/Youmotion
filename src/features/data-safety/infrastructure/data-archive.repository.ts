@@ -91,7 +91,7 @@ export const exportDataArchive = Effect.fn('DataArchiveRepository.export')(() =>
   Effect.flatMap((encoded) => Effect.tryPromise({
     try: async () => {
       assert(encoded.trim().length > 0, 'Exported archive must contain JSON.');
-      assert(encoded.includes(`\"version\":${DATA_ARCHIVE_VERSION}`), 'Exported archive must include the current version.');
+      assert(encoded.includes(`"version":${DATA_ARCHIVE_VERSION}`), 'Exported archive must include the current version.');
       if (!(await Sharing.isAvailableAsync())) {
         throw new Error('File sharing is unavailable.');
       }

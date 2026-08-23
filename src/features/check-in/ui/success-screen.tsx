@@ -1,4 +1,5 @@
 import { useSelector } from '@xstate/react';
+import * as Schema from 'effect/Schema';
 import { PressableScale } from 'pressto';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import Animated, {
@@ -16,6 +17,7 @@ import {
   REMINDER_EVENTS,
   REMINDER_TARGET_KINDS,
 } from '@/constants';
+import { CheckInSchema } from '@/features/check-in/domain/check-in';
 import { useAppNavigationActor } from '@/navigation/app-navigation.provider';
 import { savedCheckInCopy } from './emotion-copy';
 import { guidingBeliefSystemText } from './belief-system-copy';
@@ -49,8 +51,8 @@ export function SuccessScreen() {
   const actor = useAppNavigationActor();
   const context = useSelector(actor, _selectContext);
   const saved = context.saved;
-  assert(saved === null || saved.id.length > 0, 'Saved check-in must have an identifier.');
-  assert(saved === null || saved.intensity >= 0 && saved.intensity <= 1, 'Saved check-in intensity must be normalized.');
+  assert(Schema.is(Schema.NullOr(CheckInSchema))(saved), 'Saved check-in must satisfy its domain schema.');
+  assert(context.beliefStatements.every(({ beliefSystemId }) => beliefSystemId.length > 0), 'Saved check-in beliefs require identifiers.');
   const guidingStatement = saved?.beliefSystemId
     ? guidingBeliefSystemText({
         id: saved.beliefSystemId,
