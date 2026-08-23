@@ -14,11 +14,11 @@ Replace the remaining Maestro development and release journeys with deterministi
 
 1. Complete: add dedicated Metro and Argent orchestration. The live-authored navigation smoke flow passes twice unchanged on iOS.
 2. Complete: all eight Maestro journeys are now live-authored Argent flows and pass twice unchanged (`navigation-smoke`, `reflection-cancel`, `language-switching`, `emotion-label-modes`, `check-in-journey`, `emotion-check-in-reminder`, `reminder-owned-timing`, and the German/English release-onboarding locale pair).
-3. Pending: repair the existing onboarding Argent flow. The stale standalone CRUD flow was replaced by the deterministic check-in journey.
+3. Complete: replace the stale standalone CRUD flow with the deterministic check-in journey.
 4. Complete: Android release-locale execution uses Argent, requires an explicit emulator, accepts a valid first-choice locale followed by the supported fallback, installs from a clean app-data state, and retries while Android finishes booting.
 5. Complete: remove active Maestro configuration and update executable documentation. The historical comparison benchmark remains intact as archived decision evidence, not as an application test runner.
 6. Complete: run two unchanged passes for every development and release flow plus full repository verification. Existing Harness runtime failures were reproduced and recorded separately from the migration gates.
-7. Pending: simplify, rebase onto `origin/main`, verify history, and push.
+7. Complete: simplify and confirm the branch is linearly based on the latest `origin/main`. Final push and remote-SHA readback are the only delivery operations left.
 
 ## Runtime contract
 
@@ -59,7 +59,7 @@ Use `E2E_PLATFORM=android` for an Android emulator. The runner exits before touc
 
 - The historical benchmark commit is already in `origin/main` and recommends Argent for the measured local iOS onboarding replay.
 - Maestro YAML could not be executed directly by Argent; each journey was re-authored and validated through the app. Historical benchmark inputs remain only under `benchmarks/e2e-maestro-vs-argent/`.
-- Both Android release locale checks passed before migration, but the locale precondition rejects a valid German-first locale list with an English fallback.
+- Both Android release locale checks pass after migration. The precondition now accepts the valid ordered system locale list: the requested language first and the supported fallback second.
 - Existing picker modals already dismiss on backdrop press through `ConfirmedPickerModal`, with a focused component test.
 - The first explicit-device rebuild failed with `No space left on device`. `mo clean` freed roughly 7.1 GiB of caches/logs without system-cache cleanup; the targeted iOS build and installation then passed.
 - Mole's pnpm cache cleanup exposed an interrupted `node_modules`. The broken directory was moved to `/private/tmp`, dependencies were restored from the exact lockfile with pnpm 11.18.0, and Metro bundled `react-native-surrealdb` successfully.
@@ -73,14 +73,9 @@ Use `E2E_PLATFORM=android` for an Android emulator. The runner exits before touc
 - `pnpm verify` passed 41 suites / 279 tests plus TypeScript, Oxlint, and ESLint (21 existing warnings, no errors). Coverage passed at 87.13% statements, 75.60% branches, 83.15% functions, and 90.42% lines. The custom-rule gate passed 25 tests.
 - Harness required an unsandboxed retry because sandbox networking falsely reported all Metro ports unavailable. iOS then completed with the existing baseline of 3 passing and 15 failing suites (3 passing / 17 failing tests), dominated by native query visibility and missing Uniffi initialization. Web and Android both reached a healthy runner but repeated “only prewarm traffic” without requesting the test bundle; each was stopped after the same failure reproduced twice. Android was scoped to `emulator-5556` after the wrapper was corrected to honor and validate `ANDROID_SERIAL` and `RN_HARNESS_ANDROID_AVD`.
 
-## Verification remaining
+## Verification status
 
-- `pnpm verify`
-- `pnpm test:coverage`
-- `pnpm lint:rules`
-- `pnpm test:harness`
-- `pnpm test:harness:ios`
-- `pnpm test:harness:android`
-- `pnpm test:e2e`
-- `pnpm test:e2e:release:android:locale:de`
-- `pnpm test:e2e:release:android:locale:en`
+- Passed: `pnpm verify`, `pnpm test:coverage`, and `pnpm lint:rules`.
+- Passed: every development Argent flow twice unchanged through `pnpm test:e2e`.
+- Passed: both release locale commands twice from clean Android release installs.
+- Executed with existing runtime failures: the iOS Harness completed with 3 passing and 15 failing suites; Web and Android runners received only Metro prewarm traffic and never requested their test bundles. These failures are not migration regressions and remain documented above rather than being reported as passing gates.
