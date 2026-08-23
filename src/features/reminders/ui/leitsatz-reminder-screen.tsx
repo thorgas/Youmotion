@@ -14,9 +14,11 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import assert from 'tiny-invariant';
 
 import {
   NAVIGATION_EVENTS,
+  MAX_BELIEF_STATEMENT_LENGTH,
   MAX_REMINDER_TIMES,
   REMINDER_EVENTS,
   REMINDER_NOTIFICATION_CONTENT,
@@ -36,8 +38,7 @@ import type {
 } from '../domain/reminder-timing';
 import type { ReminderNotificationContent } from '../domain/reminder-assignment';
 
-function reminderWeekdayOptions() {
-  return [
+const reminderWeekdayOptions = [
     { label: String(fbs('Su', 'Abbreviated Sunday in reminder weekday picker')), weekday: 1 },
     { label: String(fbs('Mo', 'Abbreviated Monday in reminder weekday picker')), weekday: 2 },
     { label: String(fbs('Tu', 'Abbreviated Tuesday in reminder weekday picker')), weekday: 3 },
@@ -46,9 +47,10 @@ function reminderWeekdayOptions() {
     { label: String(fbs('Fr', 'Abbreviated Friday in reminder weekday picker')), weekday: 6 },
     { label: String(fbs('Sa', 'Abbreviated Saturday in reminder weekday picker')), weekday: 7 },
   ] satisfies readonly { label: string; weekday: ReminderWeekday }[];
-}
 
 function timeSlotKey(index: number) {
+  assert(Number.isInteger(index), 'Time slot index must be an integer');
+  assert(index >= 0 && index < MAX_REMINDER_TIMES, 'Time slot index must be within the supported limit');
   if (index === 0) return 'primary';
   if (index === 1) return 'secondary';
   if (index === 2) return 'tertiary';
@@ -69,6 +71,8 @@ function ActionButton({
   secondary?: boolean;
   testID: string;
 }) {
+  assert(label.length > 0, 'Action button label must not be empty');
+  assert(testID.length > 0, 'Action button test id must not be empty');
   return (
     <PressableScale
       accessibilityRole="button"
@@ -96,6 +100,8 @@ function PositiveStatementCard({
   newStatement?: boolean;
   statement: string;
 }) {
+  assert(statement.trim().length > 0, 'Positive statement card requires visible copy');
+  assert(statement.length <= MAX_BELIEF_STATEMENT_LENGTH, 'Positive statement card copy must respect the belief limit');
   return (
     <View style={styles.statementCard}>
       <Text style={styles.cardEyebrow}>
@@ -129,6 +135,8 @@ function TimeRow({
   onRemove: () => void;
   pickerOpen: boolean;
 }) {
+  assert(hour >= 0 && hour <= 23, 'Time row hour must be valid');
+  assert(minute >= 0 && minute <= 59, 'Time row minute must be valid');
   const value = `${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}`;
   const pickerValue = new Date(2000, 0, 1, hour, minute);
   return (
@@ -188,6 +196,8 @@ function OfferContent({
   pulseTarget: boolean;
   statement: string | undefined;
 }) {
+  assert((actor.getSnapshot().context.reminderTargetKind === REMINDER_TARGET_KINDS.PULSE) === pulseTarget, 'Offer target must match reminder context');
+  assert(statement === undefined || statement.trim().length > 0, 'Offer statement must not be blank');
   const _accept = () => actor.send({ type: REMINDER_EVENTS.OFFER_ACCEPTED });
   const _decline = () => actor.send({ type: REMINDER_EVENTS.OFFER_DECLINED });
   return (
@@ -223,6 +233,8 @@ function PermissionDeniedContent({
   pulseTarget: boolean;
   statement: string | undefined;
 }) {
+  assert((actor.getSnapshot().context.reminderTargetKind === REMINDER_TARGET_KINDS.PULSE) === pulseTarget, 'Permission target must match reminder context');
+  assert(statement === undefined || statement.trim().length > 0, 'Permission statement must not be blank');
   const _openSettings = () => actor.send({ type: REMINDER_EVENTS.SETTINGS_REQUESTED });
   const _checkPermission = () => actor.send({ type: REMINDER_EVENTS.SETTINGS_RETURNED });
   const _decline = () => actor.send({ type: REMINDER_EVENTS.OFFER_DECLINED });
@@ -247,6 +259,8 @@ function NotificationContentChoice({ actor, notificationContent }: {
   actor: ReminderActor;
   notificationContent: ReminderNotificationContent;
 }) {
+  assert(actor.getSnapshot().context.reminderTargetKind === REMINDER_TARGET_KINDS.GUIDING_BELIEF, 'Notification content choice belongs to a guiding belief reminder');
+  assert(actor.getSnapshot().context['reminderNotificationContent'] === notificationContent, 'Notification choice must reflect reminder context');
   const _selectGeneral = () => actor.send({
     type: REMINDER_EVENTS.CONTENT_CHANGED,
     notificationContent: REMINDER_NOTIFICATION_CONTENT.GENERAL,
@@ -313,6 +327,8 @@ function ReminderEditorContent({
   times: readonly ReminderLocalTime[];
   weekdays: readonly ReminderWeekday[];
 }) {
+  assert(weekdays.length > 0, 'Reminder editor requires weekdays');
+  assert(times.length > 0 && times.length <= MAX_REMINDER_TIMES, 'Reminder editor requires a supported number of times');
   const _addTime = () => actor.send({ type: REMINDER_EVENTS.TIME_ADDED });
   const _saveReminder = () => actor.send({ type: REMINDER_EVENTS.SAVE_REQUESTED });
   const selectedWeekdays = new Set(weekdays);
@@ -335,7 +351,9 @@ function ReminderEditorContent({
       ) : null}
       <Text style={styles.fieldLabel}><fbt desc="Reminder weekdays label">DAYS</fbt></Text>
       <View style={styles.weekdayRow}>
-        {reminderWeekdayOptions().map(({ label, weekday }) => {
+        {reminderWeekdayOptions.map(({ label, weekday }) => {
+          assert(label.length > 0, 'Weekday option label must not be empty');
+          assert(weekday >= 1 && weekday <= 7, 'Weekday option must be valid');
           const selected = selectedWeekdays.has(weekday);
           const _toggle = () => actor.send({ type: REMINDER_EVENTS.WEEKDAY_TOGGLED, weekday });
           return (
@@ -347,6 +365,8 @@ function ReminderEditorContent({
       </View>
       <Text style={styles.fieldLabel}><fbt desc="Reminder time label">TIME</fbt></Text>
       {times.map(({ hour, minute }, index) => {
+        assert(hour >= 0 && hour <= 23, 'Editor time hour must be valid');
+        assert(minute >= 0 && minute <= 59, 'Editor time minute must be valid');
         const _open = () => actor.send({ type: REMINDER_EVENTS.TIME_PICKER_REQUESTED, index });
         const _dismiss = () => actor.send({ type: REMINDER_EVENTS.TIME_PICKER_DISMISSED });
         const _change: NonNullable<DateTimePickerProps['onValueChange']> = (...parameters) => {
@@ -377,6 +397,8 @@ function ReminderEditorContent({
 }
 
 function ActiveContent({ actor, statement }: { actor: ReminderActor; statement: string | undefined }) {
+  assert(statement === undefined || statement.trim().length > 0, 'Active reminder statement must not be blank');
+  assert(statement === undefined || statement.length <= MAX_BELIEF_STATEMENT_LENGTH, 'Active reminder statement must respect the belief limit');
   const _done = () => actor.send({ type: REMINDER_EVENTS.DONE });
   const _sendTest = () => actor.send({ type: REMINDER_EVENTS.TEST_REQUESTED });
   return (
@@ -401,6 +423,8 @@ function GuidingBeliefContent({
   targetHydrated: boolean;
   statement: string | undefined;
 }) {
+  assert(statement === undefined || statement.trim().length > 0, 'Opened reminder statement must not be blank');
+  assert(!editable || statement !== undefined, 'Editable reminder target requires an available statement');
   const _openPulse = () => actor.send({ type: REMINDER_EVENTS.OPEN_PULSE_REQUESTED });
   const _editReminder = () => actor.send({ type: REMINDER_EVENTS.EDIT_REQUESTED });
   return (
@@ -440,6 +464,8 @@ export function LeitsatzReminderScreen() {
       })?.guidingStatement
     : undefined;
   const pulseTarget = context.reminderTargetKind === REMINDER_TARGET_KINDS.PULSE;
+  assert(context.reminderTargetKind === REMINDER_TARGET_KINDS.PULSE || context.reminderTargetKind === REMINDER_TARGET_KINDS.GUIDING_BELIEF, 'Reminder screen target must be supported');
+  assert(context.reminderTimePickerIndex === null || context.reminderTimePickerIndex < context['reminderTimes'].length, 'Open time picker must reference an existing time');
   const _back = () => actor.send({ type: NAVIGATION_EVENTS.BACK_REQUESTED });
 
   if (reminderScreenLoading(snapshot)) {

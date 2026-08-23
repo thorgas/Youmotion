@@ -2,6 +2,7 @@ import * as Effect from 'effect/Effect';
 import * as Schema from 'effect/Schema';
 import { getLocales } from 'expo-localization';
 import { SurrealRecordId } from 'react-native-surrealdb';
+import assert from 'tiny-invariant';
 
 import {
   APP_SETTINGS_RECORD_ID,
@@ -42,8 +43,11 @@ const appSettingsRecord = new SurrealRecordId(
 let settingsWriteQueue: Promise<void> = Promise.resolve();
 
 function enqueueSettingsWrite(write: () => Promise<void>) {
+  const priorQueue = settingsWriteQueue;
   const pendingWrite = settingsWriteQueue.then(write, write);
   settingsWriteQueue = pendingWrite.catch(() => undefined);
+  assert(pendingWrite !== priorQueue, 'Enqueueing must create a write promise after the prior queue');
+  assert(settingsWriteQueue !== pendingWrite, 'Settings queue must recover independently from the caller promise');
   return pendingWrite;
 }
 
@@ -74,6 +78,8 @@ const upsertAppSettings = Effect.fn('AppSettingsRepository.upsert')((settings: A
     Effect.mapError((cause) => AppSettingsDataError.make({ operation: 'encode', cause })),
     Effect.flatMap((encoded) => Effect.tryPromise({
       try: () => enqueueSettingsWrite(async () => {
+        assert(encoded.locale === settings.locale, 'Encoding must preserve the selected locale');
+        assert(encoded.emotionLabelMode === settings.emotionLabelMode, 'Encoding must preserve the selected label mode');
         await queryDatabase({
           surql: 'UPSERT $record CONTENT $settings',
           variables: { record: appSettingsRecord, settings: encoded },
@@ -91,6 +97,8 @@ const initializeAppSettings = Effect.suspend(() => {
 
 export const loadAppSettings = selectAppSettings.pipe(
   Effect.flatMap((settings) => {
+    assert(settings.length <= 1, 'Singleton app settings query must return at most one record');
+    assert(settings.every(({ emotionLabelMode }) => Object.values(EMOTION_LABEL_MODES).includes(emotionLabelMode)), 'Stored settings must use a supported label mode');
     const stored = settings[0];
     if (!stored) return initializeAppSettings;
     const normalized = {

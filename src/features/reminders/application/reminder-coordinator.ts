@@ -1,4 +1,5 @@
 import * as Effect from 'effect/Effect';
+import assert from 'tiny-invariant';
 
 import { REMINDER_TARGET_KINDS } from '@/constants';
 import type {
@@ -44,6 +45,8 @@ export async function activateReminder({
   target: ReminderTarget;
   timing: ReminderTiming;
 }) {
+  assert(timing.weekdays.length > 0, 'Activated reminder requires weekdays');
+  assert(timing.times.length > 0, 'Activated reminder requires times');
   const now = ReminderTimestamp.make(new Date().toISOString());
   const normalizedTiming = normalizedReminderTiming(timing);
   const existing = assignments.find((candidate) => (
@@ -88,6 +91,8 @@ export async function activateReminder({
       )
     ))
     .concat(assignment);
+  assert(nextAssignments.some((candidate) => candidate.id === assignment.id), 'Activated reminder must be present');
+  assert(assignment.enabled, 'Activated reminder must be enabled');
   await reconcileReminderNotifications({
     assignments: nextAssignments,
     locale,
@@ -111,6 +116,8 @@ export async function updateReminder({
   statements: readonly BeliefStatement[];
   timing: ReminderTiming;
 }) {
+  assert(assignments.some((candidate) => candidate.id === assignment.id), 'Updated reminder must exist');
+  assert(timing.weekdays.length > 0 && timing.times.length > 0, 'Updated reminder requires a complete timing');
   const now = ReminderTimestamp.make(new Date().toISOString());
   const normalizedTiming = normalizedReminderTiming(timing);
   const updatedAssignment: ReminderAssignment = assignment.targetKind
@@ -126,6 +133,8 @@ export async function updateReminder({
   const nextAssignments = assignments.map((candidate) => (
     candidate.id === updatedAssignment.id ? updatedAssignment : candidate
   ));
+  assert(nextAssignments.length === assignments.length, 'Updating cannot change assignment count');
+  assert(nextAssignments.some((candidate) => candidate === updatedAssignment), 'Updated reminder must replace its prior value');
   await reconcileReminderNotifications({
     assignments: nextAssignments,
     locale,
@@ -160,6 +169,8 @@ export async function setReminderAssignmentEnabled({
   locale: AppLocale;
   statements: readonly BeliefStatement[];
 }) {
+  assert(assignments.some((candidate) => candidate.id === assignment.id), 'Toggled reminder must exist');
+  assert(assignment.id.length > 0, 'Toggled reminder id must not be empty');
   const updated: ReminderAssignment = {
     ...assignment,
     enabled,
@@ -169,6 +180,8 @@ export async function setReminderAssignmentEnabled({
   const nextAssignments = assignments.map((candidate) => (
     candidate.id === updated.id ? updated : candidate
   ));
+  assert(nextAssignments.length === assignments.length, 'Toggling cannot change assignment count');
+  assert(nextAssignments.some((candidate) => candidate === updated), 'Toggled reminder must replace its prior value');
   await reconcileReminderNotifications({
     assignments: nextAssignments,
     locale,
@@ -188,7 +201,11 @@ export async function deleteReminder({
   locale: AppLocale;
   statements: readonly BeliefStatement[];
 }) {
+  assert(assignments.some((candidate) => candidate.id === assignment.id), 'Deleted reminder must exist');
+  assert(assignment.id.length > 0, 'Deleted reminder id must not be empty');
   const nextAssignments = assignments.filter((candidate) => candidate.id !== assignment.id);
+  assert(nextAssignments.length < assignments.length, 'Deleting must reduce assignment count');
+  assert(nextAssignments.every((candidate) => candidate.id !== assignment.id), 'Deleted reminder must be absent');
   await Effect.runPromise(deleteReminderAssignment(assignment.id));
   await reconcileReminderNotifications({
     assignments: nextAssignments,

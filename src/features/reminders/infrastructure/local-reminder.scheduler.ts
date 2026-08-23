@@ -1,5 +1,6 @@
 import * as Notifications from 'expo-notifications';
 import { Platform } from 'react-native';
+import assert from 'tiny-invariant';
 
 import {
   APP_LOCALES,
@@ -39,6 +40,8 @@ export async function ensureReminderChannel() {
 function permissionState(
   permission: Notifications.NotificationPermissionsStatus,
 ): ReminderPermissionState {
+  assert(permission.status !== undefined, 'Native permission status must be present');
+  assert(permission.expires !== undefined, 'Native permission expiry must be present');
   if (Platform.OS === 'ios') {
     const status = permission.ios?.status;
     if (
@@ -67,9 +70,12 @@ export async function requestReminderPermission() {
   const current = await getReminderPermission();
   if (current === REMINDER_PERMISSION_STATES.GRANTED) return current;
   if (current === REMINDER_PERMISSION_STATES.DENIED) return current;
-  return permissionState(await Notifications.requestPermissionsAsync({
+  assert(current === REMINDER_PERMISSION_STATES.UNDETERMINED, 'Only an undetermined permission may prompt');
+  const requested = await Notifications.requestPermissionsAsync({
     ios: { allowAlert: true, allowBadge: false, allowSound: false },
-  }));
+  });
+  assert(requested.status !== undefined, 'Native permission prompt must return a status');
+  return permissionState(requested);
 }
 
 function statementForAssignment({
@@ -79,6 +85,8 @@ function statementForAssignment({
   assignment: ReminderAssignment;
   statements: readonly BeliefStatement[];
 }) {
+  assert(assignment.id.length > 0, 'Reminder assignment id must not be empty');
+  assert(assignment.targetKind === REMINDER_TARGET_KINDS.GUIDING_BELIEF || assignment.targetKind === REMINDER_TARGET_KINDS.PULSE, 'Reminder target must be supported');
   if (assignment.targetKind !== REMINDER_TARGET_KINDS.GUIDING_BELIEF) return undefined;
   const statement = statements.find((candidate) => (
     candidate.beliefSystemId === assignment.beliefSystemId
@@ -86,7 +94,10 @@ function statementForAssignment({
     && candidate.guidingStatement.length > 0
     && (candidate.kind === 'built-in' || candidate.archivedAt === undefined)
   ));
-  return statement?.guidingStatement;
+  const guidingStatement = statement?.guidingStatement;
+  assert(guidingStatement === undefined || guidingStatement.length > 0, 'Matched guiding copy must not be empty');
+  assert(statement === undefined || statement.beliefSystemId === assignment.beliefSystemId, 'Matched statement must belong to the reminder target');
+  return guidingStatement;
 }
 
 function notificationContent({
@@ -100,6 +111,8 @@ function notificationContent({
   locale: string;
   statements: readonly BeliefStatement[];
 }): Notifications.NotificationContentInput | null {
+  assert(notificationFingerprint.length > 0, 'Notification fingerprint must not be empty');
+  assert(assignment.id.length > 0, 'Notification assignment id must not be empty');
   const data: ReminderNotificationData = assignment.targetKind === REMINDER_TARGET_KINDS.PULSE
     ? {
         owner: REMINDER_NOTIFICATION_OWNER,
@@ -146,7 +159,10 @@ function textFingerprint(value: string) {
     hash ^= character.codePointAt(0) ?? 0;
     hash = Math.imul(hash, 16_777_619);
   }
-  return (hash >>> 0).toString(36);
+  const encoded = (hash >>> 0).toString(36);
+  assert(encoded.length > 0, 'Text fingerprint must not be empty');
+  assert(/^[0-9a-z]+$/.test(encoded), 'Text fingerprint must be base36');
+  return encoded;
 }
 
 function fingerprint({
@@ -166,6 +182,8 @@ function fingerprint({
   statements: readonly BeliefStatement[];
   timeZone: string;
 }) {
+  assert(weekday >= 1 && weekday <= 7, 'Notification weekday must be in the weekly trigger range');
+  assert(hour >= 0 && hour <= 23 && minute >= 0 && minute <= 59, 'Notification time must be valid');
   const belief = assignment.targetKind === REMINDER_TARGET_KINDS.GUIDING_BELIEF
     ? assignment.beliefSystemId
     : '-';
@@ -174,8 +192,11 @@ function fingerprint({
         statementForAssignment({ assignment, statements }) ?? '',
       )}`
     : '-';
-  return [assignment.id, assignment.targetKind, belief, contentIdentity, weekday, hour, minute, locale, timeZone, 2]
+  const value = [assignment.id, assignment.targetKind, belief, contentIdentity, weekday, hour, minute, locale, timeZone, 2]
     .join(':');
+  assert(value.includes(assignment.id), 'Fingerprint must identify its assignment');
+  assert(value.includes(timeZone), 'Fingerprint must identify its timezone');
+  return value;
 }
 
 type ExpectedNotification = {
@@ -195,6 +216,8 @@ function expectedNotificationsForAssignment({
   timeZone: string;
 }) {
   return assignment.weekdays.flatMap((weekday) => assignment.times.flatMap((time) => {
+    assert(weekday >= 1 && weekday <= 7, 'Scheduled weekday must be valid');
+    assert(time.hour >= 0 && time.hour <= 23 && time.minute >= 0 && time.minute <= 59, 'Scheduled local time must be valid');
     const key = fingerprint({
       assignment,
       weekday,
@@ -236,6 +259,8 @@ function expectedNotifications({
   statements: readonly BeliefStatement[];
   timeZone: string;
 }) {
+  assert(assignments.every((assignment) => assignment.weekdays.length > 0), 'Every reminder must have weekdays');
+  assert(assignments.every((assignment) => assignment.times.length > 0), 'Every reminder must have times');
   const entries = assignments.flatMap((assignment) => {
     if (!assignment.enabled) return [];
     return expectedNotificationsForAssignment({
@@ -245,7 +270,10 @@ function expectedNotifications({
       timeZone,
     });
   });
-  return new Map<string, ExpectedNotification>(entries);
+  const notifications = new Map<string, ExpectedNotification>(entries);
+  assert(notifications.size <= entries.length, 'Notification map cannot exceed generated entries');
+  assert([...notifications.keys()].every((key) => key.length > 0), 'Notification keys must not be empty');
+  return notifications;
 }
 
 function reconcileActions({
@@ -255,6 +283,8 @@ function reconcileActions({
   expected: ReadonlyMap<string, ExpectedNotification>;
   scheduled: readonly Notifications.NotificationRequest[];
 }) {
+  assert([...expected.keys()].every((key) => key.length > 0), 'Expected notification keys must not be empty');
+  assert(scheduled.every((request) => request.identifier.length > 0), 'Scheduled notification identifiers must not be empty');
   const existing = new Set<string>();
   const cancelIdentifiers: string[] = [];
   for (const request of scheduled) {
@@ -271,6 +301,8 @@ function reconcileActions({
   for (const [key, request] of expected) {
     if (!existing.has(key)) scheduleRequests.push(request);
   }
+  assert(cancelIdentifiers.every((identifier) => !existing.has(identifier)), 'Cancelled identifiers cannot be expected fingerprints');
+  assert(scheduleRequests.length <= expected.size, 'Schedule requests cannot exceed expected notifications');
   return { cancelIdentifiers, scheduleRequests };
 }
 
@@ -283,6 +315,8 @@ export async function reconcileReminderNotifications({
   locale: string;
   statements: readonly BeliefStatement[];
 }) {
+  assert(assignments.every((assignment) => assignment.id.length > 0), 'Reconciled assignments must have ids');
+  assert(locale.length > 0, 'Reminder locale must not be empty');
   await ensureReminderChannel();
   const timeZone = `${Intl.DateTimeFormat().resolvedOptions().timeZone}:${new Date().getTimezoneOffset()}`;
   const expected = expectedNotifications({
@@ -293,6 +327,8 @@ export async function reconcileReminderNotifications({
   });
   const scheduled = await Notifications.getAllScheduledNotificationsAsync();
   const { cancelIdentifiers, scheduleRequests } = reconcileActions({ expected, scheduled });
+  assert(cancelIdentifiers.length <= scheduled.length, 'Cancellation count cannot exceed scheduled notifications');
+  assert(scheduleRequests.length <= expected.size, 'Schedule count cannot exceed expected notifications');
   await Promise.all(cancelIdentifiers.map((identifier) => (
     Notifications.cancelScheduledNotificationAsync(identifier)
   )));
@@ -310,6 +346,8 @@ export async function sendTestReminder({
   locale: string;
   statements: readonly BeliefStatement[];
 }) {
+  assert(assignment.id.length > 0, 'Test reminder assignment id must not be empty');
+  assert(locale.length > 0, 'Test reminder locale must not be empty');
   const content = notificationContent({
     assignment,
     notificationFingerprint: `test:${assignment.id}`,

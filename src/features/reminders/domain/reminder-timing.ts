@@ -1,4 +1,5 @@
 import * as Schema from 'effect/Schema';
+import assert from 'tiny-invariant';
 
 import { MAX_REMINDER_TIMES } from '@/constants';
 
@@ -23,6 +24,8 @@ export const ReminderTimingSchema = Schema.Struct({
 export type ReminderTiming = typeof ReminderTimingSchema.Type;
 
 export function normalizedReminderTiming(timing: ReminderTiming): ReminderTiming {
+  assert(timing.weekdays.length > 0, 'Reminder timing requires a weekday');
+  assert(timing.times.length > 0, 'Reminder timing requires a time');
   // oxlint-disable-next-line unicorn/no-array-sort -- Hermes lacks toSorted; this receiver is a fresh copy.
   const weekdays = [...new Set(timing.weekdays)].sort((left, right) => left - right);
   const times = [...timing.times]
@@ -41,8 +44,11 @@ export function normalizedReminderTiming(timing: ReminderTiming): ReminderTiming
   const [firstWeekday, ...remainingWeekdays] = weekdays;
   const [firstTime, ...remainingTimes] = times;
   if (!firstWeekday || !firstTime) return timing;
-  return {
+  const normalized: ReminderTiming = {
     weekdays: [firstWeekday, ...remainingWeekdays],
     times: [firstTime, ...remainingTimes],
   };
+  assert(normalized.weekdays.length <= timing.weekdays.length, 'Normalization cannot add weekdays');
+  assert(normalized.times.length <= timing.times.length, 'Normalization cannot add times');
+  return normalized;
 }

@@ -17,6 +17,7 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import assert from 'tiny-invariant';
 
 import {
   APP_LOCALES,
@@ -67,6 +68,8 @@ function PreferenceOption({
   testID: string;
   textStyle: StyleProp<TextStyle>;
 }) {
+  assert(label.trim().length > 0, 'Preference option label must not be blank');
+  assert(testID.length > 0, 'Preference option test id must not be empty');
   const selectionStyle = useAnimatedStyle(() => ({
     opacity: withTiming(selected ? 1 : 0, selectionAnimation),
     transform: [{
@@ -141,6 +144,8 @@ export function SettingsScreen() {
     gitCommit,
   } = useSelector(appSettingsStore, _selectSettings);
   const guidingBeliefCount = useActorSelector(actor, _selectGuidingBeliefCount);
+  assert(locale === APP_LOCALES.ENGLISH || locale === APP_LOCALES.GERMAN, 'Settings locale must be supported');
+  assert(emotionLabelMode === EMOTION_LABEL_MODES.EMOJI || emotionLabelMode === EMOTION_LABEL_MODES.TEXT || emotionLabelMode === EMOTION_LABEL_MODES.BOTH, 'Emotion label mode must be supported');
   const _setEnglish = () => actor.send({
     type: SETTINGS_EVENTS.LANGUAGE_CHANGED,
     locale: APP_LOCALES.ENGLISH,

@@ -1,6 +1,7 @@
 import * as Schema from 'effect/Schema';
 import * as Notifications from 'expo-notifications';
 import { AppState } from 'react-native';
+import assert from 'tiny-invariant';
 
 import {
   REMINDER_EVENTS,
@@ -67,6 +68,8 @@ function handlePayload(data: unknown) {
   const result = Schema.decodeUnknownEither(ReminderNotificationPayloadSchema)(data);
   if (result._tag === 'Left') return;
   const payload = result.right;
+  assert(payload.assignmentId.length > 0, 'Decoded reminder payload must identify an assignment');
+  assert(payload.fingerprint.length > 0, 'Decoded reminder payload must have a fingerprint');
   if (lastFingerprint === payload.fingerprint) return;
   lastFingerprint = payload.fingerprint;
   if (!actor) {
@@ -78,12 +81,16 @@ function handlePayload(data: unknown) {
 
 function handleResponse(response: Notifications.NotificationResponse | null) {
   if (!response) return;
+  assert(response.notification.request.identifier.length > 0, 'Notification response must identify its request');
+  assert(response.actionIdentifier.length > 0, 'Notification response must identify its action');
   handlePayload(response.notification.request.content.data);
 }
 
 export function installReminderNotificationBridge() {
   if (installed) return;
   installed = true;
+  assert(installed, 'Reminder notification bridge must mark itself installed');
+  assert(pending === undefined || pending.fingerprint.length > 0, 'Pending reminder payload must have a fingerprint');
   Notifications.setNotificationHandler({
     handleNotification: async () => ({
       shouldPlaySound: false,
@@ -102,8 +109,12 @@ export function installReminderNotificationBridge() {
 
 export function bindReminderNotificationActor(nextActor: ReminderActor) {
   actor = nextActor;
+  assert(actor === nextActor, 'Reminder bridge must retain the bound actor');
+  assert(pending === undefined || pending.assignmentId.length > 0, 'Pending reminder payload must identify an assignment');
   if (!pending) return;
   const payload = pending;
   pending = undefined;
+  assert(pending === undefined, 'Delivered reminder payload must be cleared');
+  assert(actor === nextActor, 'Delivering a pending payload must preserve the bound actor');
   actor.send(eventForPayload(payload));
 }

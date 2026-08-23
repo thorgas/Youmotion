@@ -2,6 +2,7 @@ import { useSelector } from '@xstate/react';
 import { PressableScale } from 'pressto';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import assert from 'tiny-invariant';
 
 import {
   NAVIGATION_EVENTS,
@@ -30,6 +31,8 @@ const _selectReminderContext = (
 });
 
 function PulseReminderCard({ assignment }: { assignment: PulseReminderAssignment }) {
+  assert(assignment.weekdays.length > 0, 'Pulse reminder card requires weekdays');
+  assert(assignment.times.length > 0, 'Pulse reminder card requires times');
   const actor = useAppNavigationActor();
   const locale = useAppLocale();
   const editReminder = () => actor.send({
@@ -85,6 +88,8 @@ function PulseReminderCard({ assignment }: { assignment: PulseReminderAssignment
 export function ReminderSettingsScreen() {
   const actor = useAppNavigationActor();
   const { assignment, error } = useSelector(actor, _selectReminderContext);
+  assert(assignment === undefined || assignment.targetKind === REMINDER_TARGET_KINDS.PULSE, 'Settings may only show the Pulse reminder');
+  assert(assignment === undefined || assignment.id.length > 0, 'Displayed reminder must have an id');
   const _back = () => actor.send({ type: NAVIGATION_EVENTS.BACK_REQUESTED });
   const _newReminder = () => actor.send({ type: REMINDER_EVENTS.CREATE_REQUESTED });
   const _retry = () => actor.send({ type: REMINDER_EVENTS.RETRY_REQUESTED });

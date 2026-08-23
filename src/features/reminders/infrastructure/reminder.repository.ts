@@ -1,6 +1,7 @@
 import * as Effect from 'effect/Effect';
 import * as Schema from 'effect/Schema';
 import { SurrealRecordId } from 'react-native-surrealdb';
+import assert from 'tiny-invariant';
 
 import {
   REMINDER_ASSIGNMENT_TABLE,
@@ -45,6 +46,8 @@ const ReminderAssignmentDatabaseListSchema = Schema.Array(Schema.Union(
 function reminderAssignmentFromDatabase(
   assignment: typeof ReminderAssignmentDatabaseListSchema.Type[number],
 ): object {
+  assert(assignment.weekdays.length > 0, 'Stored reminder must include weekdays');
+  assert(assignment.times.length > 0, 'Stored reminder must include times');
   const timing = {
     weekdays: assignment.weekdays.map(Number),
     times: assignment.times.map(({ hour, minute }) => ({
@@ -52,6 +55,8 @@ function reminderAssignmentFromDatabase(
       minute: Number(minute),
     })),
   };
+  assert(timing.weekdays.every(Number.isInteger), 'Decoded reminder weekdays must be integers');
+  assert(timing.times.every(({ hour, minute }) => Number.isInteger(hour) && Number.isInteger(minute)), 'Decoded reminder times must be integers');
   if (assignment.targetKind === REMINDER_TARGET_KINDS.GUIDING_BELIEF) {
     return {
       ...assignment,

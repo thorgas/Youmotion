@@ -11,6 +11,7 @@ import {
 } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import assert from 'tiny-invariant';
 
 import { AppBackButton } from '@/components/ui/app-back-button';
 import {
@@ -67,6 +68,9 @@ function guidingBeliefReminderForStatement({
 
 function LibraryBackButton() {
   const actor = useAppNavigationActor();
+  const snapshot = actor.getSnapshot();
+  assert(new Set(snapshot.context.beliefStatements.map(({ beliefSystemId }) => beliefSystemId)).size === snapshot.context.beliefStatements.length, 'Belief library ids must be unique');
+  assert(new Set(snapshot.context.reminderAssignments.map(({ id }) => id)).size === snapshot.context.reminderAssignments.length, 'Reminder assignment ids must be unique');
   const close = () => actor.send({ type: BELIEF_LIBRARY_EVENTS.CLOSED });
 
   return (
@@ -100,6 +104,8 @@ function BeliefLibraryReminderActions({
   reminder: GuidingBeliefReminderAssignment | undefined;
   statement: BeliefStatement;
 }) {
+  assert(statement.beliefSystemId.length > 0, 'Reminder actions require a belief id');
+  assert(reminder === undefined || reminder.beliefSystemId === statement.beliefSystemId, 'Reminder actions must belong to the displayed belief');
   const actor = useAppNavigationActor();
   const editReminder = () => actor.send(reminder
     ? {
@@ -205,10 +211,12 @@ function BeliefLibraryReminderSection({
 }
 
 function BeliefLibraryStatementHeader({ statement }: { statement: BeliefStatement }) {
+  assert(statement.beliefSystemId.length > 0, 'Belief header requires an id');
   const limitingBelief = beliefSystemText({
     id: statement.beliefSystemId,
     statements: [statement],
   });
+  assert(limitingBelief.trim().length > 0, 'Belief header requires limiting copy');
 
   if (statement.guidingStatement === undefined) {
     return (
@@ -251,6 +259,8 @@ function BeliefLibraryRowActions({
   statement: BeliefStatement;
 }) {
   const actor = useAppNavigationActor();
+  assert(statement.beliefSystemId.length > 0, 'Belief actions require an id');
+  assert(statement.kind === 'built-in' || statement.harmfulStatement.trim().length > 0, 'Custom belief actions require limiting copy');
   if (statement.kind !== 'custom') return null;
   const edit = () => actor.send({
     type: BELIEF_LIBRARY_EVENTS.EDIT_REQUESTED,
@@ -316,6 +326,8 @@ function BeliefLibraryList() {
     statements: snapshot.context.beliefStatements,
   });
   const retiring = snapshot.matches(BELIEF_LIBRARY_STATES.RETIRING);
+  assert(statements.length <= snapshot.context.beliefStatements.length, 'Library filtering cannot add belief statements');
+  assert(statements.every((statement) => snapshot.context.beliefStatements.includes(statement)), 'Library rows must come from stored beliefs');
   const create = () => actor.send({ type: BELIEF_LIBRARY_EVENTS.CREATE_REQUESTED });
 
   return (
@@ -398,6 +410,8 @@ function BeliefLibraryEditor() {
     : undefined;
   const creating = editingStatement === undefined;
   const harmfulReady = snapshot.context.beliefLibraryHarmfulDraft.trim().length > 0;
+  assert(snapshot.context.beliefLibraryHarmfulDraft.length <= MAX_BELIEF_STATEMENT_LENGTH, 'Limiting draft must respect its maximum length');
+  assert(snapshot.context.beliefLibraryGuidingDraft.length <= MAX_BELIEF_STATEMENT_LENGTH, 'Guiding draft must respect its maximum length');
   const cancel = () => actor.send({ type: BELIEF_LIBRARY_EVENTS.EDIT_CANCELLED });
   const harmfulChanged = (statement: string) => actor.send({
     type: BELIEF_LIBRARY_EVENTS.HARMFUL_DRAFT_CHANGED,
@@ -536,6 +550,9 @@ export function BeliefLibraryScreen() {
     snapshot.matches(BELIEF_LIBRARY_STATES.EDITOR)
     || snapshot.matches(BELIEF_LIBRARY_STATES.SAVING)
   ));
+  const snapshot = actor.getSnapshot();
+  assert(new Set(snapshot.context.beliefStatements.map(({ beliefSystemId }) => beliefSystemId)).size === snapshot.context.beliefStatements.length, 'Belief library ids must be unique');
+  assert(new Set(snapshot.context.reminderAssignments.map(({ id }) => id)).size === snapshot.context.reminderAssignments.length, 'Reminder assignment ids must be unique');
 
   return editing ? <BeliefLibraryEditor /> : <BeliefLibraryList />;
 }
