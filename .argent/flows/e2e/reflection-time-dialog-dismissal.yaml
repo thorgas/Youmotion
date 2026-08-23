@@ -1,0 +1,28 @@
+steps:
+  - echo: Open the shared reflection time dialog and dismiss it through its backdrop.
+  - launch: com.youmotion.mobile
+  - tool: open-url
+    args:
+      url: exp+youmotion://expo-development-client/?url=http%3A%2F%2F127.0.0.1%3A8091
+  - await: { visible: { id: emotion-star }, timeout: 30000 }
+  - when:
+      visible: { id: xmark }
+    steps:
+      - tap: { id: xmark }
+      - await: { hidden: { id: xmark }, timeout: 5000 }
+  - tool: gesture-swipe
+    args:
+      fromX: 0.5
+      fromY: 0.54
+      toX: 0.5
+      toY: 0.34
+      durationMs: 1000
+  - await: { visible: { id: reflection-note-input }, timeout: 10000 }
+  - tap: { id: moment-time-control }
+  - await: { visible: { id: moment-time-modal }, timeout: 5000 }
+  - echo: Tap above the centered dialog card to dismiss it without changing the draft.
+  - tap: { x: 0.5, y: 0.2 }
+  - await: { hidden: { id: moment-time-modal }, timeout: 5000 }
+  - tap: { text: What is present right now? }
+  - tap: { id: reflection-back }
+  - await: { visible: { id: emotion-star }, timeout: 5000 }

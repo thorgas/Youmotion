@@ -11,7 +11,6 @@ import { useRef } from 'react';
 import {
   ActivityIndicator,
   Keyboard,
-  Modal,
   Platform,
   Pressable,
   ScrollView,
@@ -30,6 +29,7 @@ import assert from 'tiny-invariant';
 
 import { AppBackButton } from '@/components/ui/app-back-button';
 import { ConfirmedPickerModal } from '@/components/ui/confirmed-picker-modal';
+import { Dialog } from '@/components/ui/dialog';
 import {
   CHECK_IN_EVENTS,
   CHECK_IN_STATES,
@@ -80,7 +80,7 @@ import { CheckInProgressHeader } from './check-in-progress';
 import { PersonalBeliefCreateButton } from './personal-belief-create-button';
 import { beginReflectionInputSession } from './reflection-input-session';
 import { reflectionResponsiveLayout } from './reflection-responsive-layout';
-import { actionColors, overlayColors, palette, surfaceColors, type } from '@/theme';
+import { actionColors, palette, surfaceColors, type } from '@/theme';
 
 const _selectSnapshot = (
   snapshot: ReturnType<ReturnType<typeof useAppNavigationActor>['getSnapshot']>,
@@ -149,23 +149,14 @@ export function MomentTimeControl({ disabled }: { disabled: boolean }) {
         <Text numberOfLines={2} style={styles.momentTimeText}>{label}</Text>
         <Text accessibilityElementsHidden style={styles.momentTimeDisclosure}>›</Text>
       </Pressable>
-      <Modal
-        animationType="fade"
+      <Dialog.Root
         onRequestClose={_close}
-        presentationStyle="overFullScreen"
-        statusBarTranslucent
-        transparent
+        style={styles.momentTimeModalBackdrop}
+        testID="moment-time-modal"
+        tone="dialog"
         visible={snapshot.context.momentTimeEditorOpen}
       >
-        <View style={styles.momentTimeModalBackdrop} testID="moment-time-modal">
-          <Pressable
-            accessibilityElementsHidden
-            importantForAccessibility="no"
-            onPress={_close}
-            style={styles.momentTimeModalDismissArea}
-            testID="moment-time-modal-backdrop"
-          />
-          <View accessibilityViewIsModal style={styles.momentTimeModalCard}>
+        <Dialog.Content style={styles.momentTimeModalCard}>
             <View style={styles.momentTimeModalHeader}>
               <View style={styles.momentTimeModalHeading}>
                 <Text style={styles.momentTimeModalTitle}>
@@ -269,9 +260,8 @@ export function MomentTimeControl({ disabled }: { disabled: boolean }) {
                 </Text>
               </PressableScale>
             </View>
-          </View>
-        </View>
-      </Modal>
+        </Dialog.Content>
+      </Dialog.Root>
     </>
   );
 }
@@ -1100,17 +1090,9 @@ const styles = StyleSheet.create({
   },
   momentTimeModalBackdrop: {
     alignItems: 'center',
-    backgroundColor: overlayColors.dialog,
     flex: 1,
     justifyContent: 'center',
     padding: 22,
-  },
-  momentTimeModalDismissArea: {
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
-    right: 0,
-    top: 0,
   },
   momentTimeModalCard: {
     backgroundColor: palette.paperRaised,

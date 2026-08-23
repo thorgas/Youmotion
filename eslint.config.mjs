@@ -115,6 +115,11 @@ export default tseslint.config(
               names: ['ScreenHeading.Eyebrow', 'ScreenHeading.Title'],
               styleAttributes: ['style'],
             },
+            {
+              identityProperties: ['backgroundColor'],
+              names: ['Dialog.Root'],
+              styleAttributes: ['style'],
+            },
           ],
         },
       ],

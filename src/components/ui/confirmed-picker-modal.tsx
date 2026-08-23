@@ -1,8 +1,9 @@
 import type { ReactNode } from 'react';
-import { Modal, Pressable, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import { PressableScale } from 'pressto';
 
-import { actionColors, overlayColors, palette, type } from '@/theme';
+import { Dialog } from '@/components/ui/dialog';
+import { actionColors, palette, type } from '@/theme';
 
 export function ConfirmedPickerModal({
   children,
@@ -20,23 +21,8 @@ export function ConfirmedPickerModal({
   visible: boolean;
 }) {
   return (
-    <Modal
-      animationType="fade"
-      onRequestClose={onDone}
-      presentationStyle="overFullScreen"
-      statusBarTranslucent
-      transparent
-      visible={visible}
-    >
-      <View style={styles.backdrop} testID={testID}>
-        <Pressable
-          accessibilityElementsHidden
-          importantForAccessibility="no"
-          onPress={onDone}
-          style={styles.dismissArea}
-          testID={`${testID}-backdrop`}
-        />
-        <View accessibilityViewIsModal style={styles.card}>
+    <Dialog.Root onRequestClose={onDone} style={styles.backdrop} testID={testID} tone="picker" visible={visible}>
+      <Dialog.Content style={styles.card}>
           <Text style={styles.title}>{title}</Text>
           <View style={styles.picker}>{children}</View>
           <PressableScale
@@ -47,9 +33,8 @@ export function ConfirmedPickerModal({
           >
             <Text style={styles.doneText}>{doneLabel}</Text>
           </PressableScale>
-        </View>
-      </View>
-    </Modal>
+      </Dialog.Content>
+    </Dialog.Root>
   );
 }
 
@@ -57,16 +42,8 @@ const styles = StyleSheet.create({
   backdrop: {
     flex: 1,
     justifyContent: 'flex-end',
-    backgroundColor: overlayColors.picker,
     padding: 16,
     paddingBottom: 28,
-  },
-  dismissArea: {
-    position: 'absolute',
-    top: 0,
-    right: 0,
-    bottom: 0,
-    left: 0,
   },
   card: {
     backgroundColor: palette.paper,
