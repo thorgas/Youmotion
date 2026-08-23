@@ -74,7 +74,7 @@ In terminal B, choose a dedicated device rather than another agent's target, the
 argent run list-devices --json
 export E2E_DEVICE='<iOS UDID or Android emulator serial>'
 export E2E_PLATFORM='ios'
-pnpm test:e2e -- --flow emotion-check-in-reminder.yaml
+pnpm test:e2e --flow emotion-check-in-reminder.yaml
 ```
 
 The flow selects English itself and cleans up the reminder it creates. It does not clear storage or read/write journal records.

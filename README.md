@@ -288,8 +288,8 @@ pnpm test:e2e
 Use `E2E_PLATFORM=android` for an emulator. Run `pnpm test:e2e:smoke` for the short navigation gate. To isolate one journey while keeping the same two-pass contract:
 
 ```bash
-pnpm test:e2e -- --flow reminder-owned-timing.yaml
-pnpm test:e2e -- --flow emotion-check-in-reminder.yaml
+pnpm test:e2e --flow reminder-owned-timing.yaml
+pnpm test:e2e --flow emotion-check-in-reminder.yaml
 ```
 
 The app id is `com.youmotion.mobile`. Normal Metro uses 8081, E2E uses 8091, and Harness starts at 8083/8084. The runner exits before device interaction when the explicit target or Metro server is missing. Failure snapshots are written to ignored `artifacts/argent/`; flows are under `.argent/flows/e2e/` and use fixed synthetic text that they remove before finishing.
