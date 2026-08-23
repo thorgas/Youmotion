@@ -779,8 +779,8 @@ export function AnalyticsContent({ entries, locale, now, onEvidencePress, statem
       <SafeAreaView edges={['top']} style={styles.safeArea}>
         <ScrollView contentContainerStyle={styles.content}>
           <ScreenHeading.Root>
-            <ScreenHeading.Eyebrow testID="analytics-eyebrow"><fbt desc="Analytics screen eyebrow">YOUR INSIGHTS</fbt></ScreenHeading.Eyebrow>
-            <ScreenHeading.Title size="compact"><fbt desc="Analytics screen title">Patterns you noticed.</fbt></ScreenHeading.Title>
+            <ScreenHeading.EyebrowText testID="analytics-eyebrow"><fbt desc="Analytics screen eyebrow">YOUR INSIGHTS</fbt></ScreenHeading.EyebrowText>
+            <ScreenHeading.TitleText size="compact"><fbt desc="Analytics screen title">Patterns you noticed.</fbt></ScreenHeading.TitleText>
           </ScreenHeading.Root>
           <Text style={styles.intro}>
             <fbt desc="Analytics screen explanation and privacy note">

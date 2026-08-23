@@ -6,8 +6,8 @@ describe('ScreenHeading', () => {
   it('composes the shared eyebrow and compact title identity', async () => {
     await render(
       <ScreenHeading.Root>
-        <ScreenHeading.Eyebrow testID="eyebrow">YOUR HISTORY</ScreenHeading.Eyebrow>
-        <ScreenHeading.Title size="compact">Moments you noticed.</ScreenHeading.Title>
+        <ScreenHeading.EyebrowText testID="eyebrow">YOUR HISTORY</ScreenHeading.EyebrowText>
+        <ScreenHeading.TitleText size="compact">Moments you noticed.</ScreenHeading.TitleText>
       </ScreenHeading.Root>,
     );
 

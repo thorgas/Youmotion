@@ -284,7 +284,7 @@ describe('architecture lint contract', () => {
     const messages = messagesFor({
       code: `
         import { ScreenHeading } from '@/components/ui/screen-heading';
-        const view = <ScreenHeading.Title style={{ fontSize: 48 }}>Title</ScreenHeading.Title>;
+        const view = <ScreenHeading.TitleText style={{ fontSize: 48 }}>Title</ScreenHeading.TitleText>;
       `,
       filePath: 'src/features/settings/ui/contract-fixture.tsx',
     });

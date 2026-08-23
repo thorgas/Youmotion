@@ -163,8 +163,8 @@ export function SettingsScreen() {
       <SafeAreaView edges={['top']} style={styles.safeArea}>
         <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         <ScreenHeading.Root>
-          <ScreenHeading.Eyebrow testID="settings-eyebrow"><fbt desc="Settings screen eyebrow heading">SETTINGS</fbt></ScreenHeading.Eyebrow>
-          <ScreenHeading.Title style={styles.titleLayout}><fbt desc="Settings screen title">Your space.</fbt></ScreenHeading.Title>
+          <ScreenHeading.EyebrowText testID="settings-eyebrow"><fbt desc="Settings screen eyebrow heading">SETTINGS</fbt></ScreenHeading.EyebrowText>
+          <ScreenHeading.TitleText style={styles.titleLayout}><fbt desc="Settings screen title">Your space.</fbt></ScreenHeading.TitleText>
         </ScreenHeading.Root>
         <Text style={styles.sectionHeading}>
           <fbt desc="Heading grouping app preferences in settings">PREFERENCES</fbt>

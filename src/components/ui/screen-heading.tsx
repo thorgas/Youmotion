@@ -14,7 +14,7 @@ function ScreenHeadingRoot({ children }: { children: ReactNode }) {
   return <Fragment>{children}</Fragment>;
 }
 
-function ScreenHeadingEyebrow({
+function ScreenHeadingEyebrowText({
   children,
   testID,
 }: {
@@ -24,7 +24,7 @@ function ScreenHeadingEyebrow({
   return <Text style={styles.eyebrow} testID={testID}>{children}</Text>;
 }
 
-function ScreenHeadingTitle({
+function ScreenHeadingTitleText({
   children,
   size = 'standard',
   style,
@@ -58,7 +58,7 @@ const styles = StyleSheet.create({
 });
 
 export const ScreenHeading = Object.freeze({
-  Eyebrow: ScreenHeadingEyebrow,
+  EyebrowText: ScreenHeadingEyebrowText,
   Root: ScreenHeadingRoot,
-  Title: ScreenHeadingTitle,
+  TitleText: ScreenHeadingTitleText,
 });

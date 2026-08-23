@@ -1,4 +1,4 @@
-import { createContext, use, useMemo, type ReactNode } from 'react';
+import { createContext, use, type ReactNode } from 'react';
 import { PressableScale } from 'pressto';
 import {
   ActivityIndicator,
@@ -15,12 +15,8 @@ import { actionColors, palette, type } from '@/theme';
 type ButtonVariant = 'primary' | 'secondary' | 'destructive' | 'ghost';
 type ButtonSize = 'compact' | 'regular' | 'large';
 
-type ButtonContextValue = {
-  size: ButtonSize;
-  variant: ButtonVariant;
-};
-
-const ButtonContext = createContext<ButtonContextValue | null>(null);
+const ButtonSizeContext = createContext<ButtonSize | null>(null);
+const ButtonVariantContext = createContext<ButtonVariant | null>(null);
 const buttonVariants = ['primary', 'secondary', 'destructive', 'ghost'] satisfies readonly ButtonVariant[];
 const buttonSizes = ['compact', 'regular', 'large'] satisfies readonly ButtonSize[];
 
@@ -48,36 +44,37 @@ function ButtonRoot({
   assert(label.trim().length > 0, 'Button accessibility label must not be empty.');
   assert(buttonSizes.includes(size) && buttonVariants.includes(variant), 'Button size and variant must be supported.');
   const unavailable = disabled || loading;
-  const contextValue = useMemo(() => ({ size, variant }), [size, variant]);
 
   return (
-    <ButtonContext.Provider value={contextValue}>
-      <PressableScale
-        accessibilityLabel={label}
-        accessibilityRole="button"
-        accessibilityState={{ busy: loading, disabled: unavailable }}
-        disabled={disabled || loading}
-        onPress={onPress}
-        rippleColor={palette.hairline}
-        style={[
-          styles.root,
-          rootSizes[size],
-          rootVariants[variant],
-          unavailable && styles.unavailable,
-          style,
-        ]}
-        testID={testID}
-      >
-        {loading ? (
-          <ActivityIndicator
-            color={variant === 'primary' || variant === 'destructive'
-              ? actionColors.primaryForeground
-              : palette.ink}
-            testID={`${testID}-loading`}
-          />
-        ) : children}
-      </PressableScale>
-    </ButtonContext.Provider>
+    <ButtonSizeContext.Provider value={size}>
+      <ButtonVariantContext.Provider value={variant}>
+        <PressableScale
+          accessibilityLabel={label}
+          accessibilityRole="button"
+          accessibilityState={{ busy: loading, disabled: unavailable }}
+          disabled={disabled || loading}
+          onPress={onPress}
+          rippleColor={palette.hairline}
+          style={[
+            styles.root,
+            rootSizes[size],
+            rootVariants[variant],
+            unavailable && styles.unavailable,
+            style,
+          ]}
+          testID={testID}
+        >
+          {loading ? (
+            <ActivityIndicator
+              color={variant === 'primary' || variant === 'destructive'
+                ? actionColors.primaryForeground
+                : palette.ink}
+              testID={`${testID}-loading`}
+            />
+          ) : children}
+        </PressableScale>
+      </ButtonVariantContext.Provider>
+    </ButtonSizeContext.Provider>
   );
 }
 
@@ -88,12 +85,13 @@ function ButtonText({
   children: ReactNode;
   style?: StyleProp<TextStyle>;
 }) {
-  const context = use(ButtonContext);
-  assert(context !== null, 'Button.Text must be rendered inside Button.Root.');
-  assert(buttonSizes.includes(context.size) && buttonVariants.includes(context.variant), 'Button text requires a supported root contract.');
+  const size = use(ButtonSizeContext);
+  const variant = use(ButtonVariantContext);
+  assert(size !== null && variant !== null, 'Button.Text must be rendered inside Button.Root.');
+  assert(buttonSizes.includes(size) && buttonVariants.includes(variant), 'Button text requires a supported root contract.');
 
   return (
-    <Text style={[styles.text, textSizes[context.size], textVariants[context.variant], style]}>
+    <Text style={[styles.text, textSizes[size], textVariants[variant], style]}>
       {children}
     </Text>
   );

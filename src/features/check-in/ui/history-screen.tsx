@@ -317,8 +317,8 @@ export function HistoryScreen({ now }: { now?: Date }) {
       <SafeAreaView edges={['top']} style={styles.safeArea}>
         <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
           <ScreenHeading.Root>
-            <ScreenHeading.Eyebrow testID="history-eyebrow"><fbt desc="Check-in history eyebrow heading">YOUR HISTORY</fbt></ScreenHeading.Eyebrow>
-            <ScreenHeading.Title size="compact"><fbt desc="Check-in history title">Moments you noticed.</fbt></ScreenHeading.Title>
+            <ScreenHeading.EyebrowText testID="history-eyebrow"><fbt desc="Check-in history eyebrow heading">YOUR HISTORY</fbt></ScreenHeading.EyebrowText>
+            <ScreenHeading.TitleText size="compact"><fbt desc="Check-in history title">Moments you noticed.</fbt></ScreenHeading.TitleText>
           </ScreenHeading.Root>
           <View style={styles.localStatus}>
             <View style={styles.localStatusDot} />

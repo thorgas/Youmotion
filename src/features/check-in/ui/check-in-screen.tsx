@@ -95,14 +95,14 @@ export function CheckInScreen() {
         <View style={styles.gestureRegion} testID="check-in-gesture-region">
           <View style={styles.header}>
             <ScreenHeading.Root>
-              <ScreenHeading.Eyebrow testID="today-eyebrow">
+              <ScreenHeading.EyebrowText testID="today-eyebrow">
                 <fbt desc="Today check-in screen eyebrow heading">TODAY</fbt>
-              </ScreenHeading.Eyebrow>
-              <ScreenHeading.Title style={styles.titleLayout}>
+              </ScreenHeading.EyebrowText>
+              <ScreenHeading.TitleText style={styles.titleLayout}>
                 {editing
                   ? <fbt desc="Question shown while changing the feeling in an existing check-in">How did you feel then?</fbt>
                   : <fbt desc="Question asking the user about their current feeling">How are you feeling right now?</fbt>}
-              </ScreenHeading.Title>
+              </ScreenHeading.TitleText>
             </ScreenHeading.Root>
           </View>
           <View style={styles.starCard} testID="today-pulse-card">

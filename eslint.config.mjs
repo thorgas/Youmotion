@@ -112,7 +112,7 @@ export default tseslint.config(
                 'letterSpacing',
                 'lineHeight',
               ],
-              names: ['ScreenHeading.Eyebrow', 'ScreenHeading.Title'],
+              names: ['ScreenHeading.EyebrowText', 'ScreenHeading.TitleText'],
               styleAttributes: ['style'],
             },
             {
