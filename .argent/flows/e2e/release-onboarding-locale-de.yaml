@@ -1,0 +1,11 @@
+steps:
+  - when:
+      visible: { text: { matches: "reagiert nicht$" } }
+    steps:
+      - tap: { text: "Warten" }
+  - when:
+      visible: { text: { matches: "reagiert nicht$" } }
+    steps:
+      - tap: { text: "Warten" }
+  - await: { visible: { text: "Gib dem Raum, was gerade da ist." }, timeout: 30000 }
+  - await: { hidden: { text: "Make space for what is here." }, timeout: 5000 }

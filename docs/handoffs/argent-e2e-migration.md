@@ -13,9 +13,9 @@ Replace the remaining Maestro development and release journeys with deterministi
 ## Plan and status
 
 1. Complete: add dedicated Metro and Argent orchestration. The live-authored navigation smoke flow passes twice unchanged on iOS.
-2. In progress: seven of eight Maestro journeys are now live-authored Argent flows and pass twice unchanged (`navigation-smoke`, `reflection-cancel`, `language-switching`, `emotion-label-modes`, `check-in-journey`, `emotion-check-in-reminder`, `reminder-owned-timing`).
+2. Complete: all eight Maestro journeys are now live-authored Argent flows and pass twice unchanged (`navigation-smoke`, `reflection-cancel`, `language-switching`, `emotion-label-modes`, `check-in-journey`, `emotion-check-in-reminder`, `reminder-owned-timing`, and the German/English release-onboarding locale pair).
 3. Pending: repair the existing onboarding Argent flow. The stale standalone CRUD flow was replaced by the deterministic check-in journey.
-4. Pending: migrate Android release-locale execution to Argent.
+4. Complete: Android release-locale execution uses Argent, requires an explicit emulator, accepts a valid first-choice locale followed by the supported fallback, installs from a clean app-data state, and retries while Android finishes booting.
 5. Pending: remove Maestro configuration and update all documentation.
 6. Pending: run two unchanged passes for every flow plus full repository verification.
 7. Pending: simplify, rebase onto `origin/main`, verify history, and push.
@@ -68,6 +68,7 @@ Use `E2E_PLATFORM=android` for an Android emulator. The runner exits before touc
 - `check-in-journey` creates only the fixed synthetic note `ArgentCheckInMoment`, exercises the new core-belief and guiding-belief sequence, proves persistence in History, deletes its own record through the native confirmation alert, and checks state-independent Analytics content. It passed twice unchanged on iOS. The superseded CRUD flow depended on stale navigation and exact global totals, so it was removed.
 - `emotion-check-in-reminder` creates and removes only its synthetic reminder. It proves the shared picker closes when its backdrop is pressed without changing the time, sends a test notification, and passed twice unchanged on iOS.
 - `reminder-owned-timing` creates the fixed synthetic moment and beliefs `ArgentOwnedTimingMoment`, `ArgentOwnedTimingCore`, and `ArgentOwnedTimingGuide`; exercises full-preview and general reminder timing, turn-off and removal paths; then removes every owned record. It passed twice unchanged on iOS with 84 assertions per pass.
+- The release-locale runner was validated on dedicated AOSP emulator `emulator-5556`. German-first with English fallback and English-first with German fallback each passed twice from a fresh release install. The test deliberately keeps language ordering as an explicit Android Settings prerequisite: property-level locale mutation changed Android configuration but did not reproduce the process locale delivered to Expo.
 
 ## Verification remaining
 

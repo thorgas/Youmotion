@@ -1,5 +1,5 @@
 import { execFile, spawn } from 'node:child_process';
-import { existsSync, mkdirSync } from 'node:fs';
+import { existsSync } from 'node:fs';
 import { homedir } from 'node:os';
 import { join } from 'node:path';
 import { promisify } from 'node:util';
@@ -20,25 +20,17 @@ const apk = process.env.E2E_RELEASE_APK
     'release',
     'app-release.apk',
   );
-const flow = join(
-  projectRoot,
-  '.maestro',
-  'flows',
-  'release-onboarding-locale.yaml',
-);
 const appId = 'com.youmotion.mobile';
 const localeCases = [
   {
+    configurationMarker: '-de-rDE,',
     locale: 'de-DE',
-    configurationMarker: '-de-rDE-',
-    expected: 'Gib dem Raum, was gerade da ist.',
-    unexpected: 'Make space for what is here.',
+    flow: 'release-onboarding-locale-de.yaml',
   },
   {
+    configurationMarker: '-en-rUS,',
     locale: 'en-US',
-    configurationMarker: '-en-rUS-',
-    expected: 'Make space for what is here.',
-    unexpected: 'Gib dem Raum, was gerade da ist.',
+    flow: 'release-onboarding-locale-en.yaml',
   },
 ];
 
@@ -108,58 +100,82 @@ async function installReleaseAttempt({ attempt, deviceId }) {
       arguments_: ['-s', deviceId, 'install', '-g', apk],
     });
   } catch (cause) {
-    if (attempt >= 2) throw cause;
+    if (attempt >= 11) throw cause;
     await delay(5_000);
     return installReleaseAttempt({ attempt: attempt + 1, deviceId });
   }
 }
 
-async function installFreshRelease(deviceId) {
+async function uninstallReleaseAttempt({ attempt, deviceId }) {
   try {
     await capture({
       command: adb,
       arguments_: ['-s', deviceId, 'uninstall', appId],
     });
-  } catch {
-    process.stdout.write(`${appId} was not installed; continuing with a clean install.\n`);
+  } catch (cause) {
+    const details = String(cause);
+    if (details.includes('Unknown package') || details.includes('not installed')) return;
+    if (attempt >= 11) throw cause;
+    await delay(5_000);
+    await uninstallReleaseAttempt({ attempt: attempt + 1, deviceId });
   }
+}
+
+async function installFreshRelease(deviceId) {
+  await uninstallReleaseAttempt({ attempt: 0, deviceId });
   await installReleaseAttempt({ attempt: 0, deviceId });
 }
 
-async function runLocaleCase({ deviceId, localeCase }) {
-  process.stdout.write(`\nTesting release onboarding with ${localeCase.locale}.\n`);
+async function requireSystemLocale({ deviceId, localeCase }) {
   const activeConfiguration = await capture({
     command: adb,
     arguments_: ['-s', deviceId, 'shell', 'am', 'get-config'],
   });
   if (!activeConfiguration.includes(localeCase.configurationMarker)) {
     throw new Error(
-      `Set ${deviceId} to ${localeCase.locale} in Android Settings before running this test.`,
+      `Set ${deviceId} to ${localeCase.locale} first, with the other supported locale as fallback, `
+      + 'in Android Settings > System > Languages.',
     );
   }
-  await installFreshRelease(deviceId);
+}
+
+async function launchInstalledApp(deviceId) {
+  await capture({
+    command: adb,
+    arguments_: ['-s', deviceId, 'shell', 'am', 'force-stop', appId],
+  });
+  await capture({
+    command: adb,
+    arguments_: ['-s', deviceId, 'shell', 'am', 'start', '-n', `${appId}/.MainActivity`],
+  });
+}
+
+async function runArgentPass({ deviceId, flow, pass }) {
+  process.stdout.write(`Argent release-locale pass ${String(pass)}/2.\n`);
+  await launchInstalledApp(deviceId);
   await run({
-    command: 'maestro',
+    command: 'argent',
     arguments_: [
-      '--udid',
-      deviceId,
-      'test',
+      'flow',
+      'run',
       flow,
-      '-e',
-      `EXPECTED_ONBOARDING_TITLE=${localeCase.expected}`,
-      '-e',
-      `UNEXPECTED_ONBOARDING_TITLE=${localeCase.unexpected}`,
-      '--format',
-      'JUNIT',
+      '--device',
+      deviceId,
+      '--platform',
+      'android',
       '--output',
-      join(
-        projectRoot,
-        'artifacts',
-        'maestro',
-        `release-onboarding-${localeCase.locale}.xml`,
-      ),
+      join(projectRoot, 'artifacts', 'argent'),
     ],
   });
+}
+
+async function runLocaleCase({ deviceId, localeCase }) {
+  process.stdout.write(`\nTesting release onboarding with ${localeCase.locale}.\n`);
+  await requireSystemLocale({ deviceId, localeCase });
+  await installFreshRelease(deviceId);
+  const flow = join(projectRoot, '.argent', 'flows', 'e2e', localeCase.flow);
+  await runArgentPass({ deviceId, flow, pass: 1 });
+  await runArgentPass({ deviceId, flow, pass: 2 });
 }
 
 async function buildRelease() {
@@ -175,7 +191,6 @@ async function buildRelease() {
 
 async function main() {
   if (!existsSync(adb)) throw new Error(`adb was not found at ${adb}.`);
-  if (!existsSync(flow)) throw new Error(`Maestro flow was not found at ${flow}.`);
   const requestedLocale = process.env.E2E_EXPECTED_LOCALE;
   const localeCase = localeCases.find((candidate) => candidate.locale === requestedLocale);
   if (!localeCase) {
@@ -184,7 +199,8 @@ async function main() {
   const deviceId = await selectEmulator();
   await buildRelease();
   if (!existsSync(apk)) throw new Error(`Release APK was not found at ${apk}.`);
-  mkdirSync(join(projectRoot, 'artifacts', 'maestro'), { recursive: true });
+  const flow = join(projectRoot, '.argent', 'flows', 'e2e', localeCase.flow);
+  if (!existsSync(flow)) throw new Error(`Argent flow was not found at ${flow}.`);
   await runLocaleCase({ deviceId, localeCase });
 }
 
