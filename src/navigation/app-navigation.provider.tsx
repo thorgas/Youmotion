@@ -26,9 +26,9 @@ export function AppNavigationProvider({ children }: PropsWithChildren) {
   });
 
   return (
-    <AppNavigationActorProvider actor={actor}>
+    <AppNavigationContext.Provider value={actor}>
       {children}
-    </AppNavigationActorProvider>
+    </AppNavigationContext.Provider>
   );
 }
 

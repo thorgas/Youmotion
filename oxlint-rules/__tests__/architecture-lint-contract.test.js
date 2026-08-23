@@ -17,6 +17,29 @@ const messagesFor = ({ code, filePath }) => {
   return lintResult.messages;
 };
 
+const configuredRulesFor = (filePath) => {
+  const result = spawnSync(eslint, ['--print-config', filePath], {
+    cwd,
+    encoding: 'utf8',
+  });
+  if (result.error) throw result.error;
+  return JSON.parse(result.stdout).rules;
+};
+
+const exportedRuleNames = () => {
+  const result = spawnSync(
+    process.execPath,
+    [
+      '--input-type=module',
+      '--eval',
+      "import plugin from 'eslint-plugin-code-architecture'; console.log(JSON.stringify(Object.keys(plugin.rules)));",
+    ],
+    { cwd, encoding: 'utf8' },
+  );
+  if (result.error) throw result.error;
+  return JSON.parse(result.stdout);
+};
+
 describe('architecture lint contract', () => {
   it('keeps the alpha plugin in the main verification path', () => {
     expect(packageJson.devDependencies['eslint-plugin-code-architecture']).toBe(
@@ -24,6 +47,59 @@ describe('architecture lint contract', () => {
     );
     expect(packageJson.scripts.lint).toContain('pnpm lint:architecture');
     expect(packageJson.scripts.verify).toContain('pnpm lint');
+  });
+
+  it('enables every Youmotion-applicable plugin rule as an error', () => {
+    const configuredRules = configuredRulesFor(
+      'src/components/ui/contract-fixture.tsx',
+    );
+    const applicableRules = exportedRuleNames()
+      .filter((ruleName) => ruleName !== 'require-assertions');
+
+    expect(applicableRules).toHaveLength(17);
+    for (const ruleName of applicableRules) {
+      expect(configuredRules[`code-architecture/${ruleName}`]?.[0]).toBe(2);
+    }
+    expect(configuredRules['code-architecture/require-assertions']).toBeUndefined();
+  });
+
+  it('enforces declarative components without banning named event delegates', () => {
+    const messages = messagesFor({
+      code: `
+        function Example() {
+          const [value] = useState(false);
+          const pressed = () => send({ type: 'pressed' });
+          return <Button onPress={pressed} value={value} />;
+        }
+      `,
+      filePath: 'src/components/ui/contract-fixture.tsx',
+    });
+
+    expect(messages).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        ruleId: 'code-architecture/declarative-components',
+        severity: 2,
+      }),
+    ]));
+    expect(messages).not.toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        message: expect.stringContaining('inline functions'),
+      }),
+    ]));
+  });
+
+  it('centralizes configured runtime vocabulary', () => {
+    const messages = messagesFor({
+      code: "const destination = '/today';",
+      filePath: 'src/navigation/contract-fixture.ts',
+    });
+
+    expect(messages).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        ruleId: 'code-architecture/centralize-domain-literals',
+        severity: 2,
+      }),
+    ]));
   });
 
   it('rejects unvalidated JSON parsing', () => {
@@ -49,7 +125,7 @@ describe('architecture lint contract', () => {
     expect(messages).toEqual(expect.arrayContaining([
       expect.objectContaining({
         ruleId: 'code-architecture/no-raw-design-values',
-        severity: 1,
+        severity: 2,
       }),
     ]));
   });
@@ -70,9 +146,9 @@ describe('architecture lint contract', () => {
     ]) {
       expect(messages).toEqual([
         expect.objectContaining({
-          message: `Raw design value '#EDF0EB' is not allowed for '${property}'. Use a shared semantic selection-wash token instead.`,
+          message: `Raw design value '#EDF0EB' is not allowed for '${property}'. Use palette.selectionWash instead.`,
           ruleId: 'code-architecture/no-raw-design-values',
-          severity: 1,
+          severity: 2,
         }),
       ]);
     }
@@ -96,7 +172,7 @@ describe('architecture lint contract', () => {
     expect(messages).toEqual(expect.arrayContaining([
       expect.objectContaining({
         ruleId: 'code-architecture/enforce-module-boundaries',
-        severity: 1,
+        severity: 2,
       }),
     ]));
   });

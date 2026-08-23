@@ -1,5 +1,6 @@
 import { EMOTION_AXIS_START_ANGLE, EMOTION_AXIS_STEP } from '@/constants';
-import { emotions, type EmotionSelection } from './emotion';
+import type { EmotionSelection } from './check-in';
+import { emotions } from './emotion';
 
 const TAU = Math.PI * 2;
 const DEFAULT_ACCESSIBLE_INTENSITY = 0.35;

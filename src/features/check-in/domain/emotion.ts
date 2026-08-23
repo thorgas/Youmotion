@@ -2,8 +2,6 @@ import { EMOTION_IDS } from '@/constants';
 
 import type { CheckIn, EmotionId, EmotionSelection } from './check-in';
 
-export type { EmotionSelection } from './check-in';
-
 export type Emotion = Readonly<{
   id: EmotionId;
   color: string;
