@@ -43,7 +43,7 @@ const exportedRuleNames = () => {
 describe('architecture lint contract', () => {
   it('keeps the alpha plugin in the main verification path', () => {
     expect(packageJson.devDependencies['eslint-plugin-code-architecture']).toBe(
-      '0.4.0-alpha.2',
+      '0.4.0-alpha.3',
     );
     expect(packageJson.scripts.lint).toContain('pnpm lint:architecture');
     expect(packageJson.scripts.verify).toContain('pnpm lint');
@@ -70,6 +70,8 @@ describe('architecture lint contract', () => {
       2,
       {
         checkExpressionBodies: false,
+        ignoreJSXCallbacks: true,
+        ignoreNoInputClosures: true,
         minimum: 2,
         minimumStatements: 3,
       },
