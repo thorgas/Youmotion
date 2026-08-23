@@ -1,5 +1,6 @@
 import { useMachine } from '@xstate/react';
 import { createContext, type PropsWithChildren, useContext } from 'react';
+import assert from 'tiny-invariant';
 import type { ActorRefFrom } from 'xstate';
 
 import { appNavigationMachine } from './app-navigation.machine';
@@ -34,6 +35,7 @@ export function AppNavigationProvider({ children }: PropsWithChildren) {
 
 export function useAppNavigationActor() {
   const actor = useContext(AppNavigationContext);
-  if (!actor) throw new Error('useAppNavigationActor must be used inside AppNavigationProvider.');
+  assert(actor, 'useAppNavigationActor must be used inside AppNavigationProvider.');
+  assert(actor.getSnapshot().status !== 'stopped', 'Navigation actor must be active.');
   return actor;
 }

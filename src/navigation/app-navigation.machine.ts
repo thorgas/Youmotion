@@ -2,6 +2,7 @@ import * as Effect from 'effect/Effect';
 import * as Schema from 'effect/Schema';
 import * as Haptics from 'expo-haptics';
 import { Linking } from 'react-native';
+import assert from 'tiny-invariant';
 import {
   matchesState,
   setup,
@@ -10,6 +11,7 @@ import {
 
 import {
   APP_ROUTES,
+  APP_LOCALES,
   BELIEF_LIBRARY_EVENTS,
   BELIEF_LIBRARY_STATES,
   BELIEF_SYSTEM_FAILURE_MESSAGE,
@@ -26,6 +28,7 @@ import {
   DATA_SAFETY_EVENTS,
   DATA_SAFETY_STATES,
   MAX_NOTE_LENGTH,
+  EMOTION_LABEL_MODES,
   MOMENT_TIME_PICKER_MODES,
   NAVIGATION_EVENTS,
   NAVIGATION_STATES,
@@ -186,6 +189,8 @@ function customBeliefStatementFromDraft({
 }): BeliefStatement | null {
   const harmfulStatement = beliefStatementDraft.trim();
   if (!harmfulStatement || !beliefStatementDraftId) return null;
+  assert(harmfulStatement.length > 0, 'A custom belief requires harmful text.');
+  assert(beliefStatementDraftId.length > 0, 'A custom belief requires an identifier.');
   return {
     kind: 'custom',
     beliefSystemId: beliefStatementDraftId,
@@ -215,6 +220,8 @@ function guidingBeliefStatementFromDraft({
   if (existing?.kind !== 'custom') return null;
   const harmfulStatement = beliefStatementDraft.trim();
   if (!harmfulStatement) return null;
+  assert(existing.beliefSystemId === beliefSystemId, 'Guiding belief must retain its belief system.');
+  assert(harmfulStatement.length > 0, 'A custom guiding belief requires harmful text.');
   return guidingStatement
     ? { ...existing, harmfulStatement, guidingStatement }
     : { kind: 'custom', beliefSystemId, harmfulStatement };
@@ -266,6 +273,8 @@ function managedBeliefStatementFromDraft({
   if (!beliefLibraryStatementId) return null;
   const harmfulStatement = beliefLibraryHarmfulDraft.trim();
   if (!harmfulStatement) return null;
+  assert(beliefLibraryStatementId.length > 0, 'A managed belief requires an identifier.');
+  assert(harmfulStatement.length > 0, 'A managed belief requires harmful text.');
   const guidingStatement = beliefLibraryGuidingDraft.trim();
   const existing = beliefStatementForId({
     beliefSystemId: beliefLibraryStatementId,
@@ -305,10 +314,25 @@ function reminderTargetForContext({
 function reminderExitState(
   entryPoint: typeof REMINDER_ENTRY_POINTS[keyof typeof REMINDER_ENTRY_POINTS],
 ) {
-  if (entryPoint === REMINDER_ENTRY_POINTS.SETTINGS) return REMINDER_STATES.SETTINGS;
-  if (entryPoint === REMINDER_ENTRY_POINTS.CHECK_IN_SUCCESS) return CHECK_IN_STATES.SUCCESS;
-  if (entryPoint === REMINDER_ENTRY_POINTS.NOTIFICATION) return REMINDER_STATES.GUIDING_BELIEF;
-  return BELIEF_LIBRARY_STATES.LIBRARY;
+  assert(Object.values(REMINDER_ENTRY_POINTS).includes(entryPoint), 'Reminder entry point must be supported.');
+  const exitState = [
+    { matches: entryPoint === REMINDER_ENTRY_POINTS.SETTINGS, state: REMINDER_STATES.SETTINGS },
+    {
+      matches: entryPoint === REMINDER_ENTRY_POINTS.CHECK_IN_SUCCESS,
+      state: CHECK_IN_STATES.SUCCESS,
+    },
+    {
+      matches: entryPoint === REMINDER_ENTRY_POINTS.NOTIFICATION,
+      state: REMINDER_STATES.GUIDING_BELIEF,
+    },
+  ].find(({ matches }) => matches)?.state ?? BELIEF_LIBRARY_STATES.LIBRARY;
+  assert(new Set([
+    REMINDER_STATES.SETTINGS,
+    CHECK_IN_STATES.SUCCESS,
+    REMINDER_STATES.GUIDING_BELIEF,
+    BELIEF_LIBRARY_STATES.LIBRARY,
+  ]).has(exitState), 'Reminder exit state must be supported.');
+  return exitState;
 }
 
 function reminderOfferExitState(
@@ -331,6 +355,8 @@ function successReminderBeliefSystemId({
   statements: readonly BeliefStatement[];
 }) {
   if (!reminderDataHydrated || reminderError || !savedBeliefSystemId) return null;
+  assert(reminderError === null, 'A reminder offer requires successful hydration.');
+  assert(savedBeliefSystemId.length > 0, 'A reminder offer requires a saved belief system.');
   const statement = beliefStatementForId({
     beliefSystemId: savedBeliefSystemId,
     statements,
@@ -352,6 +378,8 @@ function reminderTimingFromDraft({
   const [firstWeekday, ...remainingWeekdays] = reminderWeekdaysDraft;
   const [firstTime, ...remainingTimes] = reminderTimesDraft;
   if (!firstWeekday || !firstTime) return null;
+  assert(reminderWeekdaysDraft.length > 0, 'Reminder timing requires a weekday.');
+  assert(reminderTimesDraft.length <= MAX_REMINDER_TIMES, 'Reminder timing exceeds the supported time count.');
   return {
     weekdays: [firstWeekday, ...remainingWeekdays],
     times: [firstTime, ...remainingTimes],
@@ -372,6 +400,8 @@ function activateReminderFromDraft({
   } | { type: typeof REMINDER_EVENTS.OPERATION_FAILED; message: string }) => void };
 }) {
   const target = reminderTargetForContext(context);
+  assert(timing.weekdays.length > 0, 'Reminder activation requires weekdays.');
+  assert(timing.times.length > 0, 'Reminder activation requires times.');
   if (!target) {
     self.send({
       type: REMINDER_EVENTS.OPERATION_FAILED,
@@ -767,6 +797,8 @@ export const appNavigationMachine = setup({
   },
   entry: ({ self }, enq) => {
     enq(() => {
+      assert(self.getSnapshot().status !== 'stopped', 'Startup hydration requires an active actor.');
+      assert(Schema.is(AppContextSchema)(self.getSnapshot().context), 'Startup context must satisfy the app schema.');
       void Effect.runPromise(loadCheckIns).then(
         (entries) => self.send({ type: CHECK_IN_EVENTS.HISTORY_HYDRATED, entries }),
         () => self.send({
@@ -811,6 +843,8 @@ export const appNavigationMachine = setup({
       enq(() => checkInHistoryStore.trigger.hydrationFailed({ message: event.message }));
     },
     [CHECK_IN_EVENTS.BELIEF_STATEMENTS_HYDRATED]: ({ context, event }, enq) => {
+      assert(Schema.is(BeliefStatementListSchema)(event.statements), 'Hydrated belief statements must satisfy the domain schema.');
+      assert(Schema.is(BeliefStatementListSchema)(context.beliefStatements), 'Existing belief statements must satisfy the domain schema.');
       const beliefStatements = event.statements.reduce(
           (statements, statement) => recordBeliefStatement({
             statement,
@@ -848,6 +882,8 @@ export const appNavigationMachine = setup({
       }));
     },
     [REMINDER_EVENTS.NOTIFICATION_OPENED]: ({ event }) => {
+      assert(event.assignmentId.length > 0, 'Opened reminder requires an assignment identifier.');
+      assert(event.targetKind === REMINDER_TARGET_KINDS.PULSE || event.beliefSystemId !== undefined, 'Guiding-belief notification requires a belief identifier.');
       if (event.targetKind === REMINDER_TARGET_KINDS.PULSE) {
         return { target: `#appNavigation.${NAVIGATION_STATES.TABS}.${NAVIGATION_STATES.TODAY}` };
       }
@@ -874,6 +910,8 @@ export const appNavigationMachine = setup({
       });
     },
     [CHECK_IN_EVENTS.DELETED]: ({ context, event }, enq) => {
+      assert(event.id.length > 0, 'Deleted check-in requires an identifier.');
+      assert(context.editing === null || context.editing.id.length > 0, 'Editing check-in requires an identifier.');
       enq(() => checkInHistoryStore.trigger.deleted({ id: event.id }));
       if (context.editing?.id !== event.id) return undefined;
       return {
@@ -893,6 +931,8 @@ export const appNavigationMachine = setup({
     },
     [SETTINGS_EVENTS.EMOTION_LABEL_MODE_CHANGED]: ({ event, self }, enq) => {
       enq(() => {
+        assert(Object.values(EMOTION_LABEL_MODES).includes(event.mode), 'Emotion label mode must be supported.');
+        assert(Schema.is(AppSettingsSchema)(appSettingsStore.getSnapshot().context), 'Current settings must satisfy their domain schema.');
         appSettingsStore.trigger.emotionLabelModeChanged({ mode: event.mode });
         const {
           locale,
@@ -910,6 +950,8 @@ export const appNavigationMachine = setup({
     },
     [SETTINGS_EVENTS.LANGUAGE_CHANGED]: ({ event, self }, enq) => {
       enq(() => {
+        assert(Object.values(APP_LOCALES).includes(event.locale), 'App locale must be supported.');
+        assert(Schema.is(AppSettingsSchema)(appSettingsStore.getSnapshot().context), 'Current settings must satisfy their domain schema.');
         appSettingsStore.trigger.languageChanged({ locale: event.locale });
         const {
           emotionLabelMode,
@@ -939,6 +981,8 @@ export const appNavigationMachine = setup({
     [NAVIGATION_STATES.STARTING]: {
       always: () => {
         const settings = appSettingsStore.getSnapshot().context;
+        assert(settings.locale.length > 0, 'Startup settings require a locale.');
+        assert(Object.values(EMOTION_LABEL_MODES).includes(settings.emotionLabelMode), 'Startup settings require a label mode.');
         if (!settings.hydrated) return undefined;
         return settings.onboardingCompleted
           ? { target: `#appNavigation.${NAVIGATION_STATES.TABS}` }
@@ -979,11 +1023,15 @@ export const appNavigationMachine = setup({
       initial: ONBOARDING_STATES.WELCOME,
       on: {
         [ONBOARDING_EVENTS.SKIPPED]: ({ context, self }, enq) => {
+          assert(context.onboardingEntryPoint !== null, 'Skipping onboarding requires an entry point.');
+          assert(context.onboardingSelection === null || context.onboardingSelection.intensity >= 0, 'Onboarding intensity cannot be negative.');
           const firstLaunch = (
             context.onboardingEntryPoint === ONBOARDING_ENTRY_POINTS.FIRST_LAUNCH
           );
           if (firstLaunch) {
             enq(() => {
+              assert(!appSettingsStore.getSnapshot().context.onboardingCompleted, 'Skipped first launch must not already be complete.');
+              assert(Schema.is(AppSettingsSchema)(appSettingsStore.getSnapshot().context), 'Settings must be valid before onboarding completion.');
               appSettingsStore.trigger.onboardingCompletedChanged({ completed: true });
               const {
                 emotionLabelMode,
@@ -1010,11 +1058,15 @@ export const appNavigationMachine = setup({
           };
         },
         [ONBOARDING_EVENTS.FINISHED]: ({ context, self }, enq) => {
+          assert(context.onboardingEntryPoint !== null, 'Finishing onboarding requires an entry point.');
+          assert(Schema.is(AppContextSchema)(context), 'Finished onboarding requires valid app context.');
           const firstLaunch = (
             context.onboardingEntryPoint === ONBOARDING_ENTRY_POINTS.FIRST_LAUNCH
           );
           if (firstLaunch) {
             enq(() => {
+              assert(Schema.is(AppSettingsSchema)(appSettingsStore.getSnapshot().context), 'Settings must be valid before onboarding completion.');
+              assert(Object.values(APP_LOCALES).includes(appSettingsStore.getSnapshot().context.locale), 'Onboarding completion requires a supported locale.');
               appSettingsStore.trigger.onboardingCompletedChanged({ completed: true });
               const {
                 emotionLabelMode,
@@ -1404,6 +1456,8 @@ export const appNavigationMachine = setup({
                     });
                     return;
                   }
+                  assert(archive.version > 0, 'Restore archive requires a supported version.');
+                  assert(archive.exportedAt.length > 0, 'Restore archive requires an export timestamp.');
                   void Effect.runPromise(restoreDataArchive(archive)).then(
                     () => self.send({
                       type: DATA_SAFETY_EVENTS.RESTORE_SUCCEEDED,
@@ -1553,6 +1607,8 @@ export const appNavigationMachine = setup({
           }),
         },
         [REMINDER_EVENTS.ASSIGNMENT_EDIT_REQUESTED]: ({ context, event }) => {
+          assert(event.assignmentId.length > 0, 'Reminder edit requires an assignment identifier.');
+          assert(Schema.is(ReminderAssignmentListSchema)(context.reminderAssignments), 'Reminder assignments must satisfy their domain schema.');
           const assignment = context.reminderAssignments.find(
             (candidate) => candidate.id === event.assignmentId,
           );
@@ -1712,6 +1768,8 @@ export const appNavigationMachine = setup({
             });
             return;
           }
+          assert(statement.kind === 'custom', 'Belief library can persist only custom statements.');
+          assert(statement.harmfulStatement.length > 0, 'Persisted belief requires harmful text.');
           void Effect.runPromise(
             persistBeliefStatement(statement).pipe(Effect.as(statement)),
           ).then(
@@ -1728,6 +1786,8 @@ export const appNavigationMachine = setup({
       },
       on: {
         [BELIEF_LIBRARY_EVENTS.STATEMENT_SAVED]: ({ context, event }, enq) => {
+          assert(event.statement.kind === 'custom', 'Belief library saves custom statements only.');
+          assert(Schema.is(CustomBeliefStatementSchema)(event.statement), 'Saved custom belief must satisfy its domain schema.');
           const beliefStatements = recordBeliefStatement({
             statement: event.statement,
             statements: context.beliefStatements,
@@ -1790,6 +1850,8 @@ export const appNavigationMachine = setup({
             });
             return;
           }
+          assert(statement.beliefSystemId === beliefSystemId, 'Retirement must preserve the belief identifier.');
+          assert(statement.archivedAt === undefined, 'An active belief cannot already be archived.');
           void Effect.runPromise(retireCustomBeliefStatement({
             statement,
             archivedAt: BeliefStatementArchiveTimestamp.make(new Date().toISOString()),
@@ -1808,6 +1870,8 @@ export const appNavigationMachine = setup({
       },
       on: {
         [BELIEF_LIBRARY_EVENTS.STATEMENT_RETIRED]: ({ context, event }, enq) => {
+          assert(event.beliefSystemId.length > 0, 'Retired belief requires an identifier.');
+          assert(event.archivedStatement === null || event.archivedStatement.archivedAt !== undefined, 'Returned retired belief must be archived.');
           const beliefStatements = event.archivedStatement
               ? recordBeliefStatement({
                   statement: event.archivedStatement,
@@ -1859,6 +1923,8 @@ export const appNavigationMachine = setup({
         },
         [REMINDER_EVENTS.RETRY_REQUESTED]: ({ self }, enq) => {
           enq(() => {
+            assert(self.getSnapshot().status !== 'stopped', 'Reminder retry requires an active actor.');
+            assert(appSettingsStore.getSnapshot().context.hydrated, 'Reminder retry requires hydrated app settings.');
             void Effect.runPromise(loadReminderData).then(
               (assignments) => self.send({
                 type: REMINDER_EVENTS.HYDRATED,
@@ -1873,6 +1939,8 @@ export const appNavigationMachine = setup({
           return { context: { reminderError: null } };
         },
         [REMINDER_EVENTS.ASSIGNMENT_EDIT_REQUESTED]: ({ context, event }) => {
+          assert(event.assignmentId.length > 0, 'Reminder edit requires an assignment identifier.');
+          assert(Schema.is(ReminderAssignmentListSchema)(context.reminderAssignments), 'Reminder assignments must satisfy their domain schema.');
           const assignment = context.reminderAssignments.find(
             (candidate) => candidate.id === event.assignmentId,
           );
@@ -2077,6 +2145,8 @@ export const appNavigationMachine = setup({
         [REMINDER_EVENTS.TIME_SHIFTED]: {
           context: ({ context, event }) => ({
             reminderTimesDraft: context.reminderTimesDraft.map((time, index) => {
+              assert(time.hour >= 0 && time.hour < 24, 'Reminder hour must be in the local-day range.');
+              assert(time.minute >= 0 && time.minute < 60, 'Reminder minute must be in the hour range.');
               if (index !== event.index) return time;
               const dayMinutes = 24 * 60;
               const shifted = (time.hour * 60 + time.minute + event.minutes + dayMinutes)
@@ -2102,6 +2172,8 @@ export const appNavigationMachine = setup({
         },
         [REMINDER_EVENTS.TIME_CHANGED]: {
           context: ({ context, event }) => {
+            assert(event.hour >= 0 && event.hour < 24, 'Changed reminder hour must be in range.');
+            assert(event.minute >= 0 && event.minute < 60, 'Changed reminder minute must be in range.');
             const duplicate = context.reminderTimesDraft.some((time, index) => (
               index !== event.index
               && time.hour === event.hour
@@ -2120,6 +2192,8 @@ export const appNavigationMachine = setup({
         },
         [REMINDER_EVENTS.TIME_ADDED]: {
           context: ({ context }) => {
+            assert(context.reminderTimesDraft.length > 0, 'Reminder editor must retain at least one time.');
+            assert(context.reminderTimesDraft.length <= MAX_REMINDER_TIMES, 'Reminder editor exceeded its time limit.');
             if (context.reminderTimesDraft.length >= MAX_REMINDER_TIMES) return {};
             const hour = [18, 12, 20, 15, 7].find((candidate) => (
               !context.reminderTimesDraft.some((time) => (
@@ -2141,6 +2215,8 @@ export const appNavigationMachine = setup({
         [REMINDER_EVENTS.SAVE_REQUESTED]: ({ context, self }, enq) => {
           const timing = reminderTimingFromDraft(context);
           if (!timing) return undefined;
+          assert(timing.weekdays.length > 0, 'Saving a reminder requires weekdays.');
+          assert(timing.times.length > 0, 'Saving a reminder requires times.');
           const assignment = context.reminderAssignmentDraftId
             ? context.reminderAssignments.find(
                 (candidate) => candidate.id === context.reminderAssignmentDraftId,
@@ -2212,6 +2288,8 @@ export const appNavigationMachine = setup({
             )
           ));
           if (!assignment) return;
+          assert(assignment.enabled, 'Only an enabled reminder can send a test.');
+          assert(assignment.times.length > 0, 'A test reminder requires a scheduled time.');
           enq(() => {
             void sendTestReminder({
               assignment,
@@ -2235,6 +2313,8 @@ export const appNavigationMachine = setup({
             (candidate) => candidate.id === context.reminderAssignmentDraftId,
           );
           if (!assignment) return undefined;
+          assert(assignment.id === context.reminderAssignmentDraftId, 'Edited reminder must match the active draft.');
+          assert(assignment.times.length > 0, 'Edited reminder requires at least one time.');
           return {
             target: REMINDER_STATES.EDITOR,
             context: {
@@ -2423,6 +2503,8 @@ export const appNavigationMachine = setup({
         },
         [CHECK_IN_EVENTS.CONFIRMED]: ({ context }) => {
           if (!context.saved) return undefined;
+          assert(context.saved.id.length > 0, 'Confirmed check-in requires a saved identifier.');
+          assert(context.note.length <= MAX_NOTE_LENGTH, 'Confirmed check-in note exceeds its limit.');
           if ((context.saved.beliefSystemId ?? null) !== context.beliefSystemId) {
             return { target: CHECK_IN_STATES.ATTACHING_BELIEF_SYSTEM };
           }
@@ -2520,6 +2602,8 @@ export const appNavigationMachine = setup({
             });
             return;
           }
+          assert(statement.kind === 'custom', 'Belief editor persists custom statements only.');
+          assert(statement.harmfulStatement.length > 0, 'Persisted belief requires harmful text.');
           void Effect.runPromise(persistBeliefStatement(statement)).then(
             (persisted) => self.send({
               type: CHECK_IN_EVENTS.BELIEF_STATEMENT_PERSISTED,
@@ -2604,6 +2688,8 @@ export const appNavigationMachine = setup({
       },
       on: {
         [CHECK_IN_EVENTS.PERSISTED]: ({ context, event }, enq) => {
+          assert(event.saved.id.length > 0, 'Persisted check-in requires an identifier.');
+          assert(Schema.is(CheckInSchema)(event.saved), 'Persisted check-in must satisfy its domain schema.');
           enq(() => checkInHistoryStore.trigger.recorded({ entry: event.saved }));
           if (event.saved.beliefSystemId) {
             return {
@@ -2717,6 +2803,8 @@ export const appNavigationMachine = setup({
         },
         [CHECK_IN_EVENTS.GUIDING_BELIEF_CONFIRMED]: ({ context }) => {
           if (!context.beliefSystemId) return undefined;
+          assert(context.beliefSystemId.length > 0, 'Guiding belief requires a belief identifier.');
+          assert(context.note.length <= MAX_NOTE_LENGTH, 'Guiding belief check-in note exceeds its limit.');
           const existing = beliefStatementForId({
             beliefSystemId: context.beliefSystemId,
             statements: context.beliefStatements,
@@ -2743,6 +2831,8 @@ export const appNavigationMachine = setup({
             return;
           }
           const beliefSystemId = context.beliefSystemId;
+          assert(beliefSystemId.length > 0, 'Persisting a guiding belief requires an identifier.');
+          assert(context.note.length <= MAX_NOTE_LENGTH, 'Guiding belief check-in note exceeds its limit.');
           const statement = guidingBeliefStatementFromDraft(context);
           const existing = beliefStatementForId({
             beliefSystemId,
@@ -2797,6 +2887,8 @@ export const appNavigationMachine = setup({
       },
       on: {
         [CHECK_IN_EVENTS.BELIEF_STATEMENT_PERSISTED]: ({ context, event }) => {
+          assert(event.statement.beliefSystemId.length > 0, 'Persisted belief requires an identifier.');
+          assert(Schema.is(BeliefStatementSchema)(event.statement), 'Persisted belief must satisfy its domain schema.');
           const beliefStatements = recordBeliefStatement({
             statement: event.statement,
             statements: context.beliefStatements,
@@ -2832,6 +2924,8 @@ export const appNavigationMachine = setup({
           };
         },
         [CHECK_IN_EVENTS.BELIEF_STATEMENT_REMOVED]: ({ context, event }) => {
+          assert(event.beliefSystemId.length > 0, 'Removed belief requires an identifier.');
+          assert(beliefStatementForId({ beliefSystemId: event.beliefSystemId, statements: context.beliefStatements }) !== undefined, 'Removed belief must exist in current context.');
           const beliefStatements = removeBeliefStatement({
             beliefSystemId: event.beliefSystemId,
             statements: context.beliefStatements,
@@ -2902,6 +2996,8 @@ export const appNavigationMachine = setup({
     [CHECK_IN_STATES.SUCCESS]: {
       on: {
         [REMINDER_EVENTS.SUCCESS_OFFER_ACCEPTED]: ({ context }) => {
+          assert(Schema.is(AppContextSchema)(context), 'Reminder offer requires valid app context.');
+          assert(Schema.is(ReminderAssignmentListSchema)(context.reminderAssignments), 'Reminder offer assignments must satisfy their domain schema.');
           const beliefSystemId = successReminderBeliefSystemId({
             assignments: context.reminderAssignments,
             reminderDataHydrated: context.reminderDataHydrated,
@@ -2975,54 +3071,92 @@ export const appNavigationMachine = setup({
 });
 
 function primaryRouteForStateValue(value: StateValue) {
-  if (matchesState(
-    { [NAVIGATION_STATES.ONBOARDING]: ONBOARDING_STATES.EXAMPLE },
-    value,
-  )) {
-    return APP_ROUTES.ONBOARDING_EXAMPLE;
-  }
-  if (matchesState(
-    { [NAVIGATION_STATES.ONBOARDING]: ONBOARDING_STATES.PULSE },
-    value,
-  )) {
-    return APP_ROUTES.ONBOARDING_PULSE;
-  }
-  if (matchesState(NAVIGATION_STATES.ONBOARDING, value)) {
-    return APP_ROUTES.ONBOARDING;
-  }
-  if (matchesState(CHECK_IN_STATES.SUCCESS, value)) return APP_ROUTES.SUCCESS;
-  return null;
+  assert(
+    (typeof value === 'string' && value.length > 0)
+      || (typeof value === 'object' && value !== null),
+    'Primary routing requires a supported XState value shape.',
+  );
+  const route = [
+    {
+      matches: matchesState(
+        { [NAVIGATION_STATES.ONBOARDING]: ONBOARDING_STATES.EXAMPLE },
+        value,
+      ),
+      route: APP_ROUTES.ONBOARDING_EXAMPLE,
+    },
+    {
+      matches: matchesState(
+        { [NAVIGATION_STATES.ONBOARDING]: ONBOARDING_STATES.PULSE },
+        value,
+      ),
+      route: APP_ROUTES.ONBOARDING_PULSE,
+    },
+    { matches: matchesState(NAVIGATION_STATES.ONBOARDING, value), route: APP_ROUTES.ONBOARDING },
+    { matches: matchesState(CHECK_IN_STATES.SUCCESS, value), route: APP_ROUTES.SUCCESS },
+  ].find(({ matches }) => matches)?.route ?? null;
+  assert(
+    route === null || new Set([
+      APP_ROUTES.ONBOARDING_EXAMPLE,
+      APP_ROUTES.ONBOARDING_PULSE,
+      APP_ROUTES.ONBOARDING,
+      APP_ROUTES.SUCCESS,
+    ]).has(route),
+    'Primary routing returned an unsupported route.',
+  );
+  return route;
 }
 
 function beliefLibraryRouteForStateValue(value: StateValue) {
-  if (
-    matchesState(BELIEF_LIBRARY_STATES.EDITOR, value)
-    || matchesState(BELIEF_LIBRARY_STATES.SAVING, value)
-  ) {
-    return APP_ROUTES.BELIEF_LIBRARY_EDITOR;
-  }
-  if (
-    matchesState(BELIEF_LIBRARY_STATES.LIBRARY, value)
-    || matchesState(BELIEF_LIBRARY_STATES.RETIRING, value)
-  ) {
-    return APP_ROUTES.BELIEF_LIBRARY;
-  }
-  return null;
+  assert(
+    (typeof value === 'string' && value.length > 0)
+      || (typeof value === 'object' && value !== null),
+    'Belief-library routing requires a supported XState value shape.',
+  );
+  const route = [
+    {
+      matches: matchesState(BELIEF_LIBRARY_STATES.EDITOR, value)
+        || matchesState(BELIEF_LIBRARY_STATES.SAVING, value),
+      route: APP_ROUTES.BELIEF_LIBRARY_EDITOR,
+    },
+    {
+      matches: matchesState(BELIEF_LIBRARY_STATES.LIBRARY, value)
+        || matchesState(BELIEF_LIBRARY_STATES.RETIRING, value),
+      route: APP_ROUTES.BELIEF_LIBRARY,
+    },
+  ].find(({ matches }) => matches)?.route ?? null;
+  assert(
+    route === null || new Set([
+      APP_ROUTES.BELIEF_LIBRARY_EDITOR,
+      APP_ROUTES.BELIEF_LIBRARY,
+    ]).has(route),
+    'Belief-library routing returned an unsupported route.',
+  );
+  return route;
 }
 
 function reminderRouteForStateValue(value: StateValue) {
-  if (matchesState(REMINDER_STATES.SETTINGS, value)) return APP_ROUTES.REMINDERS;
-  if (
-    matchesState(REMINDER_STATES.CHECKING_PERMISSION, value)
+  assert(
+    (typeof value === 'string' && value.length > 0)
+      || (typeof value === 'object' && value !== null),
+    'Reminder routing requires a supported XState value shape.',
+  );
+  const editorMatches = matchesState(REMINDER_STATES.CHECKING_PERMISSION, value)
     || matchesState(REMINDER_STATES.OFFER, value)
     || matchesState(REMINDER_STATES.REQUESTING_PERMISSION, value)
     || matchesState(REMINDER_STATES.PERMISSION_DENIED, value)
     || matchesState(REMINDER_STATES.EDITOR, value)
     || matchesState(REMINDER_STATES.SAVING, value)
     || matchesState(REMINDER_STATES.ACTIVE, value)
-    || matchesState(REMINDER_STATES.GUIDING_BELIEF, value)
-  ) return APP_ROUTES.LEITSATZ_REMINDER;
-  return null;
+    || matchesState(REMINDER_STATES.GUIDING_BELIEF, value);
+  const route = [
+    { matches: matchesState(REMINDER_STATES.SETTINGS, value), route: APP_ROUTES.REMINDERS },
+    { matches: editorMatches, route: APP_ROUTES.LEITSATZ_REMINDER },
+  ].find(({ matches }) => matches)?.route ?? null;
+  assert(
+    route === null || new Set([APP_ROUTES.REMINDERS, APP_ROUTES.LEITSATZ_REMINDER]).has(route),
+    'Reminder routing returned an unsupported route.',
+  );
+  return route;
 }
 
 function guidingBeliefRouteForStateValue(value: StateValue) {
@@ -3037,24 +3171,38 @@ function guidingBeliefRouteForStateValue(value: StateValue) {
 }
 
 function beliefSystemRouteForStateValue(value: StateValue) {
-  if (matchesState(CHECK_IN_STATES.BELIEF_SYSTEM_CATALOG, value)) {
-    return APP_ROUTES.BELIEF_SYSTEM_CATALOG;
-  }
-  if (
-    matchesState(CHECK_IN_STATES.BELIEF_SYSTEM_EDITOR, value)
-    || matchesState(CHECK_IN_STATES.PERSISTING_BELIEF_STATEMENT, value)
-    || matchesState(CHECK_IN_STATES.BELIEF_STATEMENT_FAILURE, value)
-  ) {
-    return APP_ROUTES.BELIEF_SYSTEM_EDITOR;
-  }
-  if (
-    matchesState(CHECK_IN_STATES.BELIEF_SYSTEM, value)
-    || matchesState(CHECK_IN_STATES.ATTACHING_BELIEF_SYSTEM, value)
-    || matchesState(CHECK_IN_STATES.BELIEF_SYSTEM_FAILURE, value)
-  ) {
-    return APP_ROUTES.BELIEF_SYSTEM;
-  }
-  return null;
+  assert(
+    (typeof value === 'string' && value.length > 0)
+      || (typeof value === 'object' && value !== null),
+    'Belief-system routing requires a supported XState value shape.',
+  );
+  const route = [
+    {
+      matches: matchesState(CHECK_IN_STATES.BELIEF_SYSTEM_CATALOG, value),
+      route: APP_ROUTES.BELIEF_SYSTEM_CATALOG,
+    },
+    {
+      matches: matchesState(CHECK_IN_STATES.BELIEF_SYSTEM_EDITOR, value)
+        || matchesState(CHECK_IN_STATES.PERSISTING_BELIEF_STATEMENT, value)
+        || matchesState(CHECK_IN_STATES.BELIEF_STATEMENT_FAILURE, value),
+      route: APP_ROUTES.BELIEF_SYSTEM_EDITOR,
+    },
+    {
+      matches: matchesState(CHECK_IN_STATES.BELIEF_SYSTEM, value)
+        || matchesState(CHECK_IN_STATES.ATTACHING_BELIEF_SYSTEM, value)
+        || matchesState(CHECK_IN_STATES.BELIEF_SYSTEM_FAILURE, value),
+      route: APP_ROUTES.BELIEF_SYSTEM,
+    },
+  ].find(({ matches }) => matches)?.route ?? null;
+  assert(
+    route === null || new Set([
+      APP_ROUTES.BELIEF_SYSTEM_CATALOG,
+      APP_ROUTES.BELIEF_SYSTEM_EDITOR,
+      APP_ROUTES.BELIEF_SYSTEM,
+    ]).has(route),
+    'Belief-system routing returned an unsupported route.',
+  );
+  return route;
 }
 
 function reflectionRouteForStateValue(value: StateValue) {
@@ -3069,24 +3217,43 @@ function reflectionRouteForStateValue(value: StateValue) {
 }
 
 export function routeForStateValue(value: StateValue) {
+  assert(
+    (typeof value === 'string' && value.length > 0)
+      || (typeof value === 'object' && value !== null),
+    'App routing requires a supported XState value shape.',
+  );
   const primaryRoute = primaryRouteForStateValue(value);
-  if (primaryRoute) return primaryRoute;
   const beliefLibraryRoute = beliefLibraryRouteForStateValue(value);
-  if (beliefLibraryRoute) return beliefLibraryRoute;
   const reminderRoute = reminderRouteForStateValue(value);
-  if (reminderRoute) return reminderRoute;
   const guidingBeliefRoute = guidingBeliefRouteForStateValue(value);
-  if (guidingBeliefRoute) return guidingBeliefRoute;
   const beliefSystemRoute = beliefSystemRouteForStateValue(value);
-  if (beliefSystemRoute) return beliefSystemRoute;
   const reflectionRoute = reflectionRouteForStateValue(value);
-  if (reflectionRoute) return reflectionRoute;
-  if (matchesState({ [NAVIGATION_STATES.TABS]: NAVIGATION_STATES.HISTORY }, value)) return APP_ROUTES.HISTORY;
-  if (matchesState({ [NAVIGATION_STATES.TABS]: NAVIGATION_STATES.ANALYTICS }, value)) return APP_ROUTES.ANALYTICS;
-  if (matchesState({ [NAVIGATION_STATES.TABS]: NAVIGATION_STATES.SETTINGS }, value)) return APP_ROUTES.SETTINGS;
-  if (
-    matchesState(NAVIGATION_STATES.STARTING, value)
-    || matchesState({ [NAVIGATION_STATES.TABS]: NAVIGATION_STATES.TODAY }, value)
-  ) return APP_ROUTES.TODAY;
-  throw new Error(`Unhandled app navigation state: ${JSON.stringify(value)}`);
+  const tabRoute = [
+    {
+      matches: matchesState({ [NAVIGATION_STATES.TABS]: NAVIGATION_STATES.HISTORY }, value),
+      route: APP_ROUTES.HISTORY,
+    },
+    {
+      matches: matchesState({ [NAVIGATION_STATES.TABS]: NAVIGATION_STATES.ANALYTICS }, value),
+      route: APP_ROUTES.ANALYTICS,
+    },
+    {
+      matches: matchesState({ [NAVIGATION_STATES.TABS]: NAVIGATION_STATES.SETTINGS }, value),
+      route: APP_ROUTES.SETTINGS,
+    },
+    {
+      matches: matchesState(NAVIGATION_STATES.STARTING, value)
+        || matchesState({ [NAVIGATION_STATES.TABS]: NAVIGATION_STATES.TODAY }, value),
+      route: APP_ROUTES.TODAY,
+    },
+  ].find(({ matches }) => matches)?.route;
+  const route = primaryRoute
+    ?? beliefLibraryRoute
+    ?? reminderRoute
+    ?? guidingBeliefRoute
+    ?? beliefSystemRoute
+    ?? reflectionRoute
+    ?? tabRoute;
+  assert(route, `Unhandled app navigation state: ${JSON.stringify(value)}`);
+  return route;
 }
