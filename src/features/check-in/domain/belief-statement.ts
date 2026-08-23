@@ -1,5 +1,5 @@
 import * as Schema from 'effect/Schema';
-import assert from 'tiny-invariant';
+import assert from '@/assert';
 
 import {
   BELIEF_SYSTEM_IDS,

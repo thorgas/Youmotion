@@ -25,7 +25,7 @@ import {
   useKeyboardState,
 } from 'react-native-keyboard-controller';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import assert from 'tiny-invariant';
+import assert from '@/assert';
 
 import { AppBackButton } from '@/components/ui/app-back-button';
 import { ConfirmedPickerModal } from '@/components/ui/confirmed-picker-modal';

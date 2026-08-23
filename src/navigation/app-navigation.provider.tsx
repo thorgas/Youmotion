@@ -1,6 +1,6 @@
 import { useMachine } from '@xstate/react';
 import { createContext, type PropsWithChildren, useContext } from 'react';
-import assert from 'tiny-invariant';
+import assert from '@/assert';
 import type { ActorRefFrom } from 'xstate';
 
 import { appNavigationMachine } from './app-navigation.machine';

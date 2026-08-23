@@ -1,6 +1,6 @@
 import * as Notifications from 'expo-notifications';
 import { Platform } from 'react-native';
-import assert from 'tiny-invariant';
+import assert from '@/assert';
 
 import {
   APP_LOCALES,

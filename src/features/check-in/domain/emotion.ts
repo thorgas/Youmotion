@@ -1,7 +1,7 @@
 import { EMOTION_IDS } from '@/constants';
 
 import type { CheckIn, EmotionId, EmotionSelection } from './check-in';
-import assert from 'tiny-invariant';
+import assert from '@/assert';
 
 export type Emotion = Readonly<{
   id: EmotionId;

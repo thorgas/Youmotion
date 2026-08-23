@@ -2,7 +2,7 @@ import { usePerformanceMonitorDevTools } from '@rozenite/performance-monitor-plu
 import { useRequireProfilerDevTools } from '@rozenite/require-profiler-plugin';
 import type { PropsWithChildren } from 'react';
 import { ReactNativeGrabRoot } from 'react-native-grab';
-import assert from 'tiny-invariant';
+import assert from '@/assert';
 
 export function DevelopmentRoot({ children }: PropsWithChildren) {
   assert(children !== undefined, 'Development root requires app content.');

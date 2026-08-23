@@ -1,7 +1,7 @@
 import { REMINDER_TARGET_KINDS } from '@/constants';
 import type { BeliefStatement } from '@/features/check-in/domain/belief-statement';
 import type { ReminderAssignment } from '@/features/reminders/domain/reminder-assignment';
-import assert from 'tiny-invariant';
+import assert from '@/assert';
 
 export function guidingBeliefLibraryStatements({
   assignments,

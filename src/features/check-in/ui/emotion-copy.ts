@@ -1,5 +1,5 @@
 import { fbs } from 'fbtee';
-import assert from 'tiny-invariant';
+import assert from '@/assert';
 
 import { EMOTION_IDS } from '@/constants';
 import type { EmotionId, EmotionSelection } from '../domain/check-in';

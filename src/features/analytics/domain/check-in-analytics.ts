@@ -1,7 +1,7 @@
 import type { CheckIn } from '@/features/check-in/domain/check-in';
 import { emotions } from '@/features/check-in/domain/emotion';
 import type { BeliefSystemId } from '@/features/check-in/domain/belief-statement';
-import assert from 'tiny-invariant';
+import assert from '@/assert';
 
 export type EmotionFrequency = Readonly<{
   emotionId: CheckIn['emotionId'];

@@ -4,7 +4,7 @@ import Animated, {
   useAnimatedStyle,
   withTiming,
 } from 'react-native-reanimated';
-import assert from 'tiny-invariant';
+import assert from '@/assert';
 
 import { MOTION_DURATION } from '@/constants';
 import { chartColors, palette, type } from '@/theme';

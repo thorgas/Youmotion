@@ -4,7 +4,7 @@ import { fbs } from 'fbtee';
 import { PressableScale } from 'pressto';
 import { ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import assert from 'tiny-invariant';
+import assert from '@/assert';
 
 import { formatHistoryDate } from '@/localization/date-copy';
 import { useAppLocale } from '@/localization/app-locale-provider';

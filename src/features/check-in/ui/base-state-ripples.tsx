@@ -8,7 +8,7 @@ import Animated, {
   type FrameInfo,
   type SharedValue,
 } from 'react-native-reanimated';
-import assert from 'tiny-invariant';
+import assert from '@/assert';
 
 import { BASE_RIPPLE_DURATION, BASE_RIPPLE_PHASES } from '@/constants';
 import { palette } from '@/theme';

@@ -8,7 +8,7 @@ import {
   type TextStyle,
   type ViewStyle,
 } from 'react-native';
-import assert from 'tiny-invariant';
+import assert from '@/assert';
 
 import { actionColors, palette, type } from '@/theme';
 

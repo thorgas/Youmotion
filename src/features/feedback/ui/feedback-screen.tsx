@@ -10,7 +10,7 @@ import {
   View,
 } from 'react-native';
 import { createContext, type PropsWithChildren, useContext } from 'react';
-import assert from 'tiny-invariant';
+import assert from '@/assert';
 
 import { SettingsActionRow } from '@/components/ui/settings-action-row';
 import {

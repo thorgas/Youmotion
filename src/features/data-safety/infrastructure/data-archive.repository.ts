@@ -1,6 +1,6 @@
 import * as Effect from 'effect/Effect';
 import * as Schema from 'effect/Schema';
-import assert from 'tiny-invariant';
+import assert from '@/assert';
 import * as DocumentPicker from 'expo-document-picker';
 import { File, Paths } from 'expo-file-system';
 import * as Sharing from 'expo-sharing';

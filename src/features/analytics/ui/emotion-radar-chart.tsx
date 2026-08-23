@@ -12,7 +12,7 @@ import {
 } from 'echarts/core';
 import { PureComponent, createRef } from 'react';
 import { StyleSheet, View } from 'react-native';
-import assert from 'tiny-invariant';
+import assert from '@/assert';
 
 import { APP_TYPE } from '@/constants';
 import { chartColors, palette } from '@/theme';

@@ -12,7 +12,7 @@ import {
 } from 'react-native-reanimated';
 import { Image, StyleSheet, View } from 'react-native';
 import Svg, { Defs, Image as SvgImage, Mask, Path } from 'react-native-svg';
-import assert from 'tiny-invariant';
+import assert from '@/assert';
 
 import {
   SPLASH_LOGO_REVEAL_DURATION,

@@ -1,7 +1,7 @@
 import { useSelector as useActorSelector } from '@xstate/react';
 import { useSelector } from '@xstate/store-react';
 import { fbs } from 'fbtee';
-import assert from 'tiny-invariant';
+import assert from '@/assert';
 import {
   Pressable,
   ScrollView,

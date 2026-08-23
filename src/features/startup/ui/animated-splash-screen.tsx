@@ -1,6 +1,6 @@
 import { useMachine } from '@xstate/react';
 import { useCallback, type PropsWithChildren } from 'react';
-import assert from 'tiny-invariant';
+import assert from '@/assert';
 import { StyleSheet, View } from 'react-native';
 import Animated, {
   Easing,

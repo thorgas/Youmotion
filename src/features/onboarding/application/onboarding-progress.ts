@@ -2,7 +2,7 @@ import {
   ONBOARDING_STATES,
   ONBOARDING_STEP_COUNT,
 } from '@/constants';
-import assert from 'tiny-invariant';
+import assert from '@/assert';
 
 export function onboardingStepNumber(
   step: typeof ONBOARDING_STATES[keyof typeof ONBOARDING_STATES],

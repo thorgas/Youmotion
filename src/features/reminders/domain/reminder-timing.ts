@@ -1,5 +1,5 @@
 import * as Schema from 'effect/Schema';
-import assert from 'tiny-invariant';
+import assert from '@/assert';
 
 import { MAX_REMINDER_TIMES } from '@/constants';
 

@@ -9,7 +9,7 @@ import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { KeyboardProvider } from 'react-native-keyboard-controller';
-import assert from 'tiny-invariant';
+import assert from '@/assert';
 
 import { PressFeedbackProvider } from '@/components/ui/press-feedback-provider';
 import { NAVIGATION_EVENTS, SPLASH_BACKGROUND_COLOR } from '@/constants';

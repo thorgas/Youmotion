@@ -1,7 +1,7 @@
 import * as Effect from 'effect/Effect';
 import * as Schema from 'effect/Schema';
 import { SurrealRecordId } from 'react-native-surrealdb';
-import assert from 'tiny-invariant';
+import assert from '@/assert';
 
 import {
   REMINDER_ASSIGNMENT_TABLE,

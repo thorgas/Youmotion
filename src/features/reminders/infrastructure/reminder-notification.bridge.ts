@@ -1,7 +1,7 @@
 import * as Schema from 'effect/Schema';
 import * as Notifications from 'expo-notifications';
 import { AppState } from 'react-native';
-import assert from 'tiny-invariant';
+import assert from '@/assert';
 
 import {
   REMINDER_EVENTS,

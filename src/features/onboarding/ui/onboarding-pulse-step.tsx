@@ -1,7 +1,7 @@
 import { useSelector } from '@xstate/react';
 import { fbs } from 'fbtee';
 import { useRef } from 'react';
-import assert from 'tiny-invariant';
+import assert from '@/assert';
 import {
   StyleSheet,
   Text,

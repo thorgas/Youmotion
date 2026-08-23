@@ -1,6 +1,6 @@
 import * as Haptics from 'expo-haptics';
 import { Tabs } from 'expo-router';
-import assert from 'tiny-invariant';
+import assert from '@/assert';
 
 import { APP_TYPE, NAVIGATION_EVENTS, NAVIGATION_STATES } from '@/constants';
 import { navigationColors, surfaceColors } from '@/theme';

@@ -1,6 +1,6 @@
 import { fbs } from 'fbtee';
 import { StyleSheet, Text, View } from 'react-native';
-import assert from 'tiny-invariant';
+import assert from '@/assert';
 
 import {
   ONBOARDING_EVENTS,

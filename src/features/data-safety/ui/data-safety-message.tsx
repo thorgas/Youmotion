@@ -1,6 +1,6 @@
 import { fbs } from 'fbtee';
 import { Pressable, StyleSheet, Text } from 'react-native';
-import assert from 'tiny-invariant';
+import assert from '@/assert';
 
 import {
   DATA_ARCHIVE_FAILURE_MESSAGE,

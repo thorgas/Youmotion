@@ -33,10 +33,11 @@ repository contract is tested in
 | `require-interactive-component-contract` | Error | The shared Button root must keep role, state, disabled behavior, content, and press feedback. |
 | `require-assertions` | Error | Production functions with at least three statements require two runtime assertions. XState actions, guards, transitions, and named React components remain covered. Alpha.4 excludes only JSX-attribute callbacks and zero-input function expressions assigned to variables; tests, Harness files, and test-support directories are excluded. Assertions must express real input, output, state, schema, or cardinality invariants rather than typed-shape or tautological filler. |
 
-Reanimated UI-runtime callbacks use the local `assertWorkletInvariant` helper;
-calling imported JavaScript assertion libraries from a worklet is forbidden because
-it attempts a synchronous cross-runtime call. The ESLint contract recognizes both
-that helper and the standard JavaScript-runtime assertion names.
+JavaScript-runtime invariants use the Hermes-safe assertion function in
+`src/assert.ts`; no Node compatibility layer is required. Reanimated UI-runtime
+callbacks use the local `assertWorkletInvariant` helper because importing a
+JavaScript-runtime function into a worklet would attempt a synchronous
+cross-runtime call. The ESLint contract recognizes both forms.
 
 ## Design-system ownership
 

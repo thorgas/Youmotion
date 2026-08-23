@@ -1,5 +1,5 @@
 import { HISTORY_CONTENT_FILTERS } from '@/constants';
-import assert from 'tiny-invariant';
+import assert from '@/assert';
 import type { CheckIn, EmotionId } from '../domain/check-in';
 import type { BeliefSystemId } from '../domain/belief-statement';
 

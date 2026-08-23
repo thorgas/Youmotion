@@ -46,7 +46,13 @@ tester.run('no-inline-jsx-callbacks', architecture.rules['no-inline-jsx-callback
 });
 
 tester.run('no-multiple-function-params', architecture.rules['no-multiple-function-params'], {
-  valid: [{ code: 'function run({ value, limit }) {}' }],
+  valid: [
+    { code: 'function run({ value, limit }) {}' },
+    {
+      code: 'function assert(condition: unknown, message: string): asserts condition {}',
+      languageOptions: { parser: require('typescript-eslint').parser },
+    },
+  ],
   invalid: [{ code: 'function run(value, limit) {}', errors: [{ messageId: 'multiple' }] }],
 });
 

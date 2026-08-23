@@ -1,6 +1,6 @@
 import type { CheckIn } from '@/features/check-in/domain/check-in';
 import { emotions } from '@/features/check-in/domain/emotion';
-import assert from 'tiny-invariant';
+import assert from '@/assert';
 import type { AnalyticsDateRange } from './analytics-timeframe';
 
 export type CalendarDay = Readonly<{ day: number; entries: readonly CheckIn[] }>;

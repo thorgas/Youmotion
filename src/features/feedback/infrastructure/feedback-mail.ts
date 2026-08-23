@@ -3,7 +3,7 @@ import Constants from 'expo-constants';
 import * as MailComposer from 'expo-mail-composer';
 import * as Updates from 'expo-updates';
 import { Platform } from 'react-native';
-import assert from 'tiny-invariant';
+import assert from '@/assert';
 
 import {
   FEEDBACK_EMAIL_RECIPIENT,

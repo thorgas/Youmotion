@@ -9,7 +9,7 @@ import {
 } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import assert from 'tiny-invariant';
+import assert from '@/assert';
 
 import { AppBackButton } from '@/components/ui/app-back-button';
 import {

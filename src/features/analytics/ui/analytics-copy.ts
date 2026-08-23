@@ -1,5 +1,5 @@
 import { fbs } from 'fbtee';
-import assert from 'tiny-invariant';
+import assert from '@/assert';
 
 import { ANALYTICS_TIMEFRAMES, APP_LOCALES } from '@/constants';
 import type { BeliefStatement } from '@/features/check-in/domain/belief-statement';

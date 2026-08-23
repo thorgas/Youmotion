@@ -2,7 +2,7 @@ import { useSelector } from '@xstate/react';
 import { PressableScale } from 'pressto';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import assert from 'tiny-invariant';
+import assert from '@/assert';
 
 import {
   NAVIGATION_EVENTS,

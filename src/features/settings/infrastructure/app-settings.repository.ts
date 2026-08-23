@@ -2,7 +2,7 @@ import * as Effect from 'effect/Effect';
 import * as Schema from 'effect/Schema';
 import { getLocales } from 'expo-localization';
 import { SurrealRecordId } from 'react-native-surrealdb';
-import assert from 'tiny-invariant';
+import assert from '@/assert';
 
 import {
   APP_SETTINGS_RECORD_ID,

@@ -1,7 +1,7 @@
 import { Directory, Paths } from 'expo-file-system';
 import * as Effect from 'effect/Effect';
 import { connect, type SurrealClient } from 'react-native-surrealdb';
-import assert from 'tiny-invariant';
+import assert from '@/assert';
 
 import {
   FILE_URI_PREFIX,

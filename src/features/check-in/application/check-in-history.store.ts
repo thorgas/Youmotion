@@ -1,6 +1,6 @@
 import { createStore } from '@xstate/store';
 import * as Schema from 'effect/Schema';
-import assert from 'tiny-invariant';
+import assert from '@/assert';
 
 import { CheckInId, CheckInSchema, type CheckIn } from '../domain/check-in';
 

@@ -2,7 +2,7 @@ import * as Effect from 'effect/Effect';
 import * as Schema from 'effect/Schema';
 import * as Haptics from 'expo-haptics';
 import { Linking } from 'react-native';
-import assert from 'tiny-invariant';
+import assert from '@/assert';
 import {
   matchesState,
   setup,

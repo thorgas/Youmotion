@@ -6,7 +6,7 @@ import Animated, {
   useAnimatedStyle,
   withTiming,
 } from 'react-native-reanimated';
-import assert from 'tiny-invariant';
+import assert from '@/assert';
 
 import { EMOTION_LABEL_MODES, MOTION_DURATION } from '@/constants';
 import type { EmotionLabelMode } from '@/features/settings/domain/emotion-label-mode';

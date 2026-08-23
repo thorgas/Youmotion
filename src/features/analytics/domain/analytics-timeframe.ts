@@ -1,5 +1,5 @@
 import * as Schema from 'effect/Schema';
-import assert from 'tiny-invariant';
+import assert from '@/assert';
 
 import { ANALYTICS_TIMEFRAMES } from '@/constants';
 import type { CheckIn } from '@/features/check-in/domain/check-in';

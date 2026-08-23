@@ -129,18 +129,27 @@ const noInlineJsxCallbacks = {
   },
 };
 
+const isTypeScriptAssertion = (node) => (
+  node.returnType?.typeAnnotation?.type === 'TSTypePredicate'
+  && node.returnType.typeAnnotation.asserts
+);
+
+const isContextEventCallback = (node) => {
+  const [context, event] = node.params;
+  return node.params.length === 2
+    && context.type === 'Identifier'
+    && ['context', '_context'].includes(context.name)
+    && event.type === 'Identifier'
+    && event.name === 'event';
+};
+
 const noMultipleFunctionParams = {
   meta: { type: 'problem', docs: { description: 'Functions with multiple inputs accept one object parameter.' }, messages: { multiple: 'Use one object parameter so call sites are explicit and extensible.' }, schema: [] },
   create(context) {
     const check = (node) => {
       if (node.parent?.type === 'CallExpression') return;
-      if (
-        node.params.length === 2
-        && node.params[0].type === 'Identifier'
-        && ['context', '_context'].includes(node.params[0].name)
-        && node.params[1].type === 'Identifier'
-        && node.params[1].name === 'event'
-      ) return;
+      if (isTypeScriptAssertion(node)) return;
+      if (isContextEventCallback(node)) return;
       if (node.params.length === 2 && node.params[1].type === 'Identifier' && node.params[1].name === 'enq') return;
       if (node.params.length > 1) context.report({ node, messageId: 'multiple' });
     };

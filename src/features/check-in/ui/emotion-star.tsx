@@ -1,5 +1,5 @@
 import { useSelector } from '@xstate/store-react';
-import assert from 'tiny-invariant';
+import assert from '@/assert';
 import { fbs } from 'fbtee';
 import { PanResponder, StyleSheet, Text, useWindowDimensions, View, type AccessibilityActionEvent, type AccessibilityActionInfo, type StyleProp, type TextStyle } from 'react-native';
 import Animated, {

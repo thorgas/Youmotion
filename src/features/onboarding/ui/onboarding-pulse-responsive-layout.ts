@@ -1,4 +1,4 @@
-import assert from 'tiny-invariant';
+import assert from '@/assert';
 
 const REFERENCE_PHONE_HEIGHT = 900;
 const REFERENCE_STAR_SIZE = 361;

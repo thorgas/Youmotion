@@ -2,7 +2,7 @@ import { useSelector } from '@xstate/react';
 import { fbs } from 'fbtee';
 import { PressableScale } from 'pressto';
 import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
-import assert from 'tiny-invariant';
+import assert from '@/assert';
 
 import { Button } from '@/components/ui/button';
 import {

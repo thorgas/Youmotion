@@ -4,7 +4,7 @@ import { PressableScale } from 'pressto';
 import { useRef } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import assert from 'tiny-invariant';
+import assert from '@/assert';
 
 import {
   CHECK_IN_EVENTS,

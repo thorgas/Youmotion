@@ -1,7 +1,7 @@
 import { EMOTION_AXIS_START_ANGLE, EMOTION_AXIS_STEP } from '@/constants';
 import type { EmotionSelection } from './check-in';
 import { emotions } from './emotion';
-import assert from 'tiny-invariant';
+import assert from '@/assert';
 
 const TAU = Math.PI * 2;
 const DEFAULT_ACCESSIBLE_INTENSITY = 0.35;

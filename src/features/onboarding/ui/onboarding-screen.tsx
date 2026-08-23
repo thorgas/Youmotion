@@ -1,5 +1,5 @@
 import { useSelector } from '@xstate/react';
-import assert from 'tiny-invariant';
+import assert from '@/assert';
 
 import { ONBOARDING_STATES } from '@/constants';
 import { useAppNavigationActor } from '@/navigation/app-navigation.provider';

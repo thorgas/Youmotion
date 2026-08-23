@@ -1,5 +1,5 @@
 import { BELIEF_SYSTEM_IDS, EMOTION_IDS } from '@/constants';
-import assert from 'tiny-invariant';
+import assert from '@/assert';
 import type { CheckIn, EmotionId } from './check-in';
 import {
   customBeliefSystemIds,

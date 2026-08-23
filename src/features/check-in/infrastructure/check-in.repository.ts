@@ -2,7 +2,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Effect from 'effect/Effect';
 import * as Schema from 'effect/Schema';
 import { SurrealRecordId } from 'react-native-surrealdb';
-import assert from 'tiny-invariant';
+import assert from '@/assert';
 
 import {
   CHECK_IN_STORAGE_KEY,

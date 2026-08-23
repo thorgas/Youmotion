@@ -1,5 +1,5 @@
 import { router } from 'expo-router';
-import assert from 'tiny-invariant';
+import assert from '@/assert';
 import type {
   ActorRefFrom,
   InspectionEvent,

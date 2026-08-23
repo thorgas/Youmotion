@@ -1,4 +1,4 @@
-import assert from 'tiny-invariant';
+import assert from '@/assert';
 
 const REFERENCE_PHONE_WIDTH = 390;
 const MINIMUM_PHONE_SCALE = 0.9;

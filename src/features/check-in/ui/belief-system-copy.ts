@@ -1,5 +1,5 @@
 import { fbs } from 'fbtee';
-import assert from 'tiny-invariant';
+import assert from '@/assert';
 
 import { BELIEF_SYSTEM_IDS } from '@/constants';
 

@@ -1,5 +1,5 @@
 import * as Effect from 'effect/Effect';
-import assert from 'tiny-invariant';
+import assert from '@/assert';
 
 import { REMINDER_TARGET_KINDS } from '@/constants';
 import type {
