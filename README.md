@@ -229,6 +229,12 @@ The local Oxlint JavaScript plugin rejects framework imports in domain code, inf
 
 The rule suite lives beside the plugin and should be extended whenever a new invariant is introduced.
 
+The external `eslint-plugin-code-architecture` gate complements those local
+rules with blocking design-token, domain-literal, Effect, React, module,
+function-bound, and compound-component checks. Its complete applicability table
+and the one intentional exclusion are documented in
+[`docs/code-architecture-eslint.md`](docs/code-architecture-eslint.md).
+
 ## Testing strategy
 
 - Pure tests cover vector-to-emotion selection and intensity thresholds.

@@ -55,6 +55,24 @@ pnpm test:e2e:smoke
 
 Use `E2E_PLATFORM=android` for an Android emulator. The runner exits before touching a device when the ID or Metro server is missing.
 
+For the Android release-locale proof, put German and English in Android Settings
+under System > Languages, with the locale under test first and the other locale
+second. Then run:
+
+```sh
+export ANDROID_SERIAL='<dedicated Android emulator serial>'
+pnpm test:e2e:release:android:locale:de
+pnpm test:e2e:release:android:locale:en
+```
+
+Each command builds and freshly installs the release APK before two Argent
+passes. When a verified APK was already built, reuse it without rebuilding:
+
+```sh
+export E2E_RELEASE_SKIP_BUILD='true'
+export E2E_RELEASE_APK='<absolute path to app-release.apk>'
+```
+
 ## Current evidence
 
 - The historical benchmark commit is already in `origin/main` and recommends Argent for the measured local iOS onboarding replay.
@@ -68,10 +86,19 @@ Use `E2E_PLATFORM=android` for an Android emulator. The runner exits before touc
 - `check-in-journey` creates only the fixed synthetic note `ArgentCheckInMoment`, exercises the new core-belief and guiding-belief sequence, proves persistence in History, deletes its own record through the native confirmation alert, and checks state-independent Analytics content. It passed twice unchanged on iOS. The superseded CRUD flow depended on stale navigation and exact global totals, so it was removed.
 - `emotion-check-in-reminder` creates and removes only its synthetic reminder. It proves the shared picker closes when its backdrop is pressed without changing the time, sends a test notification, and passed twice unchanged on iOS.
 - `reminder-owned-timing` creates the fixed synthetic moment and beliefs `ArgentOwnedTimingMoment`, `ArgentOwnedTimingCore`, and `ArgentOwnedTimingGuide`; exercises full-preview and general reminder timing, turn-off and removal paths; then removes every owned record. It passed twice unchanged on iOS with 84 assertions per pass.
-- The release-locale runner was validated on dedicated AOSP emulator `emulator-5556`. German-first with English fallback and English-first with German fallback each passed twice from a fresh release install. The test deliberately keeps language ordering as an explicit Android Settings prerequisite: property-level locale mutation changed Android configuration but did not reproduce the process locale delivered to Expo.
+- The release-locale runner was validated again on the dedicated Pixel 10 AOSP emulator (`emulator-5554` in the final run). German-first with English fallback and English-first with German fallback each passed twice from a fresh release install. The test deliberately keeps language ordering as an explicit Android Settings prerequisite: property-level locale mutation changed Android configuration but did not reproduce the process locale delivered to Expo.
+- The final Android build produced a valid release APK but consumed about 4 GiB of app build output, leaving too little disk space for the original emulator. The APK was preserved, only this run's `android/app/build` output was removed, and the same APK completed both locale suites on a freshly booted dedicated emulator through `E2E_RELEASE_SKIP_BUILD=true` and `E2E_RELEASE_APK`.
 - The final development suite ran all seven flows twice unchanged on dedicated iOS simulator `9D5C1782-C1C3-458B-9416-6311D03AD1B9`. Every flow passed and every synthetic reminder, belief, and check-in was removed.
-- `pnpm verify` passed 41 suites / 279 tests plus TypeScript, Oxlint, and ESLint (21 existing warnings, no errors). Coverage passed at 87.13% statements, 75.60% branches, 83.15% functions, and 90.42% lines. The custom-rule gate passed 25 tests.
+- `pnpm verify` passed 41 suites / 282 tests plus TypeScript, Oxlint, and ESLint with zero warnings and zero errors. Coverage passed at 87.13% statements, 75.60% branches, 83.15% functions, and 90.42% lines. The custom-rule gate passed 33 tests.
 - Harness required an unsandboxed retry because sandbox networking falsely reported all Metro ports unavailable. iOS then completed with the existing baseline of 3 passing and 15 failing suites (3 passing / 17 failing tests), dominated by native query visibility and missing Uniffi initialization. Web and Android both reached a healthy runner but repeated “only prewarm traffic” without requesting the test bundle; each was stopped after the same failure reproduced twice. Android was scoped to `emulator-5556` after the wrapper was corrected to honor and validate `ANDROID_SERIAL` and `RN_HARNESS_ANDROID_AVD`.
+
+## Architecture-rule follow-up
+
+- `a896f49` promotes the unchanged shared palette and typography tokens from feature ownership to `src/theme.ts`, replaces repeated palette literals, and includes full-resolution Today, Settings, and Insights screenshots.
+- `caedf0a` enables all 17 Youmotion-applicable rules from `eslint-plugin-code-architecture@0.4.0-alpha.1` as errors and fixes the barrel and compound-root violations.
+- Five focused contract fixtures prove that every composition/LEGO rule reports a representative invalid component API; configuration severity is also checked against every plugin export.
+- `require-assertions` is the sole excluded export because Youmotion does not adopt TigerStyle's two-runtime-assertions-per-function convention. The complete policy and executable commands are documented in `docs/code-architecture-eslint.md`.
+- All seven development flows passed twice against the migrated theme on the dedicated iOS simulator, including the modal dismissal and destructive-confirmation paths.
 
 ## Verification status
 
