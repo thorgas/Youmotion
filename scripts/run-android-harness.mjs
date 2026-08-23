@@ -64,6 +64,22 @@ async function deviceMatchesPixel6a(deviceId) {
 
 async function selectDevice() {
   const deviceIds = await connectedDeviceIds();
+  const requestedDeviceId = process.env.ANDROID_SERIAL;
+  if (requestedDeviceId) {
+    if (!deviceIds.includes(requestedDeviceId)) {
+      throw new Error(`ANDROID_SERIAL ${requestedDeviceId} is not connected as a ready device.`);
+    }
+    if (runner !== 'android-pixel-6a' && !requestedDeviceId.startsWith('emulator-')) {
+      throw new Error(`ANDROID_SERIAL ${requestedDeviceId} must identify an emulator for ${runner}.`);
+    }
+    if (
+      runner === 'android-pixel-6a'
+      && !(await deviceMatchesPixel6a(requestedDeviceId))
+    ) {
+      throw new Error(`ANDROID_SERIAL ${requestedDeviceId} is not a Google Pixel 6a.`);
+    }
+    return requestedDeviceId;
+  }
   if (runner !== 'android-pixel-6a') {
     const emulator = deviceIds.find((deviceId) => deviceId.startsWith('emulator-'));
     if (emulator) return emulator;

@@ -17,7 +17,7 @@ Replace the remaining Maestro development and release journeys with deterministi
 3. Pending: repair the existing onboarding Argent flow. The stale standalone CRUD flow was replaced by the deterministic check-in journey.
 4. Complete: Android release-locale execution uses Argent, requires an explicit emulator, accepts a valid first-choice locale followed by the supported fallback, installs from a clean app-data state, and retries while Android finishes booting.
 5. Complete: remove active Maestro configuration and update executable documentation. The historical comparison benchmark remains intact as archived decision evidence, not as an application test runner.
-6. Pending: run two unchanged passes for every flow plus full repository verification.
+6. Complete: run two unchanged passes for every development and release flow plus full repository verification. Existing Harness runtime failures were reproduced and recorded separately from the migration gates.
 7. Pending: simplify, rebase onto `origin/main`, verify history, and push.
 
 ## Runtime contract
@@ -69,6 +69,9 @@ Use `E2E_PLATFORM=android` for an Android emulator. The runner exits before touc
 - `emotion-check-in-reminder` creates and removes only its synthetic reminder. It proves the shared picker closes when its backdrop is pressed without changing the time, sends a test notification, and passed twice unchanged on iOS.
 - `reminder-owned-timing` creates the fixed synthetic moment and beliefs `ArgentOwnedTimingMoment`, `ArgentOwnedTimingCore`, and `ArgentOwnedTimingGuide`; exercises full-preview and general reminder timing, turn-off and removal paths; then removes every owned record. It passed twice unchanged on iOS with 84 assertions per pass.
 - The release-locale runner was validated on dedicated AOSP emulator `emulator-5556`. German-first with English fallback and English-first with German fallback each passed twice from a fresh release install. The test deliberately keeps language ordering as an explicit Android Settings prerequisite: property-level locale mutation changed Android configuration but did not reproduce the process locale delivered to Expo.
+- The final development suite ran all seven flows twice unchanged on dedicated iOS simulator `9D5C1782-C1C3-458B-9416-6311D03AD1B9`. Every flow passed and every synthetic reminder, belief, and check-in was removed.
+- `pnpm verify` passed 41 suites / 279 tests plus TypeScript, Oxlint, and ESLint (21 existing warnings, no errors). Coverage passed at 87.13% statements, 75.60% branches, 83.15% functions, and 90.42% lines. The custom-rule gate passed 25 tests.
+- Harness required an unsandboxed retry because sandbox networking falsely reported all Metro ports unavailable. iOS then completed with the existing baseline of 3 passing and 15 failing suites (3 passing / 17 failing tests), dominated by native query visibility and missing Uniffi initialization. Web and Android both reached a healthy runner but repeated “only prewarm traffic” without requesting the test bundle; each was stopped after the same failure reproduced twice. Android was scoped to `emulator-5556` after the wrapper was corrected to honor and validate `ANDROID_SERIAL` and `RN_HARNESS_ANDROID_AVD`.
 
 ## Verification remaining
 

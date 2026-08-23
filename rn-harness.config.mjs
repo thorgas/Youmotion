@@ -8,6 +8,7 @@ import { chrome, webPlatform } from '@react-native-harness/platform-web';
 
 const metroPort = process.env.RN_HARNESS_METRO_PORT ?? '8081';
 const webPort = process.env.RN_HARNESS_WEB_PORT ?? metroPort;
+const androidAvdName = process.env.RN_HARNESS_ANDROID_AVD ?? 'Pixel_9';
 
 export default {
   entryPoint: './entry.tsx',
@@ -25,7 +26,7 @@ export default {
     }),
     androidPlatform({
       name: 'android',
-      device: androidEmulator('Pixel_9', {
+      device: androidEmulator(androidAvdName, {
         apiLevel: 36,
         profile: 'pixel_9',
         diskSize: '2G',
