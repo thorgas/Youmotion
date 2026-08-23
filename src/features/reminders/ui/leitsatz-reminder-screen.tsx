@@ -38,7 +38,8 @@ import type {
 } from '../domain/reminder-timing';
 import type { ReminderNotificationContent } from '../domain/reminder-assignment';
 
-const reminderWeekdayOptions = [
+function reminderWeekdayOptions() {
+  return [
     { label: String(fbs('Su', 'Abbreviated Sunday in reminder weekday picker')), weekday: 1 },
     { label: String(fbs('Mo', 'Abbreviated Monday in reminder weekday picker')), weekday: 2 },
     { label: String(fbs('Tu', 'Abbreviated Tuesday in reminder weekday picker')), weekday: 3 },
@@ -47,6 +48,7 @@ const reminderWeekdayOptions = [
     { label: String(fbs('Fr', 'Abbreviated Friday in reminder weekday picker')), weekday: 6 },
     { label: String(fbs('Sa', 'Abbreviated Saturday in reminder weekday picker')), weekday: 7 },
   ] satisfies readonly { label: string; weekday: ReminderWeekday }[];
+}
 
 function timeSlotKey(index: number) {
   assert(Number.isInteger(index), 'Time slot index must be an integer');
@@ -260,7 +262,7 @@ function NotificationContentChoice({ actor, notificationContent }: {
   notificationContent: ReminderNotificationContent;
 }) {
   assert(actor.getSnapshot().context.reminderTargetKind === REMINDER_TARGET_KINDS.GUIDING_BELIEF, 'Notification content choice belongs to a guiding belief reminder');
-  assert(actor.getSnapshot().context['reminderNotificationContent'] === notificationContent, 'Notification choice must reflect reminder context');
+  assert(actor.getSnapshot().context.reminderNotificationContentDraft === notificationContent, 'Notification choice must reflect reminder context');
   const _selectGeneral = () => actor.send({
     type: REMINDER_EVENTS.CONTENT_CHANGED,
     notificationContent: REMINDER_NOTIFICATION_CONTENT.GENERAL,
@@ -351,7 +353,7 @@ function ReminderEditorContent({
       ) : null}
       <Text style={styles.fieldLabel}><fbt desc="Reminder weekdays label">DAYS</fbt></Text>
       <View style={styles.weekdayRow}>
-        {reminderWeekdayOptions.map(({ label, weekday }) => {
+        {reminderWeekdayOptions().map(({ label, weekday }) => {
           assert(label.length > 0, 'Weekday option label must not be empty');
           assert(weekday >= 1 && weekday <= 7, 'Weekday option must be valid');
           const selected = selectedWeekdays.has(weekday);
