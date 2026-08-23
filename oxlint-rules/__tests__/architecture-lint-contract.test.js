@@ -63,6 +63,56 @@ describe('architecture lint contract', () => {
     expect(configuredRules['code-architecture/require-assertions']).toBeUndefined();
   });
 
+  it.each([
+    {
+      code: `
+        function AccordionRoot({ children }) {
+          return <AccordionContext.Provider><Accordion.Trigger />{children}</AccordionContext.Provider>;
+        }
+      `,
+      ruleName: 'no-root-owned-compound-parts',
+    },
+    {
+      code: `
+        function ConfiguredList({ items, showHeader, hideFooter }) {
+          return <View>{showHeader && <Header />}{items.map((item) => <Item item={item} />)}{!hideFooter && <Footer />}</View>;
+        }
+      `,
+      ruleName: 'prefer-composition-over-configuration',
+    },
+    {
+      code: 'function FixedRoot() { return <FixedLayout />; }',
+      ruleName: 'require-composable-root-children',
+    },
+    {
+      code: `
+        const CounterProvider = ({ children }) => <Context.Provider>{children}</Context.Provider>;
+        const CounterDisplay = () => <Text />;
+        export const Counter = { Provider: CounterProvider, Display: CounterDisplay };
+      `,
+      ruleName: 'require-compound-component-api',
+    },
+    {
+      code: `
+        import { Counter } from './counter';
+        const view = <Counter.Provider><View /></Counter.Provider>;
+      `,
+      ruleName: 'require-consumer-owned-compound-usage',
+    },
+  ])('detects a $ruleName composition violation', ({ code, ruleName }) => {
+    const messages = messagesFor({
+      code,
+      filePath: 'src/components/ui/contract-fixture.tsx',
+    });
+
+    expect(messages).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        ruleId: `code-architecture/${ruleName}`,
+        severity: 2,
+      }),
+    ]));
+  });
+
   it('enforces declarative components without banning named event delegates', () => {
     const messages = messagesFor({
       code: `
