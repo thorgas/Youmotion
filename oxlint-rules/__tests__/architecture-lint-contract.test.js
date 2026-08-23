@@ -4,11 +4,9 @@ const path = require('node:path');
 const packageJson = require('../../package.json');
 
 const pendingDesignSystemRules = new Set([
-  'no-design-identity-overrides',
   'no-raw-design-properties',
   'prefer-design-system-components',
   'require-dismissible-modal-backdrop',
-  'require-interactive-component-contract',
 ]);
 
 const cwd = path.resolve(__dirname, '../..');
@@ -65,7 +63,7 @@ describe('architecture lint contract', () => {
       .filter((ruleName) => ruleName !== 'require-assertions')
       .filter((ruleName) => !pendingDesignSystemRules.has(ruleName));
 
-    expect(applicableRules).toHaveLength(17);
+    expect(applicableRules).toHaveLength(19);
     for (const ruleName of applicableRules) {
       expect(configuredRules[`code-architecture/${ruleName}`]?.[0]).toBe(2);
     }
@@ -272,6 +270,41 @@ describe('architecture lint contract', () => {
     ]));
   });
 
+  it('protects shared button identity from consumer overrides', () => {
+    const messages = messagesFor({
+      code: `
+        import { Button } from '@/components/ui/button';
+        const view = <Button.Root label="Save" onPress={save} style={{ backgroundColor: '#fff' }} testID="save"><Button.Text>Save</Button.Text></Button.Root>;
+      `,
+      filePath: 'src/features/settings/ui/contract-fixture.tsx',
+    });
+
+    expect(messages).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        ruleId: 'code-architecture/no-design-identity-overrides',
+        severity: 2,
+      }),
+    ]));
+  });
+
+  it('requires the shared button interaction contract', () => {
+    const messages = messagesFor({
+      code: `
+        function ButtonRoot({ children, disabled }) {
+          return <Pressable disabled={disabled}>{children}</Pressable>;
+        }
+      `,
+      filePath: 'src/components/ui/contract-fixture.tsx',
+    });
+
+    expect(messages).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        ruleId: 'code-architecture/require-interactive-component-contract',
+        severity: 2,
+      }),
+    ]));
+  });
+
   it('reports configured raw design values in JSX color properties', () => {
     const directMessages = messagesFor({
       code: 'const view = <ActivityIndicator color="#EDF0EB" />;',
@@ -295,7 +328,6 @@ describe('architecture lint contract', () => {
       ]);
     }
   });
-
   it('ignores raw design values in unrelated JSX properties', () => {
     const messages = messagesFor({
       code: 'const view = <Text testID="#EDF0EB" />;',

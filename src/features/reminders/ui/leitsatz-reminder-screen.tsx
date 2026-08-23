@@ -26,6 +26,7 @@ import {
   REMINDER_TARGET_KINDS,
 } from '@/constants';
 import { AppBackButton } from '@/components/ui/app-back-button';
+import { Button } from '@/components/ui/button';
 import { ConfirmedPickerModal } from '@/components/ui/confirmed-picker-modal';
 import {
   beliefStatementForId,
@@ -76,22 +77,16 @@ function ActionButton({
   assert(label.length > 0, 'Action button label must not be empty');
   assert(testID.length > 0, 'Action button test id must not be empty');
   return (
-    <PressableScale
-      accessibilityRole="button"
-      accessibilityState={{ disabled }}
+    <Button.Root
       disabled={disabled}
+      label={label}
       onPress={onPress}
-      style={[
-        styles.action,
-        secondary && styles.actionSecondary,
-        disabled && styles.actionDisabled,
-      ]}
+      size="large"
       testID={testID}
+      variant={secondary ? 'secondary' : 'primary'}
     >
-      <Text style={[styles.actionText, secondary && styles.actionTextSecondary]}>
-        {label}
-      </Text>
-    </PressableScale>
+      <Button.Text>{label}</Button.Text>
+    </Button.Root>
   );
 }
 
@@ -532,11 +527,6 @@ const styles = StyleSheet.create({
   statementCard: { minHeight: 150, justifyContent: 'center', backgroundColor: palette.paperRaised, borderColor: palette.hairline, borderWidth: 1, borderRadius: 24, borderCurve: 'continuous', padding: 22 },
   cardEyebrow: { fontFamily: type.semibold, color: palette.inkMuted, fontSize: 10, letterSpacing: 1.2, marginBottom: 14 },
   statement: { fontFamily: type.medium, color: palette.ink, fontSize: 23, lineHeight: 32, textAlign: 'center' },
-  action: { minHeight: 54, alignItems: 'center', justifyContent: 'center', borderRadius: 18, borderCurve: 'continuous', backgroundColor: actionColors.primaryBackground, paddingHorizontal: 18 },
-  actionSecondary: { backgroundColor: 'transparent', borderWidth: 1, borderColor: palette.hairline },
-  actionDisabled: { opacity: 0.38 },
-  actionText: { fontFamily: type.semibold, color: actionColors.primaryForeground, fontSize: 15 },
-  actionTextSecondary: { color: palette.ink },
   fieldHint: { fontFamily: type.regular, color: palette.inkMuted, fontSize: 13, lineHeight: 19, marginTop: -8 },
   fieldLabel: { fontFamily: type.semibold, color: palette.inkMuted, fontSize: 11, letterSpacing: 1.2, marginTop: 8 },
   previewSection: { gap: 10 },

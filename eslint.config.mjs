@@ -84,6 +84,26 @@ export default tseslint.config(
           packages: ['effect', '@effect/platform'],
         },
       ],
+      'code-architecture/no-design-identity-overrides': [
+        'error',
+        {
+          allowedFiles: ['src/components/ui/**'],
+          components: [
+            {
+              identityProperties: [
+                'backgroundColor',
+                'borderColor',
+                'borderRadius',
+                'color',
+                'fontFamily',
+                'fontSize',
+              ],
+              names: ['Button.Root', 'Button.Text'],
+              styleAttributes: ['style'],
+            },
+          ],
+        },
+      ],
       'code-architecture/no-root-owned-compound-parts': 'error',
       'code-architecture/no-unsafe-type-assertions': 'error',
       'code-architecture/no-unvalidated-json-parse': 'error',
@@ -91,6 +111,19 @@ export default tseslint.config(
       'code-architecture/require-composable-root-children': 'error',
       'code-architecture/require-compound-component-api': 'error',
       'code-architecture/require-consumer-owned-compound-usage': 'error',
+      'code-architecture/require-interactive-component-contract': [
+        'error',
+        {
+          componentNames: ['ButtonRoot'],
+          contentProps: ['children'],
+          disabledAttributes: ['disabled'],
+          disabledProps: ['disabled'],
+          feedbackAttributes: ['rippleColor'],
+          feedbackStateNames: ['pressed', 'active'],
+          roleAttributes: ['accessibilityRole', 'role'],
+          stateAttributes: ['accessibilityState', 'aria-disabled'],
+        },
+      ],
     },
   },
   {
