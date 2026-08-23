@@ -111,7 +111,7 @@ const rootVariants = StyleSheet.create({
     borderColor: palette.hairline,
     borderWidth: 1,
   },
-  destructive: { backgroundColor: palette.danger },
+  destructive: { backgroundColor: actionColors.destructiveBackground },
   ghost: { backgroundColor: 'transparent' },
 });
 

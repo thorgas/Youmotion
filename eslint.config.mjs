@@ -125,6 +125,20 @@ export default tseslint.config(
       'code-architecture/no-unsafe-type-assertions': 'error',
       'code-architecture/no-unvalidated-json-parse': 'error',
       'code-architecture/prefer-composition-over-configuration': 'error',
+      'code-architecture/prefer-design-system-components': [
+        'error',
+        {
+          allowInside: ['src/components/ui/**'],
+          consumers: ['src/features/data-safety/ui/data-safety-controls.tsx'],
+          replacements: [
+            {
+              from: 'react-native',
+              imported: ['Button', 'Pressable', 'TouchableOpacity'],
+              replacement: '@/components/ui/button',
+            },
+          ],
+        },
+      ],
       'code-architecture/require-composable-root-children': 'error',
       'code-architecture/require-compound-component-api': 'error',
       'code-architecture/require-consumer-owned-compound-usage': 'error',

@@ -1,0 +1,21 @@
+steps:
+  - echo: Open and cancel the destructive data-safety confirmation without changing journal data.
+  - launch: com.youmotion.mobile
+  - tool: open-url
+    args:
+      url: exp+youmotion://expo-development-client/?url=http%3A%2F%2F127.0.0.1%3A8091
+  - await: { visible: { id: tab-settings }, timeout: 30000 }
+  - when:
+      visible: { id: xmark }
+    steps:
+      - tap: { id: xmark }
+      - await: { hidden: { id: xmark }, timeout: 5000 }
+  - tap: { id: tab-settings }
+  - scroll-to: { target: { id: delete-all-journal-data }, direction: down }
+  - tap: { id: delete-all-journal-data }
+  - scroll-to: { target: { id: cancel-delete-all }, direction: down }
+  - await: { visible: { id: cancel-delete-all }, timeout: 5000 }
+  - assert: { visible: { id: confirm-delete-all } }
+  - tap: { id: cancel-delete-all }
+  - await: { hidden: { id: confirm-delete-all }, timeout: 5000 }
+  - assert: { visible: { id: delete-all-journal-data } }

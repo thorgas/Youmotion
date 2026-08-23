@@ -1,8 +1,10 @@
 import { useSelector } from '@xstate/react';
+import { fbs } from 'fbtee';
 import { PressableScale } from 'pressto';
-import { ActivityIndicator, Pressable, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
 import assert from 'tiny-invariant';
 
+import { Button } from '@/components/ui/button';
 import {
   DATA_SAFETY_EVENTS,
   DATA_SAFETY_STATES,
@@ -150,12 +152,12 @@ function RestorePreviewCard({
         <fbt desc="Restore backup validation explanation">The current data is replaced only after the whole backup validates.</fbt>
       </Text>
       <View style={styles.confirmationActions}>
-        <Pressable accessibilityRole="button" onPress={onCancel} style={styles.secondaryButton} testID="cancel-data-restore">
-          <Text style={styles.secondaryButtonText}><fbt desc="Cancel data restore button">Cancel</fbt></Text>
-        </Pressable>
-        <Pressable accessibilityRole="button" onPress={onConfirm} style={styles.primaryButton} testID="confirm-data-restore">
-          <Text style={styles.primaryButtonText}><fbt desc="Confirm replacing data from a backup">Replace data</fbt></Text>
-        </Pressable>
+        <Button.Root label={String(fbs('Cancel', 'Cancel data restore button'))} onPress={onCancel} size="compact" style={styles.confirmationButton} testID="cancel-data-restore" variant="secondary">
+          <Button.Text><fbt desc="Cancel data restore button">Cancel</fbt></Button.Text>
+        </Button.Root>
+        <Button.Root label={String(fbs('Replace data', 'Confirm replacing data from a backup'))} onPress={onConfirm} size="compact" style={styles.confirmationButton} testID="confirm-data-restore">
+          <Button.Text><fbt desc="Confirm replacing data from a backup">Replace data</fbt></Button.Text>
+        </Button.Root>
       </View>
     </View>
   );
@@ -177,12 +179,12 @@ function DeleteConfirmationCard({
         <fbt desc="Delete all journal data confirmation explanation">This cannot be undone unless you exported a backup first. Language and display preferences remain.</fbt>
       </Text>
       <View style={styles.confirmationActions}>
-        <Pressable accessibilityRole="button" onPress={onCancel} style={styles.secondaryButton} testID="cancel-delete-all">
-          <Text style={styles.secondaryButtonText}><fbt desc="Cancel delete all data button">Cancel</fbt></Text>
-        </Pressable>
-        <Pressable accessibilityRole="button" onPress={onConfirm} style={styles.destructiveButton} testID="confirm-delete-all">
-          <Text style={styles.primaryButtonText}><fbt desc="Confirm delete all journal data button">Delete moments</fbt></Text>
-        </Pressable>
+        <Button.Root label={String(fbs('Cancel', 'Cancel delete all data button'))} onPress={onCancel} size="compact" style={styles.confirmationButton} testID="cancel-delete-all" variant="secondary">
+          <Button.Text><fbt desc="Cancel delete all data button">Cancel</fbt></Button.Text>
+        </Button.Root>
+        <Button.Root label={String(fbs('Delete moments', 'Confirm delete all journal data button'))} onPress={onConfirm} size="compact" style={styles.confirmationButton} testID="confirm-delete-all" variant="destructive">
+          <Button.Text><fbt desc="Confirm delete all journal data button">Delete moments</fbt></Button.Text>
+        </Button.Root>
       </View>
     </View>
   );
@@ -313,9 +315,5 @@ const styles = StyleSheet.create({
   archiveFactLabel: { fontFamily: type.regular, color: palette.inkMuted, fontSize: 13 },
   archiveFactValue: { flexShrink: 1, fontFamily: type.semibold, color: palette.ink, fontSize: 13, textAlign: 'right' },
   confirmationActions: { flexDirection: 'row', gap: 10, marginTop: 16 },
-  secondaryButton: { flex: 1, minHeight: 44, alignItems: 'center', justifyContent: 'center', borderColor: palette.hairline, borderRadius: 14, borderWidth: 1 },
-  secondaryButtonText: { fontFamily: type.semibold, color: palette.ink, fontSize: 14 },
-  primaryButton: { flex: 1, minHeight: 44, alignItems: 'center', justifyContent: 'center', backgroundColor: actionColors.primaryBackground, borderRadius: 14 },
-  destructiveButton: { flex: 1, minHeight: 44, alignItems: 'center', justifyContent: 'center', backgroundColor: actionColors.destructiveBackground, borderRadius: 14 },
-  primaryButtonText: { fontFamily: type.semibold, color: actionColors.primaryForeground, fontSize: 14 },
+  confirmationButton: { flex: 1 },
 });

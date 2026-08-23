@@ -37,6 +37,18 @@ describe('Button', () => {
     expect(onPress).not.toHaveBeenCalled();
   });
 
+  it('owns the destructive action identity', async () => {
+    await render(
+      <Button.Root label="Delete" onPress={jest.fn()} testID="delete" variant="destructive">
+        <Button.Text>Delete</Button.Text>
+      </Button.Root>,
+    );
+
+    expect(screen.getByRole('button', { name: 'Delete' })).toHaveStyle({
+      backgroundColor: '#8A3D35',
+    });
+  });
+
   it('requires text to be composed inside the button root', async () => {
     await expect(render(<Button.Text>Detached</Button.Text>)).rejects.toThrow(
       'Button.Text must be rendered inside Button.Root.',

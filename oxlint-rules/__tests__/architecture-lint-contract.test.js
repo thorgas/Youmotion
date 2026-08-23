@@ -3,10 +3,6 @@ const path = require('node:path');
 
 const packageJson = require('../../package.json');
 
-const pendingDesignSystemRules = new Set([
-  'prefer-design-system-components',
-]);
-
 const cwd = path.resolve(__dirname, '../..');
 const eslint = path.join(cwd, 'node_modules', '.bin', 'eslint');
 
@@ -58,10 +54,9 @@ describe('architecture lint contract', () => {
       'src/components/ui/contract-fixture.tsx',
     );
     const applicableRules = exportedRuleNames()
-      .filter((ruleName) => ruleName !== 'require-assertions')
-      .filter((ruleName) => !pendingDesignSystemRules.has(ruleName));
+      .filter((ruleName) => ruleName !== 'require-assertions');
 
-    expect(applicableRules).toHaveLength(21);
+    expect(applicableRules).toHaveLength(22);
     for (const ruleName of applicableRules) {
       expect(configuredRules[`code-architecture/${ruleName}`]?.[0]).toBe(2);
     }
@@ -353,6 +348,23 @@ describe('architecture lint contract', () => {
     expect(messages).toEqual(expect.arrayContaining([
       expect.objectContaining({
         ruleId: 'code-architecture/require-dismissible-modal-backdrop',
+        severity: 2,
+      }),
+    ]));
+  });
+
+  it('keeps migrated data-safety actions on the shared button', () => {
+    const messages = messagesFor({
+      code: `
+        import { Pressable } from 'react-native';
+        const view = <Pressable onPress={confirm}><Text>Replace data</Text></Pressable>;
+      `,
+      filePath: 'src/features/data-safety/ui/data-safety-controls.tsx',
+    });
+
+    expect(messages).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        ruleId: 'code-architecture/prefer-design-system-components',
         severity: 2,
       }),
     ]));
