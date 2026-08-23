@@ -173,7 +173,7 @@ async function runLocaleCase({ deviceId, localeCase }) {
   process.stdout.write(`\nTesting release onboarding with ${localeCase.locale}.\n`);
   await requireSystemLocale({ deviceId, localeCase });
   await installFreshRelease(deviceId);
-  const flow = join(projectRoot, '.argent', 'flows', 'e2e', localeCase.flow);
+  const flow = join(projectRoot, '.argent', 'flows', 'release', localeCase.flow);
   await runArgentPass({ deviceId, flow, pass: 1 });
   await runArgentPass({ deviceId, flow, pass: 2 });
 }
@@ -199,7 +199,7 @@ async function main() {
   const deviceId = await selectEmulator();
   await buildRelease();
   if (!existsSync(apk)) throw new Error(`Release APK was not found at ${apk}.`);
-  const flow = join(projectRoot, '.argent', 'flows', 'e2e', localeCase.flow);
+  const flow = join(projectRoot, '.argent', 'flows', 'release', localeCase.flow);
   if (!existsSync(flow)) throw new Error(`Argent flow was not found at ${flow}.`);
   await runLocaleCase({ deviceId, localeCase });
 }

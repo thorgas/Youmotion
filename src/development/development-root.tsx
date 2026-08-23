@@ -7,10 +7,7 @@ export function DevelopmentRoot({ children }: PropsWithChildren) {
   usePerformanceMonitorDevTools();
   useRequireProfilerDevTools();
 
-  if (
-    process.env.EXPO_PUBLIC_E2E === 'true'
-    || process.env.EXPO_PUBLIC_MAESTRO === 'true'
-  ) {
+  if (process.env.EXPO_PUBLIC_E2E === 'true') {
     return children;
   }
 

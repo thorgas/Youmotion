@@ -26,7 +26,7 @@ Replace reusable named reminder schedules with reminders that directly own their
 - Root navigation actor events and observable state paths.
 - Rendered reminder and Leitsatz-management interactions.
 - Native React Native Harness persistence/component behavior.
-- Saved redacted Maestro journey plus structural screen tests and reviewed screenshots.
+- Saved redacted Argent journey plus structural screen tests and reviewed screenshots.
 
 ## User-observable migration matrix
 
@@ -57,7 +57,7 @@ Replace reusable named reminder schedules with reminders that directly own their
 - Analysis complete.
 - Expo SDK 57 Notifications and Router documentation reviewed.
 - Relevant domain, continuity, design, TDD, React, testing, Harness, simplification, commit, and Argent workflow skills loaded.
-- Environment inspection confirmed Expo SDK 57, React Native 0.86, iOS/Android projects, Maestro, and Harness support.
+- Environment inspection confirmed Expo SDK 57, React Native 0.86, iOS/Android projects, Argent, and Harness support.
 - pnpm is pinned to 11.18.0 and the workspace permits an installed compatible binary when registry signature verification is unavailable.
 - `3683d326` fixes fresh SurrealDB bootstrap by defining `check_in` before migration 0001 updates it.
 - Assignment schema version 2, timing migration, repository/coordinator/scheduler changes, navigation/UI changes, focused tests, and screenshots are implemented locally.
@@ -77,6 +77,6 @@ Replace reusable named reminder schedules with reminders that directly own their
 
 - Run the component gate with `pnpm test:harness:android --runTestsByPath src/features/settings/__tests__/belief-library.harness.tsx` on a dedicated Android emulator.
 - The emulator-only Harness retry did not start any tests because its runner reported every port in 8084-8093 unavailable, even though a preceding `lsof` check found no listeners. Do not substitute the connected physical Pixel without permission.
-- Run `.maestro/flows/reminder-owned-timing.yaml` twice unchanged on a healthy dedicated emulator, then run the complete installed-app suite with `pnpm start:maestro` in one terminal and `pnpm test:maestro` in another. Ruby parsed the saved flow as valid two-document YAML with 53 steps, but Maestro could not launch the already-installed app on emulators 5558 or 5556 (`UNAVAILABLE: io exception`) and hung before launch on 5554; ADB package lookup and the scoped 8082 reverse succeeded on the same targets.
+- The former Maestro blocker is resolved: `.argent/flows/e2e/reminder-owned-timing.yaml` passed twice unchanged on dedicated iOS simulator `9D5C1782-C1C3-458B-9416-6311D03AD1B9`, with 84 assertions per pass and complete synthetic-data cleanup. Run it with `pnpm start:e2e` in one terminal and `E2E_DEVICE='<dedicated device>' E2E_PLATFORM=ios pnpm test:e2e -- --flow reminder-owned-timing.yaml` in another.
 - The initial Android devices failed before migration 0003 because fresh database bootstrap migration 0001 updated an undefined table. The bootstrap fix is committed; the isolated API 33 AVD then failed to cold-boot, so a clean native migration replay still needs another healthy disposable device.
-- The invalid one-step Argent recording produced while its prerequisite was false was deleted. Do not label a saved QA flow complete until two unchanged full passes succeed.
+- The invalid one-step Argent recording produced while its prerequisite was false was deleted and replaced by the complete two-pass flow.

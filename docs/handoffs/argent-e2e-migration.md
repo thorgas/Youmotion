@@ -16,7 +16,7 @@ Replace the remaining Maestro development and release journeys with deterministi
 2. Complete: all eight Maestro journeys are now live-authored Argent flows and pass twice unchanged (`navigation-smoke`, `reflection-cancel`, `language-switching`, `emotion-label-modes`, `check-in-journey`, `emotion-check-in-reminder`, `reminder-owned-timing`, and the German/English release-onboarding locale pair).
 3. Pending: repair the existing onboarding Argent flow. The stale standalone CRUD flow was replaced by the deterministic check-in journey.
 4. Complete: Android release-locale execution uses Argent, requires an explicit emulator, accepts a valid first-choice locale followed by the supported fallback, installs from a clean app-data state, and retries while Android finishes booting.
-5. Pending: remove Maestro configuration and update all documentation.
+5. Complete: remove active Maestro configuration and update executable documentation. The historical comparison benchmark remains intact as archived decision evidence, not as an application test runner.
 6. Pending: run two unchanged passes for every flow plus full repository verification.
 7. Pending: simplify, rebase onto `origin/main`, verify history, and push.
 
@@ -58,7 +58,7 @@ Use `E2E_PLATFORM=android` for an Android emulator. The runner exits before touc
 ## Current evidence
 
 - The historical benchmark commit is already in `origin/main` and recommends Argent for the measured local iOS onboarding replay.
-- Current Maestro YAML cannot be executed directly by Argent; each journey requires a native Argent recording and schema conversion.
+- Maestro YAML could not be executed directly by Argent; each journey was re-authored and validated through the app. Historical benchmark inputs remain only under `benchmarks/e2e-maestro-vs-argent/`.
 - Both Android release locale checks passed before migration, but the locale precondition rejects a valid German-first locale list with an English fallback.
 - Existing picker modals already dismiss on backdrop press through `ConfirmedPickerModal`, with a focused component test.
 - The first explicit-device rebuild failed with `No space left on device`. `mo clean` freed roughly 7.1 GiB of caches/logs without system-cache cleanup; the targeted iOS build and installation then passed.

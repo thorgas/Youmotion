@@ -108,7 +108,6 @@
   "scripts": {
     "clean": "pnpm exec expo prebuild --clean",
     "start": "expo start --dev-client",
-    "start:maestro": "EXPO_PUBLIC_MAESTRO=true expo start --dev-client --port 8082",
     "start:e2e": "EXPO_PUBLIC_E2E=true expo start --dev-client --port 8091",
     "start:tunnel": "expo start --dev-client --tunnel",
     "start:tools": "WITH_ROZENITE=true expo start --dev-client",
@@ -170,8 +169,6 @@
     "test": "jest --runInBand --no-watchman",
     "test:watch": "jest --watch --no-watchman",
     "test:coverage": "jest --coverage --runInBand --no-watchman",
-    "test:maestro": "maestro test .maestro",
-    "test:maestro:smoke": "maestro test .maestro --include-tags=smoke",
     "test:e2e": "node scripts/run-argent-e2e.mjs",
     "test:e2e:smoke": "node scripts/run-argent-e2e.mjs --flow navigation-smoke.yaml",
     "test:e2e:release:android:locale:de": "E2E_EXPECTED_LOCALE=de-DE node scripts/run-android-release-locale-e2e.mjs",

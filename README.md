@@ -137,8 +137,8 @@ pnpm typecheck
 pnpm typecheck:compat
 pnpm test
 pnpm test:coverage
-pnpm test:maestro
-pnpm test:maestro:smoke
+pnpm test:e2e
+pnpm test:e2e:smoke
 pnpm verify
 pnpm test:harness
 pnpm doctor:react
@@ -236,7 +236,7 @@ The rule suite lives beside the plugin and should be extended whenever a new inv
 - Navigation tests drive the actual root actor through persistence, Leidsatz attachment, custom entry creation, dedicated guiding-belief navigation, complete saved-moment editing, Leitsatz persistence and removal, deletion, and route event paths.
 - Screen tests render the painterly star and exercise reflection, built-in and custom Leidsatz selection, the dedicated guiding-belief page, Leitsatz display, persistence, history deletion, success, and settings.
 - Harness tests exercise custom Leidsatz persistence and emotion-label SVG nodes on the native React Native runtime.
-- Maestro tests exercise tab navigation, reflection cancellation, a persisted check-in save-and-delete journey, language switching, and redacted reminder lifecycles through the installed development app.
+- Argent flows exercise tab navigation, reflection cancellation, a persisted check-in save-and-delete journey, language switching, emotion-label settings, and redacted reminder lifecycles through the installed development app. The repository runner executes every selected flow twice unchanged.
 - The pre-release Android locale gate builds and clean-installs the release APK, then verifies first-launch onboarding before and after an app-process restart. Run both cases on dedicated emulators configured through Android Settings:
 
   ```bash
@@ -244,7 +244,7 @@ The rule suite lives beside the plugin and should be extended whenever a new inv
   pnpm test:e2e:release:android:locale:en
   ```
 
-  Start exactly one disposable Android emulator first, or set `ANDROID_SERIAL` to its `emulator-*` identifier. The German command requires German (`de-DE`) as the active system locale, and the English command requires English (`en-US`); the runner fails before installation if the emulator configuration does not match. Set `E2E_RELEASE_SKIP_BUILD=true` to exercise an existing APK, or `E2E_RELEASE_APK` to select a release APK at another path.
+  Start one disposable Android emulator and set `ANDROID_SERIAL` to its `emulator-*` identifier. In Android Settings > System > Languages, keep both supported languages and move the requested language first: German then English for the German command, or English then German for the English command. The runner validates that exact order before uninstalling the app, clean-installing the release APK, and running the matching Argent assertion twice. Set `E2E_RELEASE_SKIP_BUILD=true` to exercise an existing APK, or `E2E_RELEASE_APK` to select a release APK at another path.
 - React Native Harness is configured for web, iOS, and Android device-level component testing.
 
 The current Jest coverage gate is enforced globally and must not be lowered.
@@ -255,54 +255,40 @@ The emotion-label regression suite asserts the rendered React Native text node s
 
 Run the focused Android regression on an emulator with `pnpm test:harness:android -- emotion-label-modes.harness.tsx`, or replace the script with `pnpm test:harness:android:pixel` for a connected Pixel 6a. This structural and visual native test should be a release gate for changes to emotion labels, settings propagation, React Native, Reanimated, or native rendering dependencies; the ordinary Jest suite remains the fast gate for every change.
 
-### Maestro end-to-end tests
+### Argent end-to-end tests
 
-Install the [Maestro CLI](https://docs.maestro.dev/getting-started/installing-maestro), boot an iOS simulator or Android emulator, and install the Youmotion development client with `pnpm ios` or `pnpm android`. A development client must be installed before the flow can connect to Metro. Keep Metro running in another terminal:
-
-```bash
-pnpm start:maestro
-pnpm test:maestro
-```
-
-The app id is `com.youmotion.mobile`. Normal Metro uses port 8081; Maestro uses 8082; Harness starts at 8083/8084. When several Android targets are connected, choose one explicitly and keep every command scoped to it:
+Install Argent with `npx @swmansion/argent@latest init -y`, boot a dedicated iOS simulator or Android emulator, and install the Youmotion development client once with `pnpm ios` or `pnpm android`. Confirm the target and copy its UDID or emulator serial:
 
 ```bash
-adb devices
-export YOUMOTION_ANDROID_SERIAL=emulator-5556
-ANDROID_SERIAL="$YOUMOTION_ANDROID_SERIAL" pnpm exec expo run:android --device "$YOUMOTION_ANDROID_SERIAL"
-adb -s "$YOUMOTION_ANDROID_SERIAL" reverse tcp:8082 tcp:8082
-```
-
-The intended emulator must appear as `device`, not `offline` or `unauthorized`. If ADB is unavailable, run `adb start-server`, then `adb devices` again. Do not restart a shared ADB daemon while another agent or device session is active, and do not let Expo silently select another agent's emulator. Native installation may still require the normal Android SDK or Xcode setup. The dedicated Metro mode disables the development-only React Native Grab overlay so the application accessibility tree remains available. Run `pnpm test:maestro:smoke` for the short navigation gate. Failure output is written to the ignored `artifacts/maestro` directory.
-
-Before a long run, confirm the local tools are callable with `pnpm --version`, `argent --version`, and `maestro --version`. If Maestro reports `Operation not permitted` below `~/.maestro/deps`, repair that user-owned installation or reinstall Maestro from its official instructions before starting Metro; do not work around it with a different user's cache.
-
-Reminder changes should additionally run the focused Jest suites, then follow [the reminder runtime matrix](docs/reminders-runtime-test-matrix.md). Device evidence must cover assignment-owned timing, the post-reflection General message/Show Leitsatz choice, Leitsatz-management actions, and backdrop dismissal with redacted text.
-
-The redacted reminder lifecycle flow is `.maestro/flows/reminder-owned-timing.yaml`. Run it on the selected Android target with:
-
-```bash
-maestro --device "$YOUMOTION_ANDROID_SERIAL" test .maestro/flows/reminder-owned-timing.yaml
-```
-
-It creates unique local test text, configures and edits one Leitsatz reminder, verifies outside-tap time-dialog dismissal, then removes the reminder. Notification permission must be grantable; reset it before the run when testing the first-request path.
-
-The emotion check-in flow uses no journal data. In terminal A, keep the dedicated Maestro Metro server running:
-
-```bash
-pnpm start:maestro
-```
-
-In terminal B, select one dedicated simulator or emulator and run the flow twice unchanged:
-
-```bash
+pnpm --version
+argent --version
 argent run list-devices --json
-export YOUMOTION_DEVICE_ID='<iOS UDID or Android emulator serial>'
-maestro --device "$YOUMOTION_DEVICE_ID" test .maestro/flows/emotion-check-in-reminder.yaml
-maestro --device "$YOUMOTION_DEVICE_ID" test .maestro/flows/emotion-check-in-reminder.yaml
 ```
 
-The flow selects English for deterministic assertions, creates the device-local reminder, dismisses the time modal by tapping outside, confirms that `09:00` remains selected, activates and tests the reminder, verifies its Settings card, and deletes it again. The `10%,10%` tap is intentional: the backdrop is hidden from the accessibility tree, while the following `Reminder time 09:00` assertion can pass only after the modal has closed and the editor is visible again. The flow does not clear app storage or touch journal entries.
+Keep the dedicated E2E Metro server running in terminal A. It uses port 8091 and `EXPO_PUBLIC_E2E=true`, which removes the development-only React Native Grab wrapper from the accessibility tree:
+
+```bash
+pnpm start:e2e
+```
+
+In terminal B, scope every run to a device that no other task is using. The full runner recycles only that target's Argent services and runs each development flow twice unchanged:
+
+```bash
+export E2E_DEVICE='<iOS UDID or Android emulator serial>'
+export E2E_PLATFORM='ios'
+pnpm test:e2e
+```
+
+Use `E2E_PLATFORM=android` for an emulator. Run `pnpm test:e2e:smoke` for the short navigation gate. To isolate one journey while keeping the same two-pass contract:
+
+```bash
+pnpm test:e2e -- --flow reminder-owned-timing.yaml
+pnpm test:e2e -- --flow emotion-check-in-reminder.yaml
+```
+
+The app id is `com.youmotion.mobile`. Normal Metro uses 8081, E2E uses 8091, and Harness starts at 8083/8084. The runner exits before device interaction when the explicit target or Metro server is missing. Failure snapshots are written to ignored `artifacts/argent/`; flows are under `.argent/flows/e2e/` and use fixed synthetic text that they remove before finishing.
+
+Reminder changes should additionally run the focused Jest suites and follow [the reminder runtime matrix](docs/reminders-runtime-test-matrix.md). `reminder-owned-timing.yaml` covers assignment-owned timing, General message/Show Leitsatz choice, management actions, and cleanup. `emotion-check-in-reminder.yaml` covers creation, outside-tap time-modal dismissal without changing `09:00`, activation, test notification, Settings verification, and deletion. Neither flow reads or writes personal journal data.
 
 ## Local Codex skills
 

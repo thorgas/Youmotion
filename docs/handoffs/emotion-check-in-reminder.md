@@ -36,7 +36,7 @@ Make the existing device-local Pulse reminder a clear notification type in Setti
 
 1. `4e5e10d` documents the emotion check-in reminder contract and test matrix.
 2. `ecf49c4` adds localized notification copy and Settings/reminder UI wording with focused tests and English/German screenshots.
-3. `671e11f` adds the redacted installed-app Maestro lifecycle.
+3. `671e11f` added the original redacted installed-app lifecycle; `8ab604e` ports it to the canonical Argent runner.
 4. `6d4260b` records executable QA commands and verification evidence.
 5. `6375ed5` routes bounded command work to the optional Spark worker.
 6. The final app-map commit refreshes the mapped Settings and Reminders states without changing the route graph.
@@ -65,16 +65,16 @@ pnpm test:coverage
 For installed-app E2E, install the Expo development client once with `pnpm ios` or `pnpm android`. Keep the dedicated server running in terminal A:
 
 ```bash
-pnpm start:maestro
+pnpm start:e2e
 ```
 
 In terminal B, choose a dedicated device rather than another agent's target, then replay twice unchanged:
 
 ```bash
 argent run list-devices --json
-export YOUMOTION_DEVICE_ID='<iOS UDID or Android emulator serial>'
-maestro --device "$YOUMOTION_DEVICE_ID" test .maestro/flows/emotion-check-in-reminder.yaml
-maestro --device "$YOUMOTION_DEVICE_ID" test .maestro/flows/emotion-check-in-reminder.yaml
+export E2E_DEVICE='<iOS UDID or Android emulator serial>'
+export E2E_PLATFORM='ios'
+pnpm test:e2e -- --flow emotion-check-in-reminder.yaml
 ```
 
 The flow selects English itself and cleans up the reminder it creates. It does not clear storage or read/write journal records.
@@ -90,10 +90,10 @@ The flow selects English itself and cleans up the reminder it creates. It does n
 - `pnpm verify`: Oxlint, TypeScript 7, and 40 Jest suites / 273 tests passed.
 - `pnpm test:coverage`: 40 suites / 273 tests passed; 87.13% statements, 75.60% branches, 83.15% functions, and 90.42% lines.
 - Final `git rebase origin/main` was a no-op because the branch already descends from current `origin/main`; post-rebase `pnpm verify`, coverage, and locale compilation passed again.
-- The saved Maestro flow passed twice unchanged on dedicated iOS simulator `9D5C1782-C1C3-458B-9416-6311D03AD1B9`.
+- The saved Argent flow passed twice unchanged on dedicated iOS simulator `9D5C1782-C1C3-458B-9416-6311D03AD1B9`.
 - Argent device QA verified native delivery with “How are you feeling?”, Settings creation/edit/delete, and outside-tap modal dismissal without changing `09:00`.
 - English and German screenshots are under `docs/screenshots/reminders/`.
 - React Doctor reported no finding in changed feature files. Its repository-wide failure is from pre-existing issues, including the unrelated untracked `recipe-manager-488121-22c7f727efeb.json`, which remains untouched.
-- Focused iOS Harness booted and ran, but `@react-native-harness/ui` could not discover the React Native `Modal` subtree/test IDs in its native query tree. No failing Harness test is committed; the existing shared-modal unit test, two unchanged Maestro passes, and Argent interaction provide the dismissal evidence.
+- Focused iOS Harness booted and ran, but `@react-native-harness/ui` could not discover the React Native `Modal` subtree/test IDs in its native query tree. No failing Harness test is committed; the existing shared-modal unit test and two unchanged Argent passes provide the dismissal evidence.
 - The durable screenshots come from a development client and include its floating React Native Grab gear; the feature layout and copy remain visible, but these are verification captures rather than clean release marketing images.
-- Task-owned generated Maestro run output and temporary Expo documentation downloads were removed; the committed replayable flow and durable screenshots remain.
+- Task-owned generated E2E output and temporary Expo documentation downloads were removed; the committed replayable flow and durable screenshots remain.

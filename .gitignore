@@ -11,11 +11,9 @@ web-build/
 .harness/
 coverage/
 .reassure/
-/artifacts/maestro/
+/artifacts/argent/
 /artifacts/resolution-agent/
 /artifacts/screenshots/
-/.maestro/debug/
-/.maestro/tests/
 expo-env.d.ts
 
 # fbtee
