@@ -1,5 +1,6 @@
 import { fbs } from 'fbtee';
 import { Pressable, StyleSheet, Text } from 'react-native';
+import assert from 'tiny-invariant';
 
 import {
   DATA_ARCHIVE_FAILURE_MESSAGE,
@@ -10,6 +11,8 @@ import {
 import { palette, type } from '@/theme';
 
 const localizedDataSafetyMessage = (message: string) => {
+  assert(DATA_EXPORT_FAILURE_MESSAGE.length > 0 && DATA_ARCHIVE_FAILURE_MESSAGE.length > 0, 'Backup failures require localized source copy.');
+  assert(DATA_RESTORE_FAILURE_MESSAGE.length > 0 && DATA_DELETE_ALL_FAILURE_MESSAGE.length > 0, 'Destructive data failures require localized source copy.');
   if (message === 'Your backup is ready.') {
     return String(fbs('Your backup is ready.', 'Successful data backup export notice'));
   }
@@ -54,6 +57,8 @@ export function DataSafetyMessage({
 }) {
   const message = error ?? notice;
   if (!message) return null;
+  assert(message.trim().length > 0, 'Displayed data safety messages must not be blank.');
+  assert(error === null || message === error, 'Errors must take precedence over notices.');
   return (
     <Pressable
       accessibilityRole={error ? 'alert' : 'button'}

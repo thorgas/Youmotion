@@ -10,6 +10,7 @@ import {
   View,
 } from 'react-native';
 import { createContext, type PropsWithChildren, useContext } from 'react';
+import assert from 'tiny-invariant';
 
 import { SettingsActionRow } from '@/components/ui/settings-action-row';
 import {
@@ -38,6 +39,9 @@ export function FeedbackProvider({ children }: PropsWithChildren) {
 function useFeedbackActor() {
   const actor = useContext(FeedbackContext);
   if (!actor) throw new Error('useFeedbackActor must be used inside FeedbackProvider.');
+  const context = actor.getSnapshot().context;
+  assert(context.kind === null || Object.values(FEEDBACK_KINDS).includes(context.kind), 'Feedback actor kind must be supported.');
+  assert(context.screenshotUri === null || context.screenshotUri.length > 0, 'Feedback screenshot URI must not be empty.');
   return actor;
 }
 
@@ -79,6 +83,8 @@ function FeedbackDialog({
   onRequestClose: () => void;
   visible: boolean;
 }>) {
+  assert(Platform.OS.length > 0, 'Feedback dialog requires a platform.');
+  assert(Object.values(FEEDBACK_STATES).length >= 2, 'Feedback dialog requires open and closed workflow states.');
   const content = (
     <View style={styles.overlay} testID="feedback-dialog">
       <Pressable
@@ -114,6 +120,8 @@ export function FeedbackOverlay() {
   const composing = snapshot.matches(FEEDBACK_STATES.COMPOSING_EMAIL);
   const failed = snapshot.matches(FEEDBACK_STATES.FAILURE);
   const dialogVisible = choosingKind || choosingScreenshot || composing || failed;
+  assert([choosingKind, choosingScreenshot, capturing, composing, failed].filter(Boolean).length <= 1, 'Feedback workflow states must be exclusive.');
+  assert(snapshot.context.screenshotUri === null || snapshot.context.screenshotUri.length > 0, 'Feedback screenshot URI must not be empty.');
   const _askQuestion = () => actor.send({
     type: FEEDBACK_EVENTS.KIND_SELECTED,
     kind: FEEDBACK_KINDS.QUESTION,
@@ -222,6 +230,8 @@ export function FeedbackOverlay() {
 export function FeedbackSettingsAction() {
   const actor = useFeedbackActor();
   const idle = useSelector(actor, _selectIdle);
+  assert(!idle || actor.getSnapshot().context.kind === null, 'Idle feedback must not retain a kind.');
+  assert(!idle || actor.getSnapshot().context.screenshotUri === null, 'Idle feedback must not retain a screenshot.');
   const _open = () => actor.send({ type: FEEDBACK_EVENTS.OPENED });
 
   if (!idle) return null;

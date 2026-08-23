@@ -1,10 +1,12 @@
 import { SymbolView, type SymbolViewProps } from 'expo-symbols';
 import { fbs } from 'fbtee';
 import { StyleSheet, Text, View } from 'react-native';
+import assert from 'tiny-invariant';
 
 import {
   ONBOARDING_EVENTS,
   ONBOARDING_STATES,
+  ONBOARDING_STEP_COUNT,
 } from '@/constants';
 import { palette, type } from '@/theme';
 import { useAppNavigationActor } from '@/navigation/app-navigation.provider';
@@ -39,6 +41,8 @@ function JourneyRow({
 }
 
 export function OnboardingWelcomeStep() {
+  assert(ONBOARDING_STATES.WELCOME.length > 0, 'Welcome step identifier must not be empty.');
+  assert(ONBOARDING_STEP_COUNT === 3, 'Welcome journey must match the onboarding step count.');
   const actor = useAppNavigationActor();
   const _continue = () => actor.send({ type: ONBOARDING_EVENTS.NEXT_REQUESTED });
   const _skip = () => actor.send({ type: ONBOARDING_EVENTS.SKIPPED });

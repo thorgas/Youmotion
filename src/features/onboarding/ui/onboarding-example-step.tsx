@@ -1,5 +1,6 @@
 import { fbs } from 'fbtee';
 import { StyleSheet, Text, View } from 'react-native';
+import assert from 'tiny-invariant';
 
 import {
   ONBOARDING_EVENTS,
@@ -14,6 +15,8 @@ import { OnboardingStepShell } from './onboarding-step-shell';
 export function OnboardingExampleStep() {
   const actor = useAppNavigationActor();
   const selection = onboardingExampleSelection;
+  assert(selection.intensity >= 0 && selection.intensity <= 1, 'Onboarding example intensity must be normalized.');
+  assert(selection.emotionId.length > 0, 'Onboarding example requires an emotion.');
   const _back = () => actor.send({ type: ONBOARDING_EVENTS.BACK_REQUESTED });
   const _finish = () => actor.send({ type: ONBOARDING_EVENTS.FINISHED });
   const _skip = () => actor.send({ type: ONBOARDING_EVENTS.SKIPPED });

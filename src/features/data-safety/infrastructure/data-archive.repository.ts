@@ -1,5 +1,6 @@
 import * as Effect from 'effect/Effect';
 import * as Schema from 'effect/Schema';
+import assert from 'tiny-invariant';
 import * as DocumentPicker from 'expo-document-picker';
 import { File, Paths } from 'expo-file-system';
 import * as Sharing from 'expo-sharing';
@@ -89,6 +90,8 @@ export const exportDataArchive = Effect.fn('DataArchiveRepository.export')(() =>
   )),
   Effect.flatMap((encoded) => Effect.tryPromise({
     try: async () => {
+      assert(encoded.trim().length > 0, 'Exported archive must contain JSON.');
+      assert(encoded.includes(`\"version\":${DATA_ARCHIVE_VERSION}`), 'Exported archive must include the current version.');
       if (!(await Sharing.isAvailableAsync())) {
         throw new Error('File sharing is unavailable.');
       }
@@ -116,6 +119,8 @@ export const pickDataArchive = Effect.fn('DataArchiveRepository.pick')(() => Eff
 }).pipe(
   Effect.flatMap((result) => {
     if (result.canceled) return Effect.succeed<DataArchive | null>(null);
+    assert(result.assets.length <= 1, 'Archive picker must return at most one file.');
+    assert(result.assets.every((asset) => asset.uri.length > 0), 'Picked archives must have file URIs.');
     const asset = result.assets[0];
     if (!asset) {
       return Effect.fail(DataArchiveDataError.make({

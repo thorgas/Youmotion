@@ -1,6 +1,7 @@
 import { useSelector } from '@xstate/react';
 import { PressableScale } from 'pressto';
 import { ActivityIndicator, Pressable, StyleSheet, Text, View } from 'react-native';
+import assert from 'tiny-invariant';
 
 import {
   DATA_SAFETY_EVENTS,
@@ -52,6 +53,8 @@ const _selectDataSafetyView = (
       [NAVIGATION_STATES.SETTINGS]: DATA_SAFETY_STATES.RESTORING,
     },
   });
+  assert([deleting, exporting, picking, restoring].filter(Boolean).length <= 1, 'Data operations must be mutually exclusive.');
+  assert(snapshot.context.dataArchive === null || snapshot.context.dataArchive.version > 0, 'Restore previews require versioned archives.');
   return {
     archive: snapshot.context.dataArchive,
     busy: deleting || exporting || picking || restoring,
@@ -189,6 +192,8 @@ export function DataSafetyControls({ locale }: { locale: string }) {
   const actor = useAppNavigationActor();
   const view = useSelector(actor, _selectDataSafetyView);
   const summary = view.archive ? dataArchiveSummary(view.archive) : null;
+  assert(locale.trim().length > 0, 'Data safety dates require a locale.');
+  assert(summary === null || summary.checkInCount >= 0 && summary.beliefStatementCount >= 0, 'Archive summary counts must not be negative.');
   const _export = () => actor.send({ type: DATA_SAFETY_EVENTS.EXPORT_REQUESTED });
   const _restore = () => actor.send({ type: DATA_SAFETY_EVENTS.RESTORE_REQUESTED });
   const _confirmRestore = () => actor.send({ type: DATA_SAFETY_EVENTS.RESTORE_CONFIRMED });

@@ -1,3 +1,5 @@
+import assert from 'tiny-invariant';
+
 const REFERENCE_PHONE_HEIGHT = 900;
 const REFERENCE_STAR_SIZE = 361;
 const MINIMUM_STAR_SIZE = 248;
@@ -21,6 +23,8 @@ export function onboardingPulseResponsiveLayout({
   height: number;
   width: number;
 }) {
+  assert(width > 0 && height > 0, 'Onboarding Pulse viewport must be positive.');
+  assert(fontScale > 0, 'Onboarding Pulse font scale must be positive.');
   const fullStarSize = Math.min(
     width - STAR_HORIZONTAL_INSET,
     MAXIMUM_STAR_SIZE,

@@ -1,5 +1,6 @@
 import { useMachine } from '@xstate/react';
 import { useCallback, type PropsWithChildren } from 'react';
+import assert from 'tiny-invariant';
 import { StyleSheet, View } from 'react-native';
 import Animated, {
   Easing,
@@ -30,6 +31,8 @@ function SplashOverlay({
   onLogoReady,
   revealActive,
 }: SplashOverlayProps) {
+  assert(SPLASH_OVERLAY_FADE_DURATION > 0, 'Splash fade duration must be positive.');
+  assert(!isFading || revealActive, 'Fading splash must keep the reveal active.');
   const opacity = useDerivedValue(
     () => withTiming(isFading ? 0 : 1, {
       duration: SPLASH_OVERLAY_FADE_DURATION,
@@ -57,6 +60,8 @@ export function AnimatedSplashScreen({ children }: PropsWithChildren) {
   const isFading = snapshot.matches(SPLASH_STATES.FADING);
   const isComplete = snapshot.matches(SPLASH_STATES.COMPLETE);
   const revealActive = snapshot.matches(SPLASH_STATES.REVEALING) || isFading;
+  assert(!(isComplete && isFading), 'Complete and fading splash states must be exclusive.');
+  assert(SPLASH_OVERLAY_FADE_DURATION > 0, 'Animated splash requires a positive fade duration.');
   const _handleLayout = useCallback(() => {
     if (reduceMotion) {
       actor.send({ type: SPLASH_EVENTS.REDUCED_MOTION_LAYOUT_READY });

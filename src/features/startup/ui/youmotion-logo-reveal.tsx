@@ -12,6 +12,7 @@ import {
 } from 'react-native-reanimated';
 import { Image, StyleSheet, View } from 'react-native';
 import Svg, { Defs, Image as SvgImage, Mask, Path } from 'react-native-svg';
+import assert from 'tiny-invariant';
 
 import {
   SPLASH_LOGO_REVEAL_DURATION,
@@ -60,9 +61,13 @@ export function YoumotionLogoReveal({
   active,
   onReady,
 }: YoumotionLogoRevealProps) {
+  assert(SPLASH_LOGO_SIZE > 0, 'Splash logo size must be positive.');
+  assert(SPLASH_LOGO_REVEAL_DURATION > 0, 'Splash reveal duration must be positive.');
   const reduceMotion = useReducedMotion();
   const progress = useDerivedValue(
     () => {
+      assert(SPLASH_LOGO_SIZE > 0, 'Animated splash logo size must be positive.');
+      assert(SPLASH_LOGO_REVEAL_DURATION > 0, 'Animated splash reveal duration must be positive.');
       if (!active) return 0;
       if (reduceMotion) return 1;
       return withTiming(1, {

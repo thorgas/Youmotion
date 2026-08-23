@@ -13,6 +13,7 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import assert from 'tiny-invariant';
 
 import { AppBackButton } from '@/components/ui/app-back-button';
 import {
@@ -68,6 +69,8 @@ export function OnboardingStepShell({
   step,
   stepLabel,
 }: OnboardingStepShellProps) {
+  assert(Object.values(ONBOARDING_STATES).includes(step), 'Onboarding shell step must be supported.');
+  assert(primaryLabel.trim().length > 0 && stepLabel.trim().length > 0, 'Onboarding shell labels must not be blank.');
   const stepNumber = onboardingStepNumber(step);
   const progressLabel = String(fbs(
     'Step '

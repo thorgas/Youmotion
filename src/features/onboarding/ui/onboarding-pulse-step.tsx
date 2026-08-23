@@ -1,6 +1,7 @@
 import { useSelector } from '@xstate/react';
 import { fbs } from 'fbtee';
 import { useRef } from 'react';
+import assert from 'tiny-invariant';
 import {
   StyleSheet,
   Text,
@@ -30,6 +31,8 @@ const _samePreview = ({
   current: EmotionSelection | null;
   next: EmotionSelection | null;
 }) => {
+  assert(current === null || current.intensity >= 0 && current.intensity <= 1, 'Current onboarding selection must be normalized.');
+  assert(next === null || next.intensity >= 0 && next.intensity <= 1, 'Next onboarding selection must be normalized.');
   if (!current || !next) return current === next;
   return current.emotionId === next.emotionId && current.level === next.level;
 };
@@ -41,6 +44,8 @@ const _sameSelection = ({
   current: EmotionSelection | null;
   next: EmotionSelection | null;
 }) => {
+  assert(current === null || current.intensity >= 0 && current.intensity <= 1, 'Current full onboarding selection must be normalized.');
+  assert(next === null || next.intensity >= 0 && next.intensity <= 1, 'Next full onboarding selection must be normalized.');
   if (!_samePreview({ current, next })) return false;
   if (!current || !next) return true;
   return current.intensity === next.intensity && current.color === next.color;
@@ -51,6 +56,8 @@ export function OnboardingPulseStep() {
   const selection = useSelector(actor, _selectOnboardingSelection);
   const window = useWindowDimensions();
   const responsive = onboardingPulseResponsiveLayout(window);
+  assert(selection === null || selection.intensity >= 0 && selection.intensity <= 1, 'Onboarding selection must be normalized.');
+  assert(responsive.starContentInset >= 0, 'Onboarding star inset must not be negative.');
   const latestSelection = useRef(selection);
   const publishedSelection = useRef(selection);
   const _back = () => actor.send({ type: ONBOARDING_EVENTS.BACK_REQUESTED });
@@ -61,6 +68,8 @@ export function OnboardingPulseStep() {
     actor.send({ type: ONBOARDING_EVENTS.TOUCH_STARTED });
   };
   const _selectionChanged = (next: EmotionSelection | null) => {
+    assert(next === null || next.intensity >= 0, 'Changed onboarding intensity must not be negative.');
+    assert(next === null || next.intensity <= 1, 'Changed onboarding intensity must not exceed one.');
     latestSelection.current = next;
     if (_samePreview({ current: publishedSelection.current, next })) return;
     publishedSelection.current = next;
