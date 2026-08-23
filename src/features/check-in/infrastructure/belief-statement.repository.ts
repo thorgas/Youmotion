@@ -1,6 +1,7 @@
 import * as Effect from 'effect/Effect';
 import * as Schema from 'effect/Schema';
 import { SurrealRecordId } from 'react-native-surrealdb';
+import assert from 'tiny-invariant';
 
 import {
   BELIEF_STATEMENT_TABLE,
@@ -58,6 +59,8 @@ const BeliefStatementDatabaseListSchema = Schema.Array(Schema.Union(
 function beliefStatementFromDatabase(
   statement: typeof BeliefStatementDatabaseListSchema.Type[number],
 ): BeliefStatement {
+  assert(statement.beliefSystemId.length > 0, 'Stored belief must have an identifier.');
+  assert(statement.kind === 'built-in' || statement.kind === 'custom', 'Stored belief kind must be supported.');
   if (statement.kind === 'built-in') return statement;
   const { guidingStatement, archivedAt, ...custom } = statement;
   return CustomBeliefStatementSchema.make({
@@ -176,6 +179,8 @@ export const retireCustomBeliefStatement = Effect.fn(
 }) => (
   isBeliefStatementReferenced(statement.beliefSystemId).pipe(
     Effect.flatMap((referenced) => {
+      assert(statement.kind === 'custom', 'Only custom beliefs can be retired.');
+      assert(archivedAt.length > 0, 'Retired beliefs require an archive timestamp.');
       if (!referenced) {
         return deleteBeliefStatement(statement.beliefSystemId).pipe(
           Effect.as<CustomBeliefStatement | null>(null),

@@ -26,6 +26,7 @@ import {
   useKeyboardState,
 } from 'react-native-keyboard-controller';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import assert from 'tiny-invariant';
 
 import { AppBackButton } from '@/components/ui/app-back-button';
 import { ConfirmedPickerModal } from '@/components/ui/confirmed-picker-modal';
@@ -97,6 +98,8 @@ export function MomentTimeControl({ disabled }: { disabled: boolean }) {
   const locale = useStoreSelector(appSettingsStore, _selectLocale);
   const occurredAt = snapshot.context.occurredAtDraft;
   const pickerMode = snapshot.context.momentTimePickerMode;
+  assert(occurredAt === null || !Number.isNaN(new Date(occurredAt).getTime()), 'Moment time must be a valid timestamp.');
+  assert(pickerMode === null || pickerMode === 'date' || pickerMode === 'time', 'Moment picker mode must be supported.');
   const _open = () => {
     Keyboard.dismiss();
     actor.send({ type: CHECK_IN_EVENTS.MOMENT_TIME_EDITOR_OPENED });
@@ -282,6 +285,8 @@ function recommendationsForSelection({
   selection: EmotionSelection | null;
   statements: readonly BeliefStatement[];
 }) {
+  assert(selection === null || selection.intensity >= 0 && selection.intensity <= 1, 'Recommendation selection intensity must be normalized.');
+  assert(history.every((entry) => entry.id.length > 0), 'Recommendation history requires identifiers.');
   if (!selection) return [];
   return recommendedBeliefSystemIds({
     emotionId: selection.emotionId,
@@ -301,6 +306,8 @@ function BeliefSystemOption({
   selected: boolean;
   statements: readonly BeliefStatement[];
 }) {
+  assert(id === null || id.length > 0, 'Belief option identifier must not be empty.');
+  assert(statements.every((statement) => statement.beliefSystemId.length > 0), 'Belief options require statement identifiers.');
   const actor = useAppNavigationActor();
   const _select = () => actor.send({
     type: CHECK_IN_EVENTS.BELIEF_SYSTEM_CHANGED,
@@ -338,6 +345,8 @@ function BeliefSystemSuggestion({
   selected: boolean;
   statements: readonly BeliefStatement[];
 }) {
+  assert(id.length > 0, 'Belief suggestion identifier must not be empty.');
+  assert(statements.every((statement) => statement.beliefSystemId.length > 0), 'Belief suggestions require statement identifiers.');
   const actor = useAppNavigationActor();
   const _toggle = () => actor.send({
     type: CHECK_IN_EVENTS.BELIEF_SYSTEM_CHANGED,
@@ -482,6 +491,8 @@ function ReflectionNoteStep() {
   const editingEntry = snapshot.context.editing;
   const editing = editingEntry !== null;
   const saveForNowVisible = ![editing, saving, failed].includes(true);
+  assert(snapshot.context.note.length <= MAX_NOTE_LENGTH, 'Reflection note must respect its input limit.');
+  assert(selection === null || selection.intensity >= 0 && selection.intensity <= 1, 'Reflection selection intensity must be normalized.');
 
   const _noteChanged = (note: string) => actor.send({ type: CHECK_IN_EVENTS.NOTE_CHANGED, note });
   const _back = () => actor.send({ type: CHECK_IN_EVENTS.REFLECTION_CANCELLED });
@@ -651,6 +662,8 @@ function BeliefSystemStep() {
     : initialSuggestions;
   const attaching = snapshot.matches(CHECK_IN_STATES.ATTACHING_BELIEF_SYSTEM);
   const failed = snapshot.matches(CHECK_IN_STATES.BELIEF_SYSTEM_FAILURE);
+  assert(selection === null || selection.intensity >= 0 && selection.intensity <= 1, 'Belief step selection intensity must be normalized.');
+  assert(quickSuggestions.length <= 3, 'Quick belief suggestions must remain bounded.');
 
   const _back = () => actor.send({ type: CHECK_IN_EVENTS.BELIEF_SYSTEM_BACK_REQUESTED });
   const _browse = () => actor.send({ type: CHECK_IN_EVENTS.BELIEF_SYSTEM_CATALOG_REQUESTED });
@@ -792,6 +805,8 @@ function BeliefSystemCatalogStep() {
     selection,
     statements,
   });
+  assert(selection === null || selection.intensity >= 0 && selection.intensity <= 1, 'Belief catalog selection intensity must be normalized.');
+  assert(recommendations.every((id) => id.length > 0), 'Belief recommendations require identifiers.');
   const _close = () => actor.send({ type: CHECK_IN_EVENTS.BELIEF_SYSTEM_CATALOG_CLOSED });
   const _create = () => actor.send({
     type: CHECK_IN_EVENTS.CUSTOM_BELIEF_SYSTEM_REQUESTED,
@@ -907,6 +922,8 @@ function BeliefSystemEditorStep() {
   const saving = snapshot.matches(CHECK_IN_STATES.PERSISTING_BELIEF_STATEMENT);
   const failed = snapshot.matches(CHECK_IN_STATES.BELIEF_STATEMENT_FAILURE);
   const harmfulReady = snapshot.context.beliefStatementDraft.trim().length > 0;
+  assert(snapshot.context.beliefStatementDraft.length <= MAX_BELIEF_STATEMENT_LENGTH, 'Belief draft must respect its input limit.');
+  assert(snapshot.context.beliefStatements.every((statement) => statement.beliefSystemId.length > 0), 'Belief editor statements require identifiers.');
 
   const _beliefChanged = (statement: string) => actor.send({
     type: CHECK_IN_EVENTS.BELIEF_SYSTEM_DRAFT_CHANGED,
@@ -982,6 +999,8 @@ function BeliefSystemEditorStep() {
 export function ReflectionScreen() {
   const actor = useAppNavigationActor();
   const snapshot = useSelector(actor, _selectSnapshot);
+  assert(snapshot.context.note.length <= MAX_NOTE_LENGTH, 'Reflection note must respect its input limit.');
+  assert(snapshot.context.beliefStatementDraft.length <= MAX_BELIEF_STATEMENT_LENGTH, 'Belief draft must respect its input limit.');
 
   if (snapshot.matches(NAVIGATION_STATES.TABS)) return null;
   if (snapshot.matches(CHECK_IN_STATES.BELIEF_SYSTEM_CATALOG)) {

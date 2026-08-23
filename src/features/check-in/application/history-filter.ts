@@ -1,4 +1,5 @@
 import { HISTORY_CONTENT_FILTERS } from '@/constants';
+import assert from 'tiny-invariant';
 import type { CheckIn, EmotionId } from '../domain/check-in';
 import type { BeliefSystemId } from '../domain/belief-statement';
 
@@ -19,7 +20,9 @@ export function filterHistoryEntries({
   searchableText: (entry: CheckIn) => string;
 }) {
   const query = filters.query.trim().toLocaleLowerCase();
-  return entries.filter((entry) => {
+  const filtered = entries.filter((entry) => {
+    assert(entry.id.length > 0, 'Filtered history entry must have an identifier.');
+    assert(entry.intensity >= 0 && entry.intensity <= 1, 'Filtered history entry intensity must be normalized.');
     if (filters.emotionId !== null && entry.emotionId !== filters.emotionId) return false;
     if (
       filters.beliefSystemId !== null
@@ -31,4 +34,7 @@ export function filterHistoryEntries({
     }
     return query === '' || searchableText(entry).toLocaleLowerCase().includes(query);
   });
+  assert(filtered.length <= entries.length, 'Filtering must not add history entries.');
+  assert(filtered.every((entry) => entries.includes(entry)), 'Filtering must preserve entry identity.');
+  return filtered;
 }

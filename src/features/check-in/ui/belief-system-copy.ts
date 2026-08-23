@@ -1,4 +1,5 @@
 import { fbs } from 'fbtee';
+import assert from 'tiny-invariant';
 
 import { BELIEF_SYSTEM_IDS } from '@/constants';
 
@@ -112,6 +113,8 @@ export function beliefSystemText(
     statements?: readonly BeliefStatement[];
   },
 ) {
+  assert(id.length > 0, 'Belief copy requires an identifier.');
+  assert(statements.every((statement) => statement.beliefSystemId.length > 0), 'Belief copy statements require identifiers.');
   const statement = beliefStatementForId({ beliefSystemId: id, statements });
   if (statement?.kind === 'custom') return statement.harmfulStatement;
   return copyById.get(id)?.() ?? _fallback();

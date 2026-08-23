@@ -7,6 +7,7 @@ import Animated, {
   ZoomIn,
 } from 'react-native-reanimated';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import assert from 'tiny-invariant';
 
 import {
   CHECK_IN_EVENTS,
@@ -48,6 +49,8 @@ export function SuccessScreen() {
   const actor = useAppNavigationActor();
   const context = useSelector(actor, _selectContext);
   const saved = context.saved;
+  assert(saved === null || saved.id.length > 0, 'Saved check-in must have an identifier.');
+  assert(saved === null || saved.intensity >= 0 && saved.intensity <= 1, 'Saved check-in intensity must be normalized.');
   const guidingStatement = saved?.beliefSystemId
     ? guidingBeliefSystemText({
         id: saved.beliefSystemId,

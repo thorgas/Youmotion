@@ -9,6 +9,7 @@ import {
 } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import assert from 'tiny-invariant';
 
 import { AppBackButton } from '@/components/ui/app-back-button';
 import {
@@ -49,6 +50,8 @@ function GuidingBeliefFinishLabel({
   canSave: boolean;
   failed: boolean;
 }) {
+  assert(MAX_BELIEF_STATEMENT_LENGTH > 0, 'Guiding belief input limit must be positive.');
+  assert(REFLECTION_KEYBOARD_BOTTOM_OFFSET >= 0, 'Guiding belief keyboard offset must not be negative.');
   if (failed) {
     return (
       <Text style={styles.primaryText}>
@@ -77,6 +80,8 @@ function GuidingBeliefFinishLabel({
 function guidingBeliefViewModel(snapshot: NavigationSnapshot) {
   const beliefSystemId = snapshot.context.beliefSystemId;
   const statements = snapshot.context.beliefStatements;
+  assert(statements.every((item) => item.beliefSystemId.length > 0), 'Guiding belief statements require identifiers.');
+  assert(snapshot.context.guidingBeliefStatementDraft.length <= MAX_BELIEF_STATEMENT_LENGTH, 'Guiding belief draft must respect its input limit.');
   const statement = beliefSystemId
     ? beliefStatementForId({ beliefSystemId, statements })
     : undefined;
@@ -122,6 +127,8 @@ export function GuidingBeliefScreen() {
     selectedText,
     statement,
   } = guidingBeliefViewModel(snapshot);
+  assert(snapshot.context.beliefStatementDraft.length <= MAX_BELIEF_STATEMENT_LENGTH, 'Core belief draft must respect its input limit.');
+  assert(snapshot.context.guidingBeliefStatementDraft.length <= MAX_BELIEF_STATEMENT_LENGTH, 'Guiding belief draft must respect its input limit.');
 
   const _back = () => actor.send({
     type: CHECK_IN_EVENTS.GUIDING_BELIEF_BACK_REQUESTED,

@@ -1,3 +1,5 @@
+import assert from 'tiny-invariant';
+
 const REFERENCE_PHONE_WIDTH = 390;
 const MINIMUM_PHONE_SCALE = 0.9;
 const COMPACT_USABLE_HEIGHT = 700;
@@ -21,6 +23,8 @@ export function reflectionResponsiveLayout({
   platform: string;
   width: number;
 }) {
+  assert(width > 0 && height > 0, 'Reflection viewport dimensions must be positive.');
+  assert(keyboardHeight >= 0, 'Reflection keyboard height must not be negative.');
   const widthScale = clamp({
     maximum: 1,
     minimum: MINIMUM_PHONE_SCALE,

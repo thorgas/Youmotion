@@ -1,6 +1,7 @@
 import { EMOTION_IDS } from '@/constants';
 
 import type { CheckIn, EmotionId, EmotionSelection } from './check-in';
+import assert from 'tiny-invariant';
 
 export type Emotion = Readonly<{
   id: EmotionId;
@@ -55,6 +56,8 @@ export const emotions: readonly Emotion[] = [
 ];
 
 export function selectionForCheckIn(checkIn: CheckIn): EmotionSelection {
+  assert(checkIn.intensity >= 0, 'Check-in intensity must not be negative.');
+  assert(checkIn.intensity <= 1, 'Check-in intensity must not exceed one.');
   const emotion = emotions.find((candidate) => candidate.id === checkIn.emotionId);
   if (!emotion) throw new Error('A decoded check-in must reference a known emotion.');
 

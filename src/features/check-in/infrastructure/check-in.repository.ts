@@ -2,6 +2,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Effect from 'effect/Effect';
 import * as Schema from 'effect/Schema';
 import { SurrealRecordId } from 'react-native-surrealdb';
+import assert from 'tiny-invariant';
 
 import {
   CHECK_IN_STORAGE_KEY,
@@ -87,6 +88,8 @@ const CheckInDatabaseListSchema = Schema.Array(CheckInDatabaseSchema);
 function checkInFromDatabase(
   entry: typeof CheckInDatabaseSchema.Type,
 ): CheckIn {
+  assert(entry.id.length > 0, 'Stored check-in must have an identifier.');
+  assert(entry.intensity >= 0 && entry.intensity <= 1, 'Stored check-in intensity must be normalized.');
   const {
     beliefSystemId,
     guidingStatementSnapshot,
@@ -176,6 +179,8 @@ export const persistCheckIn = Effect.fn('CheckInRepository.persist')(({
   beliefSystemId: CheckIn['beliefSystemId'] | null;
   existing: CheckIn | null;
 }) => {
+  assert(selection.intensity >= 0 && selection.intensity <= 1, 'Persisted intensity must be normalized.');
+  assert(occurredAt.length > 0, 'Persisted check-in must have an occurrence timestamp.');
   const identity = existing ?? {
     id: CheckInId.make(`${Date.now()}-${Math.random().toString(16).slice(2)}`),
     createdAt: CheckInTimestamp.make(new Date().toISOString()),

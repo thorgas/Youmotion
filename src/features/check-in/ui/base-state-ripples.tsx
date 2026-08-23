@@ -8,6 +8,7 @@ import Animated, {
   type FrameInfo,
   type SharedValue,
 } from 'react-native-reanimated';
+import assert from 'tiny-invariant';
 
 import { BASE_RIPPLE_DURATION, BASE_RIPPLE_PHASES } from '@/constants';
 import { palette } from '@/theme';
@@ -49,6 +50,8 @@ function RippleOrigin() {
 }
 
 export function BaseStateRipples({ offsetX, offsetY }: BaseStateRipplesProps) {
+  assert(BASE_RIPPLE_DURATION > 0, 'Ripple duration must be positive.');
+  assert(BASE_RIPPLE_PHASES.every((phase) => phase >= 0 && phase < 1), 'Ripple phases must be normalized.');
   const progress = useSharedValue(0);
   const reduceMotion = useReducedMotion();
   const originStyle = useAnimatedStyle(() => ({
@@ -75,6 +78,8 @@ export function BaseStateRipples({ offsetX, offsetY }: BaseStateRipplesProps) {
 }
 
 export function CenteredBaseStateRipples() {
+  assert(BASE_RIPPLE_PHASES.length > 0, 'Centered ripples require at least one phase.');
+  assert(BASE_RIPPLE_DURATION > 0, 'Centered ripple duration must be positive.');
   const offsetX = useSharedValue(0);
   const offsetY = useSharedValue(0);
   return <BaseStateRipples offsetX={offsetX} offsetY={offsetY} />;

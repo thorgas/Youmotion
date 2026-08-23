@@ -4,6 +4,7 @@ import Animated, {
   useAnimatedStyle,
   withTiming,
 } from 'react-native-reanimated';
+import assert from 'tiny-invariant';
 
 import { MOTION_DURATION } from '@/constants';
 import { palette, type } from '@/theme';
@@ -18,6 +19,8 @@ const progressAnimation = {
 };
 
 function ProgressEyebrow({ context }: { context: ProgressHeaderContext }) {
+  assert(['reflection', 'editing', 'core-belief', 'guiding-belief'].includes(context), 'Progress context must be supported.');
+  assert(MOTION_DURATION.STATE > 0, 'Progress animation duration must be positive.');
   if (context === 'editing') {
     return (
       <Text style={styles.eyebrow}>
@@ -78,6 +81,8 @@ function progressStatus({
   activeStep: ProgressStep;
   step: ProgressStep;
 }): ProgressStatus {
+  assert(activeStep >= 1 && activeStep <= 3, 'Active progress step must be in range.');
+  assert(step >= 1 && step <= 3, 'Progress step must be in range.');
   if (step === activeStep) return 'active';
   if (step < activeStep) return 'complete';
   return 'upcoming';
@@ -90,6 +95,8 @@ function Step({
   activeStep: ProgressStep;
   step: ProgressStep;
 }) {
+  assert(activeStep >= 1 && activeStep <= 3, 'Active progress step must be in range.');
+  assert(step >= 1 && step <= 3, 'Rendered progress step must be in range.');
   const status = progressStatus({ activeStep, step });
   const segmentStyle = useAnimatedStyle(() => ({
     backgroundColor: withTiming(

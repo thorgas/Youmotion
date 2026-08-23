@@ -4,6 +4,7 @@ import { PressableScale } from 'pressto';
 import { useRef } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import assert from 'tiny-invariant';
 
 import {
   CHECK_IN_EVENTS,
@@ -31,6 +32,8 @@ const _samePreview = ({
   current: EmotionSelection | null;
   next: EmotionSelection | null;
 }) => {
+  assert(current === null || current.intensity >= 0 && current.intensity <= 1, 'Current selection intensity must be normalized.');
+  assert(next === null || next.intensity >= 0 && next.intensity <= 1, 'Next selection intensity must be normalized.');
   if (!current || !next) return current === next;
   return current.emotionId === next.emotionId && current.level === next.level;
 };
@@ -41,6 +44,8 @@ const _sameSelection = ({
   current: EmotionSelection | null;
   next: EmotionSelection | null;
 }) => {
+  assert(current === null || current.intensity >= 0 && current.intensity <= 1, 'Current full selection intensity must be normalized.');
+  assert(next === null || next.intensity >= 0 && next.intensity <= 1, 'Next full selection intensity must be normalized.');
   if (!_samePreview({ current, next })) return false;
   if (!current || !next) return true;
   return current.intensity === next.intensity && current.color === next.color;
@@ -54,6 +59,8 @@ export function CheckInScreen() {
   const publishedSelection = useRef(snapshot.context.selection);
   const latest = entries[0];
   const editing = snapshot.context.editing !== null;
+  assert(entries.every((entry) => entry.id.length > 0), 'Rendered history entries require identifiers.');
+  assert(snapshot.context.selection === null || snapshot.context.selection.intensity >= 0 && snapshot.context.selection.intensity <= 1, 'Rendered selection intensity must be normalized.');
   const centerOrigin = snapshot.matches({
     [NAVIGATION_STATES.TABS]: {
       [NAVIGATION_STATES.TODAY]: CHECK_IN_STATES.IDLE,
@@ -66,6 +73,8 @@ export function CheckInScreen() {
     actor.send({ type: CHECK_IN_EVENTS.TOUCH_STARTED });
   };
   const _selectionChanged = (selection: EmotionSelection | null) => {
+    assert(selection === null || selection.intensity >= 0, 'Changed selection intensity must not be negative.');
+    assert(selection === null || selection.intensity <= 1, 'Changed selection intensity must not exceed one.');
     latestSelection.current = selection;
     if (_samePreview({ current: publishedSelection.current, next: selection })) return;
     publishedSelection.current = selection;

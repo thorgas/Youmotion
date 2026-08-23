@@ -1,4 +1,5 @@
 import * as Schema from 'effect/Schema';
+import assert from 'tiny-invariant';
 
 import {
   BELIEF_SYSTEM_IDS,
@@ -115,6 +116,8 @@ export function customBeliefSystemIds(
       ids.push(statement.beliefSystemId);
     }
   }
+  assert(ids.length <= statements.length, 'Custom belief IDs must be a subset of statements.');
+  assert(ids.every((id) => isCustomBeliefSystemId(id)), 'Custom belief IDs must retain their namespace.');
   return ids;
 }
 
@@ -127,6 +130,8 @@ export function activeCustomBeliefStatements(
       active.push(statement);
     }
   }
+  assert(active.length <= statements.length, 'Active beliefs must be a subset of statements.');
+  assert(active.every((statement) => statement.archivedAt === undefined), 'Active beliefs must not be archived.');
   return active;
 }
 
@@ -140,10 +145,12 @@ export function recordBeliefStatement({
   const existing = statements.some(
     (candidate) => candidate.beliefSystemId === statement.beliefSystemId,
   );
-  if (!existing) return statements.concat(statement);
-  return statements.map((candidate) => (
+  const recorded = !existing ? statements.concat(statement) : statements.map((candidate) => (
     candidate.beliefSystemId === statement.beliefSystemId ? statement : candidate
   ));
+  assert(recorded.some((candidate) => candidate === statement), 'Recorded beliefs must contain the supplied statement.');
+  assert(recorded.length === statements.length + (existing ? 0 : 1), 'Recording must replace or append exactly one belief.');
+  return recorded;
 }
 
 export function removeBeliefStatement({

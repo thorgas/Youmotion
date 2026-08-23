@@ -1,4 +1,5 @@
 import { useSelector } from '@xstate/store-react';
+import assert from 'tiny-invariant';
 import { fbs } from 'fbtee';
 import { PanResponder, StyleSheet, Text, useWindowDimensions, View, type AccessibilityActionEvent, type AccessibilityActionInfo, type StyleProp, type TextStyle } from 'react-native';
 import Animated, {
@@ -162,6 +163,8 @@ function EmotionField({
         </Svg>
       </Animated.View>
       {emotions.map((emotion, index) => {
+        assert(emotion.nuanceCount > 0, 'Rendered emotions require nuances.');
+        assert(index >= 0 && index < emotions.length, 'Rendered emotion index must be in range.');
         const angle = emotionAngle(index);
         const label = _polar({ center, radius: radius * 0.86, angle });
         const isActive = selection !== null && selection.emotionId === emotion.id;
@@ -195,6 +198,8 @@ export function EmotionStar({
   const size = Math.min(width - 32 - contentInset, 390);
   const center = size / 2;
   const radius = size * 0.45;
+  assert(size > 0, 'Emotion star must have a positive size.');
+  assert(selection === null || selection.intensity >= 0 && selection.intensity <= 1, 'Emotion star selection intensity must be normalized.');
   const rippleOffsetX = useSharedValue(0);
   const rippleOffsetY = useSharedValue(0);
   const promptStyle = useAnimatedStyle(() => ({
@@ -202,6 +207,8 @@ export function EmotionStar({
   }), [selection]);
 
   const _updateSelection = ({ x, y }: { x: number; y: number }) => {
+    assert(Number.isFinite(x) && Number.isFinite(y), 'Touch coordinates must be finite.');
+    assert(radius > 0, 'Touch selection requires a positive radius.');
     const maxRadius = radius * 0.8;
     const point = pointConstrainedToRadius({
       point: { x, y },
@@ -233,6 +240,8 @@ export function EmotionStar({
     onPanResponderTerminate: onCancel,
   });
   const _accessibilityAction = (event: AccessibilityActionEvent) => {
+    assert(event.nativeEvent.actionName.length > 0, 'Accessibility actions require a name.');
+    assert(selection === null || selection.intensity >= 0 && selection.intensity <= 1, 'Accessible selection intensity must be normalized.');
     if (disabled) return;
     const { actionName } = event.nativeEvent;
     if (actionName === EMOTION_STAR_ACCESSIBILITY_ACTIONS.CONFIRM) {

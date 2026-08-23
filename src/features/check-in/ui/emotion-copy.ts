@@ -1,4 +1,5 @@
 import { fbs } from 'fbtee';
+import assert from 'tiny-invariant';
 
 import { EMOTION_IDS } from '@/constants';
 import type { EmotionId, EmotionSelection } from '../domain/check-in';
@@ -123,6 +124,8 @@ export function emotionNuance({
   intensity: number;
   level?: number | undefined;
 }) {
+  assert(intensity >= 0, 'Emotion nuance intensity must not be negative.');
+  assert(intensity <= 1, 'Emotion nuance intensity must not exceed one.');
   const copy = emotionCopy.get(emotionId);
   if (!copy) return _fallbackNuance();
   const resolvedLevel = level ?? Math.min(Math.floor(intensity * copy.nuances.length), copy.nuances.length - 1);

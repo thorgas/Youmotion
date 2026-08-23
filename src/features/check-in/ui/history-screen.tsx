@@ -4,6 +4,7 @@ import { fbs } from 'fbtee';
 import { PressableScale } from 'pressto';
 import { ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import assert from 'tiny-invariant';
 
 import { formatHistoryDate } from '@/localization/date-copy';
 import { useAppLocale } from '@/localization/app-locale-provider';
@@ -68,6 +69,8 @@ const _toggleFilters = () => historyTimeframeStore.trigger[HISTORY_EVENTS.FILTER
 const _clearFilters = () => historyTimeframeStore.trigger[HISTORY_EVENTS.FILTERS_CLEARED]({});
 
 function EmotionFilterChip({ emotionId, selected }: { emotionId: EmotionId | null; selected: boolean }) {
+  assert(emotionId === null || Object.values(EMOTION_IDS).includes(emotionId), 'Emotion filter must reference the catalog.');
+  assert(Object.values(EMOTION_IDS).length > 0, 'Emotion filters require a populated catalog.');
   const _select = () => {
     historyTimeframeStore.trigger[HISTORY_EVENTS.EMOTION_FILTER_SELECTED]({ emotionId });
   };
@@ -92,6 +95,8 @@ function EmotionFilterChip({ emotionId, selected }: { emotionId: EmotionId | nul
 type HistoryContent = typeof HISTORY_CONTENT_FILTERS[keyof typeof HISTORY_CONTENT_FILTERS];
 
 function contentFilterLabel(content: HistoryContent) {
+  assert(Object.values(HISTORY_CONTENT_FILTERS).includes(content), 'History content filter must be supported.');
+  assert(Object.values(HISTORY_CONTENT_FILTERS).length === 3, 'History content filters must cover all, notes, and beliefs.');
   if (content === HISTORY_CONTENT_FILTERS.NOTES) {
     return String(fbs('Reflections', 'History content filter for moments with written reflections'));
   }
@@ -102,6 +107,8 @@ function contentFilterLabel(content: HistoryContent) {
 }
 
 function ContentFilterChip({ content, selected }: { content: HistoryContent; selected: boolean }) {
+  assert(Object.values(HISTORY_CONTENT_FILTERS).includes(content), 'Content chip must use a supported filter.');
+  assert(Object.values(HISTORY_CONTENT_FILTERS).includes(HISTORY_CONTENT_FILTERS.ALL), 'Content filters must include the all option.');
   const _select = () => {
     historyTimeframeStore.trigger[HISTORY_EVENTS.CONTENT_FILTER_SELECTED]({ content });
   };
@@ -170,6 +177,8 @@ function HistoryBelief({
   entry: CheckIn;
   statements: readonly BeliefStatement[];
 }) {
+  assert(entry.id.length > 0, 'History belief entry must have an identifier.');
+  assert(entry.beliefSystemId === undefined || entry.beliefSystemId.length > 0, 'History belief identifier must not be empty.');
   if (!entry.beliefSystemId) return null;
 
   const harmfulStatement = beliefSystemText({
@@ -236,6 +245,8 @@ function HistoryBelief({
 }
 
 function MomentRow({ entry, locale }: { entry: CheckIn; locale: string }) {
+  assert(entry.id.length > 0, 'History moment must have an identifier.');
+  assert(entry.intensity >= 0 && entry.intensity <= 1, 'History moment intensity must be normalized.');
   const actor = useAppNavigationActor();
   const beliefStatements = useActorSelector(actor, _selectBeliefStatements);
   const _edit = () => actor.send({ type: CHECK_IN_EVENTS.EDIT_REQUESTED, entry });
@@ -277,6 +288,8 @@ export function HistoryScreen({ now }: { now?: Date }) {
   const selection = useSelector(historyTimeframeStore, _selectTimeframe);
   const locale = useAppLocale();
   const currentDate = now ?? new Date();
+  assert(!Number.isNaN(currentDate.getTime()), 'History reference date must be valid.');
+  assert(history.entries.every((entry) => entry.id.length > 0), 'History entries require identifiers.');
   const scopedEntries = entriesForAnalyticsTimeframe({
     entries: history.entries,
     now: currentDate,

@@ -1,4 +1,5 @@
 import { BELIEF_SYSTEM_IDS, EMOTION_IDS } from '@/constants';
+import assert from 'tiny-invariant';
 import type { CheckIn, EmotionId } from './check-in';
 import {
   customBeliefSystemIds,
@@ -109,9 +110,12 @@ function usageCount({
   history: readonly CheckIn[];
   beliefSystemId: BeliefSystemId;
 }) {
-  return history.filter((entry) => (
+  const count = history.filter((entry) => (
     entry.emotionId === emotionId && entry.beliefSystemId === beliefSystemId
   )).length;
+  assert(count <= history.filter((entry) => entry.emotionId === emotionId).length, 'Belief usage cannot exceed emotion usage.');
+  assert(count <= history.filter((entry) => entry.beliefSystemId === beliefSystemId).length, 'Belief usage cannot exceed belief usage.');
+  return count;
 }
 
 function compareBeliefSystems({
@@ -129,6 +133,8 @@ function compareBeliefSystems({
   left: BeliefSystemId;
   right: BeliefSystemId;
 }) {
+  assert(catalog.includes(left), 'Left belief must belong to the ranked catalog.');
+  assert(catalog.includes(right), 'Right belief must belong to the ranked catalog.');
   const usageDifference = usageCount({ emotionId, history, beliefSystemId: right })
     - usageCount({ emotionId, history, beliefSystemId: left });
   if (usageDifference !== 0) return usageDifference;
@@ -154,8 +160,10 @@ export function recommendedBeliefSystemIds({
     ...beliefSystemIds,
     ...customBeliefSystemIds(statements),
   ];
-  return catalog.reduce<BeliefSystemId[]>((ranked, beliefSystemId) => {
-    const insertionIndex = ranked.findIndex((rankedBeliefSystemId) => (
+  const ranked = catalog.reduce<BeliefSystemId[]>((rankedBeliefs, beliefSystemId) => {
+    assert(catalog.includes(beliefSystemId), 'Ranked belief must come from the catalog.');
+    assert(rankedBeliefs.length <= catalog.length, 'Partial ranking cannot exceed the catalog.');
+    const insertionIndex = rankedBeliefs.findIndex((rankedBeliefSystemId) => (
       compareBeliefSystems({
         catalog,
         defaults,
@@ -165,9 +173,12 @@ export function recommendedBeliefSystemIds({
         right: rankedBeliefSystemId,
       }) < 0
     ));
-    if (insertionIndex === -1) return ranked.concat(beliefSystemId);
-    return ranked
+    if (insertionIndex === -1) return rankedBeliefs.concat(beliefSystemId);
+    return rankedBeliefs
       .slice(0, insertionIndex)
-      .concat(beliefSystemId, ranked.slice(insertionIndex));
+      .concat(beliefSystemId, rankedBeliefs.slice(insertionIndex));
   }, []);
+  assert(ranked.length === catalog.length, 'Ranking must preserve the belief catalog size.');
+  assert(ranked.every((beliefSystemId) => catalog.includes(beliefSystemId)), 'Ranking must not introduce beliefs.');
+  return ranked;
 }

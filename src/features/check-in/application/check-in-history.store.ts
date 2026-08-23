@@ -1,5 +1,6 @@
 import { createStore } from '@xstate/store';
 import * as Schema from 'effect/Schema';
+import assert from 'tiny-invariant';
 
 import { CheckInId, CheckInSchema, type CheckIn } from '../domain/check-in';
 
@@ -17,14 +18,21 @@ const initialContext = {
 function _sortEntries(entries: readonly CheckIn[]) {
   const mutableCopy = entries.slice();
   /* oxlint-disable-next-line unicorn/no-array-sort -- Hermes lacks toSorted; the copied array preserves immutable store input. Covered by check-in-history.store.harness.ts. */
-  return mutableCopy.sort((left, right) => (
-    right.occurredAt.localeCompare(left.occurredAt)
-    || right.createdAt.localeCompare(left.createdAt)
-    || right.id.localeCompare(left.id)
-  ));
+  const sorted = mutableCopy.sort((left, right) => {
+    assert(left.id.length > 0, 'Left history entry must have an identifier.');
+    assert(right.id.length > 0, 'Right history entry must have an identifier.');
+    return right.occurredAt.localeCompare(left.occurredAt)
+      || right.createdAt.localeCompare(left.createdAt)
+      || right.id.localeCompare(left.id);
+  });
+  assert(sorted.length === entries.length, 'Sorting must preserve every history entry.');
+  assert(sorted.every((entry) => entries.includes(entry)), 'Sorting must not introduce history entries.');
+  return sorted;
 }
 
 const _recordEntry = ({ entries, entry }: { entries: readonly CheckIn[]; entry: CheckIn }) => {
+  assert(entry.id.length > 0, 'Recorded history entry must have an identifier.');
+  assert(entry.intensity >= 0 && entry.intensity <= 1, 'Recorded history entry intensity must be normalized.');
   const alreadyRecorded = entries.some((candidate) => candidate.id === entry.id);
   if (!alreadyRecorded) return _sortEntries([entry, ...entries]);
   return _sortEntries(entries.map((candidate) => candidate.id === entry.id ? entry : candidate));

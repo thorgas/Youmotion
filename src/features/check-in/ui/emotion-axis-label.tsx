@@ -6,6 +6,7 @@ import Animated, {
   useAnimatedStyle,
   withTiming,
 } from 'react-native-reanimated';
+import assert from 'tiny-invariant';
 
 import { EMOTION_LABEL_MODES, MOTION_DURATION } from '@/constants';
 import type { EmotionLabelMode } from '@/features/settings/domain/emotion-label-mode';
@@ -39,6 +40,8 @@ export function EmotionAxisLabel({
   x,
   y,
 }: EmotionAxisLabelProps) {
+  assert(emotion.nuanceCount > 0, 'Emotion axis labels require at least one nuance.');
+  assert(Number.isFinite(x) && Number.isFinite(y), 'Emotion axis coordinates must be finite.');
   const showsBoth = labelMode === EMOTION_LABEL_MODES.BOTH;
   const showsWord = labelMode === EMOTION_LABEL_MODES.TEXT || isActive;
   const activeStyle = useAnimatedStyle(() => ({
