@@ -4,7 +4,6 @@ const path = require('node:path');
 const packageJson = require('../../package.json');
 
 const pendingDesignSystemRules = new Set([
-  'no-raw-design-properties',
   'prefer-design-system-components',
   'require-dismissible-modal-backdrop',
 ]);
@@ -63,7 +62,7 @@ describe('architecture lint contract', () => {
       .filter((ruleName) => ruleName !== 'require-assertions')
       .filter((ruleName) => !pendingDesignSystemRules.has(ruleName));
 
-    expect(applicableRules).toHaveLength(19);
+    expect(applicableRules).toHaveLength(20);
     for (const ruleName of applicableRules) {
       expect(configuredRules[`code-architecture/${ruleName}`]?.[0]).toBe(2);
     }
@@ -319,15 +318,30 @@ describe('architecture lint contract', () => {
       [directMessages, 'color'],
       [expressionMessages, 'tintColor'],
     ]) {
-      expect(messages).toEqual([
+      expect(messages).toEqual(expect.arrayContaining([
         expect.objectContaining({
           message: `Raw design value '#EDF0EB' is not allowed for '${property}'. Use palette.selectionWash instead.`,
           ruleId: 'code-architecture/no-raw-design-values',
           severity: 2,
         }),
-      ]);
+      ]));
     }
   });
+
+  it('rejects previously unknown raw colors in design properties', () => {
+    const messages = messagesFor({
+      code: "const styles = { backgroundColor: '#8A3D35' };",
+      filePath: 'src/features/settings/ui/contract-fixture.tsx',
+    });
+
+    expect(messages).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        ruleId: 'code-architecture/no-raw-design-properties',
+        severity: 2,
+      }),
+    ]));
+  });
+
   it('ignores raw design values in unrelated JSX properties', () => {
     const messages = messagesFor({
       code: 'const view = <Text testID="#EDF0EB" />;',

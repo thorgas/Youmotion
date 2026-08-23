@@ -2,7 +2,7 @@ import type { ReactNode } from 'react';
 import { Modal, Pressable, StyleSheet, Text, View } from 'react-native';
 import { PressableScale } from 'pressto';
 
-import { actionColors, palette, type } from '@/theme';
+import { actionColors, overlayColors, palette, type } from '@/theme';
 
 export function ConfirmedPickerModal({
   children,
@@ -57,7 +57,7 @@ const styles = StyleSheet.create({
   backdrop: {
     flex: 1,
     justifyContent: 'flex-end',
-    backgroundColor: 'rgba(20, 23, 20, 0.34)',
+    backgroundColor: overlayColors.picker,
     padding: 16,
     paddingBottom: 28,
   },

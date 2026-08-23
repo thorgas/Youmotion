@@ -8,7 +8,7 @@ import {
   DATA_EXPORT_FAILURE_MESSAGE,
   DATA_RESTORE_FAILURE_MESSAGE,
 } from '@/constants';
-import { palette, type } from '@/theme';
+import { palette, surfaceColors, type } from '@/theme';
 
 const localizedDataSafetyMessage = (message: string) => {
   assert(DATA_EXPORT_FAILURE_MESSAGE.length > 0 && DATA_ARCHIVE_FAILURE_MESSAGE.length > 0, 'Backup failures require localized source copy.');
@@ -78,6 +78,6 @@ const styles = StyleSheet.create({
     marginTop: 14,
     padding: 14,
   },
-  errorNotice: { backgroundColor: '#F5E8E5' },
+  errorNotice: { backgroundColor: surfaceColors.dangerNotice },
   noticeText: { fontFamily: type.medium, color: palette.ink, fontSize: 13, lineHeight: 19 },
 });

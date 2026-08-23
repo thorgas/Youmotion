@@ -7,7 +7,7 @@ import {
   type ViewStyle,
 } from 'react-native';
 
-import { actionColors, palette, type } from '@/theme';
+import { actionColors, borderColors, palette, type } from '@/theme';
 
 export function PersonalBeliefCreateButton({
   disabled = false,
@@ -55,7 +55,7 @@ const styles = StyleSheet.create({
     borderRadius: 18,
     borderCurve: 'continuous',
     borderWidth: 1,
-    borderColor: 'rgba(94, 111, 97, 0.28)',
+    borderColor: borderColors.moss28,
     backgroundColor: 'transparent',
     paddingHorizontal: 16,
     paddingVertical: 12,

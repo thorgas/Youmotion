@@ -5,7 +5,7 @@ import { StyleSheet, Text, View } from 'react-native';
 import {
   ANALYTICS_TIMEFRAMES,
 } from '@/constants';
-import { palette, type } from '@/theme';
+import { interactionColors, palette, type } from '@/theme';
 import type { AppLocale } from '@/features/settings/domain/app-locale';
 import {
   analyticsDateRange,
@@ -101,7 +101,7 @@ const styles = StyleSheet.create({
     marginTop: 9,
     padding: 4,
     borderRadius: 16,
-    backgroundColor: 'rgba(42, 39, 34, 0.06)',
+    backgroundColor: interactionColors.inkWash,
   },
   option: {
     flex: 1,

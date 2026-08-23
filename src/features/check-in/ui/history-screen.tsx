@@ -38,7 +38,7 @@ import {
   confirmCheckInDeletion,
   editMomentAccessibilityHint,
 } from './check-in-deletion';
-import { palette, type } from '@/theme';
+import { borderColors, palette, surfaceColors, type } from '@/theme';
 
 const _selectHistory = (state: ReturnType<typeof checkInHistoryStore.getSnapshot>) => state.context;
 const _selectTimeframe = (state: ReturnType<typeof historyTimeframeStore.getSnapshot>) => (
@@ -430,7 +430,7 @@ const styles = StyleSheet.create({
     borderColor: palette.hairline,
     backgroundColor: palette.paperRaised,
   },
-  filterToggleActive: { borderColor: palette.moss, backgroundColor: '#F0F2ED' },
+  filterToggleActive: { borderColor: palette.moss, backgroundColor: surfaceColors.mossWash },
   filterToggleText: { fontFamily: type.semibold, color: palette.ink, fontSize: 13 },
   filterPanel: {
     gap: 10,
@@ -501,7 +501,7 @@ const styles = StyleSheet.create({
   },
   guidingBeliefCard: {
     backgroundColor: palette.selectionWash,
-    borderColor: 'rgba(94, 111, 97, 0.2)',
+    borderColor: borderColors.moss20,
     borderRadius: 14,
     borderWidth: 1,
     marginTop: 3,

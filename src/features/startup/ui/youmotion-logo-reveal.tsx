@@ -19,6 +19,7 @@ import {
   SPLASH_LOGO_SIZE,
 } from '@/constants';
 import appLogo from '@/assets/images/app-logo-transparent.png';
+import { actionColors } from '@/theme';
 
 type YoumotionLogoRevealProps = {
   active: boolean;
@@ -157,7 +158,7 @@ export function YoumotionLogoReveal({
               animatedProps={headProps}
               d={HEAD_PATH}
               fill="none"
-              stroke="white"
+              stroke={actionColors.primaryForeground}
               strokeDasharray={900}
               strokeLinecap="round"
               strokeLinejoin="round"
@@ -167,7 +168,7 @@ export function YoumotionLogoReveal({
               animatedProps={faceProps}
               d={FACE_PATH}
               fill="none"
-              stroke="white"
+              stroke={actionColors.primaryForeground}
               strokeDasharray={100}
               strokeLinecap="round"
               strokeLinejoin="round"
@@ -177,7 +178,7 @@ export function YoumotionLogoReveal({
               animatedProps={blueArrowProps}
               d={BLUE_ARROW_PATH}
               fill="none"
-              stroke="white"
+              stroke={actionColors.primaryForeground}
               strokeDasharray={220}
               strokeLinecap="round"
               strokeLinejoin="round"
@@ -187,7 +188,7 @@ export function YoumotionLogoReveal({
               animatedProps={purpleArrowProps}
               d={PURPLE_ARROW_PATH}
               fill="none"
-              stroke="white"
+              stroke={actionColors.primaryForeground}
               strokeDasharray={360}
               strokeLinecap="round"
               strokeLinejoin="round"
@@ -197,7 +198,7 @@ export function YoumotionLogoReveal({
               animatedProps={centerProps}
               d={CENTER_PATH}
               fill="none"
-              stroke="white"
+              stroke={actionColors.primaryForeground}
               strokeDasharray={260}
               strokeLinecap="round"
               strokeLinejoin="round"
@@ -207,7 +208,7 @@ export function YoumotionLogoReveal({
               animatedProps={redArrowProps}
               d={RED_ARROW_PATH}
               fill="none"
-              stroke="white"
+              stroke={actionColors.primaryForeground}
               strokeDasharray={220}
               strokeLinecap="round"
               strokeLinejoin="round"
@@ -217,7 +218,7 @@ export function YoumotionLogoReveal({
               animatedProps={downArrowProps}
               d={DOWN_ARROW_PATH}
               fill="none"
-              stroke="white"
+              stroke={actionColors.primaryForeground}
               strokeDasharray={210}
               strokeLinecap="round"
               strokeLinejoin="round"

@@ -8,7 +8,7 @@ import {
   DATA_SAFETY_STATES,
   NAVIGATION_STATES,
 } from '@/constants';
-import { actionColors, palette, type } from '@/theme';
+import { actionColors, borderColors, palette, surfaceColors, type } from '@/theme';
 import { formatHistoryDate } from '@/localization/date-copy';
 import {
   type AppNavigationActor,
@@ -263,7 +263,7 @@ export function DataSafetyControls({ locale }: { locale: string }) {
 const styles = StyleSheet.create({
   localSummary: {
     backgroundColor: palette.selectionWash,
-    borderColor: 'rgba(94, 111, 97, 0.22)',
+    borderColor: borderColors.moss22,
     borderCurve: 'continuous',
     borderRadius: 24,
     borderWidth: 1,
@@ -290,7 +290,7 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   dangerGroup: {
-    borderColor: 'rgba(157, 78, 66, 0.20)',
+    borderColor: borderColors.dangerSoft,
     borderCurve: 'continuous',
     borderRadius: 18,
     borderWidth: 1,
@@ -298,10 +298,10 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   action: { minHeight: 76, flexDirection: 'row', alignItems: 'center', gap: 12, paddingHorizontal: 17, paddingVertical: 14 },
-  destructiveAction: { backgroundColor: '#FBF4F1' },
+  destructiveAction: { backgroundColor: surfaceColors.danger },
   actionCopy: { flex: 1 },
   actionTitle: { fontFamily: type.semibold, color: palette.ink, fontSize: 15 },
-  destructiveText: { color: '#8A3D35' },
+  destructiveText: { color: actionColors.destructiveBackground },
   actionDescription: { fontFamily: type.regular, color: palette.inkMuted, fontSize: 12, lineHeight: 18, marginTop: 3 },
   chevron: { fontFamily: type.regular, color: palette.inkMuted, fontSize: 24, lineHeight: 24 },
   divider: { height: 1, backgroundColor: palette.hairline, marginLeft: 17 },
@@ -316,6 +316,6 @@ const styles = StyleSheet.create({
   secondaryButton: { flex: 1, minHeight: 44, alignItems: 'center', justifyContent: 'center', borderColor: palette.hairline, borderRadius: 14, borderWidth: 1 },
   secondaryButtonText: { fontFamily: type.semibold, color: palette.ink, fontSize: 14 },
   primaryButton: { flex: 1, minHeight: 44, alignItems: 'center', justifyContent: 'center', backgroundColor: actionColors.primaryBackground, borderRadius: 14 },
-  destructiveButton: { flex: 1, minHeight: 44, alignItems: 'center', justifyContent: 'center', backgroundColor: '#8A3D35', borderRadius: 14 },
+  destructiveButton: { flex: 1, minHeight: 44, alignItems: 'center', justifyContent: 'center', backgroundColor: actionColors.destructiveBackground, borderRadius: 14 },
   primaryButtonText: { fontFamily: type.semibold, color: actionColors.primaryForeground, fontSize: 14 },
 });

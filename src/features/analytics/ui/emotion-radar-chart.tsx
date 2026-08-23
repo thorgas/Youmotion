@@ -15,7 +15,7 @@ import { StyleSheet, View } from 'react-native';
 import assert from 'tiny-invariant';
 
 import { APP_TYPE } from '@/constants';
-import { palette } from '@/theme';
+import { chartColors, palette } from '@/theme';
 import type { EmotionFrequency } from '../domain/check-in-analytics';
 
 registerECharts([RadarChart, RadarComponent, SVGRenderer]);
@@ -84,7 +84,7 @@ export class EmotionRadarChart extends PureComponent<EmotionRadarChartProps> {
     return {
       animation: false,
       radar: {
-        axisLine: { lineStyle: { color: 'rgba(42, 39, 34, 0.16)' } },
+        axisLine: { lineStyle: { color: chartColors.axis } },
         axisName: {
           color: palette.ink,
           fontFamily: APP_TYPE.medium,
@@ -111,14 +111,14 @@ export class EmotionRadarChart extends PureComponent<EmotionRadarChartProps> {
         shape: 'circle',
         splitArea: {
           areaStyle: {
-            color: ['rgba(94, 111, 97, 0.02)', 'rgba(94, 111, 97, 0.06)'],
+            color: [chartColors.mossGradientStart, chartColors.mossGradientEnd],
           },
         },
-        splitLine: { lineStyle: { color: 'rgba(42, 39, 34, 0.10)' } },
+        splitLine: { lineStyle: { color: chartColors.grid } },
         splitNumber: 4,
       },
       series: [{
-        areaStyle: { color: 'rgba(94, 111, 97, 0.24)' },
+        areaStyle: { color: chartColors.mossArea },
         data: [{ value: this.props.frequencies.map(({ count }) => count) }],
         lineStyle: { color: palette.moss, width: 2 },
         symbol: 'circle',

@@ -80,7 +80,7 @@ import { CheckInProgressHeader } from './check-in-progress';
 import { PersonalBeliefCreateButton } from './personal-belief-create-button';
 import { beginReflectionInputSession } from './reflection-input-session';
 import { reflectionResponsiveLayout } from './reflection-responsive-layout';
-import { actionColors, palette, type } from '@/theme';
+import { actionColors, overlayColors, palette, surfaceColors, type } from '@/theme';
 
 const _selectSnapshot = (
   snapshot: ReturnType<ReturnType<typeof useAppNavigationActor>['getSnapshot']>,
@@ -1100,7 +1100,7 @@ const styles = StyleSheet.create({
   },
   momentTimeModalBackdrop: {
     alignItems: 'center',
-    backgroundColor: 'rgba(24, 22, 19, 0.42)',
+    backgroundColor: overlayColors.dialog,
     flex: 1,
     justifyContent: 'center',
     padding: 22,
@@ -1146,7 +1146,7 @@ const styles = StyleSheet.create({
   momentTimeIosControls: { gap: 10 },
   momentTimeIosControl: {
     alignItems: 'center',
-    backgroundColor: '#F4F0E9',
+    backgroundColor: surfaceColors.field,
     borderCurve: 'continuous',
     borderRadius: 14,
     flexDirection: 'row',
@@ -1158,7 +1158,7 @@ const styles = StyleSheet.create({
   momentTimeIosPicker: { width: 160 },
   momentTimeAndroidControls: { gap: 10 },
   momentTimeAndroidButton: {
-    backgroundColor: '#F4F0E9',
+    backgroundColor: surfaceColors.field,
     borderCurve: 'continuous',
     borderRadius: 14,
     minHeight: 58,
@@ -1245,7 +1245,7 @@ const styles = StyleSheet.create({
   input: {
     minHeight: 150,
     borderRadius: 18,
-    backgroundColor: '#F4F0E9',
+    backgroundColor: surfaceColors.field,
     borderColor: palette.hairline,
     borderCurve: 'continuous',
     borderWidth: 1,
@@ -1369,7 +1369,7 @@ const styles = StyleSheet.create({
     minHeight: 112,
     borderRadius: 18,
     borderCurve: 'continuous',
-    backgroundColor: '#F0EAE0',
+    backgroundColor: surfaceColors.belief,
     padding: 16,
     fontFamily: type.regular,
     color: palette.ink,
@@ -1383,7 +1383,7 @@ const styles = StyleSheet.create({
     padding: 16,
     borderRadius: 18,
     borderCurve: 'continuous',
-    backgroundColor: '#F0EAE0',
+    backgroundColor: surfaceColors.belief,
   },
   sourceBeliefText: {
     fontFamily: type.medium,

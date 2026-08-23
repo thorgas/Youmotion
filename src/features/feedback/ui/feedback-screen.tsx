@@ -19,7 +19,7 @@ import {
   FEEDBACK_KINDS,
   FEEDBACK_STATES,
 } from '@/constants';
-import { actionColors, palette, type } from '@/theme';
+import { actionColors, overlayColors, palette, type } from '@/theme';
 import { feedbackMachine } from '../application/feedback.machine';
 
 type FeedbackActor = ReturnType<typeof useMachine<typeof feedbackMachine>>[2];
@@ -264,7 +264,7 @@ const styles = StyleSheet.create({
     zIndex: 30,
   },
   backdrop: {
-    backgroundColor: 'rgba(42, 39, 34, 0.36)',
+    backgroundColor: overlayColors.feedback,
     bottom: 0,
     left: 0,
     position: 'absolute',

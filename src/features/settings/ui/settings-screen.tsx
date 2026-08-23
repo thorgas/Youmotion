@@ -34,7 +34,7 @@ import {
   tabScreenTitleStyle,
 } from '@/components/ui/tab-screen-layout';
 import { SettingsActionRow } from '@/components/ui/settings-action-row';
-import { actionColors, palette, type } from '@/theme';
+import { actionColors, palette, surfaceColors, type } from '@/theme';
 import { DataSafetyControls } from '@/features/data-safety/ui/data-safety-controls';
 import { FeedbackSettingsAction } from '@/features/feedback/ui/feedback-screen';
 import { useAppNavigationActor } from '@/navigation/app-navigation.provider';
@@ -355,7 +355,7 @@ const styles = StyleSheet.create({
   infoGroup: {
     borderRadius: 20,
     borderCurve: 'continuous',
-    backgroundColor: '#F2EFEA',
+    backgroundColor: surfaceColors.subtle,
     paddingHorizontal: 18,
     marginTop: 24,
     marginBottom: 24,

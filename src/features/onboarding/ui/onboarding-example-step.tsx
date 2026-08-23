@@ -7,7 +7,7 @@ import {
   ONBOARDING_STATES,
 } from '@/constants';
 import { emotionName, emotionNuance } from '@/features/check-in/ui/emotion-copy';
-import { palette, type } from '@/theme';
+import { palette, surfaceColors, type } from '@/theme';
 import { useAppNavigationActor } from '@/navigation/app-navigation.provider';
 import { onboardingExampleSelection } from '../domain/onboarding';
 import { OnboardingStepShell } from './onboarding-step-shell';
@@ -147,7 +147,7 @@ const styles = StyleSheet.create({
     lineHeight: 18,
   },
   beliefCard: {
-    backgroundColor: '#F2EFEA',
+    backgroundColor: surfaceColors.subtle,
     borderCurve: 'continuous',
     borderRadius: 22,
     marginTop: 14,

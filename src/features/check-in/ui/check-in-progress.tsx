@@ -7,7 +7,7 @@ import Animated, {
 import assert from 'tiny-invariant';
 
 import { MOTION_DURATION } from '@/constants';
-import { palette, type } from '@/theme';
+import { chartColors, palette, type } from '@/theme';
 
 type ProgressStep = 1 | 2 | 3;
 type ProgressStatus = 'active' | 'complete' | 'upcoming';
@@ -104,7 +104,7 @@ function Step({
         ? palette.ink
         : status === 'complete'
           ? palette.moss
-          : 'rgba(42, 39, 34, 0.10)',
+          : chartColors.grid,
       progressAnimation,
     ),
   }), [status]);

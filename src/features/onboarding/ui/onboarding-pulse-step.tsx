@@ -15,7 +15,7 @@ import {
 } from '@/constants';
 import type { EmotionSelection } from '@/features/check-in/domain/check-in';
 import { EmotionStar } from '@/features/check-in/ui/emotion-star';
-import { palette, type } from '@/theme';
+import { palette, surfaceColors, type } from '@/theme';
 import { useAppNavigationActor } from '@/navigation/app-navigation.provider';
 import { onboardingPulseResponsiveLayout } from './onboarding-pulse-responsive-layout';
 import { OnboardingStepShell } from './onboarding-step-shell';
@@ -180,7 +180,7 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
   explanation: {
-    backgroundColor: '#F2EFEA',
+    backgroundColor: surfaceColors.subtle,
     borderCurve: 'continuous',
     borderRadius: 18,
     marginTop: 12,

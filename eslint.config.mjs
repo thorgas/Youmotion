@@ -21,6 +21,9 @@ const colorProperties = [
   'textDecorationColor',
   'tintColor',
   'underlineColorAndroid',
+  'accentColor',
+  'tabBarActiveTintColor',
+  'tabBarInactiveTintColor',
 ];
 
 const domainLiterals = [
@@ -242,6 +245,29 @@ export default tseslint.config(
           ],
         },
       ],
+      'code-architecture/no-raw-design-properties': [
+        'error',
+        {
+          allowedFiles: ['src/theme.ts'],
+          properties: [
+            {
+              allowedValues: ['none', 'transparent'],
+              names: colorProperties,
+              replacement: 'semantic color tokens from @/theme',
+            },
+          ],
+        },
+      ],
+    },
+  },
+  {
+    files: [
+      'src/**/__tests__/**',
+      'src/**/*.harness.{ts,tsx}',
+      'src/**/*.test.{ts,tsx}',
+    ],
+    rules: {
+      'code-architecture/no-raw-design-properties': 'off',
     },
   },
   {

@@ -37,7 +37,7 @@ import {
 } from '@/features/check-in/ui/belief-card-label';
 import { GuidingBeliefWritingHelp } from '@/features/check-in/ui/guiding-belief-writing-help';
 import { PersonalBeliefCreateButton } from '@/features/check-in/ui/personal-belief-create-button';
-import { actionColors, palette, type } from '@/theme';
+import { actionColors, palette, surfaceColors, type } from '@/theme';
 import type {
   GuidingBeliefReminderAssignment,
   ReminderAssignment,
@@ -723,7 +723,7 @@ const styles = StyleSheet.create({
   input: {
     minHeight: 112,
     borderRadius: 18,
-    backgroundColor: '#F3EEE6',
+    backgroundColor: surfaceColors.input,
     padding: 16,
     fontFamily: type.medium,
     color: palette.ink,

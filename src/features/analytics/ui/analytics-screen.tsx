@@ -31,7 +31,7 @@ import type { CheckIn } from '@/features/check-in/domain/check-in';
 import { emotions } from '@/features/check-in/domain/emotion';
 import type { BeliefStatement } from '@/features/check-in/domain/belief-statement';
 import { emotionName } from '@/features/check-in/ui/emotion-copy';
-import { palette, type } from '@/theme';
+import { borderColors, interactionColors, palette, surfaceColors, type } from '@/theme';
 import type { AppLocale } from '@/features/settings/domain/app-locale';
 import { useAppLocale } from '@/localization/app-locale-provider';
 import { useAppNavigationActor } from '@/navigation/app-navigation.provider';
@@ -897,8 +897,8 @@ const styles = StyleSheet.create({
     borderRadius: 24,
     borderCurve: 'continuous',
     borderWidth: 1,
-    borderColor: 'rgba(94, 111, 97, 0.24)',
-    backgroundColor: '#F0F2ED',
+    borderColor: borderColors.moss24,
+    backgroundColor: surfaceColors.mossWash,
   },
   insightTabs: {
     flexDirection: 'row',
@@ -907,7 +907,7 @@ const styles = StyleSheet.create({
     padding: 4,
     borderRadius: 15,
     borderCurve: 'continuous',
-    backgroundColor: 'rgba(94, 111, 97, 0.09)',
+    backgroundColor: interactionColors.mossWash,
   },
   insightTab: {
     flex: 1,
@@ -947,7 +947,7 @@ const styles = StyleSheet.create({
     borderRadius: 15,
     backgroundColor: palette.paperRaised,
     borderWidth: 1,
-    borderColor: 'rgba(94, 111, 97, 0.18)',
+    borderColor: borderColors.moss18,
     paddingHorizontal: 15,
   },
   insightEvidenceButtonText: { flex: 1, fontFamily: type.semibold, color: palette.ink, fontSize: 13 },
@@ -1052,7 +1052,7 @@ const styles = StyleSheet.create({
     paddingTop: 7,
     alignItems: 'center',
   },
-  calendarToday: { backgroundColor: 'rgba(94, 111, 97, 0.10)' },
+  calendarToday: { backgroundColor: interactionColors.today },
   calendarDayNumber: { fontFamily: type.medium, color: palette.ink, fontSize: 12 },
   calendarTodayNumber: { fontFamily: type.semibold, color: palette.moss },
   calendarDots: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', gap: 3, width: 30, marginTop: 6 },
