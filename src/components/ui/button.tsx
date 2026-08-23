@@ -1,4 +1,4 @@
-import { createContext, use, type ReactNode } from 'react';
+import { createContext, use, useMemo, type ReactNode } from 'react';
 import { PressableScale } from 'pressto';
 import {
   ActivityIndicator,
@@ -48,9 +48,10 @@ function ButtonRoot({
   assert(label.trim().length > 0, 'Button accessibility label must not be empty.');
   assert(buttonSizes.includes(size) && buttonVariants.includes(variant), 'Button size and variant must be supported.');
   const unavailable = disabled || loading;
+  const contextValue = useMemo(() => ({ size, variant }), [size, variant]);
 
   return (
-    <ButtonContext.Provider value={{ size, variant }}>
+    <ButtonContext.Provider value={contextValue}>
       <PressableScale
         accessibilityLabel={label}
         accessibilityRole="button"
