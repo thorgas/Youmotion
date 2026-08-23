@@ -22,9 +22,8 @@ import {
 } from '@/constants';
 import {
   tabScreenContentStyle,
-  tabScreenEyebrowStyle,
-  tabScreenTitleStyle,
 } from '@/components/ui/tab-screen-layout';
+import { ScreenHeading } from '@/components/ui/screen-heading';
 import { checkInHistoryStore } from '@/features/check-in/application/check-in-history.store';
 import { historyTimeframeStore } from '@/features/check-in/application/history-timeframe.store';
 import type { CheckIn } from '@/features/check-in/domain/check-in';
@@ -779,8 +778,10 @@ export function AnalyticsContent({ entries, locale, now, onEvidencePress, statem
     <View style={styles.page} testID="analytics-screen">
       <SafeAreaView edges={['top']} style={styles.safeArea}>
         <ScrollView contentContainerStyle={styles.content}>
-          <Text style={styles.eyebrow} testID="analytics-eyebrow"><fbt desc="Analytics screen eyebrow">YOUR INSIGHTS</fbt></Text>
-          <Text style={styles.title}><fbt desc="Analytics screen title">Patterns you noticed.</fbt></Text>
+          <ScreenHeading.Root>
+            <ScreenHeading.Eyebrow testID="analytics-eyebrow"><fbt desc="Analytics screen eyebrow">YOUR INSIGHTS</fbt></ScreenHeading.Eyebrow>
+            <ScreenHeading.Title size="compact"><fbt desc="Analytics screen title">Patterns you noticed.</fbt></ScreenHeading.Title>
+          </ScreenHeading.Root>
           <Text style={styles.intro}>
             <fbt desc="Analytics screen explanation and privacy note">
               A private view of the moments you recorded on this device.
@@ -883,13 +884,6 @@ const styles = StyleSheet.create({
   page: { flex: 1, backgroundColor: palette.paper },
   safeArea: { flex: 1 },
   content: tabScreenContentStyle,
-  eyebrow: tabScreenEyebrowStyle,
-  title: {
-    ...tabScreenTitleStyle,
-    fontSize: 27,
-    lineHeight: 33,
-    marginTop: 6,
-  },
   intro: { fontFamily: type.regular, color: palette.inkMuted, fontSize: 14, lineHeight: 21, marginTop: 10 },
   insightCard: {
     marginTop: 24,

@@ -11,10 +11,7 @@ import {
   CHECK_IN_STATES,
   NAVIGATION_STATES,
 } from '@/constants';
-import {
-  tabScreenEyebrowStyle,
-  tabScreenTitleStyle,
-} from '@/components/ui/tab-screen-layout';
+import { ScreenHeading } from '@/components/ui/screen-heading';
 import { useAppNavigationActor } from '@/navigation/app-navigation.provider';
 import type { EmotionSelection } from '../domain/check-in';
 import { selectionForCheckIn } from '../domain/emotion';
@@ -97,14 +94,16 @@ export function CheckInScreen() {
       <SafeAreaView edges={['top']} style={styles.safeArea}>
         <View style={styles.gestureRegion} testID="check-in-gesture-region">
           <View style={styles.header}>
-            <Text style={styles.eyebrow} testID="today-eyebrow">
-              <fbt desc="Today check-in screen eyebrow heading">TODAY</fbt>
-            </Text>
-            <Text style={styles.title}>
-              {editing
-                ? <fbt desc="Question shown while changing the feeling in an existing check-in">How did you feel then?</fbt>
-                : <fbt desc="Question asking the user about their current feeling">How are you feeling right now?</fbt>}
-            </Text>
+            <ScreenHeading.Root>
+              <ScreenHeading.Eyebrow testID="today-eyebrow">
+                <fbt desc="Today check-in screen eyebrow heading">TODAY</fbt>
+              </ScreenHeading.Eyebrow>
+              <ScreenHeading.Title style={styles.titleLayout}>
+                {editing
+                  ? <fbt desc="Question shown while changing the feeling in an existing check-in">How did you feel then?</fbt>
+                  : <fbt desc="Question asking the user about their current feeling">How are you feeling right now?</fbt>}
+              </ScreenHeading.Title>
+            </ScreenHeading.Root>
           </View>
           <View style={styles.starCard} testID="today-pulse-card">
             <EmotionStar
@@ -157,9 +156,7 @@ const styles = StyleSheet.create({
   detailsScroll: { flex: 1, width: '100%', maxWidth: 520, alignSelf: 'center' },
   detailsContent: { flexGrow: 1, paddingHorizontal: 16, paddingBottom: 32 },
   header: { marginTop: 18, paddingHorizontal: 6 },
-  eyebrow: tabScreenEyebrowStyle,
-  title: {
-    ...tabScreenTitleStyle,
+  titleLayout: {
     letterSpacing: -0.6,
     maxWidth: 330,
   },

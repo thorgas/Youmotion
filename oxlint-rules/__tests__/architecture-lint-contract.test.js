@@ -280,6 +280,23 @@ describe('architecture lint contract', () => {
     ]));
   });
 
+  it('protects shared screen-heading typography from consumer overrides', () => {
+    const messages = messagesFor({
+      code: `
+        import { ScreenHeading } from '@/components/ui/screen-heading';
+        const view = <ScreenHeading.Title style={{ fontSize: 48 }}>Title</ScreenHeading.Title>;
+      `,
+      filePath: 'src/features/settings/ui/contract-fixture.tsx',
+    });
+
+    expect(messages).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        ruleId: 'code-architecture/no-design-identity-overrides',
+        severity: 2,
+      }),
+    ]));
+  });
+
   it('requires the shared button interaction contract', () => {
     const messages = messagesFor({
       code: `

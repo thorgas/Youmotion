@@ -104,6 +104,17 @@ export default tseslint.config(
               names: ['Button.Root', 'Button.Text'],
               styleAttributes: ['style'],
             },
+            {
+              identityProperties: [
+                'color',
+                'fontFamily',
+                'fontSize',
+                'letterSpacing',
+                'lineHeight',
+              ],
+              names: ['ScreenHeading.Eyebrow', 'ScreenHeading.Title'],
+              styleAttributes: ['style'],
+            },
           ],
         },
       ],

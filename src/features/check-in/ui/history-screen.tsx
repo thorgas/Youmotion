@@ -17,9 +17,8 @@ import {
 } from '@/constants';
 import {
   tabScreenContentStyle,
-  tabScreenEyebrowStyle,
-  tabScreenTitleStyle,
 } from '@/components/ui/tab-screen-layout';
+import { ScreenHeading } from '@/components/ui/screen-heading';
 import { AnalyticsTimeframeSelector } from '@/features/analytics/ui/analytics-timeframe-selector';
 import { entriesForAnalyticsTimeframe } from '@/features/analytics/domain/analytics-timeframe';
 import { useAppNavigationActor } from '@/navigation/app-navigation.provider';
@@ -317,8 +316,10 @@ export function HistoryScreen({ now }: { now?: Date }) {
     <View style={styles.page} testID="history-screen">
       <SafeAreaView edges={['top']} style={styles.safeArea}>
         <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
-          <Text style={styles.eyebrow} testID="history-eyebrow"><fbt desc="Check-in history eyebrow heading">YOUR HISTORY</fbt></Text>
-          <Text style={styles.title}><fbt desc="Check-in history title">Moments you noticed.</fbt></Text>
+          <ScreenHeading.Root>
+            <ScreenHeading.Eyebrow testID="history-eyebrow"><fbt desc="Check-in history eyebrow heading">YOUR HISTORY</fbt></ScreenHeading.Eyebrow>
+            <ScreenHeading.Title size="compact"><fbt desc="Check-in history title">Moments you noticed.</fbt></ScreenHeading.Title>
+          </ScreenHeading.Root>
           <View style={styles.localStatus}>
             <View style={styles.localStatusDot} />
             <Text style={styles.intro}><fbt desc="Privacy note above check-in history">Your check-ins stay locally on this device.</fbt></Text>
@@ -393,13 +394,6 @@ const styles = StyleSheet.create({
   page: { flex: 1, backgroundColor: palette.paper },
   safeArea: { flex: 1 },
   content: tabScreenContentStyle,
-  eyebrow: tabScreenEyebrowStyle,
-  title: {
-    ...tabScreenTitleStyle,
-    fontSize: 27,
-    lineHeight: 33,
-    marginTop: 6,
-  },
   localStatus: { flexDirection: 'row', alignItems: 'center', gap: 7, marginTop: 11 },
   localStatusDot: { width: 6, height: 6, borderRadius: 3, backgroundColor: palette.moss },
   intro: { fontFamily: type.regular, color: palette.inkMuted, fontSize: 13, lineHeight: 19 },

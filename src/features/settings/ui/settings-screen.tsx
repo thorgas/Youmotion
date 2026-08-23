@@ -28,11 +28,8 @@ import {
   REMINDER_EVENTS,
   SETTINGS_EVENTS,
 } from '@/constants';
-import {
-  tabScreenContentStyle,
-  tabScreenEyebrowStyle,
-  tabScreenTitleStyle,
-} from '@/components/ui/tab-screen-layout';
+import { tabScreenContentStyle } from '@/components/ui/tab-screen-layout';
+import { ScreenHeading } from '@/components/ui/screen-heading';
 import { SettingsActionRow } from '@/components/ui/settings-action-row';
 import { actionColors, palette, surfaceColors, type } from '@/theme';
 import { DataSafetyControls } from '@/features/data-safety/ui/data-safety-controls';
@@ -165,8 +162,10 @@ export function SettingsScreen() {
     <View style={styles.page} testID="settings-screen">
       <SafeAreaView edges={['top']} style={styles.safeArea}>
         <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
-        <Text style={styles.eyebrow} testID="settings-eyebrow"><fbt desc="Settings screen eyebrow heading">SETTINGS</fbt></Text>
-        <Text style={styles.title}><fbt desc="Settings screen title">Your space.</fbt></Text>
+        <ScreenHeading.Root>
+          <ScreenHeading.Eyebrow testID="settings-eyebrow"><fbt desc="Settings screen eyebrow heading">SETTINGS</fbt></ScreenHeading.Eyebrow>
+          <ScreenHeading.Title style={styles.titleLayout}><fbt desc="Settings screen title">Your space.</fbt></ScreenHeading.Title>
+        </ScreenHeading.Root>
         <Text style={styles.sectionHeading}>
           <fbt desc="Heading grouping app preferences in settings">PREFERENCES</fbt>
         </Text>
@@ -303,11 +302,7 @@ const styles = StyleSheet.create({
   page: { flex: 1, backgroundColor: palette.paper },
   safeArea: { flex: 1 },
   content: tabScreenContentStyle,
-  eyebrow: tabScreenEyebrowStyle,
-  title: {
-    ...tabScreenTitleStyle,
-    marginBottom: 30,
-  },
+  titleLayout: { marginBottom: 30 },
   sectionHeading: {
     fontFamily: type.semibold,
     color: palette.inkMuted,
