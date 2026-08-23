@@ -1,0 +1,61 @@
+steps:
+  - echo: Create, persist, inspect, and delete a synthetic check-in without using production data.
+  - launch: com.youmotion.mobile
+  - tool: open-url
+    args:
+      url: exp+youmotion://expo-development-client/?url=http%3A%2F%2F127.0.0.1%3A8091
+  - await: { visible: { id: emotion-star }, timeout: 30000 }
+  - when:
+      visible: { id: xmark }
+    steps:
+      - tap: { id: xmark }
+      - await: { hidden: { id: xmark }, timeout: 5000 }
+  - tool: gesture-swipe
+    args:
+      fromX: 0.5
+      fromY: 0.54
+      toX: 0.5
+      toY: 0.34
+      durationMs: 1000
+  - await: { visible: { id: reflection-note-input }, timeout: 10000 }
+  - tap: { id: reflection-note-input }
+  - tool: keyboard
+    args:
+      text: ArgentCheckInMoment
+  - tap: { text: What is present right now? }
+  - tap: { id: reflection-save }
+  - await: { visible: { text: Does a core belief fit this moment? }, timeout: 10000 }
+  - tap: { id: belief-system-suggestion-always-functioning }
+  - tap: { id: belief-system-finish }
+  - await: { visible: { id: guiding-belief-screen }, timeout: 10000 }
+  - tap: { id: guiding-belief-finish }
+  - await: { visible: { text: You arrived with yourself }, timeout: 10000 }
+  - tap: { id: check-in-done }
+  - await: { visible: { id: emotion-star }, timeout: 5000 }
+  - tap: { id: tab-history }
+  - await: { visible: { text: ArgentCheckInMoment }, timeout: 5000 }
+  - tap: { text: ArgentCheckInMoment, role: button }
+  - await: { visible: { text: EDIT MOMENT }, timeout: 5000 }
+  - tap: { id: reflection-note-input }
+  - tap: { text: Edit this moment. }
+  - tap: { id: delete-edited-moment }
+  - await: { visible: { text: Delete this moment? }, timeout: 5000 }
+  - when:
+      platform: ios
+    steps:
+      - tool: keyboard
+        args: { key: tab }
+      - tool: keyboard
+        args: { key: arrow-right }
+      - tool: keyboard
+        args: { key: enter }
+  - when:
+      platform: android
+    steps:
+      - tap: { text: { matches: '^Delete$' } }
+  - await: { visible: { text: YOUR HISTORY }, timeout: 15000 }
+  - await: { hidden: { text: ArgentCheckInMoment }, timeout: 5000 }
+  - tap: { id: tab-analytics }
+  - await: { visible: { text: YOUR INSIGHTS }, timeout: 5000 }
+  - tap: { id: analytics-timeframe-all }
+  - await: { visible: { text: EMOTIONAL CONSTELLATION }, timeout: 5000 }

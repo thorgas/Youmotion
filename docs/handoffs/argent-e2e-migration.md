@@ -13,8 +13,8 @@ Replace the remaining Maestro development and release journeys with deterministi
 ## Plan and status
 
 1. Complete: add dedicated Metro and Argent orchestration. The live-authored navigation smoke flow passes twice unchanged on iOS.
-2. In progress: four of eight Maestro journeys are now live-authored Argent flows and pass twice unchanged (`navigation-smoke`, `reflection-cancel`, `language-switching`, `emotion-label-modes`).
-3. Pending: repair the existing onboarding and CRUD Argent flows.
+2. In progress: five of eight Maestro journeys are now live-authored Argent flows and pass twice unchanged (`navigation-smoke`, `reflection-cancel`, `language-switching`, `emotion-label-modes`, `check-in-journey`).
+3. Pending: repair the existing onboarding Argent flow. The stale standalone CRUD flow was replaced by the deterministic check-in journey.
 4. Pending: migrate Android release-locale execution to Argent.
 5. Pending: remove Maestro configuration and update all documentation.
 6. Pending: run two unchanged passes for every flow plus full repository verification.
@@ -65,6 +65,7 @@ Use `E2E_PLATFORM=android` for an Android emulator. The runner exits before touc
 - Mole's pnpm cache cleanup exposed an interrupted `node_modules`. The broken directory was moved to `/private/tmp`, dependencies were restored from the exact lockfile with pnpm 11.18.0, and Metro bundled `react-native-surrealdb` successfully.
 - `.argent/flows/e2e/navigation-smoke.yaml` was authored from a live walkthrough, repaired to handle the optional Expo development-tools overlay, then passed two unchanged runs with no warnings.
 - The settings/interaction batch was live-authored and replayed twice unchanged. `emotion-label-modes` uses a reusable fragment for the repeated drag-and-cancel path; all flows restore English and Emoji defaults.
+- `check-in-journey` creates only the fixed synthetic note `ArgentCheckInMoment`, exercises the new core-belief and guiding-belief sequence, proves persistence in History, deletes its own record through the native confirmation alert, and checks state-independent Analytics content. It passed twice unchanged on iOS. The superseded CRUD flow depended on stale navigation and exact global totals, so it was removed.
 
 ## Verification remaining
 
