@@ -1,0 +1,155 @@
+steps:
+  - echo: Prove assignment-owned Leitsatz timing with fixed synthetic data, then remove every created record.
+  - launch: com.youmotion.mobile
+  - tool: open-url
+    args:
+      url: exp+youmotion://expo-development-client/?url=http%3A%2F%2F127.0.0.1%3A8091
+  - await: { visible: { id: emotion-star }, timeout: 30000 }
+  - when:
+      visible: { id: xmark }
+    steps:
+      - tap: { id: xmark }
+      - await: { hidden: { id: xmark }, timeout: 5000 }
+  - tool: gesture-swipe
+    args:
+      fromX: 0.5
+      fromY: 0.54
+      toX: 0.5
+      toY: 0.34
+      durationMs: 1000
+  - await: { visible: { id: reflection-note-input }, timeout: 10000 }
+  - tap: { id: reflection-note-input }
+  - tool: keyboard
+    args: { text: ArgentOwnedTimingMoment }
+  - tap: { text: What is present right now? }
+  - tap: { id: reflection-save }
+  - await: { visible: { id: belief-system-step }, timeout: 10000 }
+  - tap: { id: belief-system-browse }
+  - await: { visible: { id: belief-system-catalog }, timeout: 5000 }
+  - tap: { id: create-custom-belief }
+  - await: { visible: { id: belief-system-editor }, timeout: 5000 }
+  - tap: { id: belief-system-draft }
+  - tool: keyboard
+    args: { text: ArgentOwnedTimingCore }
+  - tap: { text: Add your own core belief. }
+  - tap: { id: belief-system-editor-save }
+  - await: { visible: { id: belief-system-step }, timeout: 10000 }
+  - tap: { id: belief-system-finish }
+  - await: { visible: { id: guiding-belief-screen }, timeout: 10000 }
+  - tap: { id: guiding-belief-draft }
+  - tool: keyboard
+    args: { text: ArgentOwnedTimingGuide }
+  - tool: gesture-swipe
+    args:
+      fromX: 0.5
+      fromY: 0.5
+      toX: 0.5
+      toY: 0.8
+      durationMs: 800
+  - scroll-to: { target: { id: guiding-belief-finish }, direction: down }
+  - tap: { id: guiding-belief-finish }
+  - await: { visible: { id: success-reminder-offer }, timeout: 10000 }
+  - tap: { id: success-plan-reminder }
+  - when:
+      visible: { id: reminder-offer-accept }
+    steps:
+      - tap: { id: reminder-offer-accept }
+  - when:
+      visible: { text: { matches: '^Allow$' } }
+    steps:
+      - tap: { text: { matches: '^Allow$' } }
+  - await: { visible: { id: reminder-preview-general }, timeout: 10000 }
+  - tap: { id: reminder-preview-full }
+  - await: { idle: true, stableFor: 400, timeout: 5000 }
+  - tool: gesture-swipe
+    args:
+      fromX: 0.5
+      fromY: 0.82
+      toX: 0.5
+      toY: 0.5
+      durationMs: 600
+  - scroll-to: { target: { id: reminder-save }, direction: down }
+  - tap: { id: reminder-save }
+  - await: { visible: { id: reminder-done }, timeout: 10000 }
+  - tap: { id: reminder-done }
+  - await: { visible: { id: check-in-done }, timeout: 5000 }
+  - tap: { id: check-in-done }
+  - await: { visible: { id: tab-settings }, timeout: 5000 }
+  - tap: { id: tab-settings }
+  - await: { visible: { text: Your space. }, timeout: 5000 }
+  - scroll-to: { target: { id: open-belief-library }, direction: down }
+  - tap: { id: open-belief-library }
+  - await: { visible: { text: ArgentOwnedTimingGuide }, timeout: 10000 }
+  - tap: { text: Edit reminder }
+  - await: { visible: { id: reminder-preview-general }, timeout: 10000 }
+  - tap: { id: reminder-preview-general }
+  - await: { idle: true, stableFor: 400, timeout: 5000 }
+  - tool: gesture-swipe
+    args:
+      fromX: 0.5
+      fromY: 0.82
+      toX: 0.5
+      toY: 0.5
+      durationMs: 600
+  - scroll-to: { target: { id: reminder-save }, direction: down }
+  - tap: { id: reminder-save }
+  - await: { visible: { text: ArgentOwnedTimingGuide }, timeout: 5000 }
+  - tap: { text: Turn off }
+  - await: { visible: { text: Off }, timeout: 10000 }
+  - tap: { text: Remove, after: { text: GENTLE REMINDER } }
+  - await: { visible: { text: Delete this reminder? }, timeout: 5000 }
+  - when:
+      platform: ios
+    steps:
+      - tool: keyboard
+        args: { key: tab }
+      - tool: keyboard
+        args: { key: arrow-right }
+      - tool: keyboard
+        args: { key: enter }
+  - when:
+      platform: android
+    steps:
+      - tap: { text: { matches: '^Delete$' } }
+  - await: { visible: { text: Not set }, timeout: 15000 }
+  - tap: { text: Remove }
+  - await: { visible: { text: Remove this core belief? }, timeout: 5000 }
+  - when:
+      platform: ios
+    steps:
+      - tool: keyboard
+        args: { key: tab }
+      - tool: keyboard
+        args: { key: arrow-right }
+      - tool: keyboard
+        args: { key: enter }
+  - when:
+      platform: android
+    steps:
+      - tap: { text: { matches: '^Remove$' } }
+  - await: { hidden: { text: ArgentOwnedTimingGuide }, timeout: 15000 }
+  - tap: { id: belief-library-close }
+  - await: { visible: { id: tab-history }, timeout: 5000 }
+  - tap: { id: tab-history }
+  - await: { visible: { text: ArgentOwnedTimingMoment }, timeout: 10000 }
+  - tap: { text: ArgentOwnedTimingMoment, role: button }
+  - await: { visible: { text: EDIT MOMENT }, timeout: 5000 }
+  - tap: { id: reflection-note-input }
+  - tap: { text: Edit this moment. }
+  - tap: { id: delete-edited-moment }
+  - await: { visible: { text: Delete this moment? }, timeout: 5000 }
+  - when:
+      platform: ios
+    steps:
+      - tool: keyboard
+        args: { key: tab }
+      - tool: keyboard
+        args: { key: arrow-right }
+      - tool: keyboard
+        args: { key: enter }
+  - when:
+      platform: android
+    steps:
+      - tap: { text: { matches: '^Delete$' } }
+  - await: { visible: { text: YOUR HISTORY }, timeout: 15000 }
+  - await: { hidden: { text: ArgentOwnedTimingMoment }, timeout: 5000 }

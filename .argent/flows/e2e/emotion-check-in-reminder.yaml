@@ -1,0 +1,66 @@
+steps:
+  - echo: Create, test, and delete a device-local emotion check-in reminder.
+  - launch: com.youmotion.mobile
+  - tool: open-url
+    args:
+      url: exp+youmotion://expo-development-client/?url=http%3A%2F%2F127.0.0.1%3A8091
+  - await: { visible: { id: tab-settings }, timeout: 30000 }
+  - when:
+      visible: { id: xmark }
+    steps:
+      - tap: { id: xmark }
+      - await: { hidden: { id: xmark }, timeout: 5000 }
+  - tap: { id: tab-settings }
+  - await: { visible: { text: Your space. }, timeout: 5000 }
+  - tap: { id: language-english }
+  - scroll-to: { target: { id: open-reminders }, direction: down }
+  - tap: { id: open-reminders }
+  - await: { visible: { text: No emotion check-in reminder yet }, timeout: 10000 }
+  - tap: { id: reminder-settings-new }
+  - when:
+      visible: { id: reminder-offer-accept }
+    steps:
+      - tap: { id: reminder-offer-accept }
+  - when:
+      visible: { text: { matches: '^Allow$' } }
+    steps:
+      - tap: { text: { matches: '^Allow$' } }
+  - await: { visible: { id: reminder-save }, timeout: 10000 }
+  - tap: { id: reminder-time-picker-0 }
+  - when:
+      platform: ios
+    steps:
+      - await: { visible: { id: reminder-time-modal-0-done }, timeout: 5000 }
+      - await: { idle: true, stableFor: 400, timeout: 5000 }
+      - echo: Tap the exposed upper backdrop; the runner's test-ID tap lands behind the modal card and does not dispatch the Pressable event.
+      - tap: { x: 0.5, y: 0.2 }
+      - await: { hidden: { id: reminder-time-modal-0-done }, timeout: 5000 }
+  - when:
+      platform: android
+    steps:
+      - tool: button
+        args: { button: back }
+  - assert: { text: { in: { id: reminder-time-picker-0 }, contains: '09:00' } }
+  - tap: { id: reminder-save }
+  - await: { visible: { id: reminder-send-test }, timeout: 10000 }
+  - tap: { id: reminder-send-test }
+  - tap: { id: reminder-done }
+  - await: { visible: { id: reminder-assignment-card }, timeout: 10000 }
+  - assert: { visible: { text: EMOTION CHECK-IN } }
+  - assert: { visible: { text: Check in with your emotions } }
+  - tap: { text: Delete reminder }
+  - await: { visible: { text: Delete this reminder? }, timeout: 5000 }
+  - when:
+      platform: ios
+    steps:
+      - tool: keyboard
+        args: { key: tab }
+      - tool: keyboard
+        args: { key: arrow-right }
+      - tool: keyboard
+        args: { key: enter }
+  - when:
+      platform: android
+    steps:
+      - tap: { text: { matches: '^Delete$' } }
+  - await: { visible: { text: No emotion check-in reminder yet }, timeout: 15000 }
