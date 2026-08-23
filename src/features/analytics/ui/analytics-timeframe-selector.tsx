@@ -5,7 +5,7 @@ import { StyleSheet, Text, View } from 'react-native';
 import {
   ANALYTICS_TIMEFRAMES,
 } from '@/constants';
-import { palette, type } from '@/features/check-in/ui/theme';
+import { palette, type } from '@/theme';
 import type { AppLocale } from '@/features/settings/domain/app-locale';
 import {
   analyticsDateRange,

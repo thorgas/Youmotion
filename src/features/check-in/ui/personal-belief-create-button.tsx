@@ -7,7 +7,7 @@ import {
   type ViewStyle,
 } from 'react-native';
 
-import { palette, type } from './theme';
+import { actionColors, palette, type } from '@/theme';
 
 export function PersonalBeliefCreateButton({
   disabled = false,
@@ -79,7 +79,7 @@ const styles = StyleSheet.create({
   },
   plus: {
     fontFamily: type.regular,
-    color: '#FFFFFF',
+    color: actionColors.primaryForeground,
     fontSize: 20,
     lineHeight: 23,
   },

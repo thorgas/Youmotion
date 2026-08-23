@@ -18,7 +18,7 @@ import {
 import { useAppNavigationActor } from '@/navigation/app-navigation.provider';
 import { savedCheckInCopy } from './emotion-copy';
 import { guidingBeliefSystemText } from './belief-system-copy';
-import { actionColors, palette, type } from './theme';
+import { actionColors, palette, type } from '@/theme';
 
 const _selectContext = (
   snapshot: ReturnType<ReturnType<typeof useAppNavigationActor>['getSnapshot']>,
@@ -156,7 +156,7 @@ const styles = StyleSheet.create({
     borderCurve: 'continuous',
     borderWidth: 1,
     borderColor: palette.moss,
-    backgroundColor: '#EDF0EB',
+    backgroundColor: palette.selectionWash,
   },
   guidingLabel: {
     fontFamily: type.semibold,

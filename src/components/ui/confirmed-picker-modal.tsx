@@ -2,7 +2,7 @@ import type { ReactNode } from 'react';
 import { Modal, Pressable, StyleSheet, Text, View } from 'react-native';
 import { PressableScale } from 'pressto';
 
-import { actionColors, palette, type } from '@/features/check-in/ui/theme';
+import { actionColors, palette, type } from '@/theme';
 
 export function ConfirmedPickerModal({
   children,

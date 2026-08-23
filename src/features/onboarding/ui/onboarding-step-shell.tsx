@@ -21,7 +21,7 @@ import {
   MOTION_DURATION,
 } from '@/constants';
 import { onboardingStepNumber } from '../application/onboarding-progress';
-import { actionColors, palette, type } from '@/features/check-in/ui/theme';
+import { actionColors, palette, type } from '@/theme';
 
 type OnboardingStep = typeof ONBOARDING_STATES[keyof typeof ONBOARDING_STATES];
 

@@ -34,7 +34,7 @@ import {
 } from './belief-card-label';
 import { CheckInProgressHeader } from './check-in-progress';
 import { GuidingBeliefWritingHelp } from './guiding-belief-writing-help';
-import { actionColors, palette, type } from './theme';
+import { actionColors, palette, type } from '@/theme';
 
 type NavigationSnapshot = ReturnType<
   ReturnType<typeof useAppNavigationActor>['getSnapshot']
@@ -265,7 +265,7 @@ export function GuidingBeliefScreen() {
               testID="guiding-belief-finish"
             >
               {saving
-                ? <ActivityIndicator color="#FFFFFF" />
+                ? <ActivityIndicator color={actionColors.primaryForeground} />
                 : <GuidingBeliefFinishLabel canSave={canSave} failed={failed} />}
             </PressableScale>
           </View>
@@ -345,7 +345,7 @@ const styles = StyleSheet.create({
   savedGuidingBelief: {
     borderRadius: 16,
     borderCurve: 'continuous',
-    backgroundColor: '#EDF0EB',
+    backgroundColor: palette.selectionWash,
     padding: 12,
     gap: 4,
   },

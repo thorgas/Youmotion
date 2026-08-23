@@ -1,6 +1,6 @@
 import type { TextStyle, ViewStyle } from 'react-native';
 
-import { palette, type } from '@/features/check-in/ui/theme';
+import { palette, type } from '@/theme';
 
 export const tabScreenContentStyle = {
   width: '100%',

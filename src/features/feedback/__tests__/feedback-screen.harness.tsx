@@ -12,7 +12,7 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { APP_LOCALES, EMOTION_LABEL_MODES } from '@/constants';
-import { palette, type } from '@/features/check-in/ui/theme';
+import { palette, type } from '@/theme';
 import { appSettingsStore } from '@/features/settings/application/app-settings.store';
 import { AppLocaleProvider } from '@/localization/app-locale-provider';
 

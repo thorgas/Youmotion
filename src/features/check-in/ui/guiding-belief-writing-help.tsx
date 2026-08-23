@@ -1,7 +1,7 @@
 import { PressableScale } from 'pressto';
 import { StyleSheet, Text, View } from 'react-native';
 
-import { palette, type } from './theme';
+import { palette, type } from '@/theme';
 
 export function GuidingBeliefWritingHelp({
   contentTestID,
@@ -112,7 +112,7 @@ const styles = StyleSheet.create({
   reflectionCard: {
     borderRadius: 24,
     borderCurve: 'continuous',
-    backgroundColor: '#EDF0EB',
+    backgroundColor: palette.selectionWash,
     padding: 20,
     gap: 14,
   },

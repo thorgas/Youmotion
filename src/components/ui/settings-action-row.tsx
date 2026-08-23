@@ -1,7 +1,7 @@
 import { PressableScale } from 'pressto';
 import { StyleSheet, Text, View } from 'react-native';
 
-import { palette, type } from '@/features/check-in/ui/theme';
+import { palette, type } from '@/theme';
 
 export function SettingsActionRow({
   count,
@@ -54,7 +54,7 @@ const styles = StyleSheet.create({
     minWidth: 28,
     minHeight: 28,
     borderRadius: 14,
-    backgroundColor: '#EDF0EB',
+    backgroundColor: palette.selectionWash,
     fontFamily: type.semibold,
     color: palette.moss,
     fontSize: 13,

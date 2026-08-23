@@ -18,7 +18,7 @@ import {
   FEEDBACK_KINDS,
   FEEDBACK_STATES,
 } from '@/constants';
-import { actionColors, palette, type } from '@/features/check-in/ui/theme';
+import { actionColors, palette, type } from '@/theme';
 import { feedbackMachine } from '../application/feedback.machine';
 
 type FeedbackActor = ReturnType<typeof useMachine<typeof feedbackMachine>>[2];

@@ -36,7 +36,7 @@ import {
 } from '@/features/check-in/ui/belief-card-label';
 import { GuidingBeliefWritingHelp } from '@/features/check-in/ui/guiding-belief-writing-help';
 import { PersonalBeliefCreateButton } from '@/features/check-in/ui/personal-belief-create-button';
-import { actionColors, palette, type } from '@/features/check-in/ui/theme';
+import { actionColors, palette, type } from '@/theme';
 import type {
   GuidingBeliefReminderAssignment,
   ReminderAssignment,
@@ -512,7 +512,7 @@ function BeliefLibraryEditor() {
             style={[styles.saveButton, !harmfulReady && styles.saveButtonDisabled]}
             testID="belief-library-save"
           >
-            {saving ? <ActivityIndicator color="#FFFFFF" /> : (
+            {saving ? <ActivityIndicator color={actionColors.primaryForeground} /> : (
               <Text style={styles.saveText}>
                 {creating ? (
                   <fbt desc="Button saving a new personal core belief from settings">
@@ -615,7 +615,7 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   reminderCard: {
-    backgroundColor: '#EDF0EB',
+    backgroundColor: palette.selectionWash,
     borderRadius: 18,
     borderCurve: 'continuous',
     padding: 14,

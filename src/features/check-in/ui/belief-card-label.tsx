@@ -1,6 +1,6 @@
 import { StyleSheet, Text } from 'react-native';
 
-import { palette, type } from './theme';
+import { palette, type } from '@/theme';
 
 export function HarmfulBeliefCardLabel() {
   return (

@@ -14,7 +14,7 @@ import {
 } from '@/constants';
 import type { EmotionSelection } from '@/features/check-in/domain/check-in';
 import { EmotionStar } from '@/features/check-in/ui/emotion-star';
-import { palette, type } from '@/features/check-in/ui/theme';
+import { palette, type } from '@/theme';
 import { useAppNavigationActor } from '@/navigation/app-navigation.provider';
 import { onboardingPulseResponsiveLayout } from './onboarding-pulse-responsive-layout';
 import { OnboardingStepShell } from './onboarding-step-shell';

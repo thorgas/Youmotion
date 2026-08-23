@@ -6,7 +6,7 @@ import {
   ONBOARDING_EVENTS,
   ONBOARDING_STATES,
 } from '@/constants';
-import { palette, type } from '@/features/check-in/ui/theme';
+import { palette, type } from '@/theme';
 import { useAppNavigationActor } from '@/navigation/app-navigation.provider';
 import { OnboardingStepShell } from './onboarding-step-shell';
 
@@ -151,7 +151,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: 16,
-    backgroundColor: '#EDF0EB',
+    backgroundColor: palette.selectionWash,
   },
   numberText: {
     color: palette.moss,
@@ -191,7 +191,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: 16,
-    backgroundColor: '#EDF0EB',
+    backgroundColor: palette.selectionWash,
   },
   privacyCopy: {
     flex: 1,

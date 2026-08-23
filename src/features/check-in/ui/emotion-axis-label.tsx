@@ -11,7 +11,7 @@ import { EMOTION_LABEL_MODES, MOTION_DURATION } from '@/constants';
 import type { EmotionLabelMode } from '@/features/settings/domain/emotion-label-mode';
 import type { Emotion } from '../domain/emotion';
 import { emotionEmoji, emotionName } from './emotion-copy';
-import { palette, textSize, type } from './theme';
+import { palette, textSize, type } from '@/theme';
 
 type EmotionAxisLabelProps = {
   emotion: Emotion;

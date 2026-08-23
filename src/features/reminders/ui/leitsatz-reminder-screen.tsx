@@ -28,7 +28,7 @@ import { ConfirmedPickerModal } from '@/components/ui/confirmed-picker-modal';
 import {
   beliefStatementForId,
 } from '@/features/check-in/domain/belief-statement';
-import { actionColors, palette, type } from '@/features/check-in/ui/theme';
+import { actionColors, palette, type } from '@/theme';
 import { useAppNavigationActor } from '@/navigation/app-navigation.provider';
 import type {
   ReminderLocalTime,
@@ -518,7 +518,7 @@ const styles = StyleSheet.create({
   weekday: { flex: 1, aspectRatio: 1, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: palette.hairline, borderRadius: 14, borderCurve: 'continuous' },
   weekdaySelected: { backgroundColor: palette.ink, borderColor: palette.ink },
   weekdayText: { fontFamily: type.semibold, color: palette.ink, fontSize: 13 },
-  weekdayTextSelected: { color: '#FFFFFF' },
+  weekdayTextSelected: { color: actionColors.primaryForeground },
   timeCard: { borderWidth: 1, borderColor: palette.hairline, borderRadius: 20, borderCurve: 'continuous', padding: 14, gap: 10 },
   timeText: { fontFamily: type.semibold, color: palette.ink, fontSize: 28 },
   timePickerButton: { minHeight: 54, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },

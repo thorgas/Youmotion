@@ -37,7 +37,7 @@ import {
   confirmCheckInDeletion,
   editMomentAccessibilityHint,
 } from './check-in-deletion';
-import { palette, type } from './theme';
+import { palette, type } from '@/theme';
 
 const _selectHistory = (state: ReturnType<typeof checkInHistoryStore.getSnapshot>) => state.context;
 const _selectTimeframe = (state: ReturnType<typeof historyTimeframeStore.getSnapshot>) => (
@@ -487,7 +487,7 @@ const styles = StyleSheet.create({
     textDecorationLine: 'line-through',
   },
   guidingBeliefCard: {
-    backgroundColor: '#EDF0EB',
+    backgroundColor: palette.selectionWash,
     borderColor: 'rgba(94, 111, 97, 0.2)',
     borderRadius: 14,
     borderWidth: 1,

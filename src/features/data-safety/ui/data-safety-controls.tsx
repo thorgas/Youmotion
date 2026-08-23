@@ -7,7 +7,7 @@ import {
   DATA_SAFETY_STATES,
   NAVIGATION_STATES,
 } from '@/constants';
-import { actionColors, palette, type } from '@/features/check-in/ui/theme';
+import { actionColors, palette, type } from '@/theme';
 import { formatHistoryDate } from '@/localization/date-copy';
 import {
   type AppNavigationActor,
@@ -257,7 +257,7 @@ export function DataSafetyControls({ locale }: { locale: string }) {
 
 const styles = StyleSheet.create({
   localSummary: {
-    backgroundColor: '#EDF0EB',
+    backgroundColor: palette.selectionWash,
     borderColor: 'rgba(94, 111, 97, 0.22)',
     borderCurve: 'continuous',
     borderRadius: 24,

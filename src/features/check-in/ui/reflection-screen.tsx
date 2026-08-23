@@ -79,7 +79,7 @@ import { CheckInProgressHeader } from './check-in-progress';
 import { PersonalBeliefCreateButton } from './personal-belief-create-button';
 import { beginReflectionInputSession } from './reflection-input-session';
 import { reflectionResponsiveLayout } from './reflection-responsive-layout';
-import { actionColors, palette, type } from './theme';
+import { actionColors, palette, type } from '@/theme';
 
 const _selectSnapshot = (
   snapshot: ReturnType<ReturnType<typeof useAppNavigationActor>['getSnapshot']>,
@@ -407,7 +407,7 @@ function ReflectionEditorActions({
         style={[styles.primaryButton, styles.standalonePrimaryButton]}
         testID="reflection-save"
       >
-        {saving ? <ActivityIndicator color="#FFFFFF" /> : (
+        {saving ? <ActivityIndicator color={actionColors.primaryForeground} /> : (
           <Text style={styles.primaryText}>
             {failed
               ? <fbt desc="Button retrying a failed reflection save">Try again</fbt>
@@ -761,7 +761,9 @@ function BeliefSystemStep() {
                 style={styles.primaryButton}
                 testID="belief-system-finish"
               >
-                {attaching ? <ActivityIndicator color="#FFFFFF" /> : (
+                {attaching ? (
+                  <ActivityIndicator color={actionColors.primaryForeground} />
+                ) : (
                   <Text style={styles.primaryText}>
                     {failed
                       ? <fbt desc="Button retrying core belief attachment">Try again</fbt>
@@ -961,7 +963,7 @@ function BeliefSystemEditorStep() {
                 style={styles.primaryButton}
                 testID="belief-system-editor-save"
               >
-                {saving ? <ActivityIndicator color="#FFFFFF" /> : (
+                {saving ? <ActivityIndicator color={actionColors.primaryForeground} /> : (
                   <Text style={styles.primaryText}>
                     {failed
                       ? <fbt desc="Button retrying belief persistence">Try again</fbt>
@@ -1041,7 +1043,7 @@ const styles = StyleSheet.create({
   selectionPill: {
     alignItems: 'center',
     alignSelf: 'flex-start',
-    backgroundColor: '#EDF0EB',
+    backgroundColor: palette.selectionWash,
     borderCurve: 'continuous',
     borderRadius: 999,
     flexDirection: 'row',
@@ -1270,7 +1272,10 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     backgroundColor: palette.paper,
   },
-  suggestionSelected: { borderColor: palette.moss, backgroundColor: '#EDF0EB' },
+  suggestionSelected: {
+    borderColor: palette.moss,
+    backgroundColor: palette.selectionWash,
+  },
   radio: {
     width: 18,
     height: 18,
@@ -1311,7 +1316,7 @@ const styles = StyleSheet.create({
     borderCurve: 'continuous',
     borderWidth: 1,
     borderColor: palette.moss,
-    backgroundColor: '#EDF0EB',
+    backgroundColor: palette.selectionWash,
     paddingHorizontal: 14,
     paddingVertical: 10,
   },

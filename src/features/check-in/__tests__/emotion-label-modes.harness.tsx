@@ -14,6 +14,7 @@ import {
 } from '@/constants';
 import type { EmotionLabelMode } from '@/features/settings/domain/emotion-label-mode';
 import { AppLocaleProvider } from '@/localization/app-locale-provider';
+import { actionColors } from '@/theme';
 import { emotions, type Emotion } from '../domain/emotion';
 import { EmotionAxisLabel } from '../ui/emotion-axis-label';
 
@@ -230,6 +231,6 @@ const styles = StyleSheet.create({
   labelRing: {
     width: 340,
     height: 120,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: actionColors.primaryForeground,
   },
 });

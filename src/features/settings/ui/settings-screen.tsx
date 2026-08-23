@@ -33,7 +33,7 @@ import {
   tabScreenTitleStyle,
 } from '@/components/ui/tab-screen-layout';
 import { SettingsActionRow } from '@/components/ui/settings-action-row';
-import { palette, type } from '@/features/check-in/ui/theme';
+import { actionColors, palette, type } from '@/theme';
 import { DataSafetyControls } from '@/features/data-safety/ui/data-safety-controls';
 import { FeedbackSettingsAction } from '@/features/feedback/ui/feedback-screen';
 import { useAppNavigationActor } from '@/navigation/app-navigation.provider';
@@ -74,7 +74,10 @@ function PreferenceOption({
     }],
   }), [selected]);
   const selectionTextStyle = useAnimatedStyle(() => ({
-    color: withTiming(selected ? '#FFFFFF' : palette.ink, selectionAnimation),
+    color: withTiming(
+      selected ? actionColors.primaryForeground : palette.ink,
+      selectionAnimation,
+    ),
   }), [selected]);
 
   return (

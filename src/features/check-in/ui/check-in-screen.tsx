@@ -20,7 +20,7 @@ import { selectionForCheckIn } from '../domain/emotion';
 import { checkInHistoryStore } from '../application/check-in-history.store';
 import { EmotionStar } from './emotion-star';
 import { emotionSummary } from './emotion-copy';
-import { palette, type } from './theme';
+import { palette, type } from '@/theme';
 
 const _selectSnapshot = (snapshot: ReturnType<ReturnType<typeof useAppNavigationActor>['getSnapshot']>) => snapshot;
 const _selectHistory = (state: ReturnType<typeof checkInHistoryStore.getSnapshot>) => state.context.entries;

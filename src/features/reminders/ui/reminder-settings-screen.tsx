@@ -9,7 +9,7 @@ import {
   REMINDER_TARGET_KINDS,
 } from '@/constants';
 import { AppBackButton } from '@/components/ui/app-back-button';
-import { actionColors, palette, type } from '@/features/check-in/ui/theme';
+import { actionColors, palette, type } from '@/theme';
 import { useAppLocale } from '@/localization/app-locale-provider';
 import { formatWeekday } from '@/localization/date-copy';
 import { useAppNavigationActor } from '@/navigation/app-navigation.provider';

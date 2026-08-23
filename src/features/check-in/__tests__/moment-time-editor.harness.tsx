@@ -25,7 +25,7 @@ import {
 import { appSettingsStore } from '@/features/settings/application/app-settings.store';
 import { AppLocaleProvider } from '@/localization/app-locale-provider';
 import { CheckInTimestamp, type EmotionSelection } from '../domain/check-in';
-import { palette } from '../ui/theme';
+import { palette } from '@/theme';
 
 type NavigationMachine = typeof import(
   '@/navigation/app-navigation.machine'

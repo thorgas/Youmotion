@@ -10,7 +10,7 @@ import Animated, {
 } from 'react-native-reanimated';
 
 import { BASE_RIPPLE_DURATION, BASE_RIPPLE_PHASES } from '@/constants';
-import { palette } from './theme';
+import { palette } from '@/theme';
 
 type RippleRingProps = {
   phase: number;

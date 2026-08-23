@@ -6,7 +6,7 @@ import {
   ONBOARDING_STATES,
 } from '@/constants';
 import { emotionName, emotionNuance } from '@/features/check-in/ui/emotion-copy';
-import { palette, type } from '@/features/check-in/ui/theme';
+import { palette, type } from '@/theme';
 import { useAppNavigationActor } from '@/navigation/app-navigation.provider';
 import { onboardingExampleSelection } from '../domain/onboarding';
 import { OnboardingStepShell } from './onboarding-step-shell';

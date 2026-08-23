@@ -10,6 +10,7 @@ export const palette = Object.freeze({
   whiteWash: 'rgba(255, 255, 255, 0.72)',
   moss: '#5E6F61',
   danger: '#9D4E42',
+  selectionWash: '#EDF0EB',
 });
 
 export const actionColors = Object.freeze({

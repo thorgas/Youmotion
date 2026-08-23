@@ -7,7 +7,7 @@ import {
   DATA_EXPORT_FAILURE_MESSAGE,
   DATA_RESTORE_FAILURE_MESSAGE,
 } from '@/constants';
-import { palette, type } from '@/features/check-in/ui/theme';
+import { palette, type } from '@/theme';
 
 const localizedDataSafetyMessage = (message: string) => {
   if (message === 'Your backup is ready.') {
@@ -67,7 +67,12 @@ export function DataSafetyMessage({
 }
 
 const styles = StyleSheet.create({
-  notice: { backgroundColor: '#EDF0EB', borderRadius: 14, marginTop: 14, padding: 14 },
+  notice: {
+    backgroundColor: palette.selectionWash,
+    borderRadius: 14,
+    marginTop: 14,
+    padding: 14,
+  },
   errorNotice: { backgroundColor: '#F5E8E5' },
   noticeText: { fontFamily: type.medium, color: palette.ink, fontSize: 13, lineHeight: 19 },
 });

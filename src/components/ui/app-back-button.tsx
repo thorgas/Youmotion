@@ -8,7 +8,7 @@ import {
   type ViewStyle,
 } from 'react-native';
 
-import { palette } from '@/features/check-in/ui/theme';
+import { palette } from '@/theme';
 
 type AppBackButtonProps = {
   disabled?: boolean;

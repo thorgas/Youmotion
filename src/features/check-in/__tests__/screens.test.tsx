@@ -69,7 +69,7 @@ import {
   BaseStateRipples,
   CenteredBaseStateRipples,
 } from '../ui/base-state-ripples';
-import { palette } from '../ui/theme';
+import { palette } from '@/theme';
 import {
   ReminderAssignmentId,
   ReminderTimestamp,
@@ -789,16 +789,16 @@ describe('check-in screens', () => {
     expect(history.getByText('Released core belief')).toBeTruthy();
     expect(history.getByText('Your guiding belief')).toBeTruthy();
     expect(history.getByTestId(`history-released-belief-${saved.id}`)).toHaveStyle({
-      color: '#6F6760',
+      color: palette.inkMuted,
       fontSize: 12,
       textDecorationLine: 'line-through',
     });
     expect(history.getByTestId(`history-guiding-belief-card-${saved.id}`)).toHaveStyle({
-      backgroundColor: '#EDF0EB',
+      backgroundColor: palette.selectionWash,
       borderWidth: 1,
     });
     expect(history.getByTestId(`history-guiding-belief-${saved.id}`)).toHaveStyle({
-      color: '#2A2722',
+      color: palette.ink,
       fontFamily: 'InstrumentSans_600SemiBold',
       fontSize: 15,
     });
@@ -985,7 +985,7 @@ describe('check-in screens', () => {
 
     const history = await _renderLocalized(<HistoryScreen />);
     expect(history.getByTestId(`history-released-belief-${checkInId}`)).toHaveStyle({
-      color: '#6F6760',
+      color: palette.inkMuted,
       textDecorationLine: 'line-through',
     });
     expect(history.getByTestId(`history-guiding-belief-${checkInId}`)).toHaveStyle({

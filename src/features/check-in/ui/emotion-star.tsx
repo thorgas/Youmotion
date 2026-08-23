@@ -15,6 +15,7 @@ import Svg, { Circle } from 'react-native-svg';
 import { EMOTION_STAR_ACCESSIBILITY_ACTIONS, MOTION_DURATION } from '@/constants';
 import { appSettingsStore } from '@/features/settings/application/app-settings.store';
 import type { EmotionLabelMode } from '@/features/settings/domain/emotion-label-mode';
+import type { EmotionSelection } from '../domain/check-in';
 import {
   emotionAngle,
   emotionSelectionWithAdjacentEmotion,
@@ -22,14 +23,14 @@ import {
   pointConstrainedToRadius,
   selectionFromPoint,
 } from '../domain/emotion-selection';
-import { emotions, type EmotionSelection } from '../domain/emotion';
+import { emotions } from '../domain/emotion';
 import {
   BaseStateRipples,
   CenteredBaseStateRipples,
 } from './base-state-ripples';
 import { EmotionAxisLabel } from './emotion-axis-label';
 import { emotionName, emotionNuance, emotionStarAccessibility, emotionStarAccessibilityHint, emotionStarAccessibilityLabel } from './emotion-copy';
-import { palette, textSize, type } from './theme';
+import { palette, textSize, type } from '@/theme';
 
 type EmotionStarProps = {
   selection: EmotionSelection | null;

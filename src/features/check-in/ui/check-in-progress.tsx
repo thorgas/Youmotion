@@ -6,7 +6,7 @@ import Animated, {
 } from 'react-native-reanimated';
 
 import { MOTION_DURATION } from '@/constants';
-import { palette, type } from './theme';
+import { palette, type } from '@/theme';
 
 type ProgressStep = 1 | 2 | 3;
 type ProgressStatus = 'active' | 'complete' | 'upcoming';
