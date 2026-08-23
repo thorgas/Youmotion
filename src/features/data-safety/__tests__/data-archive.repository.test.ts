@@ -1,4 +1,5 @@
 import * as Effect from 'effect/Effect';
+import * as Schema from 'effect/Schema';
 import * as DocumentPicker from 'expo-document-picker';
 import * as Sharing from 'expo-sharing';
 
@@ -15,6 +16,7 @@ import {
 } from '@/test-utils/surrealdb.repository.mock';
 import {
   DATA_ARCHIVE_VERSION,
+  DataArchiveFromJson,
   DataArchiveSchema,
   DataArchiveTimestamp,
 } from '../domain/data-archive';
@@ -139,7 +141,10 @@ describe('data archive repository', () => {
     const sharedUri = mockShare.mock.calls[0]?.[0];
     expect(typeof sharedUri).toBe('string');
     if (typeof sharedUri !== 'string') throw new Error('Expected a shared URI.');
-    expect(JSON.parse(mockFiles.get(sharedUri) ?? '')).toMatchObject({
+    const exportedArchive = await Effect.runPromise(
+      Schema.decodeUnknown(DataArchiveFromJson)(mockFiles.get(sharedUri) ?? ''),
+    );
+    expect(exportedArchive).toMatchObject({
       version: DATA_ARCHIVE_VERSION,
       checkIns: archive.checkIns,
       settings: archive.settings,

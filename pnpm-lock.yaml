@@ -263,6 +263,9 @@ importers:
       eslint:
         specifier: ^9.39.5
         version: 9.39.5(jiti@2.7.0)(supports-color@8.1.1)
+      eslint-plugin-code-architecture:
+        specifier: 0.4.0-alpha.1
+        version: 0.4.0-alpha.1(eslint@9.39.5(jiti@2.7.0)(supports-color@8.1.1))
       expo-no-push-entitlement:
         specifier: 1.0.0
         version: 1.0.0(expo@57.0.6)
@@ -4440,6 +4443,12 @@ packages:
     resolution: {integrity: sha512-2NlIDTwUWJN0mRPQOdtQBzbUHvdGY2P1VXSyU83Q3xKxM7WHX2Ql8dKq782Q9TgQUNOLEzEYu9bzLNj1q88I5w==}
     engines: {node: '>=6.0'}
     hasBin: true
+
+  eslint-plugin-code-architecture@0.4.0-alpha.1:
+    resolution: {integrity: sha512-ab+xC81UltWVMF5CXDIvaS+l3N+YnIsMXxitMDUQht+fWvOOcLF5WKC0TS28N1N6PbBBHLebmBTaWaeATbCJXA==}
+    engines: {node: '>=20.18'}
+    peerDependencies:
+      eslint: '>=9 <11'
 
   eslint-plugin-react-hooks@7.1.1:
     resolution: {integrity: sha512-f2I7Gw6JbvCexzIInuSbZpfdQ44D7iqdWX01FKLvrPgqxoE7oMj8clOfto8U6vYiz4yd5oKu39rRSVOe1zRu0g==}
@@ -12688,6 +12697,11 @@ snapshots:
       esutils: 2.0.3
     optionalDependencies:
       source-map: 0.6.1
+
+  eslint-plugin-code-architecture@0.4.0-alpha.1(eslint@9.39.5(jiti@2.7.0)(supports-color@8.1.1)):
+    dependencies:
+      eslint: 9.39.5(jiti@2.7.0)(supports-color@8.1.1)
+      minimatch: 9.0.9
 
   eslint-plugin-react-hooks@7.1.1(eslint@9.39.5(jiti@2.7.0)(supports-color@8.1.1))(supports-color@8.1.1):
     dependencies:
