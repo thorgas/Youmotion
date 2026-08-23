@@ -1,0 +1,23 @@
+steps:
+  - echo: Enter a reflection, cancel it without saving, and return to Today.
+  - launch: com.youmotion.mobile
+  - tool: open-url
+    args:
+      url: exp+youmotion://expo-development-client/?url=http%3A%2F%2F127.0.0.1%3A8091
+  - await: { visible: { id: emotion-star }, timeout: 30000 }
+  - when:
+      visible: { id: xmark }
+    steps:
+      - tap: { id: xmark }
+      - await: { hidden: { id: xmark }, timeout: 5000 }
+  - tool: gesture-swipe
+    args:
+      fromX: 0.5
+      fromY: 0.54
+      toX: 0.5
+      toY: 0.34
+      durationMs: 1000
+  - await: { visible: { id: reflection-note-input }, timeout: 10000 }
+  - tap: { text: What is present right now? }
+  - tap: { id: reflection-back }
+  - await: { visible: { id: emotion-star }, timeout: 5000 }

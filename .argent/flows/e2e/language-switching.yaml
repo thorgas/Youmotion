@@ -1,0 +1,31 @@
+steps:
+  - echo: Switch between German and English, verify label modes, and restore the defaults.
+  - launch: com.youmotion.mobile
+  - tool: open-url
+    args:
+      url: exp+youmotion://expo-development-client/?url=http%3A%2F%2F127.0.0.1%3A8091
+  - await: { visible: { id: tab-settings }, timeout: 30000 }
+  - when:
+      visible: { id: xmark }
+    steps:
+      - tap: { id: xmark }
+      - await: { hidden: { id: xmark }, timeout: 5000 }
+  - tap: { id: tab-settings }
+  - await: { visible: { text: Your space. }, timeout: 5000 }
+  - tap: { id: language-german }
+  - await: { visible: { text: Dein Raum. }, timeout: 10000 }
+  - tap: { id: language-english }
+  - await: { visible: { text: Your space. }, timeout: 10000 }
+  - tap: { id: emotion-label-mode-text }
+  - tap: { id: tab-today }
+  - await: { visible: { text: Disgust }, timeout: 5000 }
+  - tap: { id: tab-settings }
+  - tap: { id: emotion-label-mode-both }
+  - tap: { id: tab-today }
+  - await: { visible: { text: Disgust }, timeout: 5000 }
+  - await: { visible: { text: "🤢" }, timeout: 5000 }
+  - tap: { id: tab-settings }
+  - tap: { id: emotion-label-mode-emoji }
+  - tap: { id: tab-today }
+  - await: { visible: { text: "🤢" }, timeout: 5000 }
+  - await: { hidden: { text: Disgust }, timeout: 5000 }

@@ -13,7 +13,7 @@ Replace the remaining Maestro development and release journeys with deterministi
 ## Plan and status
 
 1. Complete: add dedicated Metro and Argent orchestration. The live-authored navigation smoke flow passes twice unchanged on iOS.
-2. Pending: record and port the eight Maestro journeys.
+2. In progress: four of eight Maestro journeys are now live-authored Argent flows and pass twice unchanged (`navigation-smoke`, `reflection-cancel`, `language-switching`, `emotion-label-modes`).
 3. Pending: repair the existing onboarding and CRUD Argent flows.
 4. Pending: migrate Android release-locale execution to Argent.
 5. Pending: remove Maestro configuration and update all documentation.
@@ -64,6 +64,7 @@ Use `E2E_PLATFORM=android` for an Android emulator. The runner exits before touc
 - The first explicit-device rebuild failed with `No space left on device`. `mo clean` freed roughly 7.1 GiB of caches/logs without system-cache cleanup; the targeted iOS build and installation then passed.
 - Mole's pnpm cache cleanup exposed an interrupted `node_modules`. The broken directory was moved to `/private/tmp`, dependencies were restored from the exact lockfile with pnpm 11.18.0, and Metro bundled `react-native-surrealdb` successfully.
 - `.argent/flows/e2e/navigation-smoke.yaml` was authored from a live walkthrough, repaired to handle the optional Expo development-tools overlay, then passed two unchanged runs with no warnings.
+- The settings/interaction batch was live-authored and replayed twice unchanged. `emotion-label-modes` uses a reusable fragment for the repeated drag-and-cancel path; all flows restore English and Emoji defaults.
 
 ## Verification remaining
 

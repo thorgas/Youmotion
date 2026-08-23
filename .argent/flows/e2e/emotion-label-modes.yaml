@@ -1,0 +1,33 @@
+steps:
+  - echo: Drag the Pulse in each label mode, cancel each reflection, and restore Emoji mode.
+  - launch: com.youmotion.mobile
+  - tool: open-url
+    args:
+      url: exp+youmotion://expo-development-client/?url=http%3A%2F%2F127.0.0.1%3A8091
+  - await: { visible: { id: tab-settings }, timeout: 30000 }
+  - when:
+      visible: { id: xmark }
+    steps:
+      - tap: { id: xmark }
+      - await: { hidden: { id: xmark }, timeout: 5000 }
+  - tap: { id: tab-settings }
+  - tap: { id: emotion-label-mode-emoji }
+  - tap: { id: tab-today }
+  - await: { visible: { text: "🤢" }, timeout: 5000 }
+  - await: { hidden: { text: Disgust }, timeout: 5000 }
+  - run: fragments/drag-and-cancel.yaml
+  - tap: { id: tab-settings }
+  - tap: { id: emotion-label-mode-text }
+  - tap: { id: tab-today }
+  - await: { visible: { text: Disgust }, timeout: 5000 }
+  - run: fragments/drag-and-cancel.yaml
+  - tap: { id: tab-settings }
+  - tap: { id: emotion-label-mode-both }
+  - tap: { id: tab-today }
+  - await: { visible: { text: Disgust }, timeout: 5000 }
+  - await: { visible: { text: "🤢" }, timeout: 5000 }
+  - run: fragments/drag-and-cancel.yaml
+  - tap: { id: tab-history }
+  - await: { visible: { id: history-search-input }, timeout: 5000 }
+  - tap: { id: tab-settings }
+  - tap: { id: emotion-label-mode-emoji }

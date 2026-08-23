@@ -1,0 +1,13 @@
+steps:
+  - await: { visible: { id: emotion-star }, timeout: 5000 }
+  - tool: gesture-swipe
+    args:
+      fromX: 0.5
+      fromY: 0.51
+      toX: 0.75
+      toY: 0.4
+      durationMs: 1600
+  - await: { visible: { id: reflection-note-input }, timeout: 10000 }
+  - tap: { text: What is present right now? }
+  - tap: { id: reflection-back }
+  - await: { visible: { id: emotion-star }, timeout: 5000 }
