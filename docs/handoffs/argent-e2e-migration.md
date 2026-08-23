@@ -95,9 +95,9 @@ export E2E_RELEASE_APK='<absolute path to app-release.apk>'
 ## Architecture-rule follow-up
 
 - `a896f49` promotes the unchanged shared palette and typography tokens from feature ownership to `src/theme.ts`, replaces repeated palette literals, and includes full-resolution Today, Settings, and Insights screenshots.
-- `caedf0a` enables all 17 Youmotion-applicable rules as errors and fixes the barrel and compound-root violations. The dependency is now `eslint-plugin-code-architecture@0.4.0-alpha.2`; its new `ignoreJSX` option keeps the 70-line limit on logic without forcing line-count-only component extraction.
+- `caedf0a` established the first 17-rule gate and fixed the barrel and compound-root violations. The dependency is now `eslint-plugin-code-architecture@0.4.0-alpha.3`; all 18 exports are enabled as errors in their applicable production scopes. `max-function-lines` ignores JSX-bearing functions, while `require-assertions` keeps XState callbacks covered and excludes only JSX-attribute callbacks, zero-input variable closures, tests, Harness files, and test-support directories.
 - Five focused contract fixtures prove that every composition/LEGO rule reports a representative invalid component API; configuration severity is also checked against every plugin export.
-- `require-assertions` is the sole excluded export because Youmotion does not adopt TigerStyle's two-runtime-assertions-per-function convention. The complete policy and executable commands are documented in `docs/code-architecture-eslint.md`.
+- `require-assertions` now requires two meaningful runtime assertions in production functions with at least three statements. Navigation/model callbacks use event, context, schema, state, and output invariants instead of exemptions. The complete policy and executable commands are documented in `docs/code-architecture-eslint.md`.
 - All seven development flows passed twice against the migrated theme on the dedicated iOS simulator, including the modal dismissal and destructive-confirmation paths.
 
 ## Verification status

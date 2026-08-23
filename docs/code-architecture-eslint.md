@@ -1,6 +1,6 @@
 # Code architecture ESLint policy
 
-Youmotion uses `eslint-plugin-code-architecture@0.4.0-alpha.2` as a blocking part of
+Youmotion uses `eslint-plugin-code-architecture@0.4.0-alpha.3` as a blocking part of
 `pnpm verify`. The effective configuration is in `eslint.config.mjs`, and its
 repository contract is tested in
 `oxlint-rules/__tests__/architecture-lint-contract.test.js`.
@@ -26,7 +26,12 @@ repository contract is tested in
 | `require-composable-root-children` | Error | Root/provider components expose children on every top-level return path. |
 | `require-compound-component-api` | Error | Compound definitions expose a valid boundary and distinct public parts. |
 | `require-consumer-owned-compound-usage` | Error | Compound consumers select the parts rendered beneath a boundary. |
-| `require-assertions` | Not applicable | The TigerStyle preset requires two runtime assertions in every non-trivial function. That convention is not used in this React Native app and would add meaningless runtime checks to ordinary components and event delegates. |
+| `require-assertions` | Error | Production functions with at least three statements require two runtime assertions. XState actions, guards, transitions, and named React components remain covered. Alpha.3 excludes only JSX-attribute callbacks and zero-input function expressions assigned to variables; tests, Harness files, and test-support directories are excluded. Assertions must express real input, output, state, schema, or cardinality invariants rather than typed-shape or tautological filler. |
+
+Reanimated UI-runtime callbacks use the local `assertWorkletInvariant` helper;
+calling imported JavaScript assertion libraries from a worklet is forbidden because
+it attempts a synchronous cross-runtime call. The ESLint contract recognizes both
+that helper and the standard JavaScript-runtime assertion names.
 
 ## Design-system ownership
 
@@ -59,5 +64,6 @@ pnpm verify
 downgrade a rule to a warning to preserve a green build.
 
 The contract suite also feeds one representative invalid component to each of
-the five composition/LEGO rules. This proves the rules detect violations rather
-than merely appearing in ESLint's printed configuration.
+the five composition/LEGO rules and an assertion-free production function to
+`require-assertions`. This proves the rules detect violations rather than merely
+appearing in ESLint's printed configuration.

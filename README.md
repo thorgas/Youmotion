@@ -231,8 +231,8 @@ The rule suite lives beside the plugin and should be extended whenever a new inv
 
 The external `eslint-plugin-code-architecture` gate complements those local
 rules with blocking design-token, domain-literal, Effect, React, module,
-function-bound, and compound-component checks. Its complete applicability table
-and the one intentional exclusion are documented in
+function-bound, assertion-density, and compound-component checks. Its complete
+applicability table and intentional test/runtime-fixture exclusions are documented in
 [`docs/code-architecture-eslint.md`](docs/code-architecture-eslint.md).
 
 ## Testing strategy
