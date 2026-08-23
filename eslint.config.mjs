@@ -116,6 +116,20 @@ export default tseslint.config(
     },
   },
   {
+    files: ['src/features/analytics/domain/**/*.{ts,tsx}'],
+    ignores: [
+      'src/**/__tests__/**',
+      'src/**/*.harness.{ts,tsx}',
+      'src/**/*.test.{ts,tsx}',
+    ],
+    rules: {
+      'code-architecture/require-assertions': [
+        'error',
+        { minimum: 2, minimumStatements: 3 },
+      ],
+    },
+  },
+  {
     files: [
       'src/app/**/*.{ts,tsx}',
       'src/components/**/*.{ts,tsx}',

@@ -64,7 +64,16 @@ describe('architecture lint contract', () => {
       2,
       { ignoreJSX: true, max: 70, skipBlankLines: false },
     ]);
-    expect(configuredRules['code-architecture/require-assertions']).toBeUndefined();
+    expect(configuredRulesFor(
+      'src/features/analytics/domain/contract-fixture.ts',
+    )['code-architecture/require-assertions']).toEqual([
+      2,
+      {
+        checkExpressionBodies: false,
+        minimum: 2,
+        minimumStatements: 3,
+      },
+    ]);
   });
 
   it('limits logic functions without forcing JSX component extraction', () => {
@@ -94,6 +103,36 @@ describe('architecture lint contract', () => {
     expect(jsxMessages).not.toEqual(expect.arrayContaining([
       expect.objectContaining({
         ruleId: 'code-architecture/max-function-lines',
+      }),
+    ]));
+  });
+
+  it('requires assertions in production while excluding tests', () => {
+    const code = `
+      function summarize(values) {
+        const total = values.length;
+        const first = values[0];
+        return { first, total };
+      }
+    `;
+    const productionMessages = messagesFor({
+      code,
+      filePath: 'src/features/analytics/domain/contract-fixture.ts',
+    });
+    const testMessages = messagesFor({
+      code,
+      filePath: 'src/features/analytics/domain/__tests__/contract-fixture.test.ts',
+    });
+
+    expect(productionMessages).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        ruleId: 'code-architecture/require-assertions',
+        severity: 2,
+      }),
+    ]));
+    expect(testMessages).not.toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        ruleId: 'code-architecture/require-assertions',
       }),
     ]));
   });

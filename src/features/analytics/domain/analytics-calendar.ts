@@ -1,5 +1,6 @@
 import type { CheckIn } from '@/features/check-in/domain/check-in';
 import { emotions } from '@/features/check-in/domain/emotion';
+import assert from 'tiny-invariant';
 import type { AnalyticsDateRange } from './analytics-timeframe';
 
 export type CalendarDay = Readonly<{ day: number; entries: readonly CheckIn[] }>;
@@ -23,6 +24,11 @@ export function calendarEmotionFrequencies(entries: readonly CheckIn[]) {
 
   return emotions.reduce<readonly CalendarEmotionFrequency[]>((ranked, emotion) => {
     const count = counts.get(emotion.id) ?? 0;
+    assert(count >= 0, 'Emotion frequency cannot be negative');
+    assert(
+      ranked.every((frequency) => frequency.count > 0),
+      'Ranked emotion frequencies must be positive',
+    );
     if (count === 0) return ranked;
     const frequency = { emotionId: emotion.id, count };
     const insertAt = ranked.findIndex((candidate) => count > candidate.count);
@@ -46,6 +52,11 @@ export function periodCalendarDays({
   entries: readonly CheckIn[];
   range: AnalyticsDateRange;
 }) {
+  assert(Number.isFinite(range.end.getTime()), 'Analytics range end must be a valid date');
+  assert(
+    range.start === null || Number.isFinite(range.start.getTime()),
+    'Analytics range start must be null or a valid date',
+  );
   if (range.start === null) return [];
   const days: PeriodCalendarDay[] = [];
   for (
@@ -75,12 +86,19 @@ export function calendarMonth({ entries, month }: {
   entries: readonly CheckIn[];
   month: Date;
 }): CalendarMonth {
+  assert(Number.isFinite(month.getTime()), 'Calendar month must be a valid date');
+  assert(entries.every((entry) => entry.occurredAt.length > 0), 'Entry timestamps cannot be empty');
   const year = month.getFullYear();
   const monthIndex = month.getMonth();
   const dayCount = new Date(year, monthIndex + 1, 0).getDate();
   const leadingDayCount = (new Date(year, monthIndex, 1).getDay() + 6) % 7;
   const entriesByDay = entries.reduce<Map<number, readonly CheckIn[]>>((buckets, entry) => {
     const date = new Date(entry.occurredAt);
+    assert(buckets.size <= dayCount, 'Calendar cannot contain more buckets than days');
+    assert(
+      [...buckets.keys()].every((day) => day >= 1 && day <= dayCount),
+      'Calendar bucket days must be within the month',
+    );
     if (Number.isNaN(date.getTime()) || !sameLocalMonth({ date, month: monthIndex, year })) {
       return buckets;
     }

@@ -1,4 +1,5 @@
 import * as Schema from 'effect/Schema';
+import assert from 'tiny-invariant';
 
 import { ANALYTICS_TIMEFRAMES } from '@/constants';
 import type { CheckIn } from '@/features/check-in/domain/check-in';
@@ -49,6 +50,11 @@ export function analyticsDateRange({
   now: Date;
   timeframe: AnalyticsTimeframe;
 }): AnalyticsDateRange {
+  assert(Number.isFinite(now.getTime()), 'Analytics reference date must be valid');
+  assert(
+    Object.values(ANALYTICS_TIMEFRAMES).includes(timeframe),
+    'Analytics timeframe must be supported',
+  );
   const end = startOfLocalWeek(now);
   if (timeframe === ANALYTICS_TIMEFRAMES.ALL_TIME) return { start: null, end };
   if (timeframe === ANALYTICS_TIMEFRAMES.LAST_FOUR_WEEKS) {
@@ -66,6 +72,11 @@ export function entriesForAnalyticsTimeframe({
   now: Date;
   timeframe: AnalyticsTimeframe;
 }) {
+  assert(Number.isFinite(now.getTime()), 'Analytics reference date must be valid');
+  assert(
+    Object.values(ANALYTICS_TIMEFRAMES).includes(timeframe),
+    'Analytics timeframe must be supported',
+  );
   const range = analyticsDateRange({ now, timeframe });
   if (range.start === null) return entries;
   const start = range.start;
@@ -87,6 +98,11 @@ type LeitsatzFrequency = Readonly<{
 
 function rankLeitsatzFrequencies(items: readonly LeitsatzFrequency[]) {
   return items.reduce<readonly LeitsatzFrequency[]>((ranked, item) => {
+    assert(item.count > 0, 'Leitsatz frequency must be positive');
+    assert(
+      ranked.every((frequency) => frequency.count > 0),
+      'Ranked Leitsatz frequencies must be positive',
+    );
     const insertionIndex = ranked.findIndex((candidate) => (
       item.count > candidate.count
       || (item.count === candidate.count && item.latestAt > candidate.latestAt)
@@ -109,6 +125,11 @@ export function topLeitsaetzeForTimeframe({
   statements: readonly BeliefStatement[];
   timeframe: AnalyticsTimeframe;
 }): TopLeitsatzGroup | null {
+  assert(Number.isFinite(now.getTime()), 'Analytics reference date must be valid');
+  assert(
+    Object.values(ANALYTICS_TIMEFRAMES).includes(timeframe),
+    'Analytics timeframe must be supported',
+  );
   const range = analyticsDateRange({ now, timeframe });
   const timeframeEntries = entriesForAnalyticsTimeframe({
     entries,
@@ -116,6 +137,8 @@ export function topLeitsaetzeForTimeframe({
     timeframe,
   });
   const frequencies = timeframeEntries.reduce<readonly LeitsatzFrequency[]>((items, entry) => {
+    assert(items.every((item) => item.count > 0), 'Leitsatz frequencies must stay positive');
+    assert(items.length <= timeframeEntries.length, 'Frequency groups cannot exceed entries');
     if (!entry.beliefSystemId) return items;
     const statement = beliefStatementForId({
       beliefSystemId: entry.beliefSystemId,
