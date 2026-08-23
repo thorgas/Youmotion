@@ -41,6 +41,14 @@ const RED_ARROW_PATH = 'M256 302C272 287 282 268 299 260C315 252 329 269 344 260
 const DOWN_ARROW_PATH = 'M256 302C255 322 268 333 290 336C317 339 332 349 334 371L334 388M334 388L324 376M334 388L344 378';
 const AnimatedPath = createAnimatedComponent(Path);
 
+function assertWorkletInvariant({ condition, message }: {
+  condition: boolean;
+  message: string;
+}) {
+  'worklet';
+  if (!condition) throw new Error(message);
+}
+
 function useTraceProps({
   progress,
   traceLength,
@@ -66,8 +74,14 @@ export function YoumotionLogoReveal({
   const reduceMotion = useReducedMotion();
   const progress = useDerivedValue(
     () => {
-      assert(SPLASH_LOGO_SIZE > 0, 'Animated splash logo size must be positive.');
-      assert(SPLASH_LOGO_REVEAL_DURATION > 0, 'Animated splash reveal duration must be positive.');
+      assertWorkletInvariant({
+        condition: SPLASH_LOGO_SIZE > 0,
+        message: 'Animated splash logo size must be positive.',
+      });
+      assertWorkletInvariant({
+        condition: SPLASH_LOGO_REVEAL_DURATION > 0,
+        message: 'Animated splash reveal duration must be positive.',
+      });
       if (!active) return 0;
       if (reduceMotion) return 1;
       return withTiming(1, {

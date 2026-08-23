@@ -128,6 +128,13 @@ export default tseslint.config(
       'code-architecture/require-assertions': [
         'error',
         {
+          assertionNames: [
+            'assert',
+            'assertDefined',
+            'assertWorkletInvariant',
+            'nodeAssert',
+            'nodeAssert.ok',
+          ],
           ignoreJSXCallbacks: true,
           ignoreNoInputClosures: true,
           minimum: 2,
