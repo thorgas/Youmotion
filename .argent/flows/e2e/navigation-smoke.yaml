@@ -1,0 +1,20 @@
+steps:
+  - echo: Open Youmotion on the dedicated E2E device and verify primary navigation.
+  - launch: com.youmotion.mobile
+  - tool: open-url
+    args:
+      url: exp+youmotion://expo-development-client/?url=http%3A%2F%2F127.0.0.1%3A8091
+  - await: { visible: { id: tab-today }, timeout: 30000 }
+  - when:
+      visible: { id: xmark }
+    steps:
+      - tap: { id: xmark }
+      - await: { hidden: { id: xmark }, timeout: 5000 }
+  - tap: { id: tab-history }
+  - await: { visible: { id: history-search-input }, timeout: 5000 }
+  - await: { idle: true }
+  - tap: { id: tab-settings }
+  - await: { visible: { text: Your space. }, timeout: 5000 }
+  - await: { idle: true }
+  - tap: { id: tab-today }
+  - await: { visible: { id: emotion-star }, timeout: 5000 }

@@ -7,6 +7,12 @@ export function DevelopmentRoot({ children }: PropsWithChildren) {
   usePerformanceMonitorDevTools();
   useRequireProfilerDevTools();
 
-  if (process.env.EXPO_PUBLIC_MAESTRO === 'true') return children;
+  if (
+    process.env.EXPO_PUBLIC_E2E === 'true'
+    || process.env.EXPO_PUBLIC_MAESTRO === 'true'
+  ) {
+    return children;
+  }
+
   return <ReactNativeGrabRoot style={{ flex: 1 }}>{children}</ReactNativeGrabRoot>;
 }
