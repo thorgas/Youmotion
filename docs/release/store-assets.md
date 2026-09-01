@@ -9,15 +9,20 @@ These files are prepared for store review and use synthetic app data only.
 - Phone screenshots: [`01-history.png`](../../artifacts/release-store/01-history.png),
   [`02-history-filters.png`](../../artifacts/release-store/02-history-filters.png),
   [`03-settings-privacy.png`](../../artifacts/release-store/03-settings-privacy.png),
-  [`04-export.png`](../../artifacts/release-store/04-export.png), and
-  [`05-analytics-pattern.png`](../../artifacts/release-store/05-analytics-pattern.png).
+  and [`04-export.png`](../../artifacts/release-store/04-export.png). These
+  four 1290×2796 RGB PNGs are the valid phone set. The separate
+  [`05-analytics-pattern.png`](../../artifacts/release-store/05-analytics-pattern.png)
+  is a 1074×1104 supplemental analytics visual, not a phone screenshot; use it
+  only where Google Play accepts a non-phone listing image.
 
 ## Apple App Store
 
 The Goldie-generated five phone captures below can be used for the supported
 iPhone sizes; App Store Connect can scale down the highest-resolution upload.
-An iPad-specific set is still required only if the iPad listing is submitted
-with screenshots for that device family.
+Because `app.json` enables `ios.supportsTablet`, App Store Connect also needs
+the iPad family populated. The raw iPad set is archived in
+[`apple-ipad/`](../../artifacts/release-store/apple-ipad/) at 2064×2752, the
+13-inch iPad portrait size.
 
 The configured locales are `en-US` and `de-DE`; the German set includes German
 store copy while the underlying app screens remain the same Release build.

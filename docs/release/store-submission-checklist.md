@@ -12,6 +12,7 @@
 - [x] Privacy-policy and terms drafts created.
 - [x] Google Play 1024x500 feature graphic prepared.
 - [x] Clean synthetic-data phone screenshot set prepared.
+- [x] Apple 13-inch iPad screenshot set prepared for the tablet-capable build.
 
 ## Publisher/legal-owner actions
 
@@ -28,8 +29,8 @@
 - [ ] Complete Google Data safety, content rating, target audience, ads,
   category, and app-access declarations.
 - [ ] If applicable, complete Google's 12-tester/14-day closed-test gate.
-- [ ] Confirm the phone screenshots against the signed production build and
-  add an iPad/tablet set if that device family is submitted.
+- [ ] Confirm all screenshots against the signed production build and upload
+  the matching iPhone, iPad, and Google Play assets.
 - [ ] Test final production binaries on real devices and store testing tracks.
 - [ ] Give reviewers instructions explaining that no account is required.
 
