@@ -11,10 +11,27 @@ function resolveGitCommit() {
   }
 }
 
+const isProductionBuild = process.env.EAS_BUILD_PROFILE === 'production';
+const harnessUiPackage = '@react-native-harness/ui';
+
 module.exports = ({ config }) => ({
   ...config,
   extra: {
     ...config.extra,
     gitCommit: resolveGitCommit(),
+  },
+  autolinking: {
+    ...config.autolinking,
+    ios: {
+      ...config.autolinking?.ios,
+      ...(isProductionBuild
+        ? {
+            exclude: [
+              ...(config.autolinking?.ios?.exclude ?? []),
+              harnessUiPackage,
+            ],
+          }
+        : {}),
+    },
   },
 });
