@@ -10,15 +10,17 @@
 - [x] iOS production build and TestFlight commands exist.
 - [x] English/German listing draft created.
 - [x] Privacy-policy and terms drafts created.
+- [x] Controller, address, register, and contact placeholders replaced from
+  `https://thorgas.com/`; bilingual legal drafts completed.
 - [x] Google Play 1024x500 feature graphic prepared.
 - [x] Clean synthetic-data phone screenshot set prepared.
 - [x] Apple 13-inch iPad screenshot set prepared for the tablet-capable build.
 
 ## Publisher/legal-owner actions
 
-- [ ] Replace legal placeholders with the real controller, address, emails,
-  effective date, governing law, and URLs.
-- [ ] Obtain legal review and publish the policy pages over HTTPS.
+- [ ] Obtain legal review of the completed drafts.
+- [ ] Publish the app privacy policy and terms over stable HTTPS URLs and add
+  those final URLs to the store listings.
 - [ ] Create/verify App Store Connect and Google Play app records.
 - [ ] Accept agreements and complete tax/banking/account verification.
 - [ ] Configure and verify Apple distribution credentials.

@@ -1,103 +1,183 @@
 # Youmotion Privacy Policy / Datenschutzerklärung
 
-**Draft for legal review — effective date: [DD Month YYYY]**
-
-Replace every bracketed placeholder and publish the reviewed version at a stable
-HTTPS URL before submitting the app. This draft is not legal advice.
+**Engineering draft for legal review — effective date: 1 September 2026.**
+This is not legal advice and must be reviewed before publication.
 
 ## 1. Controller / Verantwortlicher
 
-**[LEGAL NAME OR COMPANY]**<br>
-**[POSTAL ADDRESS]**<br>
-Email: **[PRIVACY EMAIL ADDRESS]**
+**VASTOR HOLDING UG (haftungsbeschränkt)**<br>
+**Managing director: Tim Horgas**<br>
+**Bernstorffstr. 104, 22767 Hamburg, Germany**<br>
+**Commercial register:** Amtsgericht Hamburg, HRB 20355B171109<br>
+**D-U-N-S number:** 343855633<br>
+**Data protection contact:** info@thorgas.com<br>
+**Support contact in app:** youmotion@thorgas.com
 
 ## 2. What Youmotion does
 
-Youmotion is a self-reflection and emotion-journaling application. It lets you
-record emotions, intensity, nuance, optional reflection text, optional belief
-text, reminders, and locally calculated history and insights. It is not a
-medical device, does not diagnose or treat illness, and is not a substitute for
-psychotherapy, medical advice, or emergency support.
+Youmotion is a private, local-first self-reflection application. It allows recording emotions, intensity and nuance, optional reflection notes, optional belief entries and guiding statements, reminders, and local history/insight data.
 
-## 3. Data processed on your device
+Youmotion is not a medical device and does not provide diagnosis, treatment, or emergency services. It is a support tool only.
 
-The current app stores the following in its private application storage:
+## 3. Data processed on this device / Verarbeitete Daten auf dem Gerät
 
-- emotion selections, intensity, nuance, dates, times, and reflection notes;
-- optional custom belief and supportive-statement text;
-- reminder settings and notification-content choices;
-- language and other app preferences; and
-- locally calculated history and insight data.
+- Emotion selections, intensity, nuance, timestamps, language, and app preferences
+- Optional note text and optional belief/Leitsatz text entered by you
+- Reminder settings and notification preferences
+- Locally derived history and insight data
+- Local settings used to keep the app running and store check-in data
 
-These records are not uploaded to a Youmotion server by the current app. The
-app does not require an account and does not include advertising, analytics, or
-third-party tracking in its current configuration. Journal and belief text may
-still reveal sensitive information about your emotional or mental state.
+Journal and belief text may therefore contain sensitive information about your
+emotional state.
 
-## 4. Backups and sharing
+## 4. Local-first operation / Lokal gespeicherte Daten
 
-You can explicitly export a local backup or share feedback through the device's
-share or email composer. If you attach a screenshot, the app asks for consent
-before capturing it. The selected email or sharing provider then processes the
-information under its own terms and privacy policy. Exported files remain under
-your control after they leave the app.
+The current app stores user data in private application storage on the device.
+No account is required. There are no ads, analytics, or tracking systems
+configured in this build.
 
-## 5. Notifications
+## 5. Optional sharing and export / Optionale Freigaben und Backups
 
-If you grant permission, Youmotion schedules local notifications on your device.
-The current app does not use a remote push-notification service. You can disable
-permission or individual reminders in the operating-system or app settings.
+You can explicitly start:
 
-## 6. Technical providers
+- backup export (JSON file)
+- backup restore (after preview and validation)
+- feedback email flow with optional screenshot attachment
 
-The app uses platform and open-source components supplied by Apple, Google,
-Expo, React Native, and SurrealDB to run the application, store local data,
-schedule local notifications, and compose optional email. The final published
-build must be checked against its actual dependency and platform behavior before
-this section is finalized.
+Backups are stored using OS sharing flow and remain under your control after leaving
+the app. If you attach a screenshot for feedback, the app asks permission before
+capture and only includes it with explicit consent.
 
-## 7. Retention, deletion, and rights
+The email flow opens your installed mail app; once you approve sending, your email
+provider processes the message under its own terms.
 
-Journal data remains on the device until you edit or delete it, use delete-all,
-uninstall the app, or replace it through a restore action. Exported backup files
-are not deleted by in-app deletion. Depending on applicable law, you may have
-rights to access, correct, erase, restrict, object to, or receive a copy of
-personal data. For controller-related requests, contact **[PRIVACY EMAIL
-ADDRESS]**. You may also contact your competent supervisory authority.
+## 6. Notifications / Benachrichtigungen
 
-## 8. Children and changes
+If you allow it, notifications are scheduled locally on your device. The current
+configuration does not use remote push notifications.
 
-Youmotion is not directed at children. We may update this policy when data
-practices change; the effective date above will then be updated.
+## 7. Technical providers and integrations / Technische Anbieter
 
-## Deutsche Fassung
+Youmotion uses platform components and open-source libraries including Expo,
+React Native, and SurrealDB for local storage and app behavior. Confirm provider
+declarations against the submitted build before final publication.
+
+## 8. Retention, deletion, and backup behavior / Aufbewahrung, Löschung und Backup
+
+- Journal data remains on-device until you edit/delete it, uninstall the app, or replace it via restore.
+- Restore replaces local journal and settings with the backup after validation.
+- `Delete all moments` removes journal entries and personal beliefs and is not
+  reversible.
+- Exported backup files are not deleted by in-app delete actions.
+
+## 9. Rights / Rechte
+
+Depending on applicable law, you may have rights to access, correct, erase,
+restrict, or receive your data, and other consumer rights. For controller
+requests, contact **info@thorgas.com**. You may also contact your competent
+supervisory authority.
+
+The supervisory authority named by the controller is the Hamburg Commissioner
+for Data Protection and Freedom of Information, Ludwig-Erhard-Str. 22, 20459
+Hamburg, Germany.
+
+## 10. Scope and children / Altersgrenzen
+
+Youmotion is not intended for children.
+
+This policy may be updated when behavior changes; the effective date above is
+kept current.
+
+## 11. Deutsche Fassung
 
 ### Verantwortlicher
 
-**[RECHTLICHER NAME ODER UNTERNEHMEN]**<br>
-**[POSTALISCHE ANSCHRIFT]**<br>
-E-Mail: **[DATENSCHUTZ-E-MAIL]**
+**VASTOR HOLDING UG (haftungsbeschränkt)**<br>
+**Vertretungsberechtigte Person:** Tim Horgas<br>
+**Bernstorffstr. 104, 22767 Hamburg, Deutschland**<br>
+**Handelsregister:** Amtsgericht Hamburg, HRB 20355B171109<br>
+**D-U-N-S:** 343855633<br>
+**Datenschutz-Kontakt:** info@thorgas.com<br>
+**Support in der App:** youmotion@thorgas.com<br>
+**Wirksamkeitsdatum:** 1. September 2026
 
-Bitte ersetze alle Platzhalter, lasse diese Erklärung rechtlich prüfen und
-veröffentliche sie unter einer dauerhaft erreichbaren HTTPS-Adresse.
+## 1. Gegenstand
 
-Youmotion ist eine App zur Selbstreflexion und zum Festhalten von Gefühlen. Die
-aktuellen Journal-, Glaubenssatz-, Erinnerungs-, Sprach- und Verlaufsdaten
-werden im privaten Speicher der App auf deinem Gerät gespeichert. Die aktuelle
-App lädt diese Journal-Daten nicht auf einen Youmotion-Server hoch. Du brauchst
-kein Konto; Werbung, Analyse- und Trackingdienste sind derzeit nicht Teil der
-App.
+Youmotion ist eine private, lokal-fokussierte Selbstreflexions-App. Du kannst
+Gefühle mit Intensität und Nuance, optionale Notizen, optionale Glaubens- und
+Leitsatztexte, Erinnerungen sowie lokale Verlaufsauswertungen erfassen.
 
-Journal- und Glaubenssatztexte können sensible Informationen über deine
-emotionale oder psychische Situation enthalten. Backups und Feedback-E-Mails
-werden nur durch eine ausdrückliche Aktion von dir gestartet. Vor einem
-Feedback-Screenshot fragt die App nach deiner Zustimmung. Lokale Erinnerungen
-werden auf deinem Gerät geplant.
+Youmotion ist kein Medizinprodukt und bietet weder Diagnose noch Behandlung oder
+Notfallhilfe.
 
-Du kannst Einträge bearbeiten oder löschen und die Journal-Daten vollständig
-löschen. Exportierte Dateien bleiben an dem Ort erhalten, an dem du sie
-gespeichert oder geteilt hast. Je nach geltendem Recht kannst du Auskunft,
-Berichtigung, Löschung, Einschränkung, Widerspruch oder Datenübertragbarkeit
-verlangen. Wende dich dazu an **[DATENSCHUTZ-E-MAIL]** oder die zuständige
-Datenschutzaufsichtsbehörde. Die App ist kein Medizinprodukt und ersetzt keine
-Diagnose, Therapie, medizinische Beratung oder Notfallhilfe.
+## 2. Verarbeitete Daten
+
+- Emotionsauswahl, Intensität, Nuance, Zeitangaben, Sprache und App-Einstellungen
+- optionale Notiz- und Glaubens-/Leitsatztexte
+- Erinnerungs-Einstellungen und Benachrichtigungspräferenzen
+- lokal berechnete Verlaufs- und Einsichts-Daten
+- lokale Einstellungen, die für den App-Betrieb benötigt werden
+
+Die Journaleinträge können sensible Informationen über deine emotionale Lage
+enthalten.
+
+## 3. Lokale Verarbeitung
+
+Die App speichert Daten in der privaten App-Speicherung des Geräts. Es wird kein
+Konto benötigt. In diesem Build sind Werbung, Analytics oder Tracking nicht
+konfiguriert.
+
+## 4. Optionale Freigabe- und Backup-Funktionen
+
+Du kannst aktiv auslösen:
+
+- Backuperstellung (JSON-Datei),
+- Backup-Wiederherstellung nach Vorschau und Prüfung,
+- Feedback per E-Mail mit optionalem Screenshot.
+
+Backups verbleiben nach der Freigabe unter deiner Kontrolle. Ein Screenshot wird
+nur nach ausdrücklicher Zustimmung aufgenommen und nur dann angehängt.
+
+Der Feedback-Flow öffnet deine E-Mail-App; nach deiner Zustimmung übernimmt der
+Mail-Anbieter die eigentliche Übertragung nach dessen Bedingungen.
+
+## 5. Benachrichtigungen
+
+Benachrichtigungen können nach Erlaubnis lokal auf deinem Gerät geplant werden.
+Remote-Push-Dienste werden in der aktuellen Konfiguration nicht eingesetzt.
+
+## 6. Technische Dienstleister
+
+Youmotion nutzt Plattform- und Open-Source-Komponenten (u. a. Expo, React Native,
+SurrealDB). Für die endgültige Rechtsfassung ist die tatsächlich veröffentlichte
+Build-Konfiguration maßgeblich.
+
+## 7. Speicherfristen, Löschung, Wiederherstellung
+
+- Daten bleiben auf dem Gerät bis zu Bearbeitung/Löschung, Deinstallation oder
+  Wiederherstellung.
+- Die Wiederherstellung ersetzt nach Prüfung lokale Journal- und Einstellungsdaten.
+- „Alle Einträge löschen“ entfernt alle Journal- und persönlichen Glaubensdaten
+  unwiderruflich in der App.
+- Exportierte Backups werden durch die App-Löschung nicht gelöscht.
+
+## 8. Rechte
+
+Abhängig vom anwendbaren Recht bestehen Rechte auf Auskunft, Berichtigung,
+Löschung, Einschränkung, Widerspruch oder Datenübertragbarkeit.
+Anträge: **info@thorgas.com**. Alternativ gilt die jeweilige zuständige
+Datenschutzaufsichtsbehörde.
+
+Die vom Verantwortlichen benannte Aufsichtsbehörde ist der Hamburgische
+Beauftragte für Datenschutz und Informationsfreiheit, Ludwig-Erhard-Str. 22,
+20459 Hamburg.
+
+## 9. Änderungen / Änderungshinweis
+
+Diese Erklärung wird bei Änderungen der Datenverarbeitung aktualisiert; das
+Wirksamkeitsdatum wird angepasst.
+
+## Hinweis
+
+Dieser Text ist ein Engineering-Entwurf und muss vor Veröffentlichung rechtlich
+geprüft werden.
