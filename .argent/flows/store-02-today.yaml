@@ -1,8 +1,61 @@
 steps:
   - launch: com.youmotion.mobile
-  - await: { visible: { text: "Make space for what is here." }, timeout: 30000 }
+  - await: { visible: { id: onboarding-progress }, timeout: 30000 }
   - await: { idle: true }
   - echo: Tap Skip in the fixed onboarding header; normalized center from release accessibility bounds.
   - tap: { x: 0.89, y: 0.09 }
+  - await: { visible: { id: emotion-star }, timeout: 10000 }
+  - echo: Create four neutral redacted E2E moments with varied emotions for populated store captures.
+  - tool: gesture-swipe
+    args: { fromX: 0.5, fromY: 0.54, toX: 0.5, toY: 0.34, durationMs: 700 }
+  - await: { visible: { id: reflection-note-input }, timeout: 10000 }
+  - tap: { id: reflection-note-input }
+  - tool: keyboard
+    args: { text: A slower breath helped me pause. }
+  - tap: { x: 0.5, y: 0.27 }
+  - tap: { id: reflection-save }
+  - await: { visible: { id: belief-system-step }, timeout: 10000 }
+  - tap: { id: belief-system-finish }
+  - await: { visible: { id: success-screen }, timeout: 10000 }
+  - tap: { x: 0.5, y: 0.63 }
+  - await: { visible: { id: emotion-star }, timeout: 10000 }
+  - tool: gesture-swipe
+    args: { fromX: 0.5, fromY: 0.54, toX: 0.72, toY: 0.54, durationMs: 700 }
+  - await: { visible: { id: reflection-note-input }, timeout: 10000 }
+  - tap: { id: reflection-note-input }
+  - tool: keyboard
+    args: { text: Work felt full, so I made room to pause. }
+  - tap: { x: 0.5, y: 0.27 }
+  - tap: { id: reflection-save }
+  - await: { visible: { id: belief-system-step }, timeout: 10000 }
+  - tap: { id: belief-system-finish }
+  - await: { visible: { id: success-screen }, timeout: 10000 }
+  - tap: { x: 0.5, y: 0.63 }
+  - await: { visible: { id: emotion-star }, timeout: 10000 }
+  - tool: gesture-swipe
+    args: { fromX: 0.5, fromY: 0.54, toX: 0.28, toY: 0.54, durationMs: 700 }
+  - await: { visible: { id: reflection-note-input }, timeout: 10000 }
+  - tap: { id: reflection-note-input }
+  - tool: keyboard
+    args: { text: Connection brought some warmth today. }
+  - tap: { x: 0.5, y: 0.27 }
+  - tap: { id: reflection-save }
+  - await: { visible: { id: belief-system-step }, timeout: 10000 }
+  - tap: { id: belief-system-finish }
+  - await: { visible: { id: success-screen }, timeout: 10000 }
+  - tap: { x: 0.5, y: 0.63 }
+  - await: { visible: { id: emotion-star }, timeout: 10000 }
+  - tool: gesture-swipe
+    args: { fromX: 0.5, fromY: 0.54, toX: 0.5, toY: 0.74, durationMs: 700 }
+  - await: { visible: { id: reflection-note-input }, timeout: 10000 }
+  - tap: { id: reflection-note-input }
+  - tool: keyboard
+    args: { text: Rest gave me a little more space. }
+  - tap: { x: 0.5, y: 0.27 }
+  - tap: { id: reflection-save }
+  - await: { visible: { id: belief-system-step }, timeout: 10000 }
+  - tap: { id: belief-system-finish }
+  - await: { visible: { id: success-screen }, timeout: 10000 }
+  - tap: { x: 0.5, y: 0.63 }
   - await: { visible: { id: emotion-star }, timeout: 10000 }
   - await: { idle: true }

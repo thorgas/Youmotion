@@ -19,13 +19,25 @@ iPhone sizes; App Store Connect can scale down the highest-resolution upload.
 An iPad-specific set is still required only if the iPad listing is submitted
 with screenshots for that device family.
 
+The configured locales are `en-US` and `de-DE`; the German set includes German
+store copy while the underlying app screens remain the same Release build.
+
 ## Goldie screenshot capture
 
 The store screenshot set is defined in `goldie/goldie.config.ts` and driven by
 the flows in `.argent/flows/store-*.yaml`. Goldie captures the app as a Release
 iOS Simulator build, then frames the raw captures for App Store Connect.
 
-For populated History and Insights captures, first replay
+For populated History and Insights captures, the `store-02-today` flow first
+creates four neutral, synthetic moments through the normal check-in journey.
+Replay it from a clean install when recapturing. The optional archive restore
+flow can also be used when a larger fixture is needed:
+
+```sh
+argent flow run .argent/flows/store-02-today.yaml --device "$E2E_DEVICE"
+```
+
+For the larger fixture, first replay
 `.argent/flows/store-00-restore-fixture.yaml` after making the committed
 fixture available to the simulator Files app as
 `youmotion-demo-backup.json`:

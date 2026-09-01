@@ -1,7 +1,4 @@
 steps:
   - launch: com.youmotion.mobile
-  - await:
-      visible:
-        text: Make space for what is here.
-      timeout: 30000
+  - await: { visible: { id: onboarding-progress }, timeout: 30000 }
   - await: { idle: true }

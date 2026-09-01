@@ -2,5 +2,7 @@ steps:
   - launch: com.youmotion.mobile
   - await: { visible: { id: emotion-star }, timeout: 10000 }
   - tap: { id: tab-analytics }
-  - await: { visible: { text: "YOUR INSIGHTS" }, timeout: 10000 }
+  - await: { visible: { id: analytics-screen }, timeout: 10000 }
+  - echo: Select All time so the current synthetic E2E moments appear in the store capture.
+  - tap: { x: 0.798, y: 0.241 }
   - await: { idle: true }
