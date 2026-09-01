@@ -14,10 +14,43 @@ These files are prepared for store review and use synthetic app data only.
 
 ## Apple App Store
 
-The same five phone captures can be used for the supported iPhone sizes; App
-Store Connect can scale down the highest-resolution upload. An iPad-specific
-set is still required only if the iPad listing is submitted with screenshots
-for that device family.
+The Goldie-generated five phone captures below can be used for the supported
+iPhone sizes; App Store Connect can scale down the highest-resolution upload.
+An iPad-specific set is still required only if the iPad listing is submitted
+with screenshots for that device family.
+
+## Goldie screenshot capture
+
+The store screenshot set is defined in `goldie/goldie.config.ts` and driven by
+the flows in `.argent/flows/store-*.yaml`. Goldie captures the app as a Release
+iOS Simulator build, then frames the raw captures for App Store Connect.
+
+For populated History and Insights captures, first replay
+`.argent/flows/store-00-restore-fixture.yaml` after making the committed
+fixture available to the simulator Files app as
+`youmotion-demo-backup.json`:
+
+```sh
+argent flow run .argent/flows/store-00-restore-fixture.yaml --device "$E2E_DEVICE"
+```
+
+The flow imports only
+`src/features/data-safety/__tests__/fixtures/legacy-archive.fixture.json`, a
+neutral 133-moment/15-belief archive. It must never be replaced with a
+personal backup.
+
+Build the simulator app first, then capture and verify the assets:
+
+```sh
+pnpm exec expo run:ios --configuration Release --no-bundler
+RELEASE_APP=$(find "$HOME/Library/Developer/Xcode/DerivedData" -path '*/Build/Products/Release-iphonesimulator/Youmotion.app' -print -quit)
+GOLDIE_CONFIG="$PWD/goldie/goldie.config.ts" GOLDIE_APP_PATH="$RELEASE_APP" npx -y goldie@0 all
+```
+
+The framed PNGs are written under `goldie/out/` at 1320×2868 pixels for the
+6.9-inch iPhone store slot. `goldie/out/` is intentionally ignored because it
+contains generated capture output; copy approved files into the release asset
+archive when they are ready for upload.
 
 ## Capture guardrails
 

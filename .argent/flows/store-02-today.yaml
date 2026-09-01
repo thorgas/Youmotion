@@ -1,0 +1,8 @@
+steps:
+  - launch: com.youmotion.mobile
+  - await: { visible: { text: "Make space for what is here." }, timeout: 30000 }
+  - await: { idle: true }
+  - echo: Tap Skip in the fixed onboarding header; normalized center from release accessibility bounds.
+  - tap: { x: 0.89, y: 0.09 }
+  - await: { visible: { id: emotion-star }, timeout: 10000 }
+  - await: { idle: true }

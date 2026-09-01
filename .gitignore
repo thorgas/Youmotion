@@ -55,3 +55,6 @@ example
 # generated native folders
 /ios
 /android
+
+# Goldie generated captures and studio output
+/goldie/out/

@@ -1,0 +1,6 @@
+steps:
+  - launch: com.youmotion.mobile
+  - await: { visible: { id: emotion-star }, timeout: 10000 }
+  - tap: { id: tab-analytics }
+  - await: { visible: { text: "YOUR INSIGHTS" }, timeout: 10000 }
+  - await: { idle: true }
