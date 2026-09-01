@@ -33,7 +33,7 @@ const config = {
   scenes: [
     {
       kind: 'screenshot',
-      id: 'pulse',
+      id: 'onboarding',
       flow: 'store-01-pulse',
       headline: { 'en-US': 'Make space for what is here' },
       subhead: { 'en-US': 'Start with a feeling, without needing the perfect words.' },
