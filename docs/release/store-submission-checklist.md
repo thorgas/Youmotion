@@ -31,6 +31,8 @@
 - [ ] If applicable, complete Google's 12-tester/14-day closed-test gate.
 - [ ] Confirm all screenshots against the signed production build and upload
   the matching iPhone, iPad, and Google Play assets.
+- [ ] Confirm each localized screenshot set shows the app UI in that same
+  language, especially the German App Store set.
 - [ ] Test final production binaries on real devices and store testing tracks.
 - [ ] Give reviewers instructions explaining that no account is required.
 

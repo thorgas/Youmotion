@@ -152,8 +152,8 @@ export function CheckInScreen() {
 const styles = StyleSheet.create({
   page: { flex: 1, backgroundColor: palette.paper },
   safeArea: { flex: 1 },
-  gestureRegion: { width: '100%', maxWidth: 520, alignSelf: 'center', paddingHorizontal: 16 },
-  detailsScroll: { flex: 1, width: '100%', maxWidth: 520, alignSelf: 'center' },
+  gestureRegion: { width: '100%', maxWidth: 760, alignSelf: 'center', paddingHorizontal: 32 },
+  detailsScroll: { flex: 1, width: '100%', maxWidth: 760, alignSelf: 'center' },
   detailsContent: { flexGrow: 1, paddingHorizontal: 16, paddingBottom: 32 },
   header: { marginTop: 18, paddingHorizontal: 6 },
   titleLayout: {

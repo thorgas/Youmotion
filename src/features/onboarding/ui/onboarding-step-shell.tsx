@@ -158,7 +158,7 @@ const styles = StyleSheet.create({
   },
   topBar: {
     width: '100%',
-    maxWidth: 520,
+    maxWidth: 760,
     minHeight: 48,
     alignSelf: 'center',
     alignItems: 'center',
@@ -191,7 +191,7 @@ const styles = StyleSheet.create({
   },
   progress: {
     width: '100%',
-    maxWidth: 488,
+    maxWidth: 728,
     alignSelf: 'center',
     flexDirection: 'row',
     gap: 7,
@@ -216,7 +216,7 @@ const styles = StyleSheet.create({
   },
   content: {
     width: '100%',
-    maxWidth: 520,
+    maxWidth: 760,
     flexGrow: 1,
     alignSelf: 'center',
     paddingHorizontal: 22,
@@ -225,7 +225,7 @@ const styles = StyleSheet.create({
   },
   footer: {
     width: '100%',
-    maxWidth: 520,
+    maxWidth: 760,
     alignSelf: 'center',
     paddingHorizontal: 22,
     paddingTop: 10,

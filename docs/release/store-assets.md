@@ -24,8 +24,11 @@ the iPad family populated. The raw iPad set is archived in
 [`apple-ipad/`](../../artifacts/release-store/apple-ipad/) at 2064×2752, the
 13-inch iPad portrait size.
 
-The configured locales are `en-US` and `de-DE`; the German set includes German
-store copy while the underlying app screens remain the same Release build.
+The configured locales are `en-US` and `de-DE`. A localized set is valid only
+when both the Goldie captions and the underlying app UI use that locale. For
+`de-DE`, set the simulator to German, reinstall the app so its locale is
+initialized from the system, verify German accessibility labels, and only then
+capture the German scenes. Never ship German captions around an English app.
 
 ## Goldie screenshot capture
 
@@ -77,3 +80,6 @@ archive when they are ready for upload.
   behavior. Do not claim cloud sync, diagnosis, treatment, or AI features.
 - Re-capture from the signed production build before submission if the UI or
   version changes.
+- For every localized set, inspect at least one raw capture and confirm that
+  the app controls, headings, navigation labels, dates, and empty/populated
+  states are localized before framing or uploading it.

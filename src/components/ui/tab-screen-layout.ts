@@ -4,7 +4,7 @@ import { palette, type } from '@/theme';
 
 export const tabScreenContentStyle = {
   width: '100%',
-  maxWidth: 520,
+  maxWidth: 760,
   alignSelf: 'center',
   paddingHorizontal: 22,
   paddingTop: 18,
