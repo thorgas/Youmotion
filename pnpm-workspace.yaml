@@ -1,8 +1,13 @@
 allowBuilds:
+  '@fails-components/webtransport-transport-http3-quiche': set this to true or false
   '@ottrelite/backend-wrapper-tracy': true
   '@ottrelite/core': true
   dtrace-provider: false
   esbuild: true
+  node-pty: set this to true or false
+  tree-sitter: set this to true or false
+  tree-sitter-javascript: set this to true or false
+  tree-sitter-typescript: set this to true or false
 pmOnFail: ignore
 minimumReleaseAgeExclude:
   - expo-dev-client@57.0.6
@@ -62,6 +67,7 @@ minimumReleaseAgeExclude:
   - expo-no-push-entitlement@1.0.0
   - react-native-surrealdb@0.1.0-alpha.1
   - eslint-plugin-code-architecture@0.4.0-alpha.0 || 0.4.0-alpha.1 || 0.4.0-alpha.2 || 0.4.0-alpha.4
+  - goldie@0.3.0
 overrides:
   tslib: 2.8.1
 patchedDependencies:
