@@ -28,6 +28,7 @@ EAS has plan-dependent build quotas and pricing. Store distribution also require
    - App Store Connect: create an app using bundle ID `com.youmotion.mobile`.
    - Google Play Console: create an app using package `com.youmotion.mobile`.
    - Complete the privacy, content-rating, export-compliance, pricing, tester, screenshot, and store-listing forms in each portal.
+   - Use the engineering drafts in [`docs/legal/`](docs/legal/) and [`docs/release/`](docs/release/) as preparation only; replace placeholders and obtain legal review before publishing.
 
 4. Keep secrets in EAS rather than Git:
 
