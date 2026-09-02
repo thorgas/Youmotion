@@ -11,8 +11,6 @@ import Animated, {
   withTiming,
   type SharedValue,
 } from 'react-native-reanimated';
-import Svg, { Circle } from 'react-native-svg';
-
 import { EMOTION_STAR_ACCESSIBILITY_ACTIONS, MOTION_DURATION } from '@/constants';
 import { appSettingsStore } from '@/features/settings/application/app-settings.store';
 import type { EmotionLabelMode } from '@/features/settings/domain/emotion-label-mode';
@@ -31,6 +29,7 @@ import {
 } from './base-state-ripples';
 import { EmotionAxisLabel } from './emotion-axis-label';
 import { emotionName, emotionNuance, emotionStarAccessibility, emotionStarAccessibilityHint, emotionStarAccessibilityLabel } from './emotion-copy';
+import { FeelingPulseGuides } from './feeling-pulse-guides';
 import { palette, textSize, type } from '@/theme';
 
 type EmotionStarProps = {
@@ -143,25 +142,17 @@ function EmotionField({
   selection,
   size,
 }: EmotionFieldProps) {
-  const guideStyle = useAnimatedStyle(() => ({
-    opacity: withTiming(selection ? 1 : 0, stateAnimation),
-    transform: [{
-      scale: withTiming(selection ? 1 : 0.985, stateAnimation),
-    }],
-  }), [selection]);
-
   return (
     <>
       {centerOrigin
         ? <CenteredBaseStateRipples />
         : <BaseStateRipples offsetX={rippleOffsetX} offsetY={rippleOffsetY} />}
-      <Animated.View style={[styles.guide, { height: size, width: size }, guideStyle]}>
-        <Svg height={size} viewBox={`0 0 ${size} ${size}`} width={size}>
-          {[0.28, 0.5, 0.72, 0.9].map((scale) => (
-          <Circle key={scale} cx={center} cy={center} r={radius * scale} fill="none" stroke={palette.hairline} strokeWidth={1} strokeDasharray="2 7" />
-          ))}
-        </Svg>
-      </Animated.View>
+      <FeelingPulseGuides
+        active={selection !== null}
+        center={center}
+        radius={radius}
+        size={size}
+      />
       {emotions.map((emotion, index) => {
         assert(emotion.nuanceCount > 0, 'Rendered emotions require nuances.');
         assert(index >= 0 && index < emotions.length, 'Rendered emotion index must be in range.');
@@ -319,10 +310,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   canvas: {
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  guide: {
     alignItems: 'center',
     justifyContent: 'center',
   },

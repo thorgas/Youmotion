@@ -43,8 +43,12 @@ function RippleRing({ phase, progress }: RippleRingProps) {
 
 function RippleOrigin() {
   return (
-    <View style={styles.origin} testID="ripple-origin">
-      <View style={styles.originHighlight} />
+    <View style={styles.peak} testID="feeling-pulse-peak">
+      <View style={styles.peakHighlight} />
+      <View style={styles.peakShadow} />
+      <View style={styles.origin} testID="ripple-origin">
+        <View style={styles.originHighlight} />
+      </View>
     </View>
   );
 }
@@ -129,8 +133,41 @@ const styles = StyleSheet.create({
     borderLeftColor: palette.whiteWash,
     opacity: 0.9,
   },
-  origin: {
+  peak: {
     position: 'absolute',
+    width: 46,
+    height: 46,
+    borderRadius: 23,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: palette.paperRaised,
+    borderColor: palette.whiteWash,
+    borderWidth: 1,
+    boxShadow: '-4px -5px 10px rgba(255, 255, 255, 0.74), 5px 7px 13px rgba(42, 39, 34, 0.16)',
+  },
+  peakHighlight: {
+    position: 'absolute',
+    top: 8,
+    left: 10,
+    width: 15,
+    height: 9,
+    borderRadius: 8,
+    backgroundColor: palette.whiteWash,
+    opacity: 0.72,
+    transform: [{ rotate: '-24deg' }],
+  },
+  peakShadow: {
+    position: 'absolute',
+    right: 7,
+    bottom: 7,
+    width: 18,
+    height: 11,
+    borderRadius: 9,
+    backgroundColor: palette.ink,
+    opacity: 0.055,
+    transform: [{ rotate: '-24deg' }],
+  },
+  origin: {
     width: 8,
     height: 8,
     borderRadius: 4,
