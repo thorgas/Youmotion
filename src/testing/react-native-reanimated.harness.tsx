@@ -35,6 +35,8 @@ export function useAnimatedProps<Props>(createProps: () => Props) {
   return createProps();
 }
 
+export function useAnimatedReaction() {}
+
 export function useAnimatedStyle<Style>(createStyle: () => Style) {
   return createStyle();
 }

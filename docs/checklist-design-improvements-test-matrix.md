@@ -18,6 +18,8 @@
 | Neutral state | First render | Four fully round concentric guides render in the `feeling-pulse-guide*` test ids and one raised peak renders under the ripple origin. |
 | Not selected | No touch has started | Guides are visible and the peak remains centered in the canvas. |
 | User drags selection | Active gesture or intensity change | Guides and peak remain round; the raised peak follows the origin offset from the ripple engine. |
+| User changes drag position | Active gesture | The current peak follows immediately while one lower-opacity wave field trails the prior position and fades; no second peak appears. |
+| Reduce Motion enabled | User changes drag position | The remembered field crossfades briefly at the current position without spatial drift. |
 
 ## Tab feedback
 
