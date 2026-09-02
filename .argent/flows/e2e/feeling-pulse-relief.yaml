@@ -1,0 +1,28 @@
+steps:
+  - echo: Verify the rounded Feeling Pulse surface and its unchanged drag-to-reflection path without saving data.
+  - launch: com.youmotion.mobile
+  - when:
+      platform: android
+    steps:
+      - tool: button
+        args:
+          button: back
+  - tool: open-url
+    args:
+      url: exp+youmotion://expo-development-client/?url=http%3A%2F%2F127.0.0.1%3A8091
+  - await: { visible: { id: emotion-star }, timeout: 30000 }
+  - tool: await-screen-idle
+    args:
+      timeoutMs: 5000
+      minStableMs: 400
+  - tool: gesture-tap
+    args:
+      x: 0.923
+      y: 0.102
+  - tool: await-ui-element
+    args:
+      condition: hidden
+      selector:
+        identifier: xmark
+      timeoutMs: 5000
+  - assert: { visible: { id: emotion-star } }

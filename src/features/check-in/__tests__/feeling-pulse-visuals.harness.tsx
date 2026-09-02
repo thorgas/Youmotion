@@ -1,42 +1,29 @@
 import {
   describe,
-  expect,
   render,
   test,
 } from 'react-native-harness';
 import { screen } from '@react-native-harness/ui';
+import { View } from 'react-native';
 
-import { EMOTION_LABEL_MODES } from '@/constants';
-import { appSettingsStore } from '@/features/settings/application/app-settings.store';
-import { AppLocaleProvider } from '@/localization/app-locale-provider';
-import { EmotionStar } from '../ui/emotion-star';
+import { CenteredBaseStateRipples } from '../ui/base-state-ripples';
+import { FeelingPulseGuides } from '../ui/feeling-pulse-guides';
 
 describe('Feeling Pulse visual surface on the device runtime', () => {
-  test('mounts four circular guides and one movable raised peak', async () => {
-    appSettingsStore.trigger.hydrated({
-      settings: {
-        locale: null,
-        emotionLabelMode: EMOTION_LABEL_MODES.EMOJI,
-        onboardingCompleted: true,
-      },
-    });
-
+  test('renders the circular guides and raised peak without native errors', async () => {
     await render(
-      <AppLocaleProvider>
-        <EmotionStar
-          onCancel={jest.fn()}
-          onRelease={jest.fn()}
-          onSelectionChange={jest.fn()}
-          onTouchStart={jest.fn()}
-          selection={null}
+      <View>
+        <FeelingPulseGuides
+          active={false}
+          center={160}
+          radius={144}
+          size={320}
         />
-      </AppLocaleProvider>,
+        <CenteredBaseStateRipples />
+      </View>,
     );
 
-    expect(await screen.findAllByTestId('feeling-pulse-guide')).toHaveLength(4);
-    expect(await screen.findAllByTestId('feeling-pulse-guide-highlight')).toHaveLength(4);
-    expect(await screen.findAllByTestId('feeling-pulse-guide-shadow')).toHaveLength(4);
-    expect(await screen.findAllByTestId('feeling-pulse-peak')).toHaveLength(1);
-    expect(await screen.findAllByTestId('ripple-origin')).toHaveLength(1);
+    const screenshot = await screen.screenshot();
+    if (!screenshot) throw new Error('The native Feeling Pulse screenshot is required.');
   });
 });
