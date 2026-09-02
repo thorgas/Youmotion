@@ -215,7 +215,7 @@ describe('reflection responsive layout', () => {
       bottomOffset: 12,
       compact: true,
       contentHorizontalPadding: 22,
-      inputMinHeight: 112,
+      inputMinHeight: 88,
       keyboardAwareScrollEnabled: false,
       titleFontSize: 28,
     });
@@ -232,7 +232,7 @@ describe('reflection responsive layout', () => {
       bottomOffset: 82,
       compact: false,
       contentHorizontalPadding: 20,
-      inputMinHeight: 150,
+      inputMinHeight: 112,
       keyboardAwareScrollEnabled: true,
       titleFontSize: 31,
     });
@@ -677,6 +677,12 @@ describe('check-in screens', () => {
     const noteInput = screen.getByLabelText('Optional note about the feeling');
     expect(noteInput.props['autoFocus']).toBeUndefined();
     expect(noteInput.props['maxLength']).toBe(MAX_NOTE_LENGTH);
+    expect(noteInput.props['multiline']).toBe(true);
+    expect(StyleSheet.flatten(noteInput.props['style'])).toMatchObject({
+      minHeight: 112,
+    });
+    expect(StyleSheet.flatten(noteInput.props['style'])).not.toHaveProperty('height');
+    expect(StyleSheet.flatten(noteInput.props['style'])).not.toHaveProperty('maxHeight');
     expect(screen.getByText('Joy · Cheerfulness')).toBeTruthy();
     expect(screen.queryByText(/50%/)).toBeNull();
     expect(screen.getByTestId('reflection-keyboard-scroll').props).toMatchObject({
