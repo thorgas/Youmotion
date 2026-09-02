@@ -11,6 +11,14 @@
 | Any state | Unknown accessibility action | No selection or navigation change occurs. |
 | Disabled | Any accessibility action | No selection or navigation change occurs. |
 
+## Feeling Pulse visuals
+
+| Initial state | Input | Expected visual result |
+| --- | --- | --- |
+| Neutral state | First render | Four fully round concentric guides render in the `feeling-pulse-guide*` test ids and one raised peak renders under the ripple origin. |
+| Not selected | No touch has started | Guides are visible and the peak remains centered in the canvas. |
+| User drags selection | Active gesture or intensity change | Guides and peak remain round; the raised peak follows the origin offset from the ripple engine. |
+
 ## Tab feedback
 
 | Current destination | Pressed destination | Haptic result | Navigation result |
