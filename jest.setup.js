@@ -89,6 +89,7 @@ jest.mock('react-native-reanimated', () => {
     interpolate: jest.fn((_value, _input, output) => output[0]),
     ReduceMotion: { Always: 'always', Never: 'never', System: 'system' },
     useAnimatedProps: jest.fn((props) => props()),
+    useAnimatedReaction: jest.fn(),
     useAnimatedStyle: jest.fn((style) => style()),
     useDerivedValue: jest.fn((derive) => ({ value: derive() })),
     useFrameCallback: jest.fn(),

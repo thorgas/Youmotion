@@ -448,6 +448,12 @@ export const EMOTION_AXIS_START_ANGLE = -Math.PI / 4;
 export const EMOTION_AXIS_STEP = Math.PI / 4;
 export const BASE_RIPPLE_DURATION = 2800;
 export const BASE_RIPPLE_PHASES = Object.freeze([0, 0.25, 0.5, 0.75]);
+export const FEELING_PULSE_MEMORY = Object.freeze({
+  DRIFT_DURATION: 280,
+  FADE_DELAY: 70,
+  OPACITY: 0.28,
+  REDUCED_MOTION_DURATION: 160,
+});
 export const MOTION_DURATION = Object.freeze({
   MICRO: 140,
   STATE: 180,

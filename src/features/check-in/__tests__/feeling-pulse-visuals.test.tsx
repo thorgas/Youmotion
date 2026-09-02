@@ -1,6 +1,7 @@
 import { render } from '@testing-library/react-native';
 
 import { AppLocaleProvider } from '@/localization/app-locale-provider';
+import { BASE_RIPPLE_PHASES } from '@/constants';
 import { EmotionStar } from '../ui/emotion-star';
 
 const emotionStarProps = {
@@ -40,6 +41,23 @@ describe('Feeling Pulse visual surface', () => {
     expect(screen.getAllByTestId('ripple-origin')).toHaveLength(1);
     expect(screen.getByTestId('feeling-pulse-peak')).toContainElement(
       screen.getByTestId('ripple-origin'),
+    );
+  });
+
+  it('keeps one peak while a single trailing wave field remembers the prior position', async () => {
+    const screen = await render(
+      <AppLocaleProvider>
+        <EmotionStar {...emotionStarProps} />
+      </AppLocaleProvider>,
+    );
+
+    expect(screen.getAllByTestId('feeling-pulse-memory')).toHaveLength(1);
+    expect(screen.getAllByTestId('feeling-pulse-memory-ring')).toHaveLength(
+      BASE_RIPPLE_PHASES.length,
+    );
+    expect(screen.getAllByTestId('feeling-pulse-peak')).toHaveLength(1);
+    expect(screen.getByTestId('feeling-pulse-memory')).not.toContainElement(
+      screen.getByTestId('feeling-pulse-peak'),
     );
   });
 });
