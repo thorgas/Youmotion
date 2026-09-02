@@ -43,7 +43,7 @@ export function reflectionResponsiveLayout({
     compact,
     contentHorizontalPadding: Math.round(22 * widthScale),
     contentTopPadding: compact ? 0 : 8,
-    inputMinHeight: compact ? 112 : 150,
+    inputMinHeight: compact ? 88 : 112,
     keyboardAwareScrollEnabled: !compact,
     selectionMarginBottom: compact ? 12 : 18,
     titleFontSize: Math.round((compact ? 28 : 34) * widthScale),
