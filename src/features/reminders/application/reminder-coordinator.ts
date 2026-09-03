@@ -30,24 +30,28 @@ export type ReminderTarget =
       beliefSystemId: BeliefSystemId;
     };
 
+interface ActivateReminderInput {
+  readonly assignments: ReadonlyArray<ReminderAssignment>;
+  readonly locale: AppLocale;
+  readonly notificationContent: ReminderNotificationContent;
+  readonly now: Date;
+  readonly statements: ReadonlyArray<BeliefStatement>;
+  readonly target: ReminderTarget;
+  readonly timing: ReminderTiming;
+}
+
 export async function activateReminder({
   assignments,
   locale,
+  now,
   notificationContent,
   statements,
   target,
   timing,
-}: {
-  assignments: readonly ReminderAssignment[];
-  locale: AppLocale;
-  notificationContent: ReminderNotificationContent;
-  statements: readonly BeliefStatement[];
-  target: ReminderTarget;
-  timing: ReminderTiming;
-}) {
+}: ActivateReminderInput) {
   assert(timing.weekdays.length > 0, 'Activated reminder requires weekdays');
   assert(timing.times.length > 0, 'Activated reminder requires times');
-  const now = ReminderTimestamp.make(new Date().toISOString());
+  const timestamp = ReminderTimestamp.make(now.toISOString());
   const normalizedTiming = normalizedReminderTiming(timing);
   const existing = assignments.find((candidate) => (
     candidate.targetKind === target.targetKind
@@ -61,24 +65,24 @@ export async function activateReminder({
   ));
   const assignment: ReminderAssignment = target.targetKind === REMINDER_TARGET_KINDS.PULSE
     ? {
-        id: existing?.id ?? createReminderAssignmentId({ timestamp: Date.now(), nonce: Math.random().toString(16).slice(2) }),
+        id: existing?.id ?? createReminderAssignmentId({ timestamp: now.getTime(), nonce: Math.random().toString(16).slice(2) }),
         schemaVersion: 2,
         ...normalizedTiming,
         targetKind: target.targetKind,
         enabled: true,
-        createdAt: existing?.createdAt ?? now,
-        updatedAt: now,
+        createdAt: existing?.createdAt ?? timestamp,
+        updatedAt: timestamp,
       }
     : {
-        id: existing?.id ?? createReminderAssignmentId({ timestamp: Date.now(), nonce: Math.random().toString(16).slice(2) }),
+        id: existing?.id ?? createReminderAssignmentId({ timestamp: now.getTime(), nonce: Math.random().toString(16).slice(2) }),
         schemaVersion: 2,
         ...normalizedTiming,
         targetKind: target.targetKind,
         beliefSystemId: target.beliefSystemId,
         enabled: true,
         notificationContent,
-        createdAt: existing?.createdAt ?? now,
-        updatedAt: now,
+        createdAt: existing?.createdAt ?? timestamp,
+        updatedAt: timestamp,
       };
   await Effect.runPromise(persistReminderAssignment(assignment));
   const nextAssignments = assignments

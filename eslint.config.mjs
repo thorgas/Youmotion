@@ -79,6 +79,50 @@ export default tseslint.config(
       'code-architecture/effect-error-handling': 'error',
       'code-architecture/imports-first': 'error',
       'code-architecture/max-function-parameters': ['error', { max: 5 }],
+      'code-architecture/named-imports': [
+        'error',
+        {
+          allowDefaultImportsFrom: [
+            '../infrastructure/local-reminder.scheduler',
+            '../infrastructure/reminder.repository',
+            '@/app/(tabs)/_layout',
+            '@/assert',
+            '@/assets/images/app-logo-transparent.png',
+            '@/features/data-safety/infrastructure/data-archive.repository',
+            '@/features/reminders/infrastructure/local-reminder.scheduler',
+            '@/translations/de-DE.json',
+            '@react-native-async-storage/async-storage',
+            '@wuba/react-native-echarts/svgChart',
+            'effect/Effect',
+            'effect/Schema',
+            'expo-constants',
+            'expo-document-picker',
+            'expo-mail-composer',
+            'expo-notifications',
+            'expo-sharing',
+            'expo-splash-screen',
+            'expo-updates',
+            'react-native-reanimated',
+            'react-native-svg',
+          ],
+          allowNamespaceImportsFrom: [
+            '../infrastructure/local-reminder.scheduler',
+            '../infrastructure/reminder.repository',
+            '@/features/data-safety/infrastructure/data-archive.repository',
+            '@/features/reminders/infrastructure/local-reminder.scheduler',
+            'effect/Effect',
+            'effect/Schema',
+            'expo-document-picker',
+            'expo-haptics',
+            'expo-mail-composer',
+            'expo-notifications',
+            'expo-sharing',
+            'expo-splash-screen',
+            'expo-updates',
+            'react-native-reanimated',
+          ],
+        },
+      ],
       'code-architecture/no-barrel-files': 'error',
       'code-architecture/no-barrel-imports': [
         'error',
@@ -138,6 +182,7 @@ export default tseslint.config(
         },
       ],
       'code-architecture/no-root-owned-compound-parts': 'error',
+      'code-architecture/no-namespace-exports': 'error',
       'code-architecture/no-unsafe-type-assertions': 'error',
       'code-architecture/no-unvalidated-json-parse': 'error',
       'code-architecture/prefer-composition-over-configuration': 'error',
@@ -171,6 +216,186 @@ export default tseslint.config(
           stateAttributes: ['accessibilityState', 'aria-disabled'],
         },
       ],
+    },
+  },
+  {
+    files: ['src/**/*.{ts,tsx}'],
+    rules: {
+      'code-architecture/dependency-parameter-convention': 'error',
+      'code-architecture/dependency-wrapper-shape': 'error',
+      'code-architecture/no-exported-dependency-instances': 'error',
+      'code-architecture/no-over-depending': 'error',
+      'code-architecture/sort-dependency-types': 'error',
+    },
+  },
+  {
+    files: [
+      'src/features/**/domain/**/*.{ts,tsx}',
+      'src/features/**/application/**/*.{ts,tsx}',
+      'src/navigation/**/*.{ts,tsx}',
+    ],
+    ignores: [
+      'src/**/__tests__/**',
+      'src/**/*.test.{ts,tsx}',
+      'src/test-utils/**',
+      'src/testing/**',
+    ],
+    rules: {
+      'code-architecture/no-implicit-external-dependencies': [
+        'error',
+        {
+          capabilities: [
+            {
+              dependency: 'Time',
+              replacement: 'an injected clock dependency',
+              selector: 'Date.now',
+            },
+          ],
+          compositionRoots: [
+            'src/app/**',
+            'src/**/infrastructure/**',
+            'src/navigation/app-navigation.machine.ts',
+          ],
+          root: '.',
+        },
+      ],
+      'code-architecture/no-unasserted-return': [
+        'error',
+        {
+          assertionNames: [
+            'assert',
+            'assertDefined',
+            'assertWorkletInvariant',
+            'nodeAssert',
+            'nodeAssert.ok',
+          ],
+          ignoreDelegates: true,
+          ignoreDirectCallbacks: true,
+          ignoreJSXCallbacks: true,
+          ignoreJSXComponents: true,
+          ignoreNoInputClosures: true,
+          ignoreReactHooks: true,
+          ignoreTrivialConstructors: true,
+          minimumStatements: 3,
+        },
+      ],
+      'code-architecture/prefer-interface-over-type': 'error',
+      'code-architecture/prefer-arrow-functions': [
+        'error',
+        {
+          allowDefaultExports: true,
+          allowGenerators: true,
+          allowHoisted: true,
+          allowNamedExports: true,
+          allowRecursive: true,
+          allowedFiles: [
+            '**/src/features/analytics/domain/analytics-calendar.ts',
+            '**/src/features/analytics/domain/analytics-timeframe.ts',
+            '**/src/features/analytics/domain/check-in-analytics.ts',
+            '**/src/features/check-in/application/check-in-history.store.ts',
+            '**/src/features/check-in/domain/belief-system.ts',
+            '**/src/features/check-in/domain/emotion-selection.ts',
+            '**/src/features/feedback/application/feedback.machine.ts',
+            '**/src/navigation/app-navigation.machine.ts',
+            '**/src/navigation/app-router.adapter.ts',
+            '**/src/navigation/tab-bar-icon.tsx',
+          ],
+        },
+      ],
+      'code-architecture/prefer-readonly-types': [
+        'error',
+        { collectionScope: 'contracts' },
+      ],
+      'code-architecture/top-down-declarations': [
+        'error',
+        {
+          allowedFiles: [
+            '**/src/features/analytics/domain/analytics-calendar.ts',
+            '**/src/features/analytics/domain/analytics-timeframe.ts',
+            '**/src/features/check-in/domain/emotion-selection.ts',
+          ],
+          preserveRuntimeDependencies: true,
+        },
+      ],
+    },
+  },
+  {
+    files: ['src/features/settings/application/app-settings.store.ts'],
+    rules: {
+      'code-architecture/no-exported-dependency-instances': 'off',
+    },
+  },
+  {
+    files: [
+      'src/features/check-in/application/check-in-history.store.ts',
+      'src/features/check-in/application/history-filter.ts',
+      'src/navigation/app-router.adapter.ts',
+    ],
+    rules: {
+      'code-architecture/no-unasserted-return': 'off',
+    },
+  },
+  {
+    files: ['src/features/**/domain/**/*.{ts,tsx}'],
+    rules: {
+      'code-architecture/no-unasserted-return': 'off',
+    },
+  },
+  {
+    files: ['src/features/**/domain/**/*.{ts,tsx}'],
+    ignores: [
+      'src/features/analytics/domain/analytics-calendar.ts',
+      'src/features/analytics/domain/analytics-timeframe.ts',
+      'src/features/analytics/domain/check-in-analytics.ts',
+      'src/features/check-in/domain/belief-statement.ts',
+      'src/features/check-in/domain/belief-system.ts',
+      'src/features/check-in/domain/emotion-selection.ts',
+    ],
+    rules: {
+      'code-architecture/require-assertions': 'off',
+      'code-architecture/require-contract-assertions': [
+        'error',
+        {
+          assertionNames: [
+            'assert',
+            'assertDefined',
+            'assertWorkletInvariant',
+            'nodeAssert',
+            'nodeAssert.ok',
+          ],
+          checkParameters: true,
+          checkReturns: false,
+          ignoreDelegates: true,
+          ignoreDirectCallbacks: true,
+          ignoreJSXCallbacks: true,
+          ignoreJSXComponents: true,
+          ignoreNoInputClosures: true,
+          ignoreReactHooks: true,
+          ignoreTrivialConstructors: true,
+          minimumStatements: 5,
+        },
+      ],
+    },
+  },
+  {
+    files: [
+      'src/features/**/application/**/*.{ts,tsx}',
+      'src/navigation/**/*.{ts,tsx}',
+    ],
+    rules: {
+      'code-architecture/require-contract-assertions': 'off',
+    },
+  },
+  {
+    files: [
+      'src/**/__tests__/**',
+      'src/**/*.harness.{ts,tsx}',
+      'src/**/*.test.{ts,tsx}',
+      'src/test-utils/**',
+      'src/testing/**',
+    ],
+    rules: {
+      'code-architecture/no-namespace-exports': 'off',
     },
   },
   {
@@ -327,6 +552,20 @@ export default tseslint.config(
           ],
         },
       ],
+    },
+  },
+  {
+    files: ['src/features/**/domain/**/*.{ts,tsx}'],
+    ignores: [
+      'src/features/analytics/domain/analytics-calendar.ts',
+      'src/features/analytics/domain/analytics-timeframe.ts',
+      'src/features/analytics/domain/check-in-analytics.ts',
+      'src/features/check-in/domain/belief-statement.ts',
+      'src/features/check-in/domain/belief-system.ts',
+      'src/features/check-in/domain/emotion-selection.ts',
+    ],
+    rules: {
+      'code-architecture/require-assertions': 'off',
     },
   },
 );

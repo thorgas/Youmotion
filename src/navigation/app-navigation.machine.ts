@@ -413,6 +413,7 @@ function activateReminderFromDraft({
   void activateReminder({
     assignments: context.reminderAssignments,
     locale,
+    now: new Date(),
     notificationContent: context.reminderNotificationContentDraft,
     statements: context.beliefStatements,
     target,

@@ -14,14 +14,14 @@ export type AnalyticsObservation =
     kind: 'emotion';
     emotionId: CheckIn['emotionId'];
     count: number;
-    supportingIds: readonly CheckIn['id'][];
+    supportingIds: ReadonlyArray<CheckIn['id']>;
   }>
   | Readonly<{
     kind: 'belief';
     beliefSystemId: BeliefSystemId;
     emotionId: CheckIn['emotionId'];
     count: number;
-    supportingIds: readonly CheckIn['id'][];
+    supportingIds: ReadonlyArray<CheckIn['id']>;
   }>
   | Readonly<{ kind: 'notes'; count: number; momentCount: number }>;
 
