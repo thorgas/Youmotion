@@ -36,6 +36,9 @@ describe('Feeling Pulse visual surface', () => {
 
     expect(screen.getAllByTestId('feeling-pulse-peak')).toHaveLength(1);
     expect(screen.getAllByTestId('ripple-origin')).toHaveLength(1);
+    expect(screen.getByTestId('feeling-pulse-peak')).toHaveStyle({
+      boxShadow: '-4px -5px 10px rgba(255, 255, 255, 0.74), 5px 7px 13px rgba(42, 39, 34, 0.10)',
+    });
     expect(screen.getByTestId('feeling-pulse-peak')).toContainElement(
       screen.getByTestId('ripple-origin'),
     );

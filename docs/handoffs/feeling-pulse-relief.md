@@ -17,12 +17,14 @@ Keep one raised Feeling Pulse peak with subtle 3D relief, let its animated waves
   - `src/features/check-in/__tests__/feeling-pulse-visuals.harness.tsx`
   - `.argent/flows/e2e/feeling-pulse-relief.yaml`
   - `docs/screenshots/feeling-pulse/ios-no-static-guides.png`
+  - `docs/screenshots/feeling-pulse/ios-lighter-peak-shadow.png`
   - `docs/checklist-design-improvements-test-matrix.md`
 
 ## Implementation notes
 
 - `emotion-star.tsx` renders only `BaseStateRipples`; the separate fixed SVG guide layer was removed after simulator review showed that it read as static waves.
 - `base-state-ripples.tsx` now wraps the moving origin dot in a new `feeling-pulse-peak` container with highlight/shadow accents to read as a raised center peak.
+- The raised peak keeps the same geometry and highlight while its dark outer shadow opacity is reduced from `0.16` to `0.10`, preserving depth with less visual weight.
 - A single lower-opacity ripple field now follows the previous drag position for 280 ms, retargets continuously, and fades after a 70 ms hold. It reuses the active ripple phase so the old waves keep moving instead of freezing.
 - Reduced Motion removes spatial drift and uses a 160 ms opacity-only crossfade. The existing assertion helper is now worklet-compatible so the UI-thread reaction retains finite-coordinate invariants.
 - All visual IDs used by tests were aligned between unit and harness files:
@@ -44,6 +46,7 @@ Keep one raised Feeling Pulse peak with subtle 3D relief, let its animated waves
 - `pnpm doctor:react`
   - reports no finding in the production files changed for positional memory. Its existing Harness-shim maintainability warning and unrelated repository findings remain; the untracked service-account JSON is reported as a security error and remains untouched.
 - Native app build and launch pass on the iPhone 17 Pro Max. The current evidence is `docs/screenshots/feeling-pulse/ios-no-static-guides.png`; obsolete screenshots containing the removed fixed guide layer were deleted.
+- The lighter peak shadow was replayed against the current Metro bundle on the iPhone 17 Pro Max; evidence is `docs/screenshots/feeling-pulse/ios-lighter-peak-shadow.png`.
 - Positional-memory commit `34500d9` remains the moving-wave implementation; the follow-up removes only the static SVG circles and preserves its current and trailing emitters.
 - The focused iOS Harness passes cleanly on the iPhone 17 Pro (`1/1`); its Reanimated shim now includes the reaction hook used by the production component.
 - The production iPhone 17 Pro Max accepted the equivalent automated drag through `agent-device` and reached Reflection. The permanent Argent flow parses and reaches its gesture, but three runs did not deliver the swipe to React Native and timed out awaiting `reflection-note-input`. The alternate physical Pixel 6a is securely locked and the Android emulator is offline. Keep the drag assertion intact and rerun the documented two-pass command when an Argent-compatible unlocked target is available.

@@ -206,7 +206,7 @@ const styles = StyleSheet.create({
     backgroundColor: palette.paperRaised,
     borderColor: palette.whiteWash,
     borderWidth: 1,
-    boxShadow: '-4px -5px 10px rgba(255, 255, 255, 0.74), 5px 7px 13px rgba(42, 39, 34, 0.16)',
+    boxShadow: '-4px -5px 10px rgba(255, 255, 255, 0.74), 5px 7px 13px rgba(42, 39, 34, 0.10)',
   },
   peakHighlight: {
     position: 'absolute',
