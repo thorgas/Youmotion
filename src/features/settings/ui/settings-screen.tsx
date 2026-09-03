@@ -34,6 +34,7 @@ import { SettingsActionRow } from '@/components/ui/settings-action-row';
 import { actionColors, palette, surfaceColors, type } from '@/theme';
 import { DataSafetyControls } from '@/features/data-safety/ui/data-safety-controls';
 import { FeedbackSettingsAction } from '@/features/feedback/ui/feedback-screen';
+import { LegalSettingsActions } from '@/features/legal/ui/legal-settings-actions';
 import { useAppNavigationActor } from '@/navigation/app-navigation.provider';
 import { appSettingsStore } from '../application/app-settings.store';
 import { guidingBeliefLibraryStatements } from '../domain/guiding-belief-library';
@@ -230,6 +231,10 @@ export function SettingsScreen() {
         <View style={styles.actionGroup}>
           <FeedbackSettingsAction />
         </View>
+        <Text style={styles.sectionHeading}>
+          <fbt desc="Heading grouping legal documents in settings">LEGAL</fbt>
+        </Text>
+        <LegalSettingsActions />
         <Text style={styles.sectionHeading}>
           <fbt desc="Heading for the Settings onboarding replay action">UNDERSTAND YOUMOTION</fbt>
         </Text>

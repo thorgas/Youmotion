@@ -1453,6 +1453,8 @@ describe('check-in screens', () => {
       borderRadius: 14,
     });
     expect(settings.getByText('Your journal belongs to you.')).toBeTruthy();
+    expect(settings.getByRole('button', { name: /Privacy policy/ })).toBeEnabled();
+    expect(settings.getByRole('button', { name: /Terms of use/ })).toBeEnabled();
     expect(settings.getByText('Emotion check-in reminder')).toBeTruthy();
     expect(settings.getByText(
       'Choose days and times for a gentle invitation to notice how you feel.',

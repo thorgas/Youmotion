@@ -432,6 +432,25 @@ export const MAX_REMINDER_TIMES = 5;
 export const DATABASE_MIGRATION_TABLE = 'database_migration';
 export const APP_SETTINGS_RECORD_ID = 'current';
 export const FEEDBACK_EMAIL_RECIPIENT = 'youmotion@thorgas.com';
+export const LEGAL_DOCUMENT_URLS = Object.freeze({
+  PRIVACY_POLICY: literal('https://thorgas.com/youmotion/privacy'),
+  TERMS_OF_USE: literal('https://thorgas.com/youmotion/terms'),
+});
+export const LEGAL_DOCUMENT_KINDS = Object.freeze({
+  PRIVACY_POLICY: literal('privacyPolicy'),
+  TERMS_OF_USE: literal('termsOfUse'),
+});
+export const LEGAL_DOCUMENT_EVENTS = Object.freeze({
+  OPEN_REQUESTED: literal('legalDocument.openRequested'),
+  OPENED: literal('legalDocument.opened'),
+  OPEN_FAILED: literal('legalDocument.openFailed'),
+  DISMISSED: literal('legalDocument.dismissed'),
+});
+export const LEGAL_DOCUMENT_STATES = Object.freeze({
+  IDLE: literal('idle'),
+  OPENING: literal('opening'),
+  FAILURE: literal('failure'),
+});
 export const MAX_NOTE_LENGTH = 5_000;
 export const MAX_BELIEF_STATEMENT_LENGTH = 240;
 export const CUSTOM_BELIEF_SYSTEM_ID_PREFIX = 'custom-';

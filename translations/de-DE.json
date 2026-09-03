@@ -5961,6 +5961,48 @@
       "translations": [{ "translation": "Füge eine hinzu, wenn eine sanfte Einladung, deine Gefühle wahrzunehmen, hilfreich wäre.", "variations": {} }],
       "types": []
     },
+    "tFzKdcfZk0V7SQ8F1fTFTQ==": {
+      "description": "Heading grouping legal documents in settings",
+      "tokens": [],
+      "translations": [{ "translation": "RECHTLICHES", "variations": {} }],
+      "types": []
+    },
+    "i/Vxg4TivNlb0BirNa8QBA==": {
+      "description": "Settings privacy policy link explanation",
+      "tokens": [],
+      "translations": [{ "translation": "Erfahre, wie Youmotion mit App- und Journaldaten umgeht.", "variations": {} }],
+      "types": []
+    },
+    "Miiy0jFZKXunyNFSVMGCug==": {
+      "description": "Settings privacy policy link title",
+      "tokens": [],
+      "translations": [{ "translation": "Datenschutzerklärung", "variations": {} }],
+      "types": []
+    },
+    "ZU8SJsPEXDS9n2PVoy/AkQ==": {
+      "description": "Settings terms of use link explanation",
+      "tokens": [],
+      "translations": [{ "translation": "Lies die Bedingungen, die für die Nutzung von Youmotion gelten.", "variations": {} }],
+      "types": []
+    },
+    "S0q1AJmZXCm/TX2Ux8eyJw==": {
+      "description": "Settings terms of use link title",
+      "tokens": [],
+      "translations": [{ "translation": "Nutzungsbedingungen", "variations": {} }],
+      "types": []
+    },
+    "C4dJdwZuDBTD+AAi+W2aiQ==": {
+      "description": "Legal document browser failure message",
+      "tokens": [],
+      "translations": [{ "translation": "Die Seite konnte nicht geöffnet werden. Versuche es erneut, sobald du online bist.", "variations": {} }],
+      "types": []
+    },
+    "JdibRCbgJkFUSmZTosC+bQ==": {
+      "description": "Dismiss legal document browser failure",
+      "tokens": [],
+      "translations": [{ "translation": "Schließen", "variations": {} }],
+      "types": []
+    },
     "B9E5Co6vy7iCrPQ5pqBMpA==": {
       "description": "New emotion check-in reminder setup button",
       "tokens": [],
