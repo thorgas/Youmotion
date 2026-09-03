@@ -29,7 +29,6 @@ import {
 } from './base-state-ripples';
 import { EmotionAxisLabel } from './emotion-axis-label';
 import { emotionName, emotionNuance, emotionStarAccessibility, emotionStarAccessibilityHint, emotionStarAccessibilityLabel } from './emotion-copy';
-import { FeelingPulseGuides } from './feeling-pulse-guides';
 import { palette, textSize, type } from '@/theme';
 
 type EmotionStarProps = {
@@ -50,7 +49,6 @@ type EmotionFieldProps = {
   rippleOffsetX: SharedValue<number>;
   rippleOffsetY: SharedValue<number>;
   selection: EmotionSelection | null;
-  size: number;
   labelMode: EmotionLabelMode;
 };
 
@@ -140,19 +138,12 @@ function EmotionField({
   rippleOffsetX,
   rippleOffsetY,
   selection,
-  size,
 }: EmotionFieldProps) {
   return (
     <>
       {centerOrigin
         ? <CenteredBaseStateRipples />
         : <BaseStateRipples offsetX={rippleOffsetX} offsetY={rippleOffsetY} />}
-      <FeelingPulseGuides
-        active={selection !== null}
-        center={center}
-        radius={radius}
-        size={size}
-      />
       {emotions.map((emotion, index) => {
         assert(emotion.nuanceCount > 0, 'Rendered emotions require nuances.');
         assert(index >= 0 && index < emotions.length, 'Rendered emotion index must be in range.');
@@ -293,7 +284,6 @@ export function EmotionStar({
           rippleOffsetX={rippleOffsetX}
           rippleOffsetY={rippleOffsetY}
           selection={selection}
-          size={size}
         />
       </View>
       <Text style={styles.intensityHint}>

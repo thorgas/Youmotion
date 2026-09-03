@@ -13,21 +13,18 @@ const emotionStarProps = {
 };
 
 describe('Feeling Pulse visual surface', () => {
-  it('renders four fully round embossed intensity guides', async () => {
+  it('renders no fixed guide waves behind the movable ripple field', async () => {
     const screen = await render(
       <AppLocaleProvider>
         <EmotionStar {...emotionStarProps} />
       </AppLocaleProvider>,
     );
 
-    expect(screen.getAllByTestId('feeling-pulse-guide')).toHaveLength(4);
-    expect(screen.getAllByTestId('feeling-pulse-guide-highlight')).toHaveLength(4);
-    expect(screen.getAllByTestId('feeling-pulse-guide-shadow')).toHaveLength(4);
-
-    for (const guide of screen.getAllByTestId('feeling-pulse-guide')) {
-      expect(guide.props['cx']).toBe(guide.props['cy']);
-      expect(guide.props['strokeDasharray']).toBeUndefined();
-    }
+    expect(screen.queryByTestId('feeling-pulse-guides')).not.toBeOnTheScreen();
+    expect(screen.queryByTestId('feeling-pulse-guide')).not.toBeOnTheScreen();
+    expect(screen.getAllByTestId('water-ripple-ring')).toHaveLength(
+      BASE_RIPPLE_PHASES.length,
+    );
   });
 
   it('keeps one raised peak centered beneath the movable origin', async () => {
