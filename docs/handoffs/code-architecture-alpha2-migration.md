@@ -102,5 +102,18 @@ pnpm exec tsc --noEmit
 git diff --check
 ```
 
-Next: run the complete repository verification, update the policy docs, then
-perform Harness, Argent E2E, final rebase, and clean-checkout verification.
+Repository gates passed after the configuration commit:
+
+- `pnpm verify`: 46 suites and 312 tests passed, with Oxlint, ESLint, and
+  TypeScript 7 green.
+- `pnpm lint:rules`: 46 architecture-rule tests passed.
+- `pnpm test:coverage`: 46 suites and 312 tests passed; 87.6% statements,
+  76.58% branches, 83.25% functions, and 90.46% lines.
+- `git diff --check`: passed.
+
+The requested `spark_worker` could not run because its model usage allowance
+was exhausted. The same commands were delegated to the cheapest available
+worker (`gpt-5.6-luna`, low reasoning) and independently reported back.
+
+Next: perform React Doctor, Harness, full Argent E2E, final rebase, and
+clean-checkout verification.
