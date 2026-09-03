@@ -264,8 +264,8 @@ importers:
         specifier: ^9.39.5
         version: 9.39.5(jiti@2.7.0)(supports-color@8.1.1)
       eslint-plugin-code-architecture:
-        specifier: 0.4.0-alpha.4
-        version: 0.4.0-alpha.4(eslint@9.39.5(jiti@2.7.0)(supports-color@8.1.1))
+        specifier: 0.6.0-alpha.2
+        version: 0.6.0-alpha.2(eslint@9.39.5(jiti@2.7.0)(supports-color@8.1.1))
       expo-no-push-entitlement:
         specifier: 1.0.0
         version: 1.0.0(expo@57.0.6)
@@ -4582,8 +4582,8 @@ packages:
     engines: {node: '>=6.0'}
     hasBin: true
 
-  eslint-plugin-code-architecture@0.4.0-alpha.4:
-    resolution: {integrity: sha512-b7fU9LQSyiQg8jNc1jc8GI5mnEsTCRvEqtoFkv3CeB4S4G45+Cx9Wd87JwaMDoFUAklJBafZj7K1H5jqZUxejg==}
+  eslint-plugin-code-architecture@0.6.0-alpha.2:
+    resolution: {integrity: sha512-ASINmhAvfK2B2DsP0+2aVucENclHRKZsQ0eNCdjB1lNnlmGuKBlkhEUXBzhG28WZFsi5q3KIIhE88xHiCwzZhg==}
     engines: {node: '>=20.18'}
     peerDependencies:
       eslint: '>=9 <11'
@@ -13147,7 +13147,7 @@ snapshots:
     optionalDependencies:
       source-map: 0.6.1
 
-  eslint-plugin-code-architecture@0.4.0-alpha.4(eslint@9.39.5(jiti@2.7.0)(supports-color@8.1.1)):
+  eslint-plugin-code-architecture@0.6.0-alpha.2(eslint@9.39.5(jiti@2.7.0)(supports-color@8.1.1)):
     dependencies:
       eslint: 9.39.5(jiti@2.7.0)(supports-color@8.1.1)
       minimatch: 9.0.9
