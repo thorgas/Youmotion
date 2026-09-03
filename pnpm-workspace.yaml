@@ -1,13 +1,13 @@
 allowBuilds:
-  '@fails-components/webtransport-transport-http3-quiche': set this to true or false
+  '@fails-components/webtransport-transport-http3-quiche': true
   '@ottrelite/backend-wrapper-tracy': true
   '@ottrelite/core': true
   dtrace-provider: false
   esbuild: true
-  node-pty: set this to true or false
-  tree-sitter: set this to true or false
-  tree-sitter-javascript: set this to true or false
-  tree-sitter-typescript: set this to true or false
+  node-pty: true
+  tree-sitter: true
+  tree-sitter-javascript: true
+  tree-sitter-typescript: true
 pmOnFail: ignore
 minimumReleaseAgeExclude:
   - expo-dev-client@57.0.6
