@@ -122,7 +122,16 @@ Notes:
 
 - iOS uploads land in TestFlight through App Store Connect and use Apple's standard TestFlight processing time.
 - Android uploads go to the Play Console internal track.
+- Store build numbers are held remotely by EAS and `autoIncrement` is enabled for this profile.
 - The first Play internal release can be submitted by EAS. Creating that release manually in Play Console remains an optional fallback if Google rejects the automated bootstrap.
+
+If Play reports that a versionCode was already submitted, its counter is ahead of EAS (usually after a manual or differently sourced upload). Resynchronize once, entering a value at least as high as Play's current maximum, then rebuild; `autoIncrement` will use the next value:
+
+```bash
+pnpm version:android:set
+pnpm build:testing:android
+pnpm submit:play:testing
+```
 
 ## iOS: TestFlight and App Store
 

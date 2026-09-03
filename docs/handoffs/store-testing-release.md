@@ -14,6 +14,8 @@ Queue an exact-source release for TestFlight and the Google Play internal testin
 
 The combined command uses `--no-wait`: EAS continues both builds and their automatic submissions after the local command exits.
 
+Build numbers use EAS remote versioning and `autoIncrement`. If a manual Play upload moves Google's versionCode ahead of EAS, run `pnpm version:android:set`, enter at least Play's current maximum, and rebuild. EAS then increments from the synchronized value.
+
 ## Preconditions
 
 ```bash
