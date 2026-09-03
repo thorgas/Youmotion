@@ -40,6 +40,8 @@ pnpm doctor:expo
 
 After dispatch, capture the exact source commit and EAS build URLs here. Verify processing and tester availability in both store consoles.
 
+Before iOS submission, download the IPA and run `pnpm verify:ios:archive -- /absolute/path/to/Youmotion.ipa`. This is the artifact-level guard against Apple 90338 regressions from private HarnessUI touch selectors.
+
 ## Current release
 
 - Source commit: pending

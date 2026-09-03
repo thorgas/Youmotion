@@ -125,6 +125,14 @@ Notes:
 - Store build numbers are held remotely by EAS and `autoIncrement` is enabled for this profile.
 - The first Play internal release can be submitted by EAS. Creating that release manually in Play Console remains an optional fallback if Google rejects the automated bootstrap.
 
+Before submitting an iOS archive, download its IPA from the EAS build page and scan the shipped payload for the private touch-injection selectors that trigger Apple error 90338:
+
+```bash
+pnpm verify:ios:archive -- /absolute/path/to/Youmotion.ipa
+```
+
+The command must print `iOS archive is free of the known HarnessUI private selectors.` before TestFlight submission.
+
 If Play reports that a versionCode was already submitted, its counter is ahead of EAS (usually after a manual or differently sourced upload). Resynchronize once, entering a value at least as high as Play's current maximum, then rebuild; `autoIncrement` will use the next value:
 
 ```bash
