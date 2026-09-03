@@ -27,7 +27,7 @@ export const TopLeitsatzSchema = Schema.Struct({
 export type TopLeitsatz = typeof TopLeitsatzSchema.Type;
 export type TopLeitsatzGroup = Readonly<{
   additionalCount: number;
-  leitsaetze: readonly TopLeitsatz[];
+  leitsaetze: ReadonlyArray<TopLeitsatz>;
   range: AnalyticsDateRange;
   timeframe: AnalyticsTimeframe;
 }>;
@@ -93,7 +93,7 @@ type LeitsatzFrequency = Readonly<{
   count: number;
   guidingStatement: string;
   latestAt: number;
-  supportingIds: readonly CheckIn['id'][];
+  supportingIds: ReadonlyArray<CheckIn['id']>;
 }>;
 
 function rankLeitsatzFrequencies(items: readonly LeitsatzFrequency[]) {

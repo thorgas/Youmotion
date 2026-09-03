@@ -64,6 +64,7 @@ describe('reminder coordinator', () => {
     const result = await activateReminder({
       assignments: [existing],
       locale: APP_LOCALES.ENGLISH,
+      now: new Date('2026-08-25T12:00:00.000Z'),
       notificationContent: REMINDER_NOTIFICATION_CONTENT.LEITSATZ,
       statements,
       target: { targetKind: REMINDER_TARGET_KINDS.GUIDING_BELIEF, beliefSystemId },

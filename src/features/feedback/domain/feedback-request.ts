@@ -29,7 +29,7 @@ export function parseFeedbackScreenshotUri(uri: string) {
   return Schema.decodeUnknown(FeedbackScreenshotUri)(fileUri);
 }
 
-export type FeedbackEmailRequest = {
-  kind: FeedbackKind;
-  screenshotUri: FeedbackScreenshotUri | null;
-};
+export interface FeedbackEmailRequest {
+  readonly kind: FeedbackKind;
+  readonly screenshotUri: FeedbackScreenshotUri | null;
+}

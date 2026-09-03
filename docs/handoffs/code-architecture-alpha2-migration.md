@@ -79,5 +79,28 @@ artifacts; ask before removing `node_modules`.
 
 ## Next action
 
-Upgrade the dependency and repository contract without enabling the new rules,
-then establish a green compatibility baseline.
+Alpha.2 is installed and every exported rule is now accounted for by the
+repository contract. The new rules are active in truthful scopes. Contract and
+return assertion policies are disjoint; algorithm-heavy domain files retain
+the established assertion-density policy until the contract rule can
+distinguish public boundaries from private helpers. The approved app-settings
+singleton exception is limited to one file and regression-tested.
+
+The migration also makes analytics collection contracts readonly, converts two
+plain object aliases to readonly interfaces, and injects the reminder timestamp
+into `activateReminder`. The navigation machine is explicitly a composition
+root for time access.
+
+Focused gates passed:
+
+```sh
+pnpm exec jest oxlint-rules/__tests__/architecture-lint-contract.test.js \
+  src/features/reminders/__tests__/reminder-coordinator.test.ts \
+  --runInBand --no-watchman
+pnpm lint:architecture
+pnpm exec tsc --noEmit
+git diff --check
+```
+
+Next: run the complete repository verification, update the policy docs, then
+perform Harness, Argent E2E, final rebase, and clean-checkout verification.

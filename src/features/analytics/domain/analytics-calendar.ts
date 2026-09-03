@@ -3,7 +3,7 @@ import { emotions } from '@/features/check-in/domain/emotion';
 import assert from '@/assert';
 import type { AnalyticsDateRange } from './analytics-timeframe';
 
-export type CalendarDay = Readonly<{ day: number; entries: readonly CheckIn[] }>;
+export type CalendarDay = Readonly<{ day: number; entries: ReadonlyArray<CheckIn> }>;
 export type CalendarEmotionFrequency = Readonly<{
   emotionId: CheckIn['emotionId'];
   count: number;
@@ -12,9 +12,9 @@ export type CalendarMonth = Readonly<{
   year: number;
   month: number;
   leadingDayCount: number;
-  days: readonly CalendarDay[];
+  days: ReadonlyArray<CalendarDay>;
 }>;
-export type PeriodCalendarDay = Readonly<{ date: Date; entries: readonly CheckIn[] }>;
+export type PeriodCalendarDay = Readonly<{ date: Date; entries: ReadonlyArray<CheckIn> }>;
 
 export function calendarEmotionFrequencies(entries: readonly CheckIn[]) {
   const counts = entries.reduce<Map<CheckIn['emotionId'], number>>((result, entry) => {
