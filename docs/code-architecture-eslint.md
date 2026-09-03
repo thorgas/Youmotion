@@ -1,6 +1,6 @@
 # Code architecture ESLint policy
 
-Youmotion uses `eslint-plugin-code-architecture@0.4.0-alpha.4` as a blocking part of
+Youmotion uses `eslint-plugin-code-architecture@0.6.0-alpha.2` as a blocking part of
 `pnpm verify`. The effective configuration is in `eslint.config.mjs`, and its
 repository contract is tested in
 `oxlint-rules/__tests__/architecture-lint-contract.test.js`.
@@ -10,27 +10,41 @@ repository contract is tested in
 | Rule | Status | Youmotion policy |
 | --- | --- | --- |
 | `centralize-domain-literals` | Error | App routes, locales, and persisted table names must come from `src/constants.ts`. Tests and immutable legacy migrations are excluded. |
+| `dependency-parameter-convention` | Error | Future Evolu-style `*Dep` functions must accept their dependency object through the conventional parameter shape. |
+| `dependency-wrapper-shape` | Error | Future `*Dep` wrappers must use the supported wrapper shape. |
 | `declarative-components` | Error | React state/effect hooks, multiple actor hooks, and component-local `try` statements are forbidden. Named event delegates remain allowed because the local Oxlint rule separately rejects inline JSX callbacks. |
 | `effect-error-handling` | Error | Effect failures must remain explicit and typed. |
 | `enforce-module-boundaries` | Error | Shared UI cannot import feature-owned code. |
 | `imports-first` | Error | Static imports precede declarations and executable statements. |
 | `max-function-lines` | Error | Production logic functions are capped at 70 physical lines. JSX-bearing functions are ignored so components are not extracted solely to satisfy a line count. Test callbacks and migration fixtures remain excluded. |
 | `max-function-parameters` | Error | The plugin caps functions at five parameters. The local Oxlint rule keeps Youmotion's stricter one-object-parameter convention and its framework callback exceptions. |
+| `named-imports` | Error | Named imports are preferred. Exact allowlists preserve APIs that intentionally expose defaults or namespaces, including Effect, Expo, Reanimated, assets, translations, and test seams. |
 | `no-barrel-files` | Error | Re-exports are forbidden; import concrete owners directly. |
 | `no-barrel-imports` | Error | Local index imports and Effect package barrels are forbidden. |
 | `no-design-identity-overrides` | Error | Consumers cannot replace the visual identity of `Button`, `ScreenHeading`, or `Dialog` through inline styles. Layout styles remain composable. |
+| `no-exported-dependency-instances` | Error | Exported factory instances are rejected. The established app-settings singleton is the sole tested exception. |
+| `no-implicit-external-dependencies` | Error | Application logic receives time explicitly; infrastructure and composition roots own clock access. |
+| `no-namespace-exports` | Error | Production modules export descriptive members. Test mocks and compatibility Harness shims are excluded. |
+| `no-over-depending` | Error | Future Evolu-style dependency objects may expose only dependencies actually used by their function. |
 | `no-raw-design-properties` | Error | Previously unknown literal colors are rejected in production UI even when they were not in the earlier value inventory. Tests are excluded. |
 | `no-raw-design-values` | Error | Shared palette values are forbidden in object styles and JSX color props outside `src/theme.ts`. |
 | `no-root-owned-compound-parts` | Error | Compound roots expose consumer-owned composition instead of rendering their own namespaced parts. |
+| `no-unasserted-return` | Error | Application and navigation functions that directly return delegated calls must prove their result. Domain functions use the contract rule instead. |
 | `no-unsafe-type-assertions` | Error | Runtime validation or narrowing replaces assertions and non-null escapes. |
 | `no-unvalidated-json-parse` | Error | Parsed JSON flows directly into an approved schema decoder. |
 | `prefer-composition-over-configuration` | Error | Structural component APIs use consumer composition instead of configuration props. |
 | `prefer-design-system-components` | Error | Fully migrated data-safety confirmation actions cannot reintroduce React Native action primitives. Extend `consumers` only after another path has completely migrated. |
+| `prefer-arrow-functions` | Error | New private functions in domain, application, and navigation use arrows. Framework exports, generators, recursion, hoisting, and the documented declaration baseline are allowed. |
+| `prefer-interface-over-type` | Error | Plain object contracts use interfaces; unions and type utilities remain aliases. |
+| `prefer-readonly-types` | Error | Public collection contracts use `ReadonlyArray` and interface properties are readonly. Mutable implementation state remains permitted. |
 | `require-composable-root-children` | Error | Root/provider components expose children on every top-level return path. |
 | `require-compound-component-api` | Error | Compound definitions expose a valid boundary and distinct public parts. |
+| `require-contract-assertions` | Error | Domain functions use semantic contract assertions where alpha.2 can identify the boundary reliably. Algorithm-heavy files retain the established density rule. |
 | `require-consumer-owned-compound-usage` | Error | Compound consumers select the parts rendered beneath a boundary. |
 | `require-dismissible-modal-backdrop` | Error | Every transparent native modal has request-close handling and a pressable outside-dismiss surface. |
 | `require-interactive-component-contract` | Error | The shared Button root must keep role, state, disabled behavior, content, and press feedback. |
+| `sort-dependency-types` | Error | Future intersections of Evolu-style `*Dep` wrappers use deterministic ordering. |
+| `top-down-declarations` | Error | New modules put public contracts above private details while preserving runtime dependencies. Three algorithm modules are baseline exceptions. |
 | `require-assertions` | Error | Production functions with at least three statements require two runtime assertions. XState actions, guards, transitions, and named React components remain covered. Alpha.4 excludes only JSX-attribute callbacks and zero-input function expressions assigned to variables; tests, Harness files, and test-support directories are excluded. Assertions must express real input, output, state, schema, or cardinality invariants rather than typed-shape or tautological filler. |
 
 JavaScript-runtime invariants use the Hermes-safe assertion function in
@@ -38,6 +52,13 @@ JavaScript-runtime invariants use the Hermes-safe assertion function in
 callbacks use the local `assertWorkletInvariant` helper because importing a
 JavaScript-runtime function into a worklet would attempt a synchronous
 cross-runtime call. The ESLint contract recognizes both forms.
+
+`require-contract-assertions` and `no-unasserted-return` never enforce the same
+function. Domain files use the former; application and navigation files use the
+latter. Existing algorithm-heavy domain modules remain on `require-assertions`
+until the contract rule can distinguish public boundaries from private reducer
+and sorting helpers. This avoids the duplicate diagnostics and ceremonial
+assertions found by the raw alpha.2 audit.
 
 ## Design-system ownership
 
@@ -83,6 +104,7 @@ Representative rendered evidence from the token-owner migration:
 pnpm lint:architecture
 pnpm lint:rules
 pnpm verify
+pnpm test:coverage
 ```
 
 `pnpm lint:architecture` must finish with zero warnings and zero errors. Do not

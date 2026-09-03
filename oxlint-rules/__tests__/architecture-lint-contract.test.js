@@ -96,11 +96,11 @@ describe('architecture lint contract', () => {
     ];
 
     expect(exportedRules).toHaveLength(37);
-    expect(exportedRules.slice().sort()).toEqual([
+    expect(exportedRules.toSorted()).toEqual([
       ...applicableRules,
       ...alpha2Rules,
       'require-assertions',
-    ].sort());
+    ].toSorted());
     expect(applicableRules).toHaveLength(22);
     for (const ruleName of applicableRules) {
       expect(configuredRules[`code-architecture/${ruleName}`]?.[0]).toBe(2);
