@@ -16,6 +16,10 @@ steps:
   - tool: gesture-swipe
     args: { fromX: 0.5, fromY: 0.47, toX: 0.72, toY: 0.47, durationMs: 700 }
   - await: { visible: { text: Was ist gerade da? }, timeout: 10000 }
+  - when:
+      visible: { text: Try out your stylus }
+    steps:
+      - tap: { text: Cancel }
   - tap: { text: Diesen Moment speichern und abschließen }
   - wait: 800
   - tap: { x: 0.5, y: 0.63 }

@@ -84,6 +84,11 @@ app screenshot is not an acceptable German asset.
 contains generated capture output; copy approved files into the release asset
 archive when they are ready for upload.
 
+The approved Google Play phone sets are archived in
+`artifacts/release-store/google-play/en-US/` and
+`artifacts/release-store/google-play/de-DE/`. Each locale contains six opaque
+RGB PNGs at 1080×1920.
+
 ## Capture guardrails
 
 - Captures contain no development overlay, notifications, fingers, or personal
