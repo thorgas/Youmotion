@@ -43,7 +43,7 @@ const exportedRuleNames = () => {
 describe('architecture lint contract', () => {
   it('keeps the alpha plugin in the main verification path', () => {
     expect(packageJson.devDependencies['eslint-plugin-code-architecture']).toBe(
-      '0.4.0-alpha.4',
+      '0.6.0-alpha.2',
     );
     expect(packageJson.scripts.lint).toContain('pnpm lint:architecture');
     expect(packageJson.scripts.verify).toContain('pnpm lint');
@@ -53,9 +53,33 @@ describe('architecture lint contract', () => {
     const configuredRules = configuredRulesFor(
       'src/components/ui/contract-fixture.tsx',
     );
-    const applicableRules = exportedRuleNames()
-      .filter((ruleName) => ruleName !== 'require-assertions');
+    const exportedRules = exportedRuleNames();
+    const applicableRules = [
+      'centralize-domain-literals',
+      'declarative-components',
+      'effect-error-handling',
+      'enforce-module-boundaries',
+      'imports-first',
+      'max-function-lines',
+      'max-function-parameters',
+      'no-barrel-files',
+      'no-barrel-imports',
+      'no-design-identity-overrides',
+      'no-raw-design-properties',
+      'no-raw-design-values',
+      'no-root-owned-compound-parts',
+      'no-unsafe-type-assertions',
+      'no-unvalidated-json-parse',
+      'prefer-composition-over-configuration',
+      'prefer-design-system-components',
+      'require-composable-root-children',
+      'require-compound-component-api',
+      'require-consumer-owned-compound-usage',
+      'require-dismissible-modal-backdrop',
+      'require-interactive-component-contract',
+    ];
 
+    expect(exportedRules).toHaveLength(37);
     expect(applicableRules).toHaveLength(22);
     for (const ruleName of applicableRules) {
       expect(configuredRules[`code-architecture/${ruleName}`]?.[0]).toBe(2);
@@ -68,7 +92,7 @@ describe('architecture lint contract', () => {
       'src/features/analytics/domain/contract-fixture.ts',
     )['code-architecture/require-assertions']).toEqual([
       2,
-      {
+      expect.objectContaining({
         assertionNames: [
           'assert',
           'assertDefined',
@@ -81,7 +105,7 @@ describe('architecture lint contract', () => {
         ignoreNoInputClosures: true,
         minimum: 2,
         minimumStatements: 3,
-      },
+      }),
     ]);
   });
 

@@ -66,7 +66,7 @@ minimumReleaseAgeExclude:
   - expo-updates@57.0.8
   - expo-no-push-entitlement@1.0.0
   - react-native-surrealdb@0.1.0-alpha.1
-  - eslint-plugin-code-architecture@0.4.0-alpha.0 || 0.4.0-alpha.1 || 0.4.0-alpha.2 || 0.4.0-alpha.4
+  - eslint-plugin-code-architecture@0.6.0-alpha.2
   - goldie@0.3.0
 overrides:
   tslib: 2.8.1
