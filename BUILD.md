@@ -97,6 +97,33 @@ pnpm build:production:ios
 
 Monitor cloud builds with `pnpm eas:builds`. Open the EAS dashboard with `pnpm eas:open` to inspect builds, submissions, updates, and credentials.
 
+## TestFlight + Play testing release
+
+Use this path when you want a release-ready binary for both app stores' testing paths.
+
+```bash
+pnpm build:testing
+```
+
+Then send the latest builds:
+
+```bash
+pnpm submit:testflight:testing
+pnpm submit:play:testing
+```
+
+One fire-and-forget command queues both store builds and automatically submits each successful build:
+
+```bash
+pnpm release:testing
+```
+
+Notes:
+
+- iOS uploads land in TestFlight through App Store Connect and use Apple's standard TestFlight processing time.
+- Android uploads go to the Play Console internal track.
+- The first Play internal release can be submitted by EAS. Creating that release manually in Play Console remains an optional fallback if Google rejects the automated bootstrap.
+
 ## iOS: TestFlight and App Store
 
 Always test a release in TestFlight first:
