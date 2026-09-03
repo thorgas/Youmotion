@@ -1,6 +1,6 @@
-const appRoot = '/Users/timhorgas/git/Youmotion';
+const appRoot = process['cwd']();
 
-const config = {
+export const config = {
   appRoot,
   appPath:
     process.env['GOLDIE_APP_PATH'] ??

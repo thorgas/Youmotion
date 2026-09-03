@@ -67,8 +67,20 @@ RELEASE_APP=$(find "$HOME/Library/Developer/Xcode/DerivedData" -path '*/Build/Pr
 GOLDIE_CONFIG="$PWD/goldie/goldie.config.ts" GOLDIE_APP_PATH="$RELEASE_APP" npx -y goldie@0 all
 ```
 
-The framed PNGs are written under `goldie/out/` at 1320×2868 pixels for the
-6.9-inch iPhone store slot. `goldie/out/` is intentionally ignored because it
+The framed iPhone PNGs are written under `goldie/out/` at 1320×2868 pixels for
+the 6.9-inch iPhone store slot. Generate the dedicated Google Play set with a
+release Android APK; Goldie's Pixel preset produces compliant 1080×1920 PNGs:
+
+```sh
+GOLDIE_ANDROID_APP_PATH="$RELEASE_APK" GOLDIE_LOCALE=en-US GOLDIE_CONFIG="$PWD/goldie/google-play.config.ts" pnpm exec goldie all
+GOLDIE_ANDROID_APP_PATH="$RELEASE_APK" GOLDIE_LOCALE=de-DE GOLDIE_CONFIG="$PWD/goldie/google-play.config.ts" pnpm exec goldie all
+```
+
+Run each locale separately. The German run uses dedicated flows that switch the
+app itself to German before capture; localized marketing copy around an English
+app screenshot is not an acceptable German asset.
+
+`goldie/out/` is intentionally ignored because it
 contains generated capture output; copy approved files into the release asset
 archive when they are ready for upload.
 

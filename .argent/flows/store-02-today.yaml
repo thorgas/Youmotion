@@ -8,10 +8,6 @@ steps:
   - tool: gesture-swipe
     args: { fromX: 0.5, fromY: 0.54, toX: 0.5, toY: 0.34, durationMs: 700 }
   - await: { visible: { id: reflection-note-input }, timeout: 10000 }
-  - tap: { id: reflection-note-input }
-  - tool: keyboard
-    args: { text: A slower breath helped me pause. }
-  - tap: { x: 0.5, y: 0.27 }
   - tap: { id: reflection-save }
   - await: { visible: { id: belief-system-step }, timeout: 10000 }
   - tap: { id: belief-system-finish }
@@ -21,10 +17,6 @@ steps:
   - tool: gesture-swipe
     args: { fromX: 0.5, fromY: 0.54, toX: 0.72, toY: 0.54, durationMs: 700 }
   - await: { visible: { id: reflection-note-input }, timeout: 10000 }
-  - tap: { id: reflection-note-input }
-  - tool: keyboard
-    args: { text: Work felt full, so I made room to pause. }
-  - tap: { x: 0.5, y: 0.27 }
   - tap: { id: reflection-save }
   - await: { visible: { id: belief-system-step }, timeout: 10000 }
   - tap: { id: belief-system-finish }
@@ -34,10 +26,6 @@ steps:
   - tool: gesture-swipe
     args: { fromX: 0.5, fromY: 0.54, toX: 0.28, toY: 0.54, durationMs: 700 }
   - await: { visible: { id: reflection-note-input }, timeout: 10000 }
-  - tap: { id: reflection-note-input }
-  - tool: keyboard
-    args: { text: Connection brought some warmth today. }
-  - tap: { x: 0.5, y: 0.27 }
   - tap: { id: reflection-save }
   - await: { visible: { id: belief-system-step }, timeout: 10000 }
   - tap: { id: belief-system-finish }
@@ -47,10 +35,6 @@ steps:
   - tool: gesture-swipe
     args: { fromX: 0.5, fromY: 0.54, toX: 0.5, toY: 0.74, durationMs: 700 }
   - await: { visible: { id: reflection-note-input }, timeout: 10000 }
-  - tap: { id: reflection-note-input }
-  - tool: keyboard
-    args: { text: Rest gave me a little more space. }
-  - tap: { x: 0.5, y: 0.27 }
   - tap: { id: reflection-save }
   - await: { visible: { id: belief-system-step }, timeout: 10000 }
   - tap: { id: belief-system-finish }

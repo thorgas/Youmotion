@@ -3,4 +3,7 @@ steps:
   - await: { visible: { id: emotion-star }, timeout: 10000 }
   - tap: { id: tab-settings }
   - await: { visible: { id: settings-screen }, timeout: 10000 }
+  - tool: gesture-swipe
+    args: { fromX: 0.5, fromY: 0.78, toX: 0.5, toY: 0.28, durationMs: 700 }
+  - await: { visible: { id: open-privacy-policy }, timeout: 10000 }
   - await: { idle: true }
