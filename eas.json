@@ -52,7 +52,9 @@
   },
   "submit": {
     "testing": {
-      "ios": {},
+      "ios": {
+        "ascAppId": "6807357236"
+      },
       "android": {
         "track": "internal",
         "releaseStatus": "completed"
