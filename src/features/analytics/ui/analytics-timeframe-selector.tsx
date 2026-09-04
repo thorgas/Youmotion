@@ -14,11 +14,13 @@ import {
 import { analyticsTimeframeRangeLabel } from './analytics-copy';
 
 function TimeframeOption({
+  disabled = false,
   label,
   onPress,
   selected,
   testID,
 }: {
+  disabled?: boolean;
   label: string;
   onPress: () => void;
   selected: boolean;
@@ -27,9 +29,10 @@ function TimeframeOption({
   return (
     <PressableScale
       accessibilityRole="button"
-      accessibilityState={{ selected }}
+      accessibilityState={{ selected, disabled }}
+      disabled={disabled}
       onPress={onPress}
-      style={[styles.option, selected ? styles.optionSelected : null]}
+      style={[styles.option, selected ? styles.optionSelected : null, disabled ? styles.optionDisabled : null]}
       testID={testID}
     >
       <Text style={[styles.optionText, selected ? styles.optionTextSelected : null]}>
@@ -120,6 +123,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.05,
     shadowRadius: 2,
   },
+  optionDisabled: { opacity: 0.34 },
   optionText: {
     fontFamily: type.medium,
     color: palette.inkMuted,
