@@ -3,17 +3,7 @@ import type { EmotionSelection } from './check-in';
 import { emotions } from './emotion';
 import assert from '@/assert';
 
-const TAU = Math.PI * 2;
-const DEFAULT_ACCESSIBLE_INTENSITY = 0.35;
-
 export type Point = Readonly<{ x: number; y: number }>;
-
-const _clamp = ({ value, min, max }: { value: number; min: number; max: number }) => Math.max(min, Math.min(value, max));
-
-const _circularDistance = ({ a, b }: { a: number; b: number }) => {
-  const difference = Math.abs(a - b) % TAU;
-  return Math.min(difference, TAU - difference);
-};
 
 export function emotionAngle(index: number) {
   assert(Number.isInteger(index), 'Emotion index must be an integer.');
@@ -87,30 +77,6 @@ export function selectionFromPoint({
   };
 }
 
-function _selectionForEmotion({
-  emotionIndex,
-  intensity,
-}: {
-  emotionIndex: number;
-  intensity: number;
-}) {
-  assert(Number.isInteger(emotionIndex), 'Emotion index must be an integer.');
-  assert(Number.isFinite(intensity), 'Emotion intensity must be finite.');
-  const emotion = emotions[emotionIndex];
-  if (!emotion) return null;
-  const clampedIntensity = _clamp({ value: intensity, min: 0, max: 1 });
-
-  return {
-    emotionId: emotion.id,
-    intensity: clampedIntensity,
-    level: Math.min(
-      Math.floor(clampedIntensity * emotion.nuanceCount),
-      emotion.nuanceCount - 1,
-    ),
-    color: emotion.color,
-  } satisfies EmotionSelection;
-}
-
 export function emotionSelectionWithAdjustedIntensity({
   direction,
   selection,
@@ -151,4 +117,38 @@ export function emotionSelectionWithAdjacentEmotion({
     emotionIndex,
     intensity: selection?.intensity ?? DEFAULT_ACCESSIBLE_INTENSITY,
   });
+}
+
+const TAU = Math.PI * 2;
+const DEFAULT_ACCESSIBLE_INTENSITY = 0.35;
+
+const _clamp = ({ value, min, max }: { value: number; min: number; max: number }) => Math.max(min, Math.min(value, max));
+
+const _circularDistance = ({ a, b }: { a: number; b: number }) => {
+  const difference = Math.abs(a - b) % TAU;
+  return Math.min(difference, TAU - difference);
+};
+
+function _selectionForEmotion({
+  emotionIndex,
+  intensity,
+}: {
+  emotionIndex: number;
+  intensity: number;
+}) {
+  assert(Number.isInteger(emotionIndex), 'Emotion index must be an integer.');
+  assert(Number.isFinite(intensity), 'Emotion intensity must be finite.');
+  const emotion = emotions[emotionIndex];
+  if (!emotion) return null;
+  const clampedIntensity = _clamp({ value: intensity, min: 0, max: 1 });
+
+  return {
+    emotionId: emotion.id,
+    intensity: clampedIntensity,
+    level: Math.min(
+      Math.floor(clampedIntensity * emotion.nuanceCount),
+      emotion.nuanceCount - 1,
+    ),
+    color: emotion.color,
+  } satisfies EmotionSelection;
 }

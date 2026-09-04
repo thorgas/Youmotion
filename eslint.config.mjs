@@ -297,11 +297,6 @@ export default tseslint.config(
       'code-architecture/top-down-declarations': [
         'error',
         {
-          allowedFiles: [
-            '**/src/features/analytics/domain/analytics-calendar.ts',
-            '**/src/features/analytics/domain/analytics-timeframe.ts',
-            '**/src/features/check-in/domain/emotion-selection.ts',
-          ],
           preserveRuntimeDependencies: true,
         },
       ],
