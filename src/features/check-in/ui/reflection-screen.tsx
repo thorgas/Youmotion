@@ -288,16 +288,16 @@ function recommendationsForSelection({
 function BeliefSystemOption({
   disabled,
   id,
+  label,
   selected,
-  statements,
 }: {
   disabled: boolean;
   id: BeliefSystemId | null;
+  label: string;
   selected: boolean;
-  statements: readonly BeliefStatement[];
 }) {
   assert(id === null || id.length > 0, 'Belief option identifier must not be empty.');
-  assert(statements.every((statement) => statement.beliefSystemId.length > 0), 'Belief options require statement identifiers.');
+  assert(label.trim().length > 0, 'Belief option label must not be empty.');
   const actor = useAppNavigationActor();
   const _select = () => actor.send({
     type: CHECK_IN_EVENTS.BELIEF_SYSTEM_CHANGED,
@@ -318,7 +318,7 @@ function BeliefSystemOption({
         {selected ? <View style={styles.radioDot} /> : null}
       </View>
       <Text style={styles.suggestionText}>
-        {id ? beliefSystemText({ id, statements }) : noBeliefSystemText()}
+        {label}
       </Text>
     </PressableScale>
   );
@@ -327,16 +327,16 @@ function BeliefSystemOption({
 function BeliefSystemSuggestion({
   disabled,
   id,
+  label,
   selected,
-  statements,
 }: {
   disabled: boolean;
   id: BeliefSystemId;
+  label: string;
   selected: boolean;
-  statements: readonly BeliefStatement[];
 }) {
   assert(id.length > 0, 'Belief suggestion identifier must not be empty.');
-  assert(statements.every((statement) => statement.beliefSystemId.length > 0), 'Belief suggestions require statement identifiers.');
+  assert(label.trim().length > 0, 'Belief suggestion label must not be empty.');
   const actor = useAppNavigationActor();
   const _toggle = () => actor.send({
     type: CHECK_IN_EVENTS.BELIEF_SYSTEM_CHANGED,
@@ -355,7 +355,7 @@ function BeliefSystemSuggestion({
       <View style={[styles.radio, selected ? styles.radioSelected : null]}>
         {selected ? <View style={styles.radioDot} /> : null}
       </View>
-      <Text style={styles.suggestionText}>{beliefSystemText({ id, statements })}</Text>
+      <Text style={styles.suggestionText}>{label}</Text>
     </PressableScale>
   );
 }
@@ -712,8 +712,8 @@ function BeliefSystemStep() {
                   disabled={attaching}
                   id={id}
                   key={id}
+                  label={beliefSystemText({ id, statements })}
                   selected={selectedId === id}
-                  statements={statements}
                 />
               ))}
             </View>
@@ -839,16 +839,16 @@ function BeliefSystemCatalogStep() {
             <BeliefSystemOption
               disabled={false}
               id={null}
+              label={noBeliefSystemText()}
               selected={snapshot.context.beliefSystemId === null}
-              statements={statements}
             />
             {recommendations.map((id) => (
               <BeliefSystemOption
                 disabled={false}
                 id={id}
                 key={id}
+                label={beliefSystemText({ id, statements })}
                 selected={snapshot.context.beliefSystemId === id}
-                statements={statements}
               />
             ))}
           </View>

@@ -1,4 +1,5 @@
 import { PressableScale } from 'pressto';
+import { fbs } from 'fbtee';
 import {
   StyleSheet,
   Text,
@@ -11,13 +12,17 @@ import { actionColors, borderColors, palette, type } from '@/theme';
 
 export function PersonalBeliefCreateButton({
   disabled = false,
+  help = String(fbs('Write it in your own words.', 'Description below the button for adding a personal core belief')),
   onPress,
   style,
+  title = String(fbs('Add your own core belief', 'Button for adding a personal core belief')),
   testID,
 }: {
   disabled?: boolean;
+  help?: string;
   onPress: () => void;
   style?: StyleProp<ViewStyle>;
+  title?: string;
   testID: string;
 }) {
   return (
@@ -31,12 +36,10 @@ export function PersonalBeliefCreateButton({
     >
       <View style={styles.copy}>
         <Text style={styles.title}>
-          <fbt desc="Button for adding a personal core belief">Add your own core belief</fbt>
+          {title}
         </Text>
         <Text style={styles.help}>
-          <fbt desc="Description below the button for adding a personal core belief">
-            Write it in your own words.
-          </fbt>
+          {help}
         </Text>
       </View>
       <View style={styles.badge}>
