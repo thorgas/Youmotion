@@ -128,6 +128,50 @@ describe('architecture lint contract', () => {
         minimumStatements: 3,
       }),
     ]);
+    expect(configuredRulesFor(
+      'src/features/reminders/domain/contract-fixture.ts',
+    )['code-architecture/require-contract-assertions']).toEqual([
+      2,
+      expect.objectContaining({
+        checkParameters: true,
+        checkReturns: false,
+        minimumStatements: 5,
+      }),
+    ]);
+    expect(configuredRulesFor(
+      'src/features/reminders/domain/contract-fixture.ts',
+    )['code-architecture/require-contract-assertions'][1]).not.toHaveProperty('assertionNames');
+    expect(configuredRulesFor(
+      'src/features/reminders/application/contract-fixture.ts',
+    )['code-architecture/no-unasserted-return'][1]).not.toHaveProperty(
+      'assertionNames',
+    );
+    expect(configuredRules['code-architecture/named-imports']).toEqual([
+      2,
+      {
+        allowDefaultImportsFrom: [
+          '../infrastructure/*',
+          '**/infrastructure/*',
+          '**/*.json',
+          '**/*.png',
+          '@/app/(tabs)/_layout',
+          '@/assert',
+          '@react-native-async-storage/async-storage',
+          '@wuba/react-native-echarts/svgChart',
+          'effect/*',
+          'expo-*',
+          'react-native-reanimated',
+          'react-native-svg',
+        ],
+        allowNamespaceImportsFrom: [
+          '../infrastructure/*',
+          '**/infrastructure/*',
+          'effect/*',
+          'expo-*',
+          'react-native-reanimated',
+        ],
+      },
+    ]);
   });
 
   it('enables every alpha.4 rule in a truthful production scope', () => {
@@ -181,6 +225,15 @@ describe('architecture lint contract', () => {
     expect(otherApplicationRules['code-architecture/no-exported-dependency-instances']?.[0]).toBe(2);
     expect(algorithmRules['code-architecture/require-contract-assertions']).toBeUndefined();
     expect(algorithmRules['code-architecture/require-assertions']?.[0]).toBe(2);
+    expect(configuredRulesFor(
+      'src/components/ui/app-back-button.tsx',
+    )['code-architecture/require-interactive-component-contract']).toBeUndefined();
+    expect(configuredRulesFor(
+      'src/features/settings/ui/contract-fixture.tsx',
+    )['code-architecture/require-interactive-component-contract']).toBeUndefined();
+    expect(configuredRulesFor(
+      'src/components/ui/contract-fixture.tsx',
+    )['code-architecture/require-interactive-component-contract']).toEqual([2]);
   });
 
   it('limits logic functions without forcing JSX component extraction', () => {
@@ -300,6 +353,32 @@ describe('architecture lint contract', () => {
     ]));
     expect(ordinaryMessages).toEqual(expect.arrayContaining([
       expect.objectContaining({ ruleId: 'code-architecture/no-exported-dependency-instances' }),
+    ]));
+  });
+
+  it('rejects app store service locators outside UI composition consumers', () => {
+    const code = `
+      import { appSettingsStore } from '@/app-stores';
+      export const readSettings = () => appSettingsStore.getSnapshot();
+    `;
+    const domainMessages = messagesFor({
+      code,
+      filePath: 'src/features/settings/domain/contract-fixture.ts',
+    });
+    const uiMessages = messagesFor({
+      code,
+      filePath: 'src/features/settings/ui/contract-fixture.tsx',
+    });
+
+    expect(domainMessages).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        ruleId: 'code-architecture/no-implicit-external-dependencies',
+      }),
+    ]));
+    expect(uiMessages).not.toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        ruleId: 'code-architecture/no-implicit-external-dependencies',
+      }),
     ]));
   });
 
@@ -476,8 +555,8 @@ describe('architecture lint contract', () => {
   it('requires the shared button interaction contract', () => {
     const messages = messagesFor({
       code: `
-        function ButtonRoot({ children, disabled }) {
-          return <Pressable disabled={disabled}>{children}</Pressable>;
+        function ButtonRoot({ children, disabled, onPress }) {
+          return <Pressable disabled={disabled} onPress={onPress}>{children}</Pressable>;
         }
       `,
       filePath: 'src/components/ui/contract-fixture.tsx',
