@@ -2,6 +2,7 @@ import { useSelector as useActorSelector } from '@xstate/react';
 import { useSelector } from '@xstate/store-react';
 import { fbs } from 'fbtee';
 import { PressableScale } from 'pressto';
+import type { ReactNode } from 'react';
 import { ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import assert from '@/assert';
@@ -67,21 +68,24 @@ const _changeQuery = (query: string) => {
 const _toggleFilters = () => historyTimeframeStore.trigger[HISTORY_EVENTS.FILTERS_TOGGLED]({});
 const _clearFilters = () => historyTimeframeStore.trigger[HISTORY_EVENTS.FILTERS_CLEARED]({});
 
-function EmotionFilterChip({ emotionId, selected }: { emotionId: EmotionId | null; selected: boolean }) {
+function EmotionFilterChip({ emotionId, selected, label, disabled = false }: {
+  emotionId: EmotionId | null;
+  selected: boolean;
+  label: string;
+  disabled?: boolean;
+}) {
   assert(emotionId === null || Object.values(EMOTION_IDS).includes(emotionId), 'Emotion filter must reference the catalog.');
   assert(Object.values(EMOTION_IDS).length > 0, 'Emotion filters require a populated catalog.');
   const _select = () => {
     historyTimeframeStore.trigger[HISTORY_EVENTS.EMOTION_FILTER_SELECTED]({ emotionId });
   };
-  const label = emotionId === null
-    ? String(fbs('All', 'History emotion filter showing every emotion'))
-    : emotionName(emotionId);
   return (
     <PressableScale
       accessibilityRole="button"
-      accessibilityState={{ selected }}
+      accessibilityState={{ disabled, selected }}
+      disabled={disabled}
       onPress={_select}
-      style={[styles.filterChip, selected ? styles.filterChipSelected : null]}
+      style={[styles.filterChip, selected ? styles.filterChipSelected : null, disabled ? styles.disabled : null]}
       testID={`history-emotion-filter-${emotionId ?? 'all'}`}
     >
       <Text style={[styles.filterChipText, selected ? styles.filterChipTextSelected : null]}>
@@ -105,7 +109,12 @@ function contentFilterLabel(content: HistoryContent) {
   return String(fbs('All', 'History content filter showing every kind of moment'));
 }
 
-function ContentFilterChip({ content, selected }: { content: HistoryContent; selected: boolean }) {
+function ContentFilterChip({ content, selected, label, disabled = false }: {
+  content: HistoryContent;
+  selected: boolean;
+  label: string;
+  disabled?: boolean;
+}) {
   assert(Object.values(HISTORY_CONTENT_FILTERS).includes(content), 'Content chip must use a supported filter.');
   assert(Object.values(HISTORY_CONTENT_FILTERS).includes(HISTORY_CONTENT_FILTERS.ALL), 'Content filters must include the all option.');
   const _select = () => {
@@ -114,13 +123,14 @@ function ContentFilterChip({ content, selected }: { content: HistoryContent; sel
   return (
     <PressableScale
       accessibilityRole="button"
-      accessibilityState={{ selected }}
+      accessibilityState={{ disabled, selected }}
+      disabled={disabled}
       onPress={_select}
-      style={[styles.filterChip, selected ? styles.filterChipSelected : null]}
+      style={[styles.filterChip, selected ? styles.filterChipSelected : null, disabled ? styles.disabled : null]}
       testID={`history-content-filter-${content}`}
     >
       <Text style={[styles.filterChipText, selected ? styles.filterChipTextSelected : null]}>
-        {contentFilterLabel(content)}
+        {label}
       </Text>
     </PressableScale>
   );
@@ -139,21 +149,15 @@ function HistoryFilterSheet({ activeFilterCount, selection }: {
       <Text style={styles.filterLabel}><fbt desc="History filter group label">EMOTION</fbt></Text>
       <ScrollView horizontal showsHorizontalScrollIndicator={false}>
         <View style={styles.filterChips}>
-          <EmotionFilterChip emotionId={null} selected={selection.emotionId === null} />
-          <EmotionFilterChip emotionId={EMOTION_IDS.JOY} selected={selection.emotionId === EMOTION_IDS.JOY} />
-          <EmotionFilterChip emotionId={EMOTION_IDS.LOVE} selected={selection.emotionId === EMOTION_IDS.LOVE} />
-          <EmotionFilterChip emotionId={EMOTION_IDS.SHAME} selected={selection.emotionId === EMOTION_IDS.SHAME} />
-          <EmotionFilterChip emotionId={EMOTION_IDS.DISGUST} selected={selection.emotionId === EMOTION_IDS.DISGUST} />
-          <EmotionFilterChip emotionId={EMOTION_IDS.SADNESS} selected={selection.emotionId === EMOTION_IDS.SADNESS} />
-          <EmotionFilterChip emotionId={EMOTION_IDS.ANGER} selected={selection.emotionId === EMOTION_IDS.ANGER} />
-          <EmotionFilterChip emotionId={EMOTION_IDS.FEAR} selected={selection.emotionId === EMOTION_IDS.FEAR} />
+          <EmotionFilterChip emotionId={null} label={String(fbs('All', 'History emotion filter showing every emotion'))} selected={selection.emotionId === null} />
+          {Object.values(EMOTION_IDS).map((emotionId) => <EmotionFilterChip key={emotionId} emotionId={emotionId} label={emotionName(emotionId)} selected={selection.emotionId === emotionId} />)}
         </View>
       </ScrollView>
       <Text style={styles.filterLabel}><fbt desc="History filter group label">CONTENT</fbt></Text>
       <View style={styles.filterChips}>
-        <ContentFilterChip content={HISTORY_CONTENT_FILTERS.ALL} selected={selection.content === HISTORY_CONTENT_FILTERS.ALL} />
-        <ContentFilterChip content={HISTORY_CONTENT_FILTERS.NOTES} selected={selection.content === HISTORY_CONTENT_FILTERS.NOTES} />
-        <ContentFilterChip content={HISTORY_CONTENT_FILTERS.BELIEFS} selected={selection.content === HISTORY_CONTENT_FILTERS.BELIEFS} />
+        <ContentFilterChip content={HISTORY_CONTENT_FILTERS.ALL} label={contentFilterLabel(HISTORY_CONTENT_FILTERS.ALL)} selected={selection.content === HISTORY_CONTENT_FILTERS.ALL} />
+        <ContentFilterChip content={HISTORY_CONTENT_FILTERS.NOTES} label={contentFilterLabel(HISTORY_CONTENT_FILTERS.NOTES)} selected={selection.content === HISTORY_CONTENT_FILTERS.NOTES} />
+        <ContentFilterChip content={HISTORY_CONTENT_FILTERS.BELIEFS} label={contentFilterLabel(HISTORY_CONTENT_FILTERS.BELIEFS)} selected={selection.content === HISTORY_CONTENT_FILTERS.BELIEFS} />
       </View>
       {activeFilterCount > 0 || selection.query !== '' ? (
         <PressableScale
@@ -243,11 +247,18 @@ function HistoryBelief({
   );
 }
 
-function MomentRow({ entry, locale }: { entry: CheckIn; locale: string }) {
+function MomentRow({
+  children,
+  disabled = false,
+  entry,
+}: {
+  children: ReactNode;
+  disabled?: boolean;
+  entry: CheckIn;
+}) {
   assert(entry.id.length > 0, 'History moment must have an identifier.');
   assert(entry.intensity >= 0 && entry.intensity <= 1, 'History moment intensity must be normalized.');
   const actor = useAppNavigationActor();
-  const beliefStatements = useActorSelector(actor, _selectBeliefStatements);
   const _edit = () => actor.send({ type: CHECK_IN_EVENTS.EDIT_REQUESTED, entry });
   const _delete = () => actor.send({ type: CHECK_IN_EVENTS.DELETE_REQUESTED, id: entry.id });
   const _confirmDelete = () => confirmCheckInDeletion(_delete);
@@ -257,9 +268,11 @@ function MomentRow({ entry, locale }: { entry: CheckIn; locale: string }) {
       <PressableScale
         accessibilityHint={editMomentAccessibilityHint()}
         accessibilityRole="button"
+        accessibilityState={{ disabled }}
+        disabled={disabled}
         onLongPress={_confirmDelete}
         onPress={_edit}
-        style={styles.rowMain}
+        style={[styles.rowMain, disabled ? styles.disabled : null]}
         testID={`history-moment-${entry.id}`}
       >
         <View
@@ -269,10 +282,7 @@ function MomentRow({ entry, locale }: { entry: CheckIn; locale: string }) {
           ]}
         />
         <View style={styles.rowCopy}>
-          <Text style={styles.emotion}>{emotionSummary(entry)}</Text>
-          <Text style={styles.date}>{formatHistoryDate({ date: new Date(entry.occurredAt), locale })}</Text>
-          {entry.note ? <Text style={styles.note}>{entry.note}</Text> : null}
-          <HistoryBelief entry={entry} statements={beliefStatements} />
+          {children}
         </View>
         <Text accessibilityElementsHidden style={styles.disclosure}>›</Text>
       </PressableScale>
@@ -381,7 +391,15 @@ export function HistoryScreen({ now }: { now?: Date }) {
                 </Text>
               </View>
             ) : displayedEntries.map((entry) => (
-              <MomentRow key={entry.id} entry={entry} locale={locale} />
+              <MomentRow
+                key={entry.id}
+                entry={entry}
+              >
+                <Text style={styles.emotion}>{emotionSummary(entry)}</Text>
+                <Text style={styles.date}>{formatHistoryDate({ date: new Date(entry.occurredAt), locale })}</Text>
+                {entry.note ? <Text style={styles.note}>{entry.note}</Text> : null}
+                <HistoryBelief entry={entry} statements={beliefStatements} />
+              </MomentRow>
             ))}
           </View>
         </ScrollView>
@@ -442,6 +460,7 @@ const styles = StyleSheet.create({
   filterChipSelected: { backgroundColor: palette.ink, borderColor: palette.ink },
   filterChipText: { fontFamily: type.medium, color: palette.inkMuted, fontSize: 12 },
   filterChipTextSelected: { color: palette.paperRaised },
+  disabled: { opacity: 0.42 },
   clearFilters: { alignSelf: 'flex-start', minHeight: 34, justifyContent: 'center' },
   clearFiltersText: { fontFamily: type.semibold, color: palette.moss, fontSize: 12 },
   results: {
