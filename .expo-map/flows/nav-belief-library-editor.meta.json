@@ -3,7 +3,7 @@
   "name": "nav-belief-library-editor",
   "route": "belief-library-editor",
   "title": "Navigate from Today to the personal core-belief editor",
-  "device": "iPhone 17 Pro",
+  "device": "Youmotion Leitsatz QA (iPhone 17 Pro, iOS 26.1)",
   "steps": {
     "2": { "target": "Settings tab", "screen": "(tabs)/settings" },
     "4": { "target": "Reveal personalization settings" },
