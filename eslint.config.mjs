@@ -277,8 +277,6 @@ export default tseslint.config(
           allowNamedExports: true,
           allowRecursive: true,
           allowedFiles: [
-            '**/src/features/analytics/domain/analytics-calendar.ts',
-            '**/src/features/analytics/domain/analytics-timeframe.ts',
             '**/src/features/analytics/domain/check-in-analytics.ts',
             '**/src/features/history/application/check-in-history.store.ts',
             '**/src/features/check-in/domain/belief-system.ts',

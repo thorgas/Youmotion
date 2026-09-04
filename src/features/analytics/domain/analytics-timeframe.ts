@@ -158,16 +158,16 @@ export function topLeitsaetzeForTimeframe({
 
 const MAX_VISIBLE_TOP_LEITSAETZE = 3;
 
-function startOfLocalWeek(date: Date) {
+const startOfLocalWeek = (date: Date) => {
   const mondayOffset = (date.getDay() + 6) % 7;
   return new Date(date.getFullYear(), date.getMonth(), date.getDate() - mondayOffset);
-}
+};
 
-function daysBefore({ date, dayCount }: { date: Date; dayCount: number }) {
+const daysBefore = ({ date, dayCount }: { date: Date; dayCount: number }) => {
   return new Date(date.getFullYear(), date.getMonth(), date.getDate() - dayCount);
-}
+};
 
-function rankLeitsatzFrequencies(items: readonly LeitsatzFrequency[]) {
+const rankLeitsatzFrequencies = (items: readonly LeitsatzFrequency[]) => {
   return items.reduce<readonly LeitsatzFrequency[]>((ranked, item) => {
     assert(item.count > 0, 'Leitsatz frequency must be positive');
     assert(
@@ -183,4 +183,4 @@ function rankLeitsatzFrequencies(items: readonly LeitsatzFrequency[]) {
       .slice(0, insertionIndex)
       .concat(item, ranked.slice(insertionIndex));
   }, []);
-}
+};
