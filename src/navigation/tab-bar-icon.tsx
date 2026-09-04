@@ -14,22 +14,22 @@ const historyName: TabSymbolName = { ios: 'clock.arrow.circlepath', android: 'hi
 const analyticsName: TabSymbolName = { ios: 'chart.xyaxis.line', android: 'insights', web: 'insights' };
 const settingsName: TabSymbolName = { ios: 'gearshape.fill', android: 'settings', web: 'settings' };
 
-function TabBarSymbol({ color, name, size }: TabBarIconProps & { name: TabSymbolName }) {
+const TabBarSymbol = ({ color, name, size }: TabBarIconProps & { name: TabSymbolName }) => {
   return <SymbolView name={name} size={size} tintColor={color} />;
 }
 
-export function TodayTabIcon(props: TabBarIconProps) {
+export const TodayTabIcon = (props: TabBarIconProps) => {
   return <TabBarSymbol {...props} name={todayName} />;
 }
 
-export function HistoryTabIcon(props: TabBarIconProps) {
+export const HistoryTabIcon = (props: TabBarIconProps) => {
   return <TabBarSymbol {...props} name={historyName} />;
 }
 
-export function AnalyticsTabIcon(props: TabBarIconProps) {
+export const AnalyticsTabIcon = (props: TabBarIconProps) => {
   return <TabBarSymbol {...props} name={analyticsName} />;
 }
 
-export function SettingsTabIcon(props: TabBarIconProps) {
+export const SettingsTabIcon = (props: TabBarIconProps) => {
   return <TabBarSymbol {...props} name={settingsName} />;
 }

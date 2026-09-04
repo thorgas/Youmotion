@@ -5,13 +5,13 @@ import assert from '@/assert';
 
 export type Point = Readonly<{ x: number; y: number }>;
 
-export function emotionAngle(index: number) {
+export const emotionAngle = (index: number) => {
   assert(Number.isInteger(index), 'Emotion index must be an integer.');
   assert(index >= 0 && index < emotions.length, 'Emotion index must reference the catalog.');
   return EMOTION_AXIS_START_ANGLE + index * EMOTION_AXIS_STEP;
 }
 
-export function pointConstrainedToRadius({
+export const pointConstrainedToRadius = ({
   point,
   center,
   maxRadius,
@@ -19,7 +19,7 @@ export function pointConstrainedToRadius({
   point: Point;
   center: Point;
   maxRadius: number;
-}) {
+}) => {
   assert(Number.isFinite(maxRadius), 'Selection radius must be finite.');
   assert(maxRadius >= 0, 'Selection radius must not be negative.');
   const dx = point.x - center.x;
@@ -34,7 +34,7 @@ export function pointConstrainedToRadius({
   };
 }
 
-export function selectionFromPoint({
+export const selectionFromPoint = ({
   point,
   center,
   maxRadius,
@@ -44,7 +44,7 @@ export function selectionFromPoint({
   center: Point;
   maxRadius: number;
   deadZone?: number;
-}): EmotionSelection | null {
+}): EmotionSelection | null => {
   assert(Number.isFinite(maxRadius), 'Selection radius must be finite.');
   assert(deadZone >= 0, 'Selection dead zone must not be negative.');
   const dx = point.x - center.x;
@@ -77,13 +77,13 @@ export function selectionFromPoint({
   };
 }
 
-export function emotionSelectionWithAdjustedIntensity({
+export const emotionSelectionWithAdjustedIntensity = ({
   direction,
   selection,
 }: {
   direction: -1 | 1;
   selection: EmotionSelection | null;
-}) {
+}) => {
   assert(direction === -1 || direction === 1, 'Intensity adjustment must be adjacent.');
   assert(selection === null || emotions.some((emotion) => emotion.id === selection.emotionId), 'Selection must reference the emotion catalog.');
   const emotionIndex = selection
@@ -99,13 +99,13 @@ export function emotionSelectionWithAdjustedIntensity({
   });
 }
 
-export function emotionSelectionWithAdjacentEmotion({
+export const emotionSelectionWithAdjacentEmotion = ({
   direction,
   selection,
 }: {
   direction: -1 | 1;
   selection: EmotionSelection | null;
-}) {
+}) => {
   assert(direction === -1 || direction === 1, 'Emotion adjustment must be adjacent.');
   assert(emotions.length > 0, 'Emotion adjustment requires a populated catalog.');
   const currentIndex = selection
@@ -129,13 +129,13 @@ const _circularDistance = ({ a, b }: { a: number; b: number }) => {
   return Math.min(difference, TAU - difference);
 };
 
-function _selectionForEmotion({
+const _selectionForEmotion = ({
   emotionIndex,
   intensity,
 }: {
   emotionIndex: number;
   intensity: number;
-}) {
+}) => {
   assert(Number.isInteger(emotionIndex), 'Emotion index must be an integer.');
   assert(Number.isFinite(intensity), 'Emotion intensity must be finite.');
   const emotion = emotions[emotionIndex];

@@ -101,7 +101,7 @@ const defaultsByEmotion = new Map<EmotionId, readonly BeliefSystemId[]>([
     BELIEF_SYSTEM_IDS.LOVE_REQUIRES_HELPING,
   ]],
 ]);
-function usageCount({
+const usageCount = ({
   emotionId,
   history,
   beliefSystemId,
@@ -109,7 +109,7 @@ function usageCount({
   emotionId: EmotionId;
   history: readonly CheckIn[];
   beliefSystemId: BeliefSystemId;
-}) {
+}) => {
   const count = history.filter((entry) => (
     entry.emotionId === emotionId && entry.beliefSystemId === beliefSystemId
   )).length;
@@ -118,7 +118,7 @@ function usageCount({
   return count;
 }
 
-function compareBeliefSystems({
+const compareBeliefSystems = ({
   catalog,
   defaults,
   emotionId,
@@ -132,7 +132,7 @@ function compareBeliefSystems({
   history: readonly CheckIn[];
   left: BeliefSystemId;
   right: BeliefSystemId;
-}) {
+}) => {
   assert(catalog.includes(left), 'Left belief must belong to the ranked catalog.');
   assert(catalog.includes(right), 'Right belief must belong to the ranked catalog.');
   const usageDifference = usageCount({ emotionId, history, beliefSystemId: right })
@@ -146,7 +146,7 @@ function compareBeliefSystems({
   return catalog.indexOf(left) - catalog.indexOf(right);
 }
 
-export function recommendedBeliefSystemIds({
+export const recommendedBeliefSystemIds = ({
   emotionId,
   history,
   statements = [],
@@ -154,7 +154,7 @@ export function recommendedBeliefSystemIds({
   emotionId: EmotionId;
   history: readonly CheckIn[];
   statements?: readonly BeliefStatement[];
-}) {
+}) => {
   const defaults = defaultsByEmotion.get(emotionId) ?? [];
   const catalog: readonly BeliefSystemId[] = [
     ...beliefSystemIds,
