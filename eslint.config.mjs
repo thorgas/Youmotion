@@ -54,6 +54,29 @@ const domainLiterals = [
   { value: 'database_migration', replacement: 'DATABASE_MIGRATION_TABLE' },
 ];
 
+const namedDefaultImportSources = [
+  '../infrastructure/*',
+  '**/infrastructure/*',
+  '**/*.json',
+  '**/*.png',
+  '@/app/(tabs)/_layout',
+  '@/assert',
+  '@react-native-async-storage/async-storage',
+  '@wuba/react-native-echarts/svgChart',
+  'effect/*',
+  'expo-*',
+  'react-native-reanimated',
+  'react-native-svg',
+];
+
+const namedNamespaceImportSources = [
+  '../infrastructure/*',
+  '**/infrastructure/*',
+  'effect/*',
+  'expo-*',
+  'react-native-reanimated',
+];
+
 export default tseslint.config(
   {
     ignores: [
@@ -82,45 +105,8 @@ export default tseslint.config(
       'code-architecture/named-imports': [
         'error',
         {
-          allowDefaultImportsFrom: [
-            '../infrastructure/local-reminder.scheduler',
-            '../infrastructure/reminder.repository',
-            '@/app/(tabs)/_layout',
-            '@/assert',
-            '@/assets/images/app-logo-transparent.png',
-            '@/features/data-safety/infrastructure/data-archive.repository',
-            '@/features/reminders/infrastructure/local-reminder.scheduler',
-            '@/translations/de-DE.json',
-            '@react-native-async-storage/async-storage',
-            '@wuba/react-native-echarts/svgChart',
-            'effect/Effect',
-            'effect/Schema',
-            'expo-constants',
-            'expo-document-picker',
-            'expo-mail-composer',
-            'expo-notifications',
-            'expo-sharing',
-            'expo-splash-screen',
-            'expo-updates',
-            'react-native-reanimated',
-            'react-native-svg',
-          ],
-          allowNamespaceImportsFrom: [
-            '../infrastructure/local-reminder.scheduler',
-            '../infrastructure/reminder.repository',
-            '@/features/data-safety/infrastructure/data-archive.repository',
-            '@/features/reminders/infrastructure/local-reminder.scheduler',
-            'effect/Effect',
-            'effect/Schema',
-            'expo-document-picker',
-            'expo-haptics',
-            'expo-mail-composer',
-            'expo-notifications',
-            'expo-sharing',
-            'expo-splash-screen',
-            'expo-updates',
-            'react-native-reanimated',
-          ],
+          allowDefaultImportsFrom: namedDefaultImportSources,
+          allowNamespaceImportsFrom: namedNamespaceImportSources,
         },
       ],
       'code-architecture/no-barrel-files': 'error',
@@ -203,19 +189,16 @@ export default tseslint.config(
       'code-architecture/require-composable-root-children': 'error',
       'code-architecture/require-compound-component-api': 'error',
       'code-architecture/require-consumer-owned-compound-usage': 'error',
-      'code-architecture/require-interactive-component-contract': [
-        'error',
-        {
-          componentNames: ['ButtonRoot'],
-          contentProps: ['children'],
-          disabledAttributes: ['disabled'],
-          disabledProps: ['disabled'],
-          feedbackAttributes: ['rippleColor'],
-          feedbackStateNames: ['pressed', 'active'],
-          roleAttributes: ['accessibilityRole', 'role'],
-          stateAttributes: ['accessibilityState', 'aria-disabled'],
-        },
-      ],
+    },
+  },
+  {
+    files: ['src/components/ui/**/*.{ts,tsx}'],
+    ignores: [
+      'src/components/ui/app-back-button.tsx',
+      'src/components/ui/settings-action-row.tsx',
+    ],
+    rules: {
+      'code-architecture/require-interactive-component-contract': 'error',
     },
   },
   {
@@ -256,18 +239,24 @@ export default tseslint.config(
             'src/navigation/app-navigation.machine.ts',
           ],
           root: '.',
+          serviceLocators: [
+            {
+              module: '@/app-stores',
+              imports: [
+                'analyticsStore',
+                'appSettingsStore',
+                'checkInHistoryStore',
+                'historyTimeframeStore',
+              ],
+              dependency: 'a store passed in through props or context',
+              replacement: 'the injected store',
+            },
+          ],
         },
       ],
       'code-architecture/no-unasserted-return': [
         'error',
         {
-          assertionNames: [
-            'assert',
-            'assertDefined',
-            'assertWorkletInvariant',
-            'nodeAssert',
-            'nodeAssert.ok',
-          ],
           ignoreDelegates: true,
           ignoreDirectCallbacks: true,
           ignoreJSXCallbacks: true,
@@ -319,6 +308,34 @@ export default tseslint.config(
     },
   },
   {
+    files: ['src/**/*.{ts,tsx}'],
+    ignores: [
+      'src/**/__tests__/**',
+      'src/**/*.harness.{ts,tsx}',
+      'src/**/*.test.{ts,tsx}',
+      'src/test-utils/**',
+      'src/testing/**',
+    ],
+    rules: {
+      'code-architecture/require-assertions': [
+        'error',
+        {
+          assertionNames: [
+            'assert',
+            'assertDefined',
+            'assertWorkletInvariant',
+            'nodeAssert',
+            'nodeAssert.ok',
+          ],
+          ignoreJSXCallbacks: true,
+          ignoreNoInputClosures: true,
+          minimum: 2,
+          minimumStatements: 3,
+        },
+      ],
+    },
+  },
+  {
     files: [
       'src/features/check-in/application/check-in-history.store.ts',
       'src/features/check-in/application/history-filter.ts',
@@ -349,13 +366,6 @@ export default tseslint.config(
       'code-architecture/require-contract-assertions': [
         'error',
         {
-          assertionNames: [
-            'assert',
-            'assertDefined',
-            'assertWorkletInvariant',
-            'nodeAssert',
-            'nodeAssert.ok',
-          ],
           checkParameters: true,
           checkReturns: false,
           ignoreDelegates: true,
@@ -410,34 +420,6 @@ export default tseslint.config(
       'code-architecture/max-function-lines': [
         'error',
         { ignoreJSX: true, max: 70 },
-      ],
-    },
-  },
-  {
-    files: ['src/**/*.{ts,tsx}'],
-    ignores: [
-      'src/**/__tests__/**',
-      'src/**/*.harness.{ts,tsx}',
-      'src/**/*.test.{ts,tsx}',
-      'src/test-utils/**',
-      'src/testing/**',
-    ],
-    rules: {
-      'code-architecture/require-assertions': [
-        'error',
-        {
-          assertionNames: [
-            'assert',
-            'assertDefined',
-            'assertWorkletInvariant',
-            'nodeAssert',
-            'nodeAssert.ok',
-          ],
-          ignoreJSXCallbacks: true,
-          ignoreNoInputClosures: true,
-          minimum: 2,
-          minimumStatements: 3,
-        },
       ],
     },
   },
@@ -545,20 +527,6 @@ export default tseslint.config(
           ],
         },
       ],
-    },
-  },
-  {
-    files: ['src/features/**/domain/**/*.{ts,tsx}'],
-    ignores: [
-      'src/features/analytics/domain/analytics-calendar.ts',
-      'src/features/analytics/domain/analytics-timeframe.ts',
-      'src/features/analytics/domain/check-in-analytics.ts',
-      'src/features/check-in/domain/belief-statement.ts',
-      'src/features/check-in/domain/belief-system.ts',
-      'src/features/check-in/domain/emotion-selection.ts',
-    ],
-    rules: {
-      'code-architecture/require-assertions': 'off',
     },
   },
   {

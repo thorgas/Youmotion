@@ -44,10 +44,13 @@ disjoint.
 
 - Keep `require-assertions` as the broad existing density policy.
 - Use contract and return assertion rules only in non-overlapping scopes.
-- Assertions must prove real input, output, schema, state, or cardinality
-  invariants.
+- Contract assertions prove parameter preconditions on eligible domain
+  functions with at least five statements. Return checking remains off until
+  the rule can ignore nested predicate returns consistently.
 - Keep shared XState stores, but export only factories from feature modules.
   `src/app-stores.ts` is their regression-tested composition root.
+- Declare the four `@/app-stores` exports as service locators so domain,
+  application, and navigation code cannot import the live stores.
 - Use all seven built-in implicit dependency groups. Do not configure a custom
   `Date.now` capability because alpha.4 now provides the general policy.
 - Do not introduce dependencies, UI concepts, data-model changes, or navigation
@@ -81,11 +84,29 @@ artifacts; ask before removing `node_modules`.
 
 Alpha.4 is installed and every exported rule is now accounted for by the
 repository contract. The new rules are active in truthful scopes. Contract and
-return assertion policies are disjoint; algorithm-heavy domain files retain
-the established assertion-density policy until the contract rule can
-distinguish public boundaries from private helpers. The approved app-settings
+return assertion policies are disjoint; the contract rule checks parameter
+preconditions only, and algorithm-heavy domain files retain the established
+assertion-density policy until the contract rule can distinguish public
+boundaries from private helpers. The approved app-settings
 singleton exception was removed: all four live stores now come from the tested
 composition root, while feature modules export factories.
+
+The interactive-component rule now uses bare structural detection for adopted
+shared UI. A repository-wide audit records 16 existing primitives as the
+migration baseline; `AppBackButton` and `SettingsActionRow` are the two explicit
+shared-UI exceptions. The arrow and declaration-order allowlists remain
+load-bearing at 41 findings across ten files and three findings across three
+files. Remove exemptions file by file only after the relevant mechanical
+conversion and tests. The navigation machine remains a temporary composition
+root for time and randomness; its broad exemption must not be treated as the
+desired long-term dependency boundary.
+
+Alpha.4 structurally recognizes the repository assertion helpers, so
+`require-contract-assertions` and `no-unasserted-return` no longer duplicate an
+`assertionNames` list. The named-import exceptions use source globs for Expo,
+Effect, infrastructure modules, and assets plus the six irreducible exact
+seams. The domain `require-assertions` override appears once after the broad
+density policy, preserving flat-config precedence without a duplicate block.
 
 The migration also makes analytics collection contracts readonly, converts two
 plain object aliases to readonly interfaces, and injects reminder timestamps
@@ -105,10 +126,10 @@ git diff --check
 
 Repository gates passed after the configuration commit:
 
-- `pnpm verify`: 46 suites and 313 tests passed, with Oxlint, ESLint, and
+- `pnpm verify`: 46 suites and 314 tests passed, with Oxlint, ESLint, and
   TypeScript 7 green.
-- `pnpm lint:rules`: 47 architecture-rule tests passed.
-- `pnpm test:coverage`: 46 suites and 313 tests passed; 87.61% statements,
+- `pnpm lint:rules`: 48 architecture-rule tests passed.
+- `pnpm test:coverage`: 46 suites and 314 tests passed; 87.61% statements,
   76.58% branches, 83.31% functions, and 90.46% lines.
 - `git diff --check`: passed.
 
