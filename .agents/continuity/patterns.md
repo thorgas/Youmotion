@@ -7,13 +7,13 @@ This file records source-of-truth examples and continuity rules for this repo.
 ### Pattern: leitsatz-owned-reminder-configuration
 
 - **Status:** active
-- **Scope:** `src/features/reminders/**`, `src/features/settings/ui/belief-library-screen.tsx`, `src/navigation/app-navigation.machine.ts`
+- **Scope:** `src/features/reminders/**`, `src/features/beliefs/ui/belief-library-screen.tsx`, `src/navigation/app-navigation.machine.ts`
 - **Enforcement:** changed-files
 - **Default check:** changed-files
 - **Source of truth:**
   - `src/features/reminders/domain/reminder-assignment.ts` - one assignment owns its timing and notification content.
   - `src/features/reminders/ui/leitsatz-reminder-screen.tsx` - configures timing and content immediately after a Leitsatz or from Leitsatz management.
-  - `src/features/settings/ui/belief-library-screen.tsx` - exposes each Leitsatz reminder's status and actions beside that Leitsatz.
+  - `src/features/beliefs/ui/belief-library-screen.tsx` - exposes each Leitsatz reminder's status and actions beside that Leitsatz.
 - **Applies to:**
   - Gentle reminders attached to one Leitsatz.
 - **Do not apply to:**
@@ -38,8 +38,8 @@ This file records source-of-truth examples and continuity rules for this repo.
 - **Enforcement:** changed-files
 - **Default check:** changed-files
 - **Source of truth:**
-  - `src/features/settings/ui/belief-library-removal.ts` - canonical native confirmation for removing one user-owned item.
-  - `src/features/settings/ui/belief-library-screen.tsx` - canonical visible destructive action beside a primary edit action.
+  - `src/features/beliefs/ui/belief-library-removal.ts` - canonical native confirmation for removing one user-owned item.
+  - `src/features/beliefs/ui/belief-library-screen.tsx` - canonical visible destructive action beside a primary edit action.
   - `src/features/check-in/ui/check-in-deletion.ts` - canonical permanent-delete wording and destructive alert role.
 - **Applies to:**
   - User-triggered deletion or removal of one locally persisted item.
@@ -74,10 +74,10 @@ This file records source-of-truth examples and continuity rules for this repo.
 - **Enforcement:** changed-files
 - **Default check:** changed-files
 - **Source of truth:**
-  - `src/features/check-in/infrastructure/migrations/database-migration.ts` - canonical migration contract and branded identity.
-  - `src/features/check-in/infrastructure/migrations/database-migration.runner.ts` - canonical ledger, ordering, transaction, and failure behavior.
-  - `src/features/check-in/infrastructure/migrations/database-migrations.ts` - canonical append-only registry.
-  - `src/features/check-in/infrastructure/migrations/occurrence-time.database-migration.ts` - canonical concrete data migration.
+  - `src/infrastructure/database/migrations/database-migration.ts` - canonical migration contract and branded identity.
+  - `src/infrastructure/database/migrations/database-migration.runner.ts` - canonical ledger, ordering, transaction, and failure behavior.
+  - `src/infrastructure/database/migrations/database-migrations.ts` - canonical append-only registry.
+  - `src/infrastructure/database/migrations/occurrence-time.database-migration.ts` - canonical concrete data migration.
   - `docs/migrations/2026-08-03-check-in-occurrence-time.md` - canonical migration rationale and lifecycle documentation.
 - **Applies to:**
   - Persisted field changes whose legacy storage representation cannot pass the current domain schema directly.
