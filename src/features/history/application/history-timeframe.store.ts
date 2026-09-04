@@ -21,36 +21,29 @@ const HistoryContentFilterSchema = Schema.Literal(
   HISTORY_CONTENT_FILTERS.BELIEFS,
 );
 
+const historyContextSchema = Schema.standardSchemaV1(Schema.Struct({
+  beliefSystemId: Schema.NullOr(BeliefSystemId),
+  content: HistoryContentFilterSchema,
+  emotionId: Schema.NullOr(EmotionId),
+  filtersOpen: Schema.Boolean,
+  query: Schema.String,
+  timeframe: HistoryTimeframeSchema,
+}));
+
+const historyEventSchemas = {
+  [HISTORY_EVENTS.TIMEFRAME_SELECTED]: Schema.standardSchemaV1(Schema.Struct({ timeframe: HistoryTimeframeSchema })),
+  [HISTORY_EVENTS.QUERY_CHANGED]: Schema.standardSchemaV1(Schema.Struct({ query: Schema.String })),
+  [HISTORY_EVENTS.FILTERS_TOGGLED]: Schema.standardSchemaV1(Schema.Struct({})),
+  [HISTORY_EVENTS.EMOTION_FILTER_SELECTED]: Schema.standardSchemaV1(Schema.Struct({ emotionId: Schema.NullOr(EmotionId) })),
+  [HISTORY_EVENTS.CONTENT_FILTER_SELECTED]: Schema.standardSchemaV1(Schema.Struct({ content: HistoryContentFilterSchema })),
+  [HISTORY_EVENTS.BELIEF_FILTER_SELECTED]: Schema.standardSchemaV1(Schema.Struct({ beliefSystemId: BeliefSystemId, timeframe: HistoryTimeframeSchema })),
+  [HISTORY_EVENTS.FILTERS_CLEARED]: Schema.standardSchemaV1(Schema.Struct({})),
+};
+
 export const createHistoryTimeframeStore = () => createStore({
   schemas: {
-    context: Schema.standardSchemaV1(Schema.Struct({
-      beliefSystemId: Schema.NullOr(BeliefSystemId),
-      content: HistoryContentFilterSchema,
-      emotionId: Schema.NullOr(EmotionId),
-      filtersOpen: Schema.Boolean,
-      query: Schema.String,
-      timeframe: HistoryTimeframeSchema,
-    })),
-    events: {
-      [HISTORY_EVENTS.TIMEFRAME_SELECTED]: Schema.standardSchemaV1(Schema.Struct({
-        timeframe: HistoryTimeframeSchema,
-      })),
-      [HISTORY_EVENTS.QUERY_CHANGED]: Schema.standardSchemaV1(Schema.Struct({
-        query: Schema.String,
-      })),
-      [HISTORY_EVENTS.FILTERS_TOGGLED]: Schema.standardSchemaV1(Schema.Struct({})),
-      [HISTORY_EVENTS.EMOTION_FILTER_SELECTED]: Schema.standardSchemaV1(Schema.Struct({
-        emotionId: Schema.NullOr(EmotionId),
-      })),
-      [HISTORY_EVENTS.CONTENT_FILTER_SELECTED]: Schema.standardSchemaV1(Schema.Struct({
-        content: HistoryContentFilterSchema,
-      })),
-      [HISTORY_EVENTS.BELIEF_FILTER_SELECTED]: Schema.standardSchemaV1(Schema.Struct({
-        beliefSystemId: BeliefSystemId,
-        timeframe: HistoryTimeframeSchema,
-      })),
-      [HISTORY_EVENTS.FILTERS_CLEARED]: Schema.standardSchemaV1(Schema.Struct({})),
-    },
+    context: historyContextSchema,
+    events: historyEventSchemas,
   },
   context: {
     beliefSystemId: null,
