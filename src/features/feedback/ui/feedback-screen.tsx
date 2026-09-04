@@ -241,7 +241,21 @@ export function FeedbackOverlay() {
   );
 }
 
-export function FeedbackSettingsAction() {
+export function FeedbackSettingsAction({
+  description = String(fbs(
+    'Ask a question or share feedback through your email app.',
+    'Settings support and feedback entry explanation',
+  )),
+  disabled = false,
+  title = String(fbs(
+    'Questions and feedback',
+    'Settings support and feedback entry title',
+  )),
+}: {
+  description?: string;
+  disabled?: boolean;
+  title?: string;
+} = {}) {
   const actor = useFeedbackActor();
   const idle = useSelector(actor, _selectIdle);
   assert(!idle || actor.getSnapshot().context.kind === null, 'Idle feedback must not retain a kind.');
@@ -251,16 +265,11 @@ export function FeedbackSettingsAction() {
   if (!idle) return null;
   return (
     <SettingsActionRow
-      description={String(fbs(
-        'Ask a question or share feedback through your email app.',
-        'Settings support and feedback entry explanation',
-      ))}
+      description={description}
+      disabled={disabled}
       onPress={_open}
       testID="feedback-button"
-      title={String(fbs(
-        'Questions and feedback',
-        'Settings support and feedback entry title',
-      ))}
+      title={title}
     />
   );
 }
