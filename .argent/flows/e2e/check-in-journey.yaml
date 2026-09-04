@@ -7,11 +7,7 @@ steps:
   - tool: open-url
     args:
       url: exp+youmotion://expo-development-client/?url=http%3A%2F%2F127.0.0.1%3A8091
-  - when:
-      visible: { id: onboarding-skip }
-    steps:
-      - tap: { id: onboarding-skip }
-      - await: { visible: { id: emotion-star }, timeout: 10000 }
+  - run: fragments/ensure-onboarded.yaml
   - run: fragments/ensure-english.yaml
   - tap: { id: tab-history }
   - await: { visible: { text: YOUR HISTORY }, timeout: 10000 }

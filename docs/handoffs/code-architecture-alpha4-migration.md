@@ -105,30 +105,29 @@ git diff --check
 
 Repository gates passed after the configuration commit:
 
-- `pnpm verify`: 46 suites and 312 tests passed, with Oxlint, ESLint, and
+- `pnpm verify`: 46 suites and 313 tests passed, with Oxlint, ESLint, and
   TypeScript 7 green.
-- `pnpm lint:rules`: 46 architecture-rule tests passed.
-- `pnpm test:coverage`: 46 suites and 312 tests passed; 87.6% statements,
-  76.58% branches, 83.25% functions, and 90.46% lines.
+- `pnpm lint:rules`: 47 architecture-rule tests passed.
+- `pnpm test:coverage`: 46 suites and 313 tests passed; 87.61% statements,
+  76.58% branches, 83.31% functions, and 90.46% lines.
 - `git diff --check`: passed.
 
 The requested `spark_worker` could not run because its model usage allowance
 was exhausted. The same commands were delegated to the cheapest available
 worker (`gpt-5.6-luna`, low reasoning) and independently reported back.
 
-React Doctor passed the changed-file scope with a 100/100 score and no
+React Doctor passed the changed-file scope with a 92/100 score and no
 findings.
 
-The complete committed Argent E2E inventory passed twice on the connected
-Pixel `28261JEGR07474` with `E2E_PLATFORM=android`, `E2E_DEVICE` set to the
-serial, and Metro on port 8091. The runner now restores ADB reverse and
-force-stops the development app before every pass. Shared setup waits for the
-development client, normalizes the app locale to English, and uses explicit
-OS gestures for tab transitions where injected selector taps can retain stale
-frames. Reminder flows accept Android's uppercase native confirmation labels,
-prove time-picker dismissal, and remove only exact-name synthetic records left
-by an interrupted run. Argent can still emit a non-fatal idle warning while
-the Pulse keeps animating; destination assertions remain the pass criterion.
+After upgrading the local runner from Argent 0.23.0 to 0.24.0, the complete
+11-flow development inventory passed twice on dedicated iOS simulator
+`9D5C1782-C1C3-458B-9416-6311D03AD1B9` with `E2E_PLATFORM=ios`, Metro on port
+8091, zero failures, and zero warnings. Shared setup now tolerates cold Metro
+startup before onboarding. The reminder-owned-timing flow dismisses the iOS
+keyboard through the screen's interactive scroll contract and verifies that
+the Return key is hidden before saving. Navigation readiness uses semantic
+History controls plus bounded post-identity transition waits; its Settings-tab
+coordinate stays clear of the development-tools overlay.
 
 Native Harness was exercised after E2E. The connected Pixel contains a
 non-debuggable production-signed app, so Android Harness correctly stopped

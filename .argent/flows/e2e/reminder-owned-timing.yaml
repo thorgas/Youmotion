@@ -7,11 +7,7 @@ steps:
   - tool: open-url
     args:
       url: exp+youmotion://expo-development-client/?url=http%3A%2F%2F127.0.0.1%3A8091
-  - when:
-      visible: { id: onboarding-skip }
-    steps:
-      - tap: { id: onboarding-skip }
-      - await: { visible: { id: emotion-star }, timeout: 10000 }
+  - run: fragments/ensure-onboarded.yaml
   - run: fragments/ensure-english.yaml
   - tap: { id: tab-history }
   - await: { visible: { text: YOUR HISTORY }, timeout: 10000 }
@@ -67,13 +63,19 @@ steps:
   - when:
       platform: ios
     steps:
-      - tap: { text: What could guide you instead? }
+      - tool: gesture-swipe
+        args:
+          fromX: 0.5
+          fromY: 0.35
+          toX: 0.5
+          toY: 0.75
+          durationMs: 800
+      - await: { hidden: { id: Return }, timeout: 5000 }
   - when:
       platform: android
     steps:
       - tool: keyboard
         args: { key: escape }
-  - await: { idle: true, stableFor: 400, timeout: 5000 }
   - scroll-to: { target: { id: guiding-belief-finish }, direction: down }
   - tap: { id: guiding-belief-finish }
   - await: { visible: { id: success-reminder-offer }, timeout: 10000 }

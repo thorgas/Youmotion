@@ -1,12 +1,6 @@
 steps:
   - await: { visible: { id: tab-settings }, timeout: 30000 }
-  - await: { idle: true, stableFor: 1000, timeout: 10000 }
   - wait: 3000
-  - when:
-      visible: { id: xmark }
-    steps:
-      - tap: { id: xmark }
-      - await: { hidden: { id: xmark }, timeout: 5000 }
   - when:
       platform: ios
     steps:
@@ -20,7 +14,7 @@ steps:
   - await: { visible: { id: language-english }, timeout: 10000 }
   - tap: { id: language-english }
   - await: { visible: { text: Your space. }, timeout: 10000 }
-  - await: { idle: true, stableFor: 700, timeout: 10000 }
+  - wait: 1000
   - when:
       platform: ios
     steps:
