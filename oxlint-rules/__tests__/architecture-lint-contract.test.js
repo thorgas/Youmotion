@@ -43,7 +43,7 @@ const exportedRuleNames = () => {
 describe('architecture lint contract', () => {
   it('keeps the alpha plugin in the main verification path', () => {
     expect(packageJson.devDependencies['eslint-plugin-code-architecture']).toBe(
-      '0.6.0-alpha.5',
+      '0.6.0-alpha.6',
     );
     expect(packageJson.scripts.lint).toContain('pnpm lint:architecture');
     expect(packageJson.scripts.verify).toContain('pnpm lint');
@@ -213,6 +213,12 @@ describe('architecture lint contract', () => {
     const algorithmRules = configuredRulesFor(
       'src/features/analytics/domain/analytics-calendar.ts',
     );
+    const interactionRule = [
+      2,
+      expect.objectContaining({
+        contractComponents: ['AppBackButton', 'Button.Root', 'SettingsActionRow'],
+      }),
+    ];
 
     expect(storeRules['code-architecture/no-exported-dependency-instances']?.[0]).toBe(2);
     expect(otherApplicationRules['code-architecture/no-exported-dependency-instances']?.[0]).toBe(2);
@@ -220,13 +226,13 @@ describe('architecture lint contract', () => {
     expect(algorithmRules['code-architecture/require-assertions']?.[0]).toBe(2);
     expect(configuredRulesFor(
       'src/components/ui/app-back-button.tsx',
-    )['code-architecture/require-interactive-component-contract']).toEqual([2]);
+    )['code-architecture/require-interactive-component-contract']).toEqual(interactionRule);
     expect(configuredRulesFor(
       'src/features/settings/ui/contract-fixture.tsx',
-    )['code-architecture/require-interactive-component-contract']).toBeUndefined();
+    )['code-architecture/require-interactive-component-contract']).toEqual(interactionRule);
     expect(configuredRulesFor(
       'src/components/ui/contract-fixture.tsx',
-    )['code-architecture/require-interactive-component-contract']).toEqual([2]);
+    )['code-architecture/require-interactive-component-contract']).toEqual(interactionRule);
   });
 
   it('limits logic functions without forcing JSX component extraction', () => {

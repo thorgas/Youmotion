@@ -192,9 +192,21 @@ export default tseslint.config(
     },
   },
   {
-    files: ['src/components/ui/**/*.{ts,tsx}'],
+    files: [
+      'src/components/ui/**/*.{ts,tsx}',
+      'src/features/**/ui/**/*.{ts,tsx}',
+    ],
     rules: {
-      'code-architecture/require-interactive-component-contract': 'error',
+      'code-architecture/require-interactive-component-contract': [
+        'error',
+        {
+          contractComponents: [
+            'AppBackButton',
+            'Button.Root',
+            'SettingsActionRow',
+          ],
+        },
+      ],
     },
   },
   {
