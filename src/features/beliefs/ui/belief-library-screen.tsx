@@ -66,7 +66,7 @@ function guidingBeliefReminderForStatement({
   );
 }
 
-function LibraryBackButton() {
+function LibraryBackButton({ disabled = false, label }: { disabled?: boolean; label?: string }) {
   const actor = useAppNavigationActor();
   const snapshot = actor.getSnapshot();
   assert(new Set(snapshot.context.beliefStatements.map(({ beliefSystemId }) => beliefSystemId)).size === snapshot.context.beliefStatements.length, 'Belief library ids must be unique');
@@ -76,6 +76,8 @@ function LibraryBackButton() {
   return (
     <AppBackButton
       onPress={close}
+      disabled={disabled}
+      {...(label === undefined ? {} : { label })}
       style={styles.backButton}
       testID="belief-library-close"
     />
@@ -338,7 +340,7 @@ function BeliefLibraryList() {
           showsVerticalScrollIndicator
           testID="belief-library-scroll"
         >
-          <LibraryBackButton />
+          <LibraryBackButton disabled={retiring} />
           <Text style={styles.eyebrow}>
             <fbt desc="Eyebrow above guiding-belief management">YOUR GUIDING BELIEFS</fbt>
           </Text>
