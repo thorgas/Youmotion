@@ -2,10 +2,15 @@ steps:
   - await: { visible: { id: tab-settings }, timeout: 30000 }
   - wait: 3000
   - when:
+      visible: { id: xmark }
+    steps:
+      - tap: { id: xmark }
+      - await: { hidden: { id: xmark }, timeout: 5000 }
+  - when:
       platform: ios
     steps:
       - tool: gesture-tap
-        args: { x: 0.875, y: 0.96 }
+        args: { x: 0.78, y: 0.93 }
   - when:
       platform: android
     steps:
@@ -19,7 +24,7 @@ steps:
       platform: ios
     steps:
       - tool: gesture-tap
-        args: { x: 0.125, y: 0.96 }
+        args: { x: 0.125, y: 0.93 }
   - when:
       platform: android
     steps:

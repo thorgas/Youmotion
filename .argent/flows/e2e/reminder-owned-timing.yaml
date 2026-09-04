@@ -84,6 +84,7 @@ steps:
       visible: { id: reminder-offer-accept }
     steps:
       - tap: { id: reminder-offer-accept }
+  - wait: 2000
   - when:
       visible: { text: { matches: '^Allow$' } }
     steps:
@@ -144,7 +145,7 @@ steps:
     steps:
       - tap: { text: { matches: '^(Delete|DELETE)$' } }
   - await: { visible: { text: Not set }, timeout: 15000 }
-  - tap: { text: Remove }
+  - tap: { text: Remove, after: { text: ArgentOwnedTimingCore } }
   - await: { visible: { text: Remove this core belief? }, timeout: 5000 }
   - when:
       platform: ios
@@ -161,7 +162,15 @@ steps:
       - tap: { text: { matches: '^(Remove|REMOVE)$' } }
   - await: { hidden: { text: ArgentOwnedTimingGuide }, timeout: 15000 }
   - scroll-to: { target: { id: belief-library-close }, direction: up }
-  - tap: { id: belief-library-close }
+  - when:
+      platform: ios
+    steps:
+      - tool: gesture-tap
+        args: { x: 0.2, y: 0.12 }
+  - when:
+      platform: android
+    steps:
+      - tap: { id: belief-library-close }
   - await: { visible: { id: tab-history }, timeout: 5000 }
   - tap: { id: tab-history }
   - await: { visible: { text: ArgentOwnedTimingMoment }, timeout: 10000 }
