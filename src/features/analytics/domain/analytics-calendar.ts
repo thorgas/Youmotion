@@ -37,14 +37,6 @@ export function calendarEmotionFrequencies(entries: readonly CheckIn[]) {
   }, []);
 }
 
-function sameLocalMonth({ date, month, year }: {
-  date: Date;
-  month: number;
-  year: number;
-}) {
-  return date.getFullYear() === year && date.getMonth() === month;
-}
-
 export function periodCalendarDays({
   entries,
   range,
@@ -111,4 +103,12 @@ export function calendarMonth({ entries, month }: {
     return { day, entries: entriesByDay.get(day) ?? [] };
   });
   return { year, month: monthIndex, leadingDayCount, days };
+}
+
+function sameLocalMonth({ date, month, year }: {
+  date: Date;
+  month: number;
+  year: number;
+}) {
+  return date.getFullYear() === year && date.getMonth() === month;
 }

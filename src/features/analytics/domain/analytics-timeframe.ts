@@ -11,19 +11,7 @@ import {
   type BeliefStatement,
 } from '@/features/beliefs/domain/belief-statement';
 
-export const AnalyticsTimeframeSchema = Schema.Literal(
-  ANALYTICS_TIMEFRAMES.LAST_WEEK,
-  ANALYTICS_TIMEFRAMES.LAST_FOUR_WEEKS,
-  ANALYTICS_TIMEFRAMES.ALL_TIME,
-);
 export type AnalyticsTimeframe = typeof AnalyticsTimeframeSchema.Type;
-
-export const TopLeitsatzSchema = Schema.Struct({
-  beliefSystemId: BeliefSystemId,
-  guidingStatement: BeliefStatementText,
-  count: Schema.Int.pipe(Schema.positive()),
-  supportingIds: CheckInIdListSchema,
-});
 export type TopLeitsatz = typeof TopLeitsatzSchema.Type;
 export type TopLeitsatzGroup = Readonly<{
   additionalCount: number;
@@ -33,15 +21,26 @@ export type TopLeitsatzGroup = Readonly<{
 }>;
 
 export type AnalyticsDateRange = Readonly<{ start: Date | null; end: Date }>;
+type LeitsatzFrequency = Readonly<{
+  beliefSystemId: BeliefSystemId;
+  count: number;
+  guidingStatement: string;
+  latestAt: number;
+  supportingIds: ReadonlyArray<CheckIn['id']>;
+}>;
 
-function startOfLocalWeek(date: Date) {
-  const mondayOffset = (date.getDay() + 6) % 7;
-  return new Date(date.getFullYear(), date.getMonth(), date.getDate() - mondayOffset);
-}
+export const AnalyticsTimeframeSchema = Schema.Literal(
+  ANALYTICS_TIMEFRAMES.LAST_WEEK,
+  ANALYTICS_TIMEFRAMES.LAST_FOUR_WEEKS,
+  ANALYTICS_TIMEFRAMES.ALL_TIME,
+);
 
-function daysBefore({ date, dayCount }: { date: Date; dayCount: number }) {
-  return new Date(date.getFullYear(), date.getMonth(), date.getDate() - dayCount);
-}
+export const TopLeitsatzSchema = Schema.Struct({
+  beliefSystemId: BeliefSystemId,
+  guidingStatement: BeliefStatementText,
+  count: Schema.Int.pipe(Schema.positive()),
+  supportingIds: CheckInIdListSchema,
+});
 
 export function analyticsDateRange({
   now,
@@ -84,34 +83,6 @@ export function entriesForAnalyticsTimeframe({
     const occurredAt = new Date(entry.occurredAt);
     return !Number.isNaN(occurredAt.getTime()) && occurredAt >= start && occurredAt < range.end;
   });
-}
-
-const MAX_VISIBLE_TOP_LEITSAETZE = 3;
-
-type LeitsatzFrequency = Readonly<{
-  beliefSystemId: BeliefSystemId;
-  count: number;
-  guidingStatement: string;
-  latestAt: number;
-  supportingIds: ReadonlyArray<CheckIn['id']>;
-}>;
-
-function rankLeitsatzFrequencies(items: readonly LeitsatzFrequency[]) {
-  return items.reduce<readonly LeitsatzFrequency[]>((ranked, item) => {
-    assert(item.count > 0, 'Leitsatz frequency must be positive');
-    assert(
-      ranked.every((frequency) => frequency.count > 0),
-      'Ranked Leitsatz frequencies must be positive',
-    );
-    const insertionIndex = ranked.findIndex((candidate) => (
-      item.count > candidate.count
-      || (item.count === candidate.count && item.latestAt > candidate.latestAt)
-    ));
-    if (insertionIndex === -1) return ranked.concat(item);
-    return ranked
-      .slice(0, insertionIndex)
-      .concat(item, ranked.slice(insertionIndex));
-  }, []);
 }
 
 export function topLeitsaetzeForTimeframe({
@@ -183,4 +154,33 @@ export function topLeitsaetzeForTimeframe({
     range,
     timeframe,
   };
+}
+
+const MAX_VISIBLE_TOP_LEITSAETZE = 3;
+
+function startOfLocalWeek(date: Date) {
+  const mondayOffset = (date.getDay() + 6) % 7;
+  return new Date(date.getFullYear(), date.getMonth(), date.getDate() - mondayOffset);
+}
+
+function daysBefore({ date, dayCount }: { date: Date; dayCount: number }) {
+  return new Date(date.getFullYear(), date.getMonth(), date.getDate() - dayCount);
+}
+
+function rankLeitsatzFrequencies(items: readonly LeitsatzFrequency[]) {
+  return items.reduce<readonly LeitsatzFrequency[]>((ranked, item) => {
+    assert(item.count > 0, 'Leitsatz frequency must be positive');
+    assert(
+      ranked.every((frequency) => frequency.count > 0),
+      'Ranked Leitsatz frequencies must be positive',
+    );
+    const insertionIndex = ranked.findIndex((candidate) => (
+      item.count > candidate.count
+      || (item.count === candidate.count && item.latestAt > candidate.latestAt)
+    ));
+    if (insertionIndex === -1) return ranked.concat(item);
+    return ranked
+      .slice(0, insertionIndex)
+      .concat(item, ranked.slice(insertionIndex));
+  }, []);
 }
