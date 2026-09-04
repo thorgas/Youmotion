@@ -32,51 +32,51 @@ type AppNavigationTransition = Extract<
 const routeHistory = new WeakMap<AppNavigationActor, readonly AppRoute[]>();
 const nativeDismissals = new WeakSet<AppNavigationActor>();
 
-function isAppNavigationSnapshot(
+const isAppNavigationSnapshot = (
   snapshot: Snapshot<unknown>,
-): snapshot is AppNavigationSnapshot {
+): snapshot is AppNavigationSnapshot => {
   return 'machine' in snapshot && snapshot.machine === appNavigationMachine;
-}
+};
 
-function isAppNavigationTransition(
+const isAppNavigationTransition = (
   event: InspectionEvent,
-): event is AppNavigationTransition {
+): event is AppNavigationTransition => {
   return event.type === '@xstate.transition'
     && isAppNavigationSnapshot(event.snapshot);
-}
+};
 
-function isTabRoute(route: AppRoute) {
+const isTabRoute = (route: AppRoute) => {
   return (
     route === APP_ROUTES.TODAY
     || route === APP_ROUTES.HISTORY
     || route === APP_ROUTES.ANALYTICS
     || route === APP_ROUTES.SETTINGS
   );
-}
+};
 
-function replaceRoute(route: AppRoute) {
+const replaceRoute = (route: AppRoute) => {
   router.replace(route);
-}
+};
 
-function dismissToRoute(route: AppRoute) {
+const dismissToRoute = (route: AppRoute) => {
   router.dismissTo(route);
-}
+};
 
-function routeNameMatchesAppRoute({
+const routeNameMatchesAppRoute = ({
   route,
   routeName,
 }: {
   route: AppRoute;
   routeName: string | undefined;
-}) {
+}) => {
   assert(route.startsWith('/'), 'Route matching requires an absolute app route.');
   assert(routeName === undefined || routeName === routeName.trim(), 'Native route names cannot contain outer whitespace.');
   if (!routeName) return false;
   const routePath = route.slice(1);
   return routeName === routePath || routeName.endsWith(`/${routePath}`);
-}
+};
 
-function syncNativeDismissal({
+const syncNativeDismissal = ({
   actor,
   history,
   route,
@@ -84,7 +84,7 @@ function syncNativeDismissal({
   actor: AppNavigationActor;
   history: readonly AppRoute[];
   route: AppRoute;
-}) {
+}) => {
   assert(history.length > 0, 'Native dismissal requires route history.');
   assert(route.startsWith('/'), 'Native dismissal requires an absolute app route.');
   nativeDismissals.delete(actor);
@@ -98,15 +98,15 @@ function syncNativeDismissal({
   routeHistory.set(actor, history.slice(0, routeIndex + 1));
   if (routeIndex === history.length - 2) return;
   dismissToRoute(route);
-}
+};
 
-function syncMachineRoute({
+const syncMachineRoute = ({
   actor,
   route,
 }: {
   actor: AppNavigationActor;
   route: AppRoute;
-}) {
+}) => {
   assert(actor.getSnapshot().status !== 'stopped', 'Cannot sync a stopped navigation actor.');
   assert(route.startsWith('/'), 'Machine route must be an absolute app route.');
   const history = routeHistory.get(actor);
@@ -145,9 +145,9 @@ function syncMachineRoute({
 
   routeHistory.set(actor, [...history, route]);
   router.push(route);
-}
+};
 
-export function inspectAppNavigation(event: InspectionEvent) {
+export const inspectAppNavigation = (event: InspectionEvent) => {
   assert(event.type.startsWith('@xstate.'), 'Navigation inspection requires an XState event.');
   assert('actorRef' in event, 'Navigation inspection requires an actor reference.');
   if (!isAppNavigationTransition(event)) return;
@@ -157,9 +157,9 @@ export function inspectAppNavigation(event: InspectionEvent) {
     actor: event.actorRef,
     route: routeForStateValue(event.snapshot.value),
   });
-}
+};
 
-export function handleNativeRouteRemoval({
+export const handleNativeRouteRemoval = ({
   actor,
   event,
   routeName,
@@ -167,7 +167,7 @@ export function handleNativeRouteRemoval({
   actor: AppNavigationActor;
   event: { preventDefault: () => void };
   routeName: string | undefined;
-}) {
+}) => {
   assert(actor.getSnapshot().status !== 'stopped', 'Cannot remove a route from a stopped actor.');
   assert(routeName === undefined || routeName.length > 0, 'A native route name cannot be empty.');
   const snapshot = actor.getSnapshot();
@@ -182,9 +182,9 @@ export function handleNativeRouteRemoval({
 
   nativeDismissals.add(actor);
   actor.send({ type: NAVIGATION_EVENTS.BACK_REQUESTED });
-}
+};
 
-export function nativeRouteTransitionEnded({
+export const nativeRouteTransitionEnded = ({
   actor,
   event,
   routeName,
@@ -192,7 +192,7 @@ export function nativeRouteTransitionEnded({
   actor: AppNavigationActor;
   event: { data: { closing: boolean } };
   routeName: string | undefined;
-}) {
+}) => {
   assert(actor.getSnapshot().status !== 'stopped', 'Cannot finish a transition for a stopped actor.');
   assert(routeName === undefined || routeName.length > 0, 'A native route name cannot be empty.');
   if (!event.data.closing) return;
@@ -209,4 +209,4 @@ export function nativeRouteTransitionEnded({
 
   nativeDismissals.add(actor);
   actor.send({ type: NAVIGATION_EVENTS.BACK_REQUESTED });
-}
+};

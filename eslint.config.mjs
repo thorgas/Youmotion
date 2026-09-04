@@ -278,7 +278,6 @@ export default tseslint.config(
           allowRecursive: true,
           allowedFiles: [
             '**/src/navigation/app-navigation.machine.ts',
-            '**/src/navigation/app-router.adapter.ts',
           ],
         },
       ],
