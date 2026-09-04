@@ -303,7 +303,6 @@ export default tseslint.config(
       'code-architecture/require-assertions': [
         'error',
         {
-          assertionNames: ['assertWorkletInvariant'],
           ignoreJSXCallbacks: true,
           ignoreNoInputClosures: true,
           minimum: 2,

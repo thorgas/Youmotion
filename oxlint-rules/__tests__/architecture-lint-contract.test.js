@@ -43,7 +43,7 @@ const exportedRuleNames = () => {
 describe('architecture lint contract', () => {
   it('keeps the alpha plugin in the main verification path', () => {
     expect(packageJson.devDependencies['eslint-plugin-code-architecture']).toBe(
-      '0.6.0-alpha.4',
+      '0.6.0-alpha.5',
     );
     expect(packageJson.scripts.lint).toContain('pnpm lint:architecture');
     expect(packageJson.scripts.verify).toContain('pnpm lint');
@@ -114,7 +114,6 @@ describe('architecture lint contract', () => {
     )['code-architecture/require-assertions']).toEqual([
       2,
       expect.objectContaining({
-        assertionNames: ['assertWorkletInvariant'],
         checkExpressionBodies: false,
         ignoreJSXCallbacks: true,
         ignoreNoInputClosures: true,
