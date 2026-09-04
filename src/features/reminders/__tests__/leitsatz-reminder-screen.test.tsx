@@ -4,12 +4,14 @@ import { createActor, waitFor, type Actor } from 'xstate';
 import {
   APP_LOCALES,
   BELIEF_LIBRARY_EVENTS,
+  CHECK_IN_EVENTS,
   EMOTION_LABEL_MODES,
   NAVIGATION_EVENTS,
   REMINDER_EVENTS,
   REMINDER_NOTIFICATION_CONTENT,
   REMINDER_PERMISSION_STATES,
   REMINDER_STATES,
+  REMINDER_TARGET_KINDS,
 } from '@/constants';
 import { appSettingsStore } from '@/app-stores';
 import { configureAppLocale } from '@/localization/app-locale.configuration';
@@ -21,6 +23,9 @@ import {
 } from '@/test-utils/surrealdb.repository.mock';
 import * as reminderScheduler from '../infrastructure/local-reminder.scheduler';
 import { LeitsatzReminderScreen } from '../ui/leitsatz-reminder-screen';
+import { borderColors, palette } from '@/theme';
+import { CustomBeliefSystemId } from '@/features/beliefs/domain/belief-statement';
+import { ReminderAssignmentId } from '../domain/reminder-assignment';
 
 jest.mock('expo-router', () => ({
   router: { dismissTo: jest.fn(), push: jest.fn(), replace: jest.fn() },
@@ -103,7 +108,39 @@ describe('Leitsatz reminder screen', () => {
     expect(screen.getByText('Would you like a friendly reminder of your new Leitsatz?'))
       .toBeOnTheScreen();
     expect(screen.getByText('“I can ask for support.”')).toBeOnTheScreen();
+    expect(screen.getByTestId('positive-leitsatz-card')).toHaveStyle({
+      backgroundColor: palette.selectionWash,
+      borderColor: borderColors.moss20,
+    });
     expect(actor.getSnapshot().context.reminderAssignments).toEqual([]);
+  });
+
+  it('shows the focused notification Leitsatz on its positive surface', async () => {
+    const actor = createActor(appNavigationMachine).start();
+    const beliefSystemId = CustomBeliefSystemId.make('custom-focused-notification-belief');
+    actor.send({
+      type: REMINDER_EVENTS.NOTIFICATION_OPENED,
+      assignmentId: ReminderAssignmentId.make('focused-notification-assignment'),
+      targetKind: REMINDER_TARGET_KINDS.GUIDING_BELIEF,
+      beliefSystemId,
+    });
+    actor.send({
+      type: CHECK_IN_EVENTS.BELIEF_STATEMENTS_HYDRATED,
+      statements: [{
+        kind: 'custom',
+        beliefSystemId,
+        harmfulStatement: 'I must always be available.',
+        guidingStatement: 'I may protect time for myself.',
+      }],
+    });
+    await renderReminder(actor);
+
+    expect(screen.getByText('A thought that may accompany you.')).toBeOnTheScreen();
+    expect(screen.getByText('“I may protect time for myself.”')).toBeOnTheScreen();
+    expect(screen.getByTestId('positive-leitsatz-card')).toHaveStyle({
+      backgroundColor: palette.selectionWash,
+      borderColor: borderColors.moss20,
+    });
   });
 
   it('describes only the timing choices available for an emotion check-in reminder', async () => {

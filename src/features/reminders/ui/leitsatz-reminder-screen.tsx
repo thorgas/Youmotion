@@ -31,7 +31,7 @@ import { ConfirmedPickerModal } from '@/components/ui/confirmed-picker-modal';
 import {
   beliefStatementForId,
 } from '@/features/beliefs/domain/belief-statement';
-import { actionColors, palette, type } from '@/theme';
+import { actionColors, borderColors, palette, type } from '@/theme';
 import { useAppNavigationActor } from '@/navigation/app-navigation.provider';
 import type {
   ReminderLocalTime,
@@ -100,7 +100,7 @@ function PositiveStatementCard({
   assert(statement.trim().length > 0, 'Positive statement card requires visible copy');
   assert(statement.length <= MAX_BELIEF_STATEMENT_LENGTH, 'Positive statement card copy must respect the belief limit');
   return (
-    <View style={styles.statementCard}>
+    <View style={styles.statementCard} testID="positive-leitsatz-card">
       <Text style={styles.cardEyebrow}>
         {newStatement
           ? <fbt desc="New positive Leitsatz reminder card label">YOUR NEW LEITSATZ</fbt>
@@ -524,8 +524,8 @@ const styles = StyleSheet.create({
   title: { fontFamily: type.semibold, color: palette.ink, fontSize: 34, lineHeight: 40 },
   copy: { fontFamily: type.regular, color: palette.inkMuted, fontSize: 15, lineHeight: 23 },
   error: { fontFamily: type.medium, color: palette.danger, fontSize: 14, lineHeight: 20 },
-  statementCard: { minHeight: 150, justifyContent: 'center', backgroundColor: palette.paperRaised, borderColor: palette.hairline, borderWidth: 1, borderRadius: 24, borderCurve: 'continuous', padding: 22 },
-  cardEyebrow: { fontFamily: type.semibold, color: palette.inkMuted, fontSize: 10, letterSpacing: 1.2, marginBottom: 14 },
+  statementCard: { minHeight: 150, justifyContent: 'center', backgroundColor: palette.selectionWash, borderColor: borderColors.moss20, borderWidth: 1, borderRadius: 24, borderCurve: 'continuous', padding: 22 },
+  cardEyebrow: { fontFamily: type.semibold, color: palette.moss, fontSize: 10, letterSpacing: 1.2, marginBottom: 14 },
   statement: { fontFamily: type.medium, color: palette.ink, fontSize: 23, lineHeight: 32, textAlign: 'center' },
   fieldHint: { fontFamily: type.regular, color: palette.inkMuted, fontSize: 13, lineHeight: 19, marginTop: -8 },
   fieldLabel: { fontFamily: type.semibold, color: palette.inkMuted, fontSize: 11, letterSpacing: 1.2, marginTop: 8 },
