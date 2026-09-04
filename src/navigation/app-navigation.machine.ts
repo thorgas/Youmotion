@@ -94,7 +94,7 @@ import {
 import { appSettingsStore } from '@/app-stores';
 import { AppLocaleSchema } from '@/localization/app-locale';
 import { AppSettingsSchema } from '@/features/settings/domain/app-settings';
-import { EmotionLabelModeSchema } from '@/features/settings/domain/emotion-label-mode';
+import { EmotionLabelModeSchema } from '@/preferences/emotion-label-mode';
 import {
   OnboardingEntryPointSchema,
   OnboardingSelectionSchema,

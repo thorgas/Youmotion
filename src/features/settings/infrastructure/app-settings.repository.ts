@@ -15,7 +15,7 @@ import {
   AppLocaleSchema,
 } from '@/localization/app-locale';
 import { AppSettingsSchema, type AppSettings } from '../domain/app-settings';
-import { EmotionLabelModeSchema } from '../domain/emotion-label-mode';
+import { EmotionLabelModeSchema } from '@/preferences/emotion-label-mode';
 
 export class AppSettingsStorageError extends Schema.TaggedError<AppSettingsStorageError>()(
   'AppSettingsStorageError',

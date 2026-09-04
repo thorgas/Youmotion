@@ -82,6 +82,29 @@ artifacts; ask before removing `node_modules`.
 
 ## Next action
 
+The follow-up ownership audit removed the broad one-module `features` blind
+spot. Production code is now checked as explicit `analytics`, `beliefs`,
+`check-in`, `data-safety`, `feedback`, `history`, `onboarding`, `reminders`,
+`settings`, and `startup` modules, with app routes and navigation declared as
+composition roots. Belief domain types form a leaf boundary so consumers do
+not gain access to belief persistence or UI by default. A contract test proves
+both a forbidden feature edge and an intended analytics-to-check-in edge.
+
+Cherry-pickable ownership slices pushed so far:
+
+- `f6b00e9` moves the shared database runtime/migrations and app locale out of
+  feature ownership.
+- `8d47df8` extracts the shared beliefs vertical and its owned tests.
+- `93478d4` extracts History state, filtering, screen, Harness tests, and visual
+  baseline from check-in.
+
+`EmotionLabelMode` is also app-wide presentation vocabulary and now lives in
+`src/preferences/emotion-label-mode.ts`; check-in no longer depends on Settings
+for that type. Settings remains an intentional grouped mobile composition
+surface for Feedback, Data Safety, and belief/reminder entry points. That
+existing UI concept matches the mobile Settings design checklist, so no slot
+API or rendered layout change was introduced solely for lint.
+
 Alpha.4 is installed and every exported rule is now accounted for by the
 repository contract. The new rules are active in truthful scopes. Contract and
 return assertion policies are disjoint; the contract rule checks parameter

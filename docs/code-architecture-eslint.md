@@ -14,7 +14,7 @@ repository contract is tested in
 | `dependency-wrapper-shape` | Error | Future `*Dep` wrappers must use the supported wrapper shape. |
 | `declarative-components` | Error | React state/effect hooks, multiple actor hooks, and component-local `try` statements are forbidden. Named event delegates remain allowed because the local Oxlint rule separately rejects inline JSX callbacks. |
 | `effect-error-handling` | Error | Effect failures must remain explicit and typed. |
-| `enforce-module-boundaries` | Error | Shared UI cannot import feature-owned code. |
+| `enforce-module-boundaries` | Error | Every production route, navigation module, shared component, and feature belongs to an explicit dependency graph. Belief domain types are a separate leaf module so reminders can consume them without granting access to belief UI or infrastructure. Tests and Harness files are excluded. |
 | `imports-first` | Error | Static imports precede declarations and executable statements. |
 | `max-function-lines` | Error | Production logic functions are capped at 70 physical lines. JSX-bearing functions are ignored so components are not extracted solely to satisfy a line count. Test callbacks, migration fixtures, and the declarative history-store factory definition remain excluded. |
 | `max-function-parameters` | Error | The plugin caps functions at five parameters. The local Oxlint rule keeps Youmotion's stricter one-object-parameter convention and its framework callback exceptions. |
@@ -51,9 +51,12 @@ JavaScript-runtime invariants use the Hermes-safe assertion function in
 `src/assert.ts`; no Node compatibility layer is required. Reanimated UI-runtime
 callbacks use the local `assertWorkletInvariant` helper because importing a
 JavaScript-runtime function into a worklet would attempt a synchronous
-cross-runtime call. Alpha.4 recognizes these local helpers, `@/assert`, and
-`nodeAssert.ok` structurally; the contract and return rules do not repeat an
-`assertionNames` list.
+cross-runtime call. Alpha.4 recognizes `@/assert`, `nodeAssert.ok`, and
+TypeScript `asserts` functions structurally. The density rule retains only
+`assertWorkletInvariant` as a textual exception because a worklet-local helper
+cannot safely use the imported JavaScript assertion and cannot express an
+`asserts` predicate over its destructured options. The former repeated
+five-name lists are gone; the contract and return rules have no textual list.
 
 `require-contract-assertions` and `no-unasserted-return` never enforce the same
 function. Domain files use the former; application and navigation files use the
