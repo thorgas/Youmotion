@@ -15,8 +15,8 @@
     "status": "ok"
   },
   "belief-library-editor": {
-    "status": "needs-recapture",
-    "note": "The positive Leitsatz editor surface changed on 2026-09-04. Re-capture the default and keyboard-open variants on the explicitly selected Youmotion Expo Map simulator."
+    "status": "ok",
+    "note": "The default and keyboard-open variants show the 2026-09-04 green positive Leitsatz editor surface. Captured on the isolated Youmotion Leitsatz QA simulator."
   },
   "belief-library": {
     "status": "needs-recapture",
@@ -38,9 +38,9 @@
     "note": "A bare deep link has no active reflection actor context. Reach this screen by continuing a staged reflection."
   },
   "guiding-belief": {
-    "status": "needs-recapture",
+    "status": "ok",
     "needsNavigation": true,
-    "note": "A bare deep link has no active reflection actor context. Reach this screen through a staged reflection, then re-capture the 2026-09-04 green positive Leitsatz editor treatment on the explicitly selected Youmotion Expo Map simulator."
+    "note": "A bare deep link has no active reflection actor context. The 2026-09-04 green positive Leitsatz editor treatment was captured through a staged synthetic reflection on the isolated Youmotion Leitsatz QA simulator."
   },
   "index": {
     "status": "error-boundary",
@@ -49,7 +49,7 @@
   },
   "leitsatz-reminder": {
     "status": "needs-recapture",
-    "note": "The shared positive Leitsatz card changed on 2026-09-04. Re-capture the default, preview, focused-notification, and success-origin schedule-picker variants on the explicitly selected Youmotion Expo Map simulator."
+    "note": "The 2026-09-04 default offer and full-preview variants were re-captured on the isolated Youmotion Leitsatz QA simulator. The focused-notification and success-origin schedule-picker variants still require re-capture before a new bundle is packed."
   },
   "onboarding-example": {
     "status": "ok"

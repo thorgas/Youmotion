@@ -16,7 +16,7 @@ This directory is a committed `expo-map` result set. Its static route graph was 
 
 The 2026-09-04 implementation aligns positive Leitsatz content on the guiding-belief editor, belief library, belief-library editor, and all Leitsatz reminder entry states. The static graph still reconciles to 18 routes and 2 layouts, and the affected component tests cover the green semantic surface, neutral explanatory content, crossed-out released Leitsatz, and focused-notification state.
 
-The affected runtime captures are deliberately marked `needs-recapture` in `capture-status.json`. They must be replayed only on the explicitly selected `Youmotion Expo Map` simulator with bundle id `com.youmotion.mobile`. Never use automatic simulator selection or a simulator belonging to another app. Until those captures are replaced and visually inspected, `Youmotion-2026-08-21.appmap` remains the latest complete bundle; do not package the stale images under a newer date.
+The guiding-belief editor, belief-library editor (default and keyboard-open), reminder offer, and full-preview variants were re-captured on an isolated simulator named `Youmotion Leitsatz QA` with bundle id `com.youmotion.mobile`. The populated library remains tied to the committed 133-moment/15-belief archive fixture and still needs re-capture, as do the focused-notification and success-origin schedule-picker variants. Never use automatic simulator selection or a simulator belonging to another app. Until those captures are replaced and visually inspected, `Youmotion-2026-08-21.appmap` remains the latest complete bundle; do not package the remaining stale images under a newer date.
 
 ## Emotion check-in reminder refresh
 

@@ -3,7 +3,7 @@
   "name": "nav-leitsatz-reminder",
   "route": "leitsatz-reminder",
   "title": "Choose a custom Leitsatz for a new reminder",
-  "device": "iPhone 17 Pro",
+  "device": "Youmotion Leitsatz QA (iPhone 17 Pro, iOS 26.1)",
   "steps": {
     "4": {
       "target": "Sanfte Erinnerungen",
