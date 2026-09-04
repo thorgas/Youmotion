@@ -124,18 +124,20 @@ type InsightEvidenceSelection = Readonly<{
   timeframe: AnalyticsTimeframe;
 }>;
 
-function InsightTab({ label, onPress, selected, testID }: {
+function InsightTab({ label, onPress, selected, disabled = false, testID }: {
   label: string;
   onPress: () => void;
   selected: boolean;
+  disabled?: boolean;
   testID: string;
 }) {
   return (
     <Pressable
       accessibilityRole="tab"
-      accessibilityState={{ selected }}
+      accessibilityState={{ selected, disabled }}
+      disabled={disabled}
       onPress={onPress}
-      style={[styles.insightTab, selected ? styles.insightTabSelected : null]}
+      style={[styles.insightTab, selected ? styles.insightTabSelected : null, disabled ? styles.insightTabDisabled : null]}
       testID={testID}
     >
       <Text style={[styles.insightTabText, selected ? styles.insightTabTextSelected : null]}>
@@ -915,6 +917,7 @@ const styles = StyleSheet.create({
     backgroundColor: palette.paperRaised,
     boxShadow: '0 1px 3px rgba(43, 45, 42, 0.12)',
   },
+  insightTabDisabled: { opacity: 0.34 },
   insightTabText: { fontFamily: type.medium, color: palette.inkMuted, fontSize: 12 },
   insightTabTextSelected: { fontFamily: type.semibold, color: palette.ink },
   insightLearning: {
