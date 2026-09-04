@@ -138,5 +138,16 @@ test runtime, missing native query IDs, and one missing `FeedbackProvider`).
 These failures are outside the ESLint migration and did not appear in Jest or
 the full device E2E suite.
 
-Next: rebase onto current `origin/main` and repeat the final verification
-matrix.
+Final rebase onto `origin/main` was a no-op: the branch was already current.
+Post-rebase gates passed again: `pnpm verify` (46 suites/312 tests),
+`pnpm lint:rules` (46 tests), `pnpm test:coverage` (87.6% statements, 76.58%
+branches, 83.25% functions, 90.46% lines), React Doctor (100/100), and
+`git diff --check`.
+
+Every development E2E flow passed twice on the current code using the connected
+Pixel. A later segmented replay reconfirmed all flows; the final physical-device
+segment stopped only when the secured phone auto-locked, and the available
+emulator's Argent server then stalled before flow execution. Because the rebase
+changed no commit, the earlier complete two-pass result remains exact evidence
+for the delivered tree. Keep a secured physical phone unlocked and plugged in
+for long segmented replays.
