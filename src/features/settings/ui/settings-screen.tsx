@@ -51,6 +51,7 @@ const selectionAnimation = {
 };
 
 function PreferenceOption({
+  disabled = false,
   label,
   onPress,
   selected,
@@ -58,6 +59,7 @@ function PreferenceOption({
   testID,
   textStyle,
 }: {
+  disabled?: boolean;
   label: string;
   onPress: () => void;
   selected: boolean;
@@ -83,9 +85,10 @@ function PreferenceOption({
   return (
     <PressableScale
       accessibilityRole="button"
-      accessibilityState={{ selected }}
+      accessibilityState={{ disabled, selected }}
+      disabled={disabled}
       onPress={onPress}
-      style={style}
+      style={[style, disabled && styles.disabledPreference]}
       testID={testID}>
       <Animated.View
         pointerEvents="none"
@@ -341,6 +344,7 @@ const styles = StyleSheet.create({
     borderRadius: 14,
     borderCurve: 'continuous',
   },
+  disabledPreference: { opacity: 0.42 },
   actionGroup: {
     borderTopWidth: 1,
     borderBottomWidth: 1,
