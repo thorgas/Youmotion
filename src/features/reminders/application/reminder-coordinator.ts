@@ -6,7 +6,7 @@ import type {
   BeliefStatement,
   BeliefSystemId,
 } from '@/features/check-in/domain/belief-statement';
-import type { AppLocale } from '@/features/settings/domain/app-locale';
+import type { AppLocale } from '@/localization/app-locale';
 import {
   createReminderAssignmentId,
   ReminderTimestamp,

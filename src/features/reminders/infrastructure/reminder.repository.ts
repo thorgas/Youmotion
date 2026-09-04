@@ -7,7 +7,7 @@ import {
   REMINDER_ASSIGNMENT_TABLE,
   REMINDER_TARGET_KINDS,
 } from '@/constants';
-import { queryDatabase } from '@/features/check-in/infrastructure/surrealdb.database';
+import { queryDatabase } from '@/infrastructure/database/surrealdb.database';
 import {
   ReminderAssignmentListSchema,
   ReminderAssignmentSchema,

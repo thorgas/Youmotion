@@ -16,7 +16,7 @@ import {
   FILE_URI_PREFIX,
   SURREAL_DATABASE_ENDPOINT_PREFIX,
 } from '@/constants';
-import { runDatabaseMigrations } from '@/features/check-in/infrastructure/migrations/database-migration.runner';
+import { runDatabaseMigrations } from '@/infrastructure/database/migrations/database-migration.runner';
 
 const RestoredIdListSchema = Schema.Array(Schema.String);
 

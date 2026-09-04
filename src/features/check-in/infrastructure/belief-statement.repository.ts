@@ -19,7 +19,7 @@ import {
   type CustomBeliefStatement,
 } from '../domain/belief-statement';
 import { CheckInId } from '../domain/check-in';
-import { queryDatabase } from './surrealdb.database';
+import { queryDatabase } from '@/infrastructure/database/surrealdb.database';
 
 export class BeliefStatementStorageError extends Schema.TaggedError<BeliefStatementStorageError>()(
   'BeliefStatementStorageError',

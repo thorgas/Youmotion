@@ -9,7 +9,7 @@ import {
   type EmotionSelection,
 } from '../domain/check-in';
 import { loadCheckIns, persistCheckIn } from '../infrastructure/check-in.repository';
-import { getDatabase } from '../infrastructure/surrealdb.database';
+import { getDatabase } from '@/infrastructure/database/surrealdb.database';
 
 const selection = {
   emotionId: EMOTION_IDS.JOY,

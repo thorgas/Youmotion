@@ -10,7 +10,7 @@ import {
 import {
   appLocaleForLanguageCodes,
   AppLocaleSchema,
-} from '../domain/app-locale';
+} from '@/localization/app-locale';
 import { AppSettingsSchema, type AppSettings } from '../domain/app-settings';
 import { EmotionLabelModeSchema } from '../domain/emotion-label-mode';
 

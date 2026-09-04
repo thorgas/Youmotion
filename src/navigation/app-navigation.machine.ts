@@ -92,7 +92,7 @@ import {
   restoreDataArchive,
 } from '@/features/data-safety/infrastructure/data-archive.repository';
 import { appSettingsStore } from '@/app-stores';
-import { AppLocaleSchema } from '@/features/settings/domain/app-locale';
+import { AppLocaleSchema } from '@/localization/app-locale';
 import { AppSettingsSchema } from '@/features/settings/domain/app-settings';
 import { EmotionLabelModeSchema } from '@/features/settings/domain/emotion-label-mode';
 import {

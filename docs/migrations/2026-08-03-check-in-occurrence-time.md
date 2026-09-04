@@ -10,11 +10,11 @@ The supplied 2026-08-03 backup confirmed the legacy shape: all 133 check-ins had
 
 | File | Responsibility |
 | --- | --- |
-| `src/features/check-in/infrastructure/migrations/database-migration.ts` | Branded migration ID and migration contract |
-| `src/features/check-in/infrastructure/migrations/database-migrations.ts` | Ordered, append-only registry |
-| `src/features/check-in/infrastructure/migrations/database-migration.runner.ts` | Ledger decoding, pending selection, transactions, and typed failures |
-| `src/features/check-in/infrastructure/migrations/occurrence-time.database-migration.ts` | Migration 0001 statement and description |
-| `src/features/check-in/infrastructure/surrealdb.database.ts` | Runs pending migrations before releasing the shared connection |
+| `src/infrastructure/database/migrations/database-migration.ts` | Branded migration ID and migration contract |
+| `src/infrastructure/database/migrations/database-migrations.ts` | Ordered, append-only registry |
+| `src/infrastructure/database/migrations/database-migration.runner.ts` | Ledger decoding, pending selection, transactions, and typed failures |
+| `src/infrastructure/database/migrations/occurrence-time.database-migration.ts` | Migration 0001 statement and description |
+| `src/infrastructure/database/surrealdb.database.ts` | Runs pending migrations before releasing the shared connection |
 | `src/features/check-in/infrastructure/check-in.repository.ts` | Strict post-migration decoder; contains no occurrence-time fallback |
 | `src/features/check-in/__tests__/database-migration.runner.test.ts` | Runner, ledger, malformed-data, and retry tests |
 | `src/features/check-in/__tests__/database-migration.runner.harness.ts` | Native SurrealKV backfill and idempotency test with 133 redacted rows |
@@ -101,7 +101,7 @@ The test checks structure, counts, timestamps, and round-trip compatibility; it 
 
 ## Adding migration 0002 and later
 
-1. Create one directly imported file in `src/features/check-in/infrastructure/migrations/`, for example `normalize-example.database-migration.ts`.
+1. Create one directly imported file in `src/infrastructure/database/migrations/`, for example `normalize-example.database-migration.ts`.
 2. Export a `DatabaseMigration` with a new zero-padded, immutable ID such as `0002-normalize-example`, a concise description, and an idempotent SurrealQL statement.
 3. Append it to `DATABASE_MIGRATIONS` in `database-migrations.ts`. Never reorder, rename, reuse, or edit the meaning of an ID that may have shipped.
 4. Let the runner own `BEGIN`, the ledger UPSERT, and `COMMIT`; the migration statement must not manage its own transaction or ledger row.

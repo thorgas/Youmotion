@@ -3,7 +3,7 @@ import assert from '@/assert';
 
 import { ANALYTICS_TIMEFRAMES, APP_LOCALES } from '@/constants';
 import type { BeliefStatement } from '@/features/check-in/domain/belief-statement';
-import type { AppLocale } from '@/features/settings/domain/app-locale';
+import type { AppLocale } from '@/localization/app-locale';
 import type { AnalyticsObservation } from '../domain/check-in-analytics';
 import type {
   AnalyticsDateRange,

@@ -6,7 +6,7 @@ import {
   ANALYTICS_TIMEFRAMES,
 } from '@/constants';
 import { interactionColors, palette, type } from '@/theme';
-import type { AppLocale } from '@/features/settings/domain/app-locale';
+import type { AppLocale } from '@/localization/app-locale';
 import {
   analyticsDateRange,
   type AnalyticsTimeframe,

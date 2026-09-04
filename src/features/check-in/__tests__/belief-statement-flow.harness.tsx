@@ -25,7 +25,7 @@ import type {
   CheckInId,
   EmotionSelection,
 } from '../domain/check-in';
-import { getDatabase } from '../infrastructure/surrealdb.database';
+import { getDatabase } from '@/infrastructure/database/surrealdb.database';
 
 let actor: Actor<typeof appNavigationMachine> | undefined;
 let createdBeliefSystemId: BeliefSystemId | undefined;

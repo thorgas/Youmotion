@@ -24,7 +24,7 @@ import {
   resetSurrealDatabaseMock,
 } from '@/test-utils/surrealdb.repository.mock';
 
-jest.mock('../infrastructure/surrealdb.database', () => ({
+jest.mock('@/infrastructure/database/surrealdb.database', () => ({
   getDatabase: jest.fn(() => Promise.resolve(mockSurrealDatabase)),
   queryDatabase: jest.fn(({ surql, variables }: {
     surql: string;
