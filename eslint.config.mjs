@@ -193,10 +193,6 @@ export default tseslint.config(
   },
   {
     files: ['src/components/ui/**/*.{ts,tsx}'],
-    ignores: [
-      'src/components/ui/app-back-button.tsx',
-      'src/components/ui/settings-action-row.tsx',
-    ],
     rules: {
       'code-architecture/require-interactive-component-contract': 'error',
     },

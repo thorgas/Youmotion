@@ -220,7 +220,7 @@ describe('architecture lint contract', () => {
     expect(algorithmRules['code-architecture/require-assertions']?.[0]).toBe(2);
     expect(configuredRulesFor(
       'src/components/ui/app-back-button.tsx',
-    )['code-architecture/require-interactive-component-contract']).toBeUndefined();
+    )['code-architecture/require-interactive-component-contract']).toEqual([2]);
     expect(configuredRulesFor(
       'src/features/settings/ui/contract-fixture.tsx',
     )['code-architecture/require-interactive-component-contract']).toBeUndefined();
