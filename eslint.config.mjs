@@ -280,7 +280,7 @@ export default tseslint.config(
             '**/src/features/analytics/domain/analytics-calendar.ts',
             '**/src/features/analytics/domain/analytics-timeframe.ts',
             '**/src/features/analytics/domain/check-in-analytics.ts',
-            '**/src/features/check-in/application/check-in-history.store.ts',
+            '**/src/features/history/application/check-in-history.store.ts',
             '**/src/features/check-in/domain/belief-system.ts',
             '**/src/features/check-in/domain/emotion-selection.ts',
             '**/src/features/feedback/application/feedback.machine.ts',
@@ -331,8 +331,8 @@ export default tseslint.config(
   },
   {
     files: [
-      'src/features/check-in/application/check-in-history.store.ts',
-      'src/features/check-in/application/history-filter.ts',
+      'src/features/history/application/check-in-history.store.ts',
+      'src/features/history/application/history-filter.ts',
       'src/features/beliefs/application/guiding-belief-library.ts',
       'src/navigation/app-router.adapter.ts',
     ],
@@ -525,7 +525,7 @@ export default tseslint.config(
     },
   },
   {
-    files: ['src/features/check-in/application/history-timeframe.store.ts'],
+    files: ['src/features/history/application/history-timeframe.store.ts'],
     rules: {
       'code-architecture/max-function-lines': 'off',
     },

@@ -2,7 +2,11 @@ import { createStore } from '@xstate/store';
 import * as Schema from 'effect/Schema';
 import assert from '@/assert';
 
-import { CheckInId, CheckInSchema, type CheckIn } from '../domain/check-in';
+import {
+  CheckInId,
+  CheckInSchema,
+  type CheckIn,
+} from '@/features/check-in/domain/check-in';
 
 const emptyEntries: readonly CheckIn[] = [];
 const initialContext = {

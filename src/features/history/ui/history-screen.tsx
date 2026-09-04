@@ -25,10 +25,10 @@ import { useAppNavigationActor } from '@/navigation/app-navigation.provider';
 import { checkInHistoryStore } from '@/app-stores';
 import { filterHistoryEntries } from '../application/history-filter';
 import { historyTimeframeStore } from '@/app-stores';
-import type { CheckIn, EmotionId } from '../domain/check-in';
-import { selectionForCheckIn } from '../domain/emotion';
+import type { CheckIn, EmotionId } from '@/features/check-in/domain/check-in';
+import { selectionForCheckIn } from '@/features/check-in/domain/emotion';
 import type { BeliefStatement } from '@/features/beliefs/domain/belief-statement';
-import { emotionName, emotionSummary } from './emotion-copy';
+import { emotionName, emotionSummary } from '@/features/check-in/ui/emotion-copy';
 import {
   beliefSystemText,
   guidingBeliefSystemText,
@@ -36,7 +36,7 @@ import {
 import {
   confirmCheckInDeletion,
   editMomentAccessibilityHint,
-} from './check-in-deletion';
+} from '@/features/check-in/ui/check-in-deletion';
 import { borderColors, palette, surfaceColors, type } from '@/theme';
 
 const _selectHistory = (state: ReturnType<typeof checkInHistoryStore.getSnapshot>) => state.context;
