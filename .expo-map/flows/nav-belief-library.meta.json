@@ -7,7 +7,7 @@
   "steps": {
     "1": {
       "capture": "belief-library.png",
-      "note": "Genuine empty state for a profile without custom beliefs"
+      "note": "Populated state restored from the committed synthetic archive fixture (15 beliefs)"
     }
   }
 }

@@ -15,11 +15,12 @@
     "status": "ok"
   },
   "belief-library-editor": {
-    "status": "ok"
+    "status": "needs-recapture",
+    "note": "The positive Leitsatz editor surface changed on 2026-09-04. Re-capture the default and keyboard-open variants on the explicitly selected Youmotion Expo Map simulator."
   },
   "belief-library": {
-    "status": "ok",
-    "note": "Lists suggested and authored beliefs, hides Edit/Remove for suggested ones, and keeps their reminder controls. Captured from the committed archive fixture after a real Settings restore."
+    "status": "needs-recapture",
+    "note": "Lists suggested and authored beliefs from the committed archive fixture. Re-capture the 2026-09-04 crossed-out released Leitsatz and green positive Leitsatz treatment on the explicitly selected Youmotion Expo Map simulator."
   },
   "belief-system-catalog": {
     "status": "error-boundary",
@@ -37,9 +38,9 @@
     "note": "A bare deep link has no active reflection actor context. Reach this screen by continuing a staged reflection."
   },
   "guiding-belief": {
-    "status": "error-boundary",
+    "status": "needs-recapture",
     "needsNavigation": true,
-    "note": "A bare deep link has no active reflection actor context. Reach this screen by continuing a staged reflection."
+    "note": "A bare deep link has no active reflection actor context. Reach this screen through a staged reflection, then re-capture the 2026-09-04 green positive Leitsatz editor treatment on the explicitly selected Youmotion Expo Map simulator."
   },
   "index": {
     "status": "error-boundary",
@@ -47,8 +48,8 @@
     "note": "The root route is an XState-to-Router synchronization entry and does not render a standalone screen from a bare deep link."
   },
   "leitsatz-reminder": {
-    "status": "ok",
-    "note": "Includes preview, focused-notification, and success-origin schedule-picker variants."
+    "status": "needs-recapture",
+    "note": "The shared positive Leitsatz card changed on 2026-09-04. Re-capture the default, preview, focused-notification, and success-origin schedule-picker variants on the explicitly selected Youmotion Expo Map simulator."
   },
   "onboarding-example": {
     "status": "ok"
