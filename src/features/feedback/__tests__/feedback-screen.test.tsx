@@ -33,12 +33,16 @@ const safeAreaMetrics = {
   insets: { top: 47, right: 0, bottom: 34, left: 0 },
 };
 
-function renderFeedbackOverlay() {
+function renderFeedbackOverlay(actionProps: {
+  description?: string;
+  disabled?: boolean;
+  title?: string;
+} = {}) {
   return render(
     <AppLocaleProvider>
       <SafeAreaProvider initialMetrics={safeAreaMetrics}>
         <FeedbackProvider>
-          <FeedbackSettingsAction />
+          <FeedbackSettingsAction {...actionProps} />
           <FeedbackOverlay />
         </FeedbackProvider>
       </SafeAreaProvider>
@@ -66,6 +70,20 @@ describe('settings feedback UI', () => {
     await fireEvent.press(screen.getByTestId('feedback-cancel'));
     expect(screen.queryByTestId('feedback-dialog')).toBeNull();
     expect(screen.getByTestId('feedback-button')).toBeTruthy();
+  });
+
+  it('forwards configurable content and disabled behavior through the settings action', async () => {
+    const screen = await renderFeedbackOverlay({
+      description: 'Choose how to contact us.',
+      disabled: true,
+      title: 'Contact support',
+    });
+
+    const action = screen.getByTestId('feedback-button');
+    expect(action).toBeDisabled();
+    expect(screen.getByText('Contact support')).toBeTruthy();
+    await fireEvent.press(action);
+    expect(screen.queryByTestId('feedback-dialog')).toBeNull();
   });
 
   it('does not occupy the iOS native modal presentation slot', async () => {
