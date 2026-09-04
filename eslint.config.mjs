@@ -604,10 +604,4 @@ export default tseslint.config(
       ],
     },
   },
-  {
-    files: ['src/features/history/application/history-timeframe.store.ts'],
-    rules: {
-      'code-architecture/max-function-lines': 'off',
-    },
-  },
 );
