@@ -12,6 +12,7 @@ import { palette } from '@/theme';
 
 type AppBackButtonProps = {
   disabled?: boolean;
+  label?: string;
   onPress: () => void;
   style?: StyleProp<ViewStyle>;
   testID: string;
@@ -25,12 +26,11 @@ const backSymbol: SymbolViewProps['name'] = {
 
 export function AppBackButton({
   disabled = false,
+  label = String(fbs('Back', 'Label for the app-wide back navigation button')),
   onPress,
   style,
   testID,
 }: AppBackButtonProps) {
-  const label = String(fbs('Back', 'Label for the app-wide back navigation button'));
-
   return (
     <PressableScale
       accessibilityLabel={label}

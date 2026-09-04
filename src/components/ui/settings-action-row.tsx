@@ -6,12 +6,14 @@ import { palette, type } from '@/theme';
 export function SettingsActionRow({
   count,
   description,
+  disabled = false,
   onPress,
   testID,
   title,
 }: {
   count?: number;
   description: string;
+  disabled?: boolean;
   onPress: () => void;
   testID: string;
   title: string;
@@ -19,8 +21,10 @@ export function SettingsActionRow({
   return (
     <PressableScale
       accessibilityRole="button"
+      accessibilityState={{ disabled }}
+      disabled={disabled}
       onPress={onPress}
-      style={styles.actionRow}
+      style={[styles.actionRow, disabled && styles.disabled]}
       testID={testID}
     >
       <View style={styles.actionCopy}>
@@ -41,6 +45,7 @@ const styles = StyleSheet.create({
     gap: 12,
     paddingVertical: 14,
   },
+  disabled: { opacity: 0.42 },
   actionCopy: { flex: 1 },
   actionTitle: { fontFamily: type.semibold, color: palette.ink, fontSize: 15 },
   actionDescription: {
