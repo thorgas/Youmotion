@@ -3,7 +3,7 @@ import {
   ANALYTICS_INSIGHT_TABS,
   ANALYTICS_TIMEFRAMES,
 } from '@/constants';
-import { analyticsStore } from '../application/analytics.store';
+import { analyticsStore } from '@/app-stores';
 
 describe('analytics calendar store', () => {
   beforeEach(() => {

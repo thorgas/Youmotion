@@ -1,6 +1,6 @@
 import { IntlVariations, setupFbtee } from 'fbtee';
 
-import { appSettingsStore } from '@/features/settings/application/app-settings.store';
+import { appSettingsStore } from '@/app-stores';
 import deDE from '@/translations/de-DE.json';
 
 export function configureAppLocale(store: typeof appSettingsStore) {

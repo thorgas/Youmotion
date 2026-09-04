@@ -1,9 +1,9 @@
-# Code architecture alpha.2 migration handoff
+# Code architecture alpha.4 migration handoff
 
 ## Scope
 
-Upgrade Youmotion from `eslint-plugin-code-architecture@0.4.0-alpha.4` to
-`0.6.0-alpha.2`, enable every rule that truthfully applies, and resolve the
+Upgrade Youmotion from `eslint-plugin-code-architecture@0.4.0-alpha.4` through
+`0.6.0-alpha.4`, enable every rule that truthfully applies, and resolve the
 resulting findings without behavior changes or ceremonial assertions.
 
 ## Git state
@@ -16,12 +16,10 @@ resulting findings without behavior changes or ceremonial assertions.
 
 ## Published package evidence
 
-- Version: `0.6.0-alpha.2`
-- Release commit: `af28525b929e4a480c536210bf615e9c1f2c12f4`
-- Integrity:
-  `sha512-ASINmhAvfK2B2DsP0+2aVucENclHRKZsQ0eNCdjB1lNnlmGuKBlkhEUXBzhG28WZFsi5q3KIIhE88xHiCwzZhg==`
+- Version: `0.6.0-alpha.4`
+- Release commit: `e0394c533dbf6a480771cb66c858f238e75eb7cf`
 
-## Initial alpha.2 audit
+## Initial alpha audit
 
 The prerelease exposes 37 rules. A practical full-source audit produced 833
 raw findings across 92 files:
@@ -48,8 +46,10 @@ disjoint.
 - Use contract and return assertion rules only in non-overlapping scopes.
 - Assertions must prove real input, output, schema, state, or cardinality
   invariants.
-- Keep `appSettingsStore` as the composition-owned singleton. Configure a
-  narrow, regression-tested one-file exception; the exception must not spread.
+- Keep shared XState stores, but export only factories from feature modules.
+  `src/app-stores.ts` is their regression-tested composition root.
+- Use all seven built-in implicit dependency groups. Do not configure a custom
+  `Date.now` capability because alpha.4 now provides the general policy.
 - Do not introduce dependencies, UI concepts, data-model changes, or navigation
   state.
 - If a refactor unexpectedly changes rendered UI, stop that slice for design
@@ -79,17 +79,18 @@ artifacts; ask before removing `node_modules`.
 
 ## Next action
 
-Alpha.2 is installed and every exported rule is now accounted for by the
+Alpha.4 is installed and every exported rule is now accounted for by the
 repository contract. The new rules are active in truthful scopes. Contract and
 return assertion policies are disjoint; algorithm-heavy domain files retain
 the established assertion-density policy until the contract rule can
 distinguish public boundaries from private helpers. The approved app-settings
-singleton exception is limited to one file and regression-tested.
+singleton exception was removed: all four live stores now come from the tested
+composition root, while feature modules export factories.
 
 The migration also makes analytics collection contracts readonly, converts two
-plain object aliases to readonly interfaces, and injects the reminder timestamp
-into `activateReminder`. The navigation machine is explicitly a composition
-root for time access.
+plain object aliases to readonly interfaces, and injects reminder timestamps
+and ID randomness into the coordinator. The navigation machine is explicitly a
+composition root for ambient time and randomness.
 
 Focused gates passed:
 

@@ -11,7 +11,7 @@ import {
   REMINDER_TARGET_KINDS,
 } from '@/constants';
 import { CustomBeliefSystemId } from '@/features/check-in/domain/belief-statement';
-import { appSettingsStore } from '@/features/settings/application/app-settings.store';
+import { appSettingsStore } from '@/app-stores';
 import { configureAppLocale } from '@/localization/app-locale.configuration';
 import { appNavigationMachine } from '@/navigation/app-navigation.machine';
 import { AppNavigationActorProvider } from '@/navigation/app-navigation.provider';

@@ -21,7 +21,7 @@ const HistoryContentFilterSchema = Schema.Literal(
   HISTORY_CONTENT_FILTERS.BELIEFS,
 );
 
-export const historyTimeframeStore = createStore({
+export const createHistoryTimeframeStore = () => createStore({
   schemas: {
     context: Schema.standardSchemaV1(Schema.Struct({
       beliefSystemId: Schema.NullOr(BeliefSystemId),

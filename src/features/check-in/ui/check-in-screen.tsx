@@ -15,7 +15,7 @@ import { ScreenHeading } from '@/components/ui/screen-heading';
 import { useAppNavigationActor } from '@/navigation/app-navigation.provider';
 import type { EmotionSelection } from '../domain/check-in';
 import { selectionForCheckIn } from '../domain/emotion';
-import { checkInHistoryStore } from '../application/check-in-history.store';
+import { checkInHistoryStore } from '@/app-stores';
 import { EmotionStar } from './emotion-star';
 import { emotionSummary } from './emotion-copy';
 import { palette, type } from '@/theme';

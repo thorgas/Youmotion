@@ -1,6 +1,6 @@
 # Code architecture ESLint policy
 
-Youmotion uses `eslint-plugin-code-architecture@0.6.0-alpha.2` as a blocking part of
+Youmotion uses `eslint-plugin-code-architecture@0.6.0-alpha.4` as a blocking part of
 `pnpm verify`. The effective configuration is in `eslint.config.mjs`, and its
 repository contract is tested in
 `oxlint-rules/__tests__/architecture-lint-contract.test.js`.
@@ -16,14 +16,14 @@ repository contract is tested in
 | `effect-error-handling` | Error | Effect failures must remain explicit and typed. |
 | `enforce-module-boundaries` | Error | Shared UI cannot import feature-owned code. |
 | `imports-first` | Error | Static imports precede declarations and executable statements. |
-| `max-function-lines` | Error | Production logic functions are capped at 70 physical lines. JSX-bearing functions are ignored so components are not extracted solely to satisfy a line count. Test callbacks and migration fixtures remain excluded. |
+| `max-function-lines` | Error | Production logic functions are capped at 70 physical lines. JSX-bearing functions are ignored so components are not extracted solely to satisfy a line count. Test callbacks, migration fixtures, and the declarative history-store factory definition remain excluded. |
 | `max-function-parameters` | Error | The plugin caps functions at five parameters. The local Oxlint rule keeps Youmotion's stricter one-object-parameter convention and its framework callback exceptions. |
 | `named-imports` | Error | Named imports are preferred. Exact allowlists preserve APIs that intentionally expose defaults or namespaces, including Effect, Expo, Reanimated, assets, translations, and test seams. |
 | `no-barrel-files` | Error | Re-exports are forbidden; import concrete owners directly. |
 | `no-barrel-imports` | Error | Local index imports and Effect package barrels are forbidden. |
 | `no-design-identity-overrides` | Error | Consumers cannot replace the visual identity of `Button`, `ScreenHeading`, or `Dialog` through inline styles. Layout styles remain composable. |
-| `no-exported-dependency-instances` | Error | Exported factory instances are rejected. The established app-settings singleton is the sole tested exception. |
-| `no-implicit-external-dependencies` | Error | Application logic receives time explicitly; infrastructure and composition roots own clock access. |
+| `no-exported-dependency-instances` | Error | Feature modules export store factories. `src/app-stores.ts` is the tested composition root that owns the four shared live store instances. |
+| `no-implicit-external-dependencies` | Error | All built-in groups are active: time, randomness, logging, environment, network, storage, and locale. Application and domain logic receive capabilities explicitly; infrastructure and composition roots own ambient access. |
 | `no-namespace-exports` | Error | Production modules export descriptive members. Test mocks and compatibility Harness shims are excluded. |
 | `no-over-depending` | Error | Future Evolu-style dependency objects may expose only dependencies actually used by their function. |
 | `no-raw-design-properties` | Error | Previously unknown literal colors are rejected in production UI even when they were not in the earlier value inventory. Tests are excluded. |
@@ -39,7 +39,7 @@ repository contract is tested in
 | `prefer-readonly-types` | Error | Public collection contracts use `ReadonlyArray` and interface properties are readonly. Mutable implementation state remains permitted. |
 | `require-composable-root-children` | Error | Root/provider components expose children on every top-level return path. |
 | `require-compound-component-api` | Error | Compound definitions expose a valid boundary and distinct public parts. |
-| `require-contract-assertions` | Error | Domain functions use semantic contract assertions where alpha.2 can identify the boundary reliably. Algorithm-heavy files retain the established density rule. |
+| `require-contract-assertions` | Error | Domain functions use semantic contract assertions where the plugin can identify the boundary reliably. Algorithm-heavy files retain the established density rule. |
 | `require-consumer-owned-compound-usage` | Error | Compound consumers select the parts rendered beneath a boundary. |
 | `require-dismissible-modal-backdrop` | Error | Every transparent native modal has request-close handling and a pressable outside-dismiss surface. |
 | `require-interactive-component-contract` | Error | The shared Button root must keep role, state, disabled behavior, content, and press feedback. |
@@ -58,7 +58,7 @@ function. Domain files use the former; application and navigation files use the
 latter. Existing algorithm-heavy domain modules remain on `require-assertions`
 until the contract rule can distinguish public boundaries from private reducer
 and sorting helpers. This avoids the duplicate diagnostics and ceremonial
-assertions found by the raw alpha.2 audit.
+assertions found by the initial alpha audit.
 
 ## Design-system ownership
 

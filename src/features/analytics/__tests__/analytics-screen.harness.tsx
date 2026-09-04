@@ -26,7 +26,7 @@ import {
   CheckInTimestamp,
   type CheckIn,
 } from '@/features/check-in/domain/check-in';
-import { analyticsStore } from '../application/analytics.store';
+import { analyticsStore } from '@/app-stores';
 
 type AnalyticsContentComponent = typeof import('../ui/analytics-screen')['AnalyticsContent'];
 let AnalyticsContent: AnalyticsContentComponent;

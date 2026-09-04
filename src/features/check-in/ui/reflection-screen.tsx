@@ -45,14 +45,14 @@ import {
   formatMomentDate,
   formatMomentTime,
 } from '@/localization/date-copy';
-import { appSettingsStore } from '@/features/settings/application/app-settings.store';
+import { appSettingsStore } from '@/app-stores';
 import {
   emotionName,
   emotionNuance,
   optionalNoteAccessibilityLabel,
   optionalNotePlaceholder,
 } from './emotion-copy';
-import { checkInHistoryStore } from '../application/check-in-history.store';
+import { checkInHistoryStore } from '@/app-stores';
 import {
   checkInTimestampFromDate,
   type CheckIn,

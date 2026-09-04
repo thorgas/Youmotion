@@ -35,7 +35,7 @@ import { actionColors, palette, surfaceColors, type } from '@/theme';
 import { DataSafetyControls } from '@/features/data-safety/ui/data-safety-controls';
 import { FeedbackSettingsAction } from '@/features/feedback/ui/feedback-screen';
 import { useAppNavigationActor } from '@/navigation/app-navigation.provider';
-import { appSettingsStore } from '../application/app-settings.store';
+import { appSettingsStore } from '@/app-stores';
 import { guidingBeliefLibraryStatements } from '../domain/guiding-belief-library';
 
 const _selectSettings = (state: ReturnType<typeof appSettingsStore.getSnapshot>) => state.context;

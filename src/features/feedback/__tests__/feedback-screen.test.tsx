@@ -3,7 +3,7 @@ import { Platform } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { APP_LOCALES, FEEDBACK_KINDS } from '@/constants';
-import { appSettingsStore } from '@/features/settings/application/app-settings.store';
+import { appSettingsStore } from '@/app-stores';
 import { AppLocaleProvider } from '@/localization/app-locale-provider';
 import { FeedbackScreenshotUri } from '../domain/feedback-request';
 import { composeFeedbackEmail } from '../infrastructure/feedback-mail';

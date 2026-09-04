@@ -43,8 +43,8 @@ import {
   CustomBeliefSystemId,
   type BeliefStatement,
 } from '../domain/belief-statement';
-import { checkInHistoryStore } from '../application/check-in-history.store';
-import { historyTimeframeStore } from '../application/history-timeframe.store';
+import { checkInHistoryStore } from '@/app-stores';
+import { historyTimeframeStore } from '@/app-stores';
 import {
   mockSurrealDatabase,
   mockSurrealQuery,
@@ -61,10 +61,10 @@ import { GuidingBeliefScreen } from '../ui/guiding-belief-screen';
 import { SuccessScreen } from '../ui/success-screen';
 import { SettingsScreen } from '@/features/settings/ui/settings-screen';
 import { FeedbackProvider } from '@/features/feedback/ui/feedback-screen';
-import { analyticsStore } from '@/features/analytics/application/analytics.store';
+import { analyticsStore } from '@/app-stores';
 import { AnalyticsScreen } from '@/features/analytics/ui/analytics-screen';
 import { BeliefLibraryScreen } from '@/features/settings/ui/belief-library-screen';
-import { appSettingsStore } from '@/features/settings/application/app-settings.store';
+import { appSettingsStore } from '@/app-stores';
 import {
   BaseStateRipples,
   CenteredBaseStateRipples,

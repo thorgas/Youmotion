@@ -21,7 +21,7 @@ import {
   NAVIGATION_EVENTS,
   NAVIGATION_STATES,
 } from '@/constants';
-import { appSettingsStore } from '@/features/settings/application/app-settings.store';
+import { appSettingsStore } from '@/app-stores';
 import { AppLocaleProvider } from '@/localization/app-locale-provider';
 
 type NavigationMachine = typeof import('@/navigation/app-navigation.machine')['appNavigationMachine'];

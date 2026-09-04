@@ -34,6 +34,7 @@ interface ActivateReminderInput {
   readonly assignments: ReadonlyArray<ReminderAssignment>;
   readonly locale: AppLocale;
   readonly notificationContent: ReminderNotificationContent;
+  readonly nonce: string;
   readonly now: Date;
   readonly statements: ReadonlyArray<BeliefStatement>;
   readonly target: ReminderTarget;
@@ -43,6 +44,7 @@ interface ActivateReminderInput {
 export async function activateReminder({
   assignments,
   locale,
+  nonce,
   now,
   notificationContent,
   statements,
@@ -65,7 +67,7 @@ export async function activateReminder({
   ));
   const assignment: ReminderAssignment = target.targetKind === REMINDER_TARGET_KINDS.PULSE
     ? {
-        id: existing?.id ?? createReminderAssignmentId({ timestamp: now.getTime(), nonce: Math.random().toString(16).slice(2) }),
+        id: existing?.id ?? createReminderAssignmentId({ timestamp: now.getTime(), nonce }),
         schemaVersion: 2,
         ...normalizedTiming,
         targetKind: target.targetKind,
@@ -74,7 +76,7 @@ export async function activateReminder({
         updatedAt: timestamp,
       }
     : {
-        id: existing?.id ?? createReminderAssignmentId({ timestamp: now.getTime(), nonce: Math.random().toString(16).slice(2) }),
+        id: existing?.id ?? createReminderAssignmentId({ timestamp: now.getTime(), nonce }),
         schemaVersion: 2,
         ...normalizedTiming,
         targetKind: target.targetKind,
@@ -109,6 +111,7 @@ export async function updateReminder({
   assignment,
   assignments,
   locale,
+  now,
   notificationContent,
   statements,
   timing,
@@ -116,13 +119,14 @@ export async function updateReminder({
   assignment: ReminderAssignment;
   assignments: readonly ReminderAssignment[];
   locale: AppLocale;
+  now: Date;
   notificationContent: ReminderNotificationContent;
   statements: readonly BeliefStatement[];
   timing: ReminderTiming;
 }) {
   assert(assignments.some((candidate) => candidate.id === assignment.id), 'Updated reminder must exist');
   assert(timing.weekdays.length > 0 && timing.times.length > 0, 'Updated reminder requires a complete timing');
-  const now = ReminderTimestamp.make(new Date().toISOString());
+  const timestamp = ReminderTimestamp.make(now.toISOString());
   const normalizedTiming = normalizedReminderTiming(timing);
   const updatedAssignment: ReminderAssignment = assignment.targetKind
     === REMINDER_TARGET_KINDS.GUIDING_BELIEF
@@ -130,9 +134,9 @@ export async function updateReminder({
         ...assignment,
         ...normalizedTiming,
         notificationContent,
-        updatedAt: now,
+        updatedAt: timestamp,
       }
-    : { ...assignment, ...normalizedTiming, updatedAt: now };
+    : { ...assignment, ...normalizedTiming, updatedAt: timestamp };
   await Effect.runPromise(persistReminderAssignment(updatedAssignment));
   const nextAssignments = assignments.map((candidate) => (
     candidate.id === updatedAssignment.id ? updatedAssignment : candidate
@@ -165,12 +169,14 @@ export async function setReminderAssignmentEnabled({
   assignments,
   enabled,
   locale,
+  now,
   statements,
 }: {
   assignment: ReminderAssignment;
   assignments: readonly ReminderAssignment[];
   enabled: boolean;
   locale: AppLocale;
+  now: Date;
   statements: readonly BeliefStatement[];
 }) {
   assert(assignments.some((candidate) => candidate.id === assignment.id), 'Toggled reminder must exist');
@@ -178,7 +184,7 @@ export async function setReminderAssignmentEnabled({
   const updated: ReminderAssignment = {
     ...assignment,
     enabled,
-    updatedAt: ReminderTimestamp.make(new Date().toISOString()),
+    updatedAt: ReminderTimestamp.make(now.toISOString()),
   };
   await Effect.runPromise(persistReminderAssignment(updated));
   const nextAssignments = assignments.map((candidate) => (

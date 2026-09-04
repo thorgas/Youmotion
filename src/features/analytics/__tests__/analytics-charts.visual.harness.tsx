@@ -15,7 +15,7 @@ import {
   type CheckIn,
 } from '@/features/check-in/domain/check-in';
 import { emotions } from '@/features/check-in/domain/emotion';
-import { appSettingsStore } from '@/features/settings/application/app-settings.store';
+import { appSettingsStore } from '@/app-stores';
 import { AppLocaleProvider } from '@/localization/app-locale-provider';
 import type { EmotionFrequency } from '../domain/check-in-analytics';
 import { AnalyticsContent, ObservationCard } from '../ui/analytics-screen';

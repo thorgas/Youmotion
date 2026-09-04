@@ -15,10 +15,10 @@ import {
   EMOTION_LABEL_MODES,
   HISTORY_EVENTS,
 } from '@/constants';
-import { appSettingsStore } from '@/features/settings/application/app-settings.store';
+import { appSettingsStore } from '@/app-stores';
 import { AppLocaleProvider } from '@/localization/app-locale-provider';
-import { checkInHistoryStore } from '../application/check-in-history.store';
-import { historyTimeframeStore } from '../application/history-timeframe.store';
+import { checkInHistoryStore } from '@/app-stores';
+import { historyTimeframeStore } from '@/app-stores';
 import { HistoryScreen } from '../ui/history-screen';
 
 const visualTest = Platform.OS === 'android' ? test : test.skip;

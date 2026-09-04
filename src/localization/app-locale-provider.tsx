@@ -1,7 +1,7 @@
 import { useSelector } from '@xstate/store-react';
 import { Fragment, type PropsWithChildren } from 'react';
 
-import { appSettingsStore } from '@/features/settings/application/app-settings.store';
+import { appSettingsStore } from '@/app-stores';
 import { configureAppLocale } from './app-locale.configuration';
 
 const _selectLocale = (state: ReturnType<typeof appSettingsStore.getSnapshot>) => (

@@ -64,6 +64,7 @@ describe('reminder coordinator', () => {
     const result = await activateReminder({
       assignments: [existing],
       locale: APP_LOCALES.ENGLISH,
+      nonce: 'activation-test',
       now: new Date('2026-08-25T12:00:00.000Z'),
       notificationContent: REMINDER_NOTIFICATION_CONTENT.LEITSATZ,
       statements,
@@ -100,6 +101,7 @@ describe('reminder coordinator', () => {
       assignment: existing,
       assignments: [existing, other],
       locale: APP_LOCALES.ENGLISH,
+      now: new Date('2026-08-25T13:00:00.000Z'),
       notificationContent: REMINDER_NOTIFICATION_CONTENT.LEITSATZ,
       statements,
       timing: { weekdays: [1, 7], times: [{ hour: 20, minute: 30 }] },
@@ -119,6 +121,7 @@ describe('reminder coordinator', () => {
       assignments: [existing],
       enabled: true,
       locale: APP_LOCALES.ENGLISH,
+      now: new Date('2026-08-25T14:00:00.000Z'),
       statements,
     });
     expect(toggled[0]?.enabled).toBe(true);
