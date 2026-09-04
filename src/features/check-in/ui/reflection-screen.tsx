@@ -64,20 +64,20 @@ import {
 import type {
   BeliefStatement,
   BeliefSystemId,
-} from '../domain/belief-statement';
+} from '@/features/beliefs/domain/belief-statement';
 import {
   beliefSystemText,
   customBeliefAccessibilityLabel,
   customBeliefPlaceholder,
   noBeliefSystemText,
-} from './belief-system-copy';
+} from '@/features/beliefs/ui/belief-system-copy';
 import {
   confirmCheckInDeletion,
   deleteMomentAccessibilityLabel,
   deleteMomentText,
 } from './check-in-deletion';
 import { CheckInProgressHeader } from './check-in-progress';
-import { PersonalBeliefCreateButton } from './personal-belief-create-button';
+import { PersonalBeliefCreateButton } from '@/features/beliefs/ui/personal-belief-create-button';
 import { beginReflectionInputSession } from './reflection-input-session';
 import { reflectionResponsiveLayout } from './reflection-responsive-layout';
 import { actionColors, palette, surfaceColors, type } from '@/theme';

@@ -8,7 +8,7 @@ import {
   REMINDER_NOTIFICATION_OWNER,
   REMINDER_TARGET_KINDS,
 } from '@/constants';
-import { BeliefSystemId } from '@/features/check-in/domain/belief-statement';
+import { BeliefSystemId } from '@/features/beliefs/domain/belief-statement';
 import { ReminderAssignmentId } from '../domain/reminder-assignment';
 
 const PulsePayloadSchema = Schema.Struct({

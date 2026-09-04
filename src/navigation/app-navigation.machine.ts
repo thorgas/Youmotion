@@ -68,7 +68,7 @@ import {
   removeBeliefStatement,
   type BeliefStatement,
   type CustomBeliefStatement,
-} from '@/features/check-in/domain/belief-statement';
+} from '@/features/beliefs/domain/belief-statement';
 import {
   deleteCheckIn,
   loadCheckIns,
@@ -80,7 +80,7 @@ import {
   loadBeliefStatements,
   persistBeliefStatement,
   retireCustomBeliefStatement,
-} from '@/features/check-in/infrastructure/belief-statement.repository';
+} from '@/features/beliefs/infrastructure/belief-statement.repository';
 import { checkInHistoryStore } from '@/app-stores';
 import {
   DataArchiveSchema,

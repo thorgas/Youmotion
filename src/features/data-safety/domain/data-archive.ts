@@ -1,6 +1,6 @@
 import * as Schema from 'effect/Schema';
 
-import { BeliefStatementListSchema } from '@/features/check-in/domain/belief-statement';
+import { BeliefStatementListSchema } from '@/features/beliefs/domain/belief-statement';
 import {
   CheckInListSchema,
   LegacyCheckInListSchema,

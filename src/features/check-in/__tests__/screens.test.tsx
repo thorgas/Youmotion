@@ -42,7 +42,7 @@ import {
 import {
   CustomBeliefSystemId,
   type BeliefStatement,
-} from '../domain/belief-statement';
+} from '@/features/beliefs/domain/belief-statement';
 import { checkInHistoryStore } from '@/app-stores';
 import { historyTimeframeStore } from '@/app-stores';
 import {
@@ -63,7 +63,7 @@ import { SettingsScreen } from '@/features/settings/ui/settings-screen';
 import { FeedbackProvider } from '@/features/feedback/ui/feedback-screen';
 import { analyticsStore } from '@/app-stores';
 import { AnalyticsScreen } from '@/features/analytics/ui/analytics-screen';
-import { BeliefLibraryScreen } from '@/features/settings/ui/belief-library-screen';
+import { BeliefLibraryScreen } from '@/features/beliefs/ui/belief-library-screen';
 import { appSettingsStore } from '@/app-stores';
 import {
   BaseStateRipples,

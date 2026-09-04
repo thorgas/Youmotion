@@ -75,7 +75,7 @@ Replace reusable named reminder schedules with reminders that directly own their
 
 ## Remaining verification
 
-- Run the component gate with `pnpm test:harness:android --runTestsByPath src/features/settings/__tests__/belief-library.harness.tsx` on a dedicated Android emulator.
+- Run the component gate with `pnpm test:harness:android --runTestsByPath src/features/beliefs/__tests__/belief-library.harness.tsx` on a dedicated Android emulator.
 - The emulator-only Harness retry did not start any tests because its runner reported every port in 8084-8093 unavailable, even though a preceding `lsof` check found no listeners. Do not substitute the connected physical Pixel without permission.
 - The former Maestro blocker is resolved: `.argent/flows/e2e/reminder-owned-timing.yaml` passed twice unchanged on dedicated iOS simulator `9D5C1782-C1C3-458B-9416-6311D03AD1B9`, with 84 assertions per pass and complete synthetic-data cleanup. Run it with `pnpm start:e2e` in one terminal and `E2E_DEVICE='<dedicated device>' E2E_PLATFORM=ios pnpm test:e2e --flow reminder-owned-timing.yaml` in another.
 - The initial Android devices failed before migration 0003 because fresh database bootstrap migration 0001 updated an undefined table. The bootstrap fix is committed; the isolated API 33 AVD then failed to cold-boot, so a clean native migration replay still needs another healthy disposable device.

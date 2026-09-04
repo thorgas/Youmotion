@@ -7,13 +7,13 @@ import {
   BeliefStatementArchiveTimestamp,
   CustomBeliefSystemId,
   type BeliefStatement,
-} from '@/features/check-in/domain/belief-statement';
+} from '@/features/beliefs/domain/belief-statement';
 import {
   ReminderAssignmentId,
   ReminderTimestamp,
   type ReminderAssignment,
 } from '@/features/reminders/domain/reminder-assignment';
-import { guidingBeliefLibraryStatements } from '../domain/guiding-belief-library';
+import { guidingBeliefLibraryStatements } from '../application/guiding-belief-library';
 
 const timestamp = ReminderTimestamp.make('2026-08-18T09:00:00.000Z');
 const authoredId = CustomBeliefSystemId.make('custom-authored');

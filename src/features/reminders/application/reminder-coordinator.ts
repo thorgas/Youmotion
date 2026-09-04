@@ -5,7 +5,7 @@ import { REMINDER_TARGET_KINDS } from '@/constants';
 import type {
   BeliefStatement,
   BeliefSystemId,
-} from '@/features/check-in/domain/belief-statement';
+} from '@/features/beliefs/domain/belief-statement';
 import type { AppLocale } from '@/localization/app-locale';
 import {
   createReminderAssignmentId,

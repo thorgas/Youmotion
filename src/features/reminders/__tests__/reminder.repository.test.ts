@@ -4,7 +4,7 @@ import {
   REMINDER_NOTIFICATION_CONTENT,
   REMINDER_TARGET_KINDS,
 } from '@/constants';
-import { CustomBeliefSystemId } from '@/features/check-in/domain/belief-statement';
+import { CustomBeliefSystemId } from '@/features/beliefs/domain/belief-statement';
 import {
   failNextSurrealUpsert,
   mockSurrealDatabase,

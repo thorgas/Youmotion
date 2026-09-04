@@ -20,7 +20,7 @@ import {
 import { CheckInSchema } from '@/features/check-in/domain/check-in';
 import { useAppNavigationActor } from '@/navigation/app-navigation.provider';
 import { savedCheckInCopy } from './emotion-copy';
-import { guidingBeliefSystemText } from './belief-system-copy';
+import { guidingBeliefSystemText } from '@/features/beliefs/ui/belief-system-copy';
 import { actionColors, palette, type } from '@/theme';
 
 const _selectContext = (

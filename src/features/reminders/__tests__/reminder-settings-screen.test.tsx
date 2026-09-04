@@ -10,7 +10,7 @@ import {
   REMINDER_STATES,
   REMINDER_TARGET_KINDS,
 } from '@/constants';
-import { CustomBeliefSystemId } from '@/features/check-in/domain/belief-statement';
+import { CustomBeliefSystemId } from '@/features/beliefs/domain/belief-statement';
 import { appSettingsStore } from '@/app-stores';
 import { configureAppLocale } from '@/localization/app-locale.configuration';
 import { appNavigationMachine } from '@/navigation/app-navigation.machine';

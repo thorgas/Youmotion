@@ -10,7 +10,7 @@ import {
   REMINDER_PERMISSION_STATES,
   REMINDER_TARGET_KINDS,
 } from '@/constants';
-import type { BeliefStatement } from '@/features/check-in/domain/belief-statement';
+import type { BeliefStatement } from '@/features/beliefs/domain/belief-statement';
 import type { ReminderAssignment } from '../domain/reminder-assignment';
 
 export type ReminderPermissionState = typeof REMINDER_PERMISSION_STATES[

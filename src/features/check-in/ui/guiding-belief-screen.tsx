@@ -22,19 +22,19 @@ import { useAppNavigationActor } from '@/navigation/app-navigation.provider';
 import {
   beliefStatementForId,
   isCustomBeliefSystemId,
-} from '../domain/belief-statement';
+} from '@/features/beliefs/domain/belief-statement';
 import {
   beliefSystemText,
   customBeliefAccessibilityLabel,
   guidingBeliefAccessibilityLabel,
   guidingBeliefPlaceholder,
-} from './belief-system-copy';
+} from '@/features/beliefs/ui/belief-system-copy';
 import {
   GuidingBeliefCardLabel,
   HarmfulBeliefCardLabel,
-} from './belief-card-label';
+} from '@/features/beliefs/ui/belief-card-label';
 import { CheckInProgressHeader } from './check-in-progress';
-import { GuidingBeliefWritingHelp } from './guiding-belief-writing-help';
+import { GuidingBeliefWritingHelp } from '@/features/beliefs/ui/guiding-belief-writing-help';
 import { actionColors, palette, type } from '@/theme';
 
 type NavigationSnapshot = ReturnType<

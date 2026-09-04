@@ -30,7 +30,7 @@ import { Button } from '@/components/ui/button';
 import { ConfirmedPickerModal } from '@/components/ui/confirmed-picker-modal';
 import {
   beliefStatementForId,
-} from '@/features/check-in/domain/belief-statement';
+} from '@/features/beliefs/domain/belief-statement';
 import { actionColors, palette, type } from '@/theme';
 import { useAppNavigationActor } from '@/navigation/app-navigation.provider';
 import type {
