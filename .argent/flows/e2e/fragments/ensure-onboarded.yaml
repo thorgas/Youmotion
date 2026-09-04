@@ -1,0 +1,15 @@
+steps:
+  - wait: 20000
+  - when:
+      visible: { id: onboarding-skip }
+    steps:
+      - when:
+          platform: ios
+        steps:
+          - tap: { id: onboarding-skip }
+      - when:
+          platform: android
+        steps:
+          - tool: gesture-tap
+            args: { x: 0.82, y: 0.06 }
+  - await: { visible: { id: emotion-star }, timeout: 30000 }

@@ -7,11 +7,7 @@ steps:
   - tool: open-url
     args:
       url: exp+youmotion://expo-development-client/?url=http%3A%2F%2F127.0.0.1%3A8091
-  - when:
-      visible: { id: onboarding-skip }
-    steps:
-      - tap: { id: onboarding-skip }
-      - await: { visible: { id: emotion-star }, timeout: 10000 }
+  - run: fragments/ensure-onboarded.yaml
   - run: fragments/ensure-english.yaml
   - await: { visible: { id: tab-today }, timeout: 30000 }
   - when:
@@ -30,19 +26,20 @@ steps:
       - tool: gesture-tap
         args: { x: 0.375, y: 0.94 }
   - await: { visible: { id: history-search-input }, timeout: 5000 }
-  - await: { idle: true }
+  - await: { visible: { id: history-filters-toggle }, timeout: 5000 }
+  - wait: 1000
   - when:
       platform: ios
     steps:
       - tool: gesture-tap
-        args: { x: 0.875, y: 0.96 }
+        args: { x: 0.76, y: 0.93 }
   - when:
       platform: android
     steps:
       - tool: gesture-tap
-        args: { x: 0.875, y: 0.94 }
+        args: { x: 0.76, y: 0.93 }
   - await: { visible: { text: Your space. }, timeout: 5000 }
-  - await: { idle: true }
+  - wait: 1000
   - when:
       platform: ios
     steps:
