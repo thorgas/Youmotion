@@ -129,5 +129,14 @@ prove time-picker dismissal, and remove only exact-name synthetic records left
 by an interrupted run. Argent can still emit a non-fatal idle warning while
 the Pulse keeps animating; destination assertions remain the pass criterion.
 
-Next: run the native Harness, commit and push the E2E hardening, rebase onto
-current `origin/main`, and repeat the final verification matrix.
+Native Harness was exercised after E2E. The connected Pixel contains a
+non-debuggable production-signed app, so Android Harness correctly stopped
+before tests rather than overwriting its app data. The isolated iOS simulator
+ran all 19 suites: 4 suites/4 tests passed and 15 suites/17 tests exposed the
+pre-existing Harness runtime backlog (`uniffiEnsureInitialized` missing in the
+test runtime, missing native query IDs, and one missing `FeedbackProvider`).
+These failures are outside the ESLint migration and did not appear in Jest or
+the full device E2E suite.
+
+Next: rebase onto current `origin/main` and repeat the final verification
+matrix.
