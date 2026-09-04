@@ -2,7 +2,7 @@ import { fbs } from 'fbtee';
 import assert from '@/assert';
 
 import { ANALYTICS_TIMEFRAMES, APP_LOCALES } from '@/constants';
-import type { BeliefStatement } from '@/features/check-in/domain/belief-statement';
+import type { BeliefStatement } from '@/features/beliefs/domain/belief-statement';
 import type { AppLocale } from '@/localization/app-locale';
 import type { AnalyticsObservation } from '../domain/check-in-analytics';
 import type {
@@ -11,7 +11,7 @@ import type {
   TopLeitsatz,
 } from '../domain/analytics-timeframe';
 import type { CalendarEmotionFrequency } from '../domain/analytics-calendar';
-import { beliefSystemText } from '@/features/check-in/ui/belief-system-copy';
+import { beliefSystemText } from '@/features/beliefs/ui/belief-system-copy';
 import { emotionName } from '@/features/check-in/ui/emotion-copy';
 
 const englishCalendarDateFormatter = new Intl.DateTimeFormat(APP_LOCALES.ENGLISH, {

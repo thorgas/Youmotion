@@ -13,9 +13,9 @@ import {
 } from '@/constants';
 import {
   BeliefStatementListSchema,
-} from '@/features/check-in/domain/belief-statement';
+} from '@/features/beliefs/domain/belief-statement';
 import { CheckInListSchema } from '@/features/check-in/domain/check-in';
-import { loadBeliefStatements } from '@/features/check-in/infrastructure/belief-statement.repository';
+import { loadBeliefStatements } from '@/features/beliefs/infrastructure/belief-statement.repository';
 import { loadCheckIns } from '@/features/check-in/infrastructure/check-in.repository';
 import { queryDatabase } from '@/infrastructure/database/surrealdb.database';
 import { AppSettingsSchema } from '@/features/settings/domain/app-settings';

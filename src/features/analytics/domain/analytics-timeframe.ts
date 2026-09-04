@@ -9,7 +9,7 @@ import {
   BeliefSystemId,
   beliefStatementForId,
   type BeliefStatement,
-} from '@/features/check-in/domain/belief-statement';
+} from '@/features/beliefs/domain/belief-statement';
 
 export const AnalyticsTimeframeSchema = Schema.Literal(
   ANALYTICS_TIMEFRAMES.LAST_WEEK,

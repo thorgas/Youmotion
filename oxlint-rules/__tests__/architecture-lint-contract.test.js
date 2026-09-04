@@ -114,13 +114,7 @@ describe('architecture lint contract', () => {
     )['code-architecture/require-assertions']).toEqual([
       2,
       expect.objectContaining({
-        assertionNames: [
-          'assert',
-          'assertDefined',
-          'assertWorkletInvariant',
-          'nodeAssert',
-          'nodeAssert.ok',
-        ],
+        assertionNames: ['assertWorkletInvariant'],
         checkExpressionBodies: false,
         ignoreJSXCallbacks: true,
         ignoreNoInputClosures: true,

@@ -20,7 +20,7 @@ import {
 } from '@/constants';
 import { appSettingsStore } from '@/app-stores';
 import { appNavigationMachine } from '@/navigation/app-navigation.machine';
-import type { BeliefSystemId } from '../domain/belief-statement';
+import type { BeliefSystemId } from '@/features/beliefs/domain/belief-statement';
 import type {
   CheckInId,
   EmotionSelection,

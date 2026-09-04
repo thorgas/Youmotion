@@ -36,7 +36,7 @@ import { DataSafetyControls } from '@/features/data-safety/ui/data-safety-contro
 import { FeedbackSettingsAction } from '@/features/feedback/ui/feedback-screen';
 import { useAppNavigationActor } from '@/navigation/app-navigation.provider';
 import { appSettingsStore } from '@/app-stores';
-import { guidingBeliefLibraryStatements } from '../domain/guiding-belief-library';
+import { guidingBeliefLibraryStatements } from '@/features/beliefs/application/guiding-belief-library';
 
 const _selectSettings = (state: ReturnType<typeof appSettingsStore.getSnapshot>) => state.context;
 const _selectGuidingBeliefCount = (

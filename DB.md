@@ -20,13 +20,13 @@ UI event
 The relevant ownership boundaries are:
 
 - `src/features/check-in/domain/check-in.ts`: canonical persisted check-in schema and types.
-- `src/features/check-in/domain/belief-statement.ts`: built-in and custom belief IDs plus persisted Leidsatz/Leitsatz schemas.
+- `src/features/beliefs/domain/belief-statement.ts`: built-in and custom belief IDs plus persisted Leidsatz/Leitsatz schemas.
 - `src/features/check-in/domain/belief-system.ts`: stable belief-system IDs, emotion mappings, and history-based recommendation ranking.
 - `src/features/check-in/infrastructure/check-in.repository.ts`: strict current-schema queries, persistence, and typed errors.
 - `src/features/check-in/infrastructure/migrations/database-migration.runner.ts`: ordered startup migration execution and ledger validation.
 - `src/features/check-in/infrastructure/migrations/database-migrations.ts`: append-only migration registry.
 - `src/features/check-in/infrastructure/migrations/*.database-migration.ts`: individual idempotent migration definitions.
-- `src/features/check-in/infrastructure/belief-statement.repository.ts`: custom Leidsatz and Leitsatz queries, persistence, and typed errors.
+- `src/features/beliefs/infrastructure/belief-statement.repository.ts`: custom Leidsatz and Leitsatz queries, persistence, and typed errors.
 - `src/features/check-in/infrastructure/surrealdb.database.ts`: filesystem location and shared native connection.
 - `src/features/check-in/application/check-in-history.store.ts`: validated in-memory history projection.
 - `src/navigation/app-navigation.machine.ts`: hydration, save, retry, and edit workflows.
@@ -96,7 +96,7 @@ Localized labels and colors are derived from stable IDs when rendering. Custom L
 
 ## Belief-statement record schema
 
-`BeliefStatementSchema` in `src/features/check-in/domain/belief-statement.ts` is a tagged union:
+`BeliefStatementSchema` in `src/features/beliefs/domain/belief-statement.ts` is a tagged union:
 
 | `kind` | Stored fields | Meaning |
 | --- | --- | --- |

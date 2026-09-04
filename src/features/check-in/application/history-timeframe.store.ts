@@ -7,7 +7,7 @@ import {
   HISTORY_EVENTS,
 } from '@/constants';
 import { EmotionId } from '../domain/check-in';
-import { BeliefSystemId } from '../domain/belief-statement';
+import { BeliefSystemId } from '@/features/beliefs/domain/belief-statement';
 
 const HistoryTimeframeSchema = Schema.Literal(
   ANALYTICS_TIMEFRAMES.LAST_WEEK,

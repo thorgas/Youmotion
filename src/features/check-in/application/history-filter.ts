@@ -1,7 +1,7 @@
 import { HISTORY_CONTENT_FILTERS } from '@/constants';
 import assert from '@/assert';
 import type { CheckIn, EmotionId } from '../domain/check-in';
-import type { BeliefSystemId } from '../domain/belief-statement';
+import type { BeliefSystemId } from '@/features/beliefs/domain/belief-statement';
 
 export type HistoryFilters = Readonly<{
   beliefSystemId: BeliefSystemId | null;

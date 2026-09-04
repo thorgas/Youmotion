@@ -30,7 +30,7 @@ import {
 import {
   CustomBeliefSystemId,
   type BeliefStatement,
-} from '@/features/check-in/domain/belief-statement';
+} from '@/features/beliefs/domain/belief-statement';
 import {
   CheckInId,
   CheckInTimestamp,

@@ -28,7 +28,7 @@ import { checkInHistoryStore } from '@/app-stores';
 import { historyTimeframeStore } from '@/app-stores';
 import type { CheckIn } from '@/features/check-in/domain/check-in';
 import { emotions } from '@/features/check-in/domain/emotion';
-import type { BeliefStatement } from '@/features/check-in/domain/belief-statement';
+import type { BeliefStatement } from '@/features/beliefs/domain/belief-statement';
 import { emotionName } from '@/features/check-in/ui/emotion-copy';
 import { borderColors, interactionColors, palette, surfaceColors, type } from '@/theme';
 import type { AppLocale } from '@/localization/app-locale';

@@ -13,7 +13,7 @@ import {
   CustomBeliefSystemId,
   type BeliefStatement,
   type BeliefSystemId,
-} from '../domain/belief-statement';
+} from '@/features/beliefs/domain/belief-statement';
 import {
   beliefSystemIds,
   recommendedBeliefSystemIds,

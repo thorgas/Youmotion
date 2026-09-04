@@ -4,7 +4,7 @@ import {
   REMINDER_NOTIFICATION_CONTENT,
   REMINDER_TARGET_KINDS,
 } from '@/constants';
-import { BeliefSystemId } from '@/features/check-in/domain/belief-statement';
+import { BeliefSystemId } from '@/features/beliefs/domain/belief-statement';
 import { ReminderTimingSchema } from './reminder-timing';
 
 export const ReminderAssignmentId = Schema.String.pipe(

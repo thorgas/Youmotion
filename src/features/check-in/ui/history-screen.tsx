@@ -27,12 +27,12 @@ import { filterHistoryEntries } from '../application/history-filter';
 import { historyTimeframeStore } from '@/app-stores';
 import type { CheckIn, EmotionId } from '../domain/check-in';
 import { selectionForCheckIn } from '../domain/emotion';
-import type { BeliefStatement } from '../domain/belief-statement';
+import type { BeliefStatement } from '@/features/beliefs/domain/belief-statement';
 import { emotionName, emotionSummary } from './emotion-copy';
 import {
   beliefSystemText,
   guidingBeliefSystemText,
-} from './belief-system-copy';
+} from '@/features/beliefs/ui/belief-system-copy';
 import {
   confirmCheckInDeletion,
   editMomentAccessibilityHint,

@@ -26,17 +26,17 @@ import {
 import {
   beliefStatementForId,
   type BeliefStatement,
-} from '@/features/check-in/domain/belief-statement';
+} from '@/features/beliefs/domain/belief-statement';
 import {
   beliefSystemText,
   guidingBeliefPlaceholder,
-} from '@/features/check-in/ui/belief-system-copy';
+} from '@/features/beliefs/ui/belief-system-copy';
 import {
   GuidingBeliefCardLabel,
   HarmfulBeliefCardLabel,
-} from '@/features/check-in/ui/belief-card-label';
-import { GuidingBeliefWritingHelp } from '@/features/check-in/ui/guiding-belief-writing-help';
-import { PersonalBeliefCreateButton } from '@/features/check-in/ui/personal-belief-create-button';
+} from '@/features/beliefs/ui/belief-card-label';
+import { GuidingBeliefWritingHelp } from '@/features/beliefs/ui/guiding-belief-writing-help';
+import { PersonalBeliefCreateButton } from '@/features/beliefs/ui/personal-belief-create-button';
 import { actionColors, palette, surfaceColors, type } from '@/theme';
 import type {
   GuidingBeliefReminderAssignment,
@@ -45,7 +45,7 @@ import type {
 import { confirmReminderDeletion } from '@/features/reminders/ui/reminder-deletion';
 import { useAppNavigationActor } from '@/navigation/app-navigation.provider';
 import { confirmBeliefRemoval } from './belief-library-removal';
-import { guidingBeliefLibraryStatements } from '../domain/guiding-belief-library';
+import { guidingBeliefLibraryStatements } from '../application/guiding-belief-library';
 
 const selectSnapshot = (
   snapshot: ReturnType<ReturnType<typeof useAppNavigationActor>['getSnapshot']>,

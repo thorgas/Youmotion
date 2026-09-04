@@ -6,7 +6,7 @@ import {
   type BeliefStatement,
   type BeliefSystemId,
   type BuiltInBeliefSystemId,
-} from './belief-statement';
+} from '@/features/beliefs/domain/belief-statement';
 
 export const beliefSystemIds: readonly BuiltInBeliefSystemId[] = [
   BELIEF_SYSTEM_IDS.ALWAYS_FUNCTIONING,
