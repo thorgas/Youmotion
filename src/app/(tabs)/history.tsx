@@ -1,5 +1,5 @@
 import { DevelopmentScreen } from '@/development/development-screen';
-import { HistoryScreen } from '@/features/check-in/ui/history-screen';
+import { HistoryScreen } from '@/features/history/ui/history-screen';
 
 export default function HistoryRoute() {
   return (

@@ -19,7 +19,7 @@ import { appSettingsStore } from '@/app-stores';
 import { AppLocaleProvider } from '@/localization/app-locale-provider';
 import { checkInHistoryStore } from '@/app-stores';
 import { historyTimeframeStore } from '@/app-stores';
-import { HistoryScreen } from '../ui/history-screen';
+import { HistoryScreen } from '@/features/history/ui/history-screen';
 
 const visualTest = Platform.OS === 'android' ? test : test.skip;
 

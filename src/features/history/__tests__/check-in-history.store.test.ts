@@ -11,7 +11,7 @@ import {
   CheckInId,
   CheckInTimestamp,
   type CheckIn,
-} from '../domain/check-in';
+} from '@/features/check-in/domain/check-in';
 
 function entry(index: number): CheckIn {
   return {

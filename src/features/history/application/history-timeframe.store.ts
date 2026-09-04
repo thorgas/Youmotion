@@ -6,7 +6,7 @@ import {
   HISTORY_CONTENT_FILTERS,
   HISTORY_EVENTS,
 } from '@/constants';
-import { EmotionId } from '../domain/check-in';
+import { EmotionId } from '@/features/check-in/domain/check-in';
 import { BeliefSystemId } from '@/features/beliefs/domain/belief-statement';
 
 const HistoryTimeframeSchema = Schema.Literal(
