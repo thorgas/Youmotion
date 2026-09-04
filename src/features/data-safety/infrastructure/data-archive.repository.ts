@@ -17,7 +17,7 @@ import {
 import { CheckInListSchema } from '@/features/check-in/domain/check-in';
 import { loadBeliefStatements } from '@/features/check-in/infrastructure/belief-statement.repository';
 import { loadCheckIns } from '@/features/check-in/infrastructure/check-in.repository';
-import { queryDatabase } from '@/features/check-in/infrastructure/surrealdb.database';
+import { queryDatabase } from '@/infrastructure/database/surrealdb.database';
 import { AppSettingsSchema } from '@/features/settings/domain/app-settings';
 import { loadAppSettings } from '@/features/settings/infrastructure/app-settings.repository';
 import {

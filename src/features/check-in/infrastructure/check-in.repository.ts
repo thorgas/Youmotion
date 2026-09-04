@@ -19,7 +19,7 @@ import {
   type EmotionSelection,
 } from '../domain/check-in';
 import { BeliefStatementText, BeliefSystemId } from '../domain/belief-statement';
-import { queryDatabase } from './surrealdb.database';
+import { queryDatabase } from '@/infrastructure/database/surrealdb.database';
 
 export class CheckInStorageError extends Schema.TaggedError<CheckInStorageError>()(
   'CheckInStorageError',

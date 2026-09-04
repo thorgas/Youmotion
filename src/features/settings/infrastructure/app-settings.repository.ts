@@ -9,9 +9,11 @@ import {
   APP_SETTINGS_TABLE,
   EMOTION_LABEL_MODES,
 } from '@/constants';
-import { queryDatabase } from '@/features/check-in/infrastructure/surrealdb.database';
-import { appLocaleForLanguageCodes } from '../domain/app-locale';
-import { AppLocaleSchema } from '../domain/app-locale';
+import { queryDatabase } from '@/infrastructure/database/surrealdb.database';
+import {
+  appLocaleForLanguageCodes,
+  AppLocaleSchema,
+} from '@/localization/app-locale';
 import { AppSettingsSchema, type AppSettings } from '../domain/app-settings';
 import { EmotionLabelModeSchema } from '../domain/emotion-label-mode';
 

@@ -1,11 +1,11 @@
 import * as Effect from 'effect/Effect';
 
 import { DATABASE_MIGRATION_TABLE } from '@/constants';
-import { occurrenceTimeDatabaseMigration } from '../infrastructure/migrations/occurrence-time.database-migration';
-import { reminderTablesDatabaseMigration } from '../infrastructure/migrations/reminder-tables.database-migration';
-import { inlineReminderTimingDatabaseMigration } from '../infrastructure/migrations/inline-reminder-timing.database-migration';
-import { journalTablesDatabaseMigration } from '../infrastructure/migrations/journal-tables.database-migration';
-import { runDatabaseMigrations } from '../infrastructure/migrations/database-migration.runner';
+import { occurrenceTimeDatabaseMigration } from '@/infrastructure/database/migrations/occurrence-time.database-migration';
+import { reminderTablesDatabaseMigration } from '@/infrastructure/database/migrations/reminder-tables.database-migration';
+import { inlineReminderTimingDatabaseMigration } from '@/infrastructure/database/migrations/inline-reminder-timing.database-migration';
+import { journalTablesDatabaseMigration } from '@/infrastructure/database/migrations/journal-tables.database-migration';
+import { runDatabaseMigrations } from '@/infrastructure/database/migrations/database-migration.runner';
 
 const query = jest.fn();
 const database = { query };

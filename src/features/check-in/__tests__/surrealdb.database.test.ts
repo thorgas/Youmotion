@@ -24,8 +24,8 @@ jest.mock('react-native-surrealdb', () => ({
 }));
 
 function loadDatabaseModule() {
-  return jest.requireActual<typeof import('../infrastructure/surrealdb.database')>(
-    '../infrastructure/surrealdb.database',
+  return jest.requireActual<typeof import('@/infrastructure/database/surrealdb.database')>(
+    '@/infrastructure/database/surrealdb.database',
   );
 }
 

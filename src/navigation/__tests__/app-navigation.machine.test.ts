@@ -61,7 +61,7 @@ import {
   ReminderTimestamp,
 } from '@/features/reminders/domain/reminder-assignment';
 
-jest.mock('@/features/check-in/infrastructure/surrealdb.database', () => ({
+jest.mock('@/infrastructure/database/surrealdb.database', () => ({
   getDatabase: jest.fn(() => Promise.resolve(mockSurrealDatabase)),
   queryDatabase: jest.fn(({ surql, variables }: {
     surql: string;

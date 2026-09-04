@@ -26,7 +26,7 @@ jest.mock('expo-router', () => ({
   router: { dismissTo: jest.fn(), push: jest.fn(), replace: jest.fn() },
 }));
 
-jest.mock('@/features/check-in/infrastructure/surrealdb.database', () => ({
+jest.mock('@/infrastructure/database/surrealdb.database', () => ({
   getDatabase: jest.fn(() => Promise.resolve(mockSurrealDatabase)),
   queryDatabase: jest.fn(({ surql, variables }: {
     surql: string;

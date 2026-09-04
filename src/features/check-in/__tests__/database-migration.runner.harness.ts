@@ -14,9 +14,9 @@ import {
   FILE_URI_PREFIX,
   SURREAL_DATABASE_ENDPOINT_PREFIX,
 } from '@/constants';
-import { occurrenceTimeDatabaseMigration } from '../infrastructure/migrations/occurrence-time.database-migration';
-import { DATABASE_MIGRATIONS } from '../infrastructure/migrations/database-migrations';
-import { runDatabaseMigrations } from '../infrastructure/migrations/database-migration.runner';
+import { occurrenceTimeDatabaseMigration } from '@/infrastructure/database/migrations/occurrence-time.database-migration';
+import { DATABASE_MIGRATIONS } from '@/infrastructure/database/migrations/database-migrations';
+import { runDatabaseMigrations } from '@/infrastructure/database/migrations/database-migration.runner';
 
 const suppliedArchiveCheckInCount = 133;
 const legacyIdPrefix = 'migration-e2e-legacy-';

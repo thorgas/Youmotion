@@ -31,7 +31,7 @@ import { emotions } from '@/features/check-in/domain/emotion';
 import type { BeliefStatement } from '@/features/check-in/domain/belief-statement';
 import { emotionName } from '@/features/check-in/ui/emotion-copy';
 import { borderColors, interactionColors, palette, surfaceColors, type } from '@/theme';
-import type { AppLocale } from '@/features/settings/domain/app-locale';
+import type { AppLocale } from '@/localization/app-locale';
 import { useAppLocale } from '@/localization/app-locale-provider';
 import { useAppNavigationActor } from '@/navigation/app-navigation.provider';
 import { analyticsStore } from '@/app-stores';
