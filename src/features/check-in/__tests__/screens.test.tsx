@@ -69,7 +69,7 @@ import {
   BaseStateRipples,
   CenteredBaseStateRipples,
 } from '../ui/base-state-ripples';
-import { palette } from '@/theme';
+import { borderColors, palette, surfaceColors } from '@/theme';
 import {
   ReminderAssignmentId,
   ReminderTimestamp,
@@ -1101,6 +1101,13 @@ describe('check-in screens', () => {
     const screen = await _renderLocalized(<GuidingBeliefScreen />);
     expect(screen.getByDisplayValue('Ich darf auch einmal mich priorisieren.')).toBeTruthy();
     expect(screen.getByTestId('saved-guiding-belief-reason')).toBeTruthy();
+    expect(screen.getByTestId('saved-guiding-belief-reason')).toHaveStyle({
+      backgroundColor: surfaceColors.subtle,
+    });
+    expect(screen.getByTestId('guiding-belief-draft')).toHaveStyle({
+      backgroundColor: palette.selectionWash,
+      borderColor: borderColors.moss20,
+    });
     expect(screen.getByText('Bereits für diesen Leidsatz gespeichert')).toBeTruthy();
     expect(screen.getByText(
       'Darum ist dein Leitsatz hier schon eingetragen. Du kannst ihn übernehmen oder verändern.',
@@ -1210,7 +1217,7 @@ describe('check-in screens', () => {
     await fireEvent.press(library.getByTestId('belief-library-guiding-help-toggle'));
     expect(library.getByText('Nimm dir einen Moment, bevor du ihn neu formulierst')).toBeTruthy();
     await fireEvent.press(library.getByTestId('belief-library-editor-cancel'));
-    expect(library.getByText('LEIDSATZ · EINENGEND')).toBeTruthy();
+    expect(library.getByText('Losgelassener Leidsatz')).toBeTruthy();
     expect(library.getByText('LEITSATZ · UNTERSTÜTZEND')).toBeTruthy();
     expect(library.getByTestId(/belief-reminder-edit-/)).toBeTruthy();
     await fireEvent.press(library.getByText('Bearbeiten'));
@@ -1550,10 +1557,16 @@ describe('check-in screens', () => {
     expect(mockActor.getSnapshot().matches(BELIEF_LIBRARY_STATES.LIBRARY)).toBe(true);
 
     const library = await _renderLocalized(<BeliefLibraryScreen />);
-    expect(library.getByText('CORE BELIEF · LIMITING')).toBeTruthy();
+    expect(library.getByText('Released core belief')).toBeTruthy();
     expect(library.getByText('GUIDING BELIEF · SUPPORTIVE')).toBeTruthy();
-    expect(library.getByText('I must never need help.')).toBeTruthy();
+    expect(library.getByText('I must never need help.')).toHaveStyle({
+      textDecorationLine: 'line-through',
+    });
     expect(library.getByText('I can ask for support.')).toBeTruthy();
+    expect(library.getByTestId(/belief-library-guiding-surface-/)).toHaveStyle({
+      backgroundColor: palette.selectionWash,
+      borderColor: borderColors.moss20,
+    });
     expect(library.getByText('Add your own core belief')).toBeTruthy();
     expect(library.getByText('Write it in your own words.')).toBeTruthy();
     await fireEvent.press(library.getByTestId('belief-library-create'));
@@ -1561,6 +1574,10 @@ describe('check-in screens', () => {
     expect(library.getByText('ADD CORE BELIEF')).toBeTruthy();
     expect(library.getByTestId('belief-library-harmful-card')).toBeTruthy();
     expect(library.getByTestId('belief-library-guiding-card')).toBeTruthy();
+    expect(library.getByTestId('belief-library-guiding-draft')).toHaveStyle({
+      backgroundColor: palette.selectionWash,
+      borderColor: borderColors.moss20,
+    });
     expect(library.getByText('Your core belief')).toBeTruthy();
     expect(library.getByText('Your new guiding belief')).toBeTruthy();
     expect(library.getByTestId('belief-library-guiding-draft').props['placeholder']).toBe(
