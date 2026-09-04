@@ -12,7 +12,7 @@ import Animated, {
   type SharedValue,
 } from 'react-native-reanimated';
 import { EMOTION_STAR_ACCESSIBILITY_ACTIONS, MOTION_DURATION } from '@/constants';
-import { appSettingsStore } from '@/features/settings/application/app-settings.store';
+import { appSettingsStore } from '@/app-stores';
 import type { EmotionLabelMode } from '@/features/settings/domain/emotion-label-mode';
 import type { EmotionSelection } from '../domain/check-in';
 import {

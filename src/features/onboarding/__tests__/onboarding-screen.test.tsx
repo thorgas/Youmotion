@@ -16,8 +16,8 @@ import {
   ONBOARDING_EVENTS,
   ONBOARDING_STATES,
 } from '@/constants';
-import { checkInHistoryStore } from '@/features/check-in/application/check-in-history.store';
-import { appSettingsStore } from '@/features/settings/application/app-settings.store';
+import { checkInHistoryStore } from '@/app-stores';
+import { appSettingsStore } from '@/app-stores';
 import { AppLocaleProvider } from '@/localization/app-locale-provider';
 import {
   appNavigationMachine,

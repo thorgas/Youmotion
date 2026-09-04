@@ -16,14 +16,17 @@ import { APP_LOCALES } from '@/constants';
 const navigationSend = fn();
 
 function loadOnboardingForLanguage(languageCode: string) {
-  mock('@/features/settings/application/app-settings.store', () => {
-    const actual: typeof import(
+  mock('@/app-stores', () => {
+    const actualStores: typeof import(
+      '@/app-stores'
+    ) = requireActual('@/app-stores');
+    const settings: typeof import(
       '@/features/settings/application/app-settings.store'
     ) = requireActual('@/features/settings/application/app-settings.store');
     return {
-      ...actual,
-      appSettingsStore: actual.createAppSettingsStore(
-        actual.initialAppSettingsContext([languageCode]),
+      ...actualStores,
+      appSettingsStore: settings.createAppSettingsStore(
+        settings.initialAppSettingsContext([languageCode]),
       ),
     };
   });
@@ -31,8 +34,8 @@ function loadOnboardingForLanguage(languageCode: string) {
     useAppNavigationActor: () => ({ send: navigationSend }),
   }));
   const settingsModule: typeof import(
-    '@/features/settings/application/app-settings.store'
-  ) = require('@/features/settings/application/app-settings.store');
+    '@/app-stores'
+  ) = require('@/app-stores');
   const localizationModule: typeof import(
     '@/localization/app-locale-provider'
   ) = require('@/localization/app-locale-provider');

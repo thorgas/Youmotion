@@ -24,8 +24,8 @@ import {
   tabScreenContentStyle,
 } from '@/components/ui/tab-screen-layout';
 import { ScreenHeading } from '@/components/ui/screen-heading';
-import { checkInHistoryStore } from '@/features/check-in/application/check-in-history.store';
-import { historyTimeframeStore } from '@/features/check-in/application/history-timeframe.store';
+import { checkInHistoryStore } from '@/app-stores';
+import { historyTimeframeStore } from '@/app-stores';
 import type { CheckIn } from '@/features/check-in/domain/check-in';
 import { emotions } from '@/features/check-in/domain/emotion';
 import type { BeliefStatement } from '@/features/check-in/domain/belief-statement';
@@ -34,7 +34,7 @@ import { borderColors, interactionColors, palette, surfaceColors, type } from '@
 import type { AppLocale } from '@/features/settings/domain/app-locale';
 import { useAppLocale } from '@/localization/app-locale-provider';
 import { useAppNavigationActor } from '@/navigation/app-navigation.provider';
-import { analyticsStore } from '../application/analytics.store';
+import { analyticsStore } from '@/app-stores';
 import {
   analyticsObservations,
   emotionFrequencies,

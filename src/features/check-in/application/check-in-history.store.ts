@@ -42,7 +42,7 @@ const _deleteEntry = ({ entries, id }: { entries: readonly CheckIn[]; id: CheckI
   entries.filter((entry) => entry.id !== id)
 );
 
-export const checkInHistoryStore = createStore({
+export const createCheckInHistoryStore = () => createStore({
   schemas: {
     context: Schema.standardSchemaV1(Schema.Struct({
       entries: Schema.Array(CheckInSchema),

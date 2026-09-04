@@ -10,7 +10,8 @@ import {
   NAVIGATION_EVENTS,
 } from '@/constants';
 import type { EmotionSelection } from '@/features/check-in/domain/check-in';
-import { appSettingsStore } from '@/features/settings/application/app-settings.store';
+import { emotions } from '@/features/check-in/domain/emotion';
+import { appSettingsStore } from '@/app-stores';
 import {
   mockSurrealDatabase,
   resetSurrealDatabaseMock,
@@ -42,11 +43,14 @@ jest.mock('@/features/check-in/infrastructure/surrealdb.database', () => ({
     : mockSurrealDatabase.query(surql, variables)),
 }));
 
+const joyEmotion = emotions.find(({ id }) => id === EMOTION_IDS.JOY);
+if (!joyEmotion) throw new Error('The joy emotion fixture must exist.');
+
 const selection = {
   emotionId: EMOTION_IDS.JOY,
   intensity: 0.42,
   level: 2,
-  color: '#E7AD32',
+  color: joyEmotion.color,
 } satisfies EmotionSelection;
 
 function startNavigationActor() {

@@ -20,7 +20,7 @@ const initialContext = {
   timeframe: ANALYTICS_TIMEFRAMES.LAST_WEEK,
 };
 
-export const analyticsStore = createStore({
+export const createAnalyticsStore = () => createStore({
   schemas: {
     context: Schema.standardSchemaV1(Schema.Struct({
       insightTab: Schema.Literal(

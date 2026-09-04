@@ -1,7 +1,7 @@
 import { describe, expect, test } from 'react-native-harness';
 
 import { EMOTION_IDS } from '@/constants';
-import { checkInHistoryStore } from '../application/check-in-history.store';
+import { checkInHistoryStore } from '@/app-stores';
 import { CheckInId, CheckInTimestamp, type CheckIn } from '../domain/check-in';
 
 function entry({ id, occurredAt }: { id: string; occurredAt: string }): CheckIn {

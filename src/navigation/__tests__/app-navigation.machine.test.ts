@@ -37,8 +37,9 @@ import {
   type CheckIn,
   type EmotionSelection,
 } from '@/features/check-in/domain/check-in';
-import { checkInHistoryStore } from '@/features/check-in/application/check-in-history.store';
-import { appSettingsStore } from '@/features/settings/application/app-settings.store';
+import { emotions } from '@/features/check-in/domain/emotion';
+import { checkInHistoryStore } from '@/app-stores';
+import { appSettingsStore } from '@/app-stores';
 import {
   DataArchiveSchema,
   DataArchiveTimestamp,
@@ -97,11 +98,14 @@ const mockDeleteAllJournalData = jest.mocked(dataArchiveRepository.deleteAllJour
 const mockRequestReminderPermission = jest.mocked(reminderScheduler.requestReminderPermission);
 const mockGetReminderPermission = jest.mocked(reminderScheduler.getReminderPermission);
 
+const joyEmotion = emotions.find(({ id }) => id === EMOTION_IDS.JOY);
+if (!joyEmotion) throw new Error('The joy emotion fixture must exist.');
+
 const selection = {
   emotionId: EMOTION_IDS.JOY,
   intensity: 0.42,
   level: 2,
-  color: '#E7AD32',
+  color: joyEmotion.color,
 } satisfies EmotionSelection;
 
 const hydrationSentinel = {

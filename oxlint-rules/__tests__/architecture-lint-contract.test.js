@@ -43,7 +43,7 @@ const exportedRuleNames = () => {
 describe('architecture lint contract', () => {
   it('keeps the alpha plugin in the main verification path', () => {
     expect(packageJson.devDependencies['eslint-plugin-code-architecture']).toBe(
-      '0.6.0-alpha.2',
+      '0.6.0-alpha.4',
     );
     expect(packageJson.scripts.lint).toContain('pnpm lint:architecture');
     expect(packageJson.scripts.verify).toContain('pnpm lint');
@@ -78,7 +78,7 @@ describe('architecture lint contract', () => {
       'require-dismissible-modal-backdrop',
       'require-interactive-component-contract',
     ];
-    const alpha2Rules = [
+    const alphaRules = [
       'dependency-parameter-convention',
       'dependency-wrapper-shape',
       'named-imports',
@@ -98,7 +98,7 @@ describe('architecture lint contract', () => {
     expect(exportedRules).toHaveLength(37);
     expect(exportedRules.toSorted()).toEqual([
       ...applicableRules,
-      ...alpha2Rules,
+      ...alphaRules,
       'require-assertions',
     ].toSorted());
     expect(applicableRules).toHaveLength(22);
@@ -130,7 +130,7 @@ describe('architecture lint contract', () => {
     ]);
   });
 
-  it('enables every alpha.2 rule in a truthful production scope', () => {
+  it('enables every alpha.4 rule in a truthful production scope', () => {
     const sharedRules = configuredRulesFor('src/components/ui/contract-fixture.tsx');
     const domainRules = configuredRulesFor(
       'src/features/reminders/domain/contract-fixture.ts',
@@ -139,7 +139,7 @@ describe('architecture lint contract', () => {
       'src/features/reminders/application/contract-fixture.ts',
     );
     const ruleConfigurations = [sharedRules, domainRules, applicationRules];
-    const alpha2Rules = [
+    const alphaRules = [
       'dependency-parameter-convention',
       'dependency-wrapper-shape',
       'named-imports',
@@ -156,7 +156,7 @@ describe('architecture lint contract', () => {
       'top-down-declarations',
     ];
 
-    for (const ruleName of alpha2Rules) {
+    for (const ruleName of alphaRules) {
       expect(ruleConfigurations.some(
         (rules) => rules[`code-architecture/${ruleName}`]?.[0] === 2,
       )).toBe(true);
@@ -166,7 +166,7 @@ describe('architecture lint contract', () => {
     expect(applicationRules['code-architecture/require-contract-assertions']?.[0]).toBe(0);
   });
 
-  it('keeps narrow alpha.2 exceptions from spreading', () => {
+  it('keeps narrow alpha exceptions from spreading', () => {
     const storeRules = configuredRulesFor(
       'src/features/settings/application/app-settings.store.ts',
     );
@@ -177,8 +177,8 @@ describe('architecture lint contract', () => {
       'src/features/analytics/domain/analytics-calendar.ts',
     );
 
-    expect(storeRules['code-architecture/no-exported-dependency-instances']?.[0]).toBe(0);
-    expect(otherApplicationRules['code-architecture/no-exported-dependency-instances']).toEqual([2]);
+    expect(storeRules['code-architecture/no-exported-dependency-instances']?.[0]).toBe(2);
+    expect(otherApplicationRules['code-architecture/no-exported-dependency-instances']?.[0]).toBe(2);
     expect(algorithmRules['code-architecture/require-contract-assertions']).toBeUndefined();
     expect(algorithmRules['code-architecture/require-assertions']?.[0]).toBe(2);
   });
@@ -284,23 +284,42 @@ describe('architecture lint contract', () => {
     ]));
   });
 
-  it('limits the exported dependency instance exception to app settings', () => {
+  it('limits exported dependency instances to the composition root', () => {
     const code = 'export const appSettingsStore = createAppSettingsStore();';
-    const exceptionMessages = messagesFor({
+    const compositionRootMessages = messagesFor({
       code,
-      filePath: 'src/features/settings/application/app-settings.store.ts',
+      filePath: 'src/app-stores.ts',
     });
     const ordinaryMessages = messagesFor({
       code,
       filePath: 'src/features/settings/application/contract-fixture.ts',
     });
 
-    expect(exceptionMessages).not.toEqual(expect.arrayContaining([
+    expect(compositionRootMessages).not.toEqual(expect.arrayContaining([
       expect.objectContaining({ ruleId: 'code-architecture/no-exported-dependency-instances' }),
     ]));
     expect(ordinaryMessages).toEqual(expect.arrayContaining([
       expect.objectContaining({ ruleId: 'code-architecture/no-exported-dependency-instances' }),
     ]));
+  });
+
+  it('enables every built-in implicit external dependency group', () => {
+    const messages = messagesFor({
+      code: `
+        Date.now();
+        Math.random();
+        console.info('contract');
+        process.env.NODE_ENV;
+        fetch('/contract');
+        localStorage.getItem('contract');
+        Intl.DateTimeFormat();
+      `,
+      filePath: 'src/features/reminders/application/contract-fixture.ts',
+    }).filter(({ ruleId }) => (
+      ruleId === 'code-architecture/no-implicit-external-dependencies'
+    ));
+
+    expect(messages).toHaveLength(7);
   });
 
   it.each([

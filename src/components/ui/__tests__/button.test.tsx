@@ -1,6 +1,7 @@
 import { render, screen, userEvent } from '@testing-library/react-native';
 
 import { Button } from '@/components/ui/button';
+import { actionColors } from '@/theme';
 
 describe('Button', () => {
   it('composes an accessible action and dispatches its press', async () => {
@@ -45,7 +46,7 @@ describe('Button', () => {
     );
 
     expect(screen.getByRole('button', { name: 'Delete' })).toHaveStyle({
-      backgroundColor: '#8A3D35',
+      backgroundColor: actionColors.destructiveBackground,
     });
   });
 

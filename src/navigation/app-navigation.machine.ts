@@ -81,7 +81,7 @@ import {
   persistBeliefStatement,
   retireCustomBeliefStatement,
 } from '@/features/check-in/infrastructure/belief-statement.repository';
-import { checkInHistoryStore } from '@/features/check-in/application/check-in-history.store';
+import { checkInHistoryStore } from '@/app-stores';
 import {
   DataArchiveSchema,
 } from '@/features/data-safety/domain/data-archive';
@@ -91,7 +91,7 @@ import {
   pickDataArchive,
   restoreDataArchive,
 } from '@/features/data-safety/infrastructure/data-archive.repository';
-import { appSettingsStore } from '@/features/settings/application/app-settings.store';
+import { appSettingsStore } from '@/app-stores';
 import { AppLocaleSchema } from '@/features/settings/domain/app-locale';
 import { AppSettingsSchema } from '@/features/settings/domain/app-settings';
 import { EmotionLabelModeSchema } from '@/features/settings/domain/emotion-label-mode';
@@ -413,6 +413,7 @@ function activateReminderFromDraft({
   void activateReminder({
     assignments: context.reminderAssignments,
     locale,
+    nonce: Math.random().toString(16).slice(2),
     now: new Date(),
     notificationContent: context.reminderNotificationContentDraft,
     statements: context.beliefStatements,
@@ -1641,6 +1642,7 @@ export const appNavigationMachine = setup({
               assignments: context.reminderAssignments,
               enabled: !assignment.enabled,
               locale: appSettingsStore.getSnapshot().context.locale,
+              now: new Date(),
               statements: context.beliefStatements,
             }).then(
               (assignments) => self.send({
@@ -1980,6 +1982,7 @@ export const appNavigationMachine = setup({
               assignments: context.reminderAssignments,
               enabled: !assignment.enabled,
               locale: appSettingsStore.getSnapshot().context.locale,
+              now: new Date(),
               statements: context.beliefStatements,
             }).then(
               (assignments) => self.send({
@@ -2233,6 +2236,7 @@ export const appNavigationMachine = setup({
                 assignment,
                 assignments: context.reminderAssignments,
                 locale: appSettingsStore.getSnapshot().context.locale,
+                now: new Date(),
                 notificationContent: context.reminderNotificationContentDraft,
                 statements: context.beliefStatements,
                 timing,

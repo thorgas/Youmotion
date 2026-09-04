@@ -22,7 +22,7 @@ import {
   EMOTION_IDS,
   NAVIGATION_STATES,
 } from '@/constants';
-import { appSettingsStore } from '@/features/settings/application/app-settings.store';
+import { appSettingsStore } from '@/app-stores';
 import { AppLocaleProvider } from '@/localization/app-locale-provider';
 import { CheckInTimestamp, type EmotionSelection } from '../domain/check-in';
 import { palette } from '@/theme';

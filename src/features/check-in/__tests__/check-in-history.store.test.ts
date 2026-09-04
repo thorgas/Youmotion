@@ -5,8 +5,8 @@ import {
   HISTORY_CONTENT_FILTERS,
   HISTORY_EVENTS,
 } from '@/constants';
-import { checkInHistoryStore } from '../application/check-in-history.store';
-import { historyTimeframeStore } from '../application/history-timeframe.store';
+import { checkInHistoryStore } from '@/app-stores';
+import { historyTimeframeStore } from '@/app-stores';
 import {
   CheckInId,
   CheckInTimestamp,

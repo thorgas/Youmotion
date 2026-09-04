@@ -95,5 +95,3 @@ export function createAppSettingsStore(
     },
   });
 }
-
-export const appSettingsStore = createAppSettingsStore();

@@ -11,7 +11,7 @@ import {
   REMINDER_PERMISSION_STATES,
   REMINDER_STATES,
 } from '@/constants';
-import { appSettingsStore } from '@/features/settings/application/app-settings.store';
+import { appSettingsStore } from '@/app-stores';
 import { configureAppLocale } from '@/localization/app-locale.configuration';
 import { appNavigationMachine } from '@/navigation/app-navigation.machine';
 import { AppNavigationActorProvider } from '@/navigation/app-navigation.provider';

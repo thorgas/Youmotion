@@ -223,7 +223,13 @@ export default tseslint.config(
     rules: {
       'code-architecture/dependency-parameter-convention': 'error',
       'code-architecture/dependency-wrapper-shape': 'error',
-      'code-architecture/no-exported-dependency-instances': 'error',
+      'code-architecture/no-exported-dependency-instances': [
+        'error',
+        {
+          compositionRoots: ['src/app-stores.ts'],
+          root: '.',
+        },
+      ],
       'code-architecture/no-over-depending': 'error',
       'code-architecture/sort-dependency-types': 'error',
     },
@@ -244,13 +250,6 @@ export default tseslint.config(
       'code-architecture/no-implicit-external-dependencies': [
         'error',
         {
-          capabilities: [
-            {
-              dependency: 'Time',
-              replacement: 'an injected clock dependency',
-              selector: 'Date.now',
-            },
-          ],
           compositionRoots: [
             'src/app/**',
             'src/**/infrastructure/**',
@@ -317,12 +316,6 @@ export default tseslint.config(
           preserveRuntimeDependencies: true,
         },
       ],
-    },
-  },
-  {
-    files: ['src/features/settings/application/app-settings.store.ts'],
-    rules: {
-      'code-architecture/no-exported-dependency-instances': 'off',
     },
   },
   {
@@ -566,6 +559,12 @@ export default tseslint.config(
     ],
     rules: {
       'code-architecture/require-assertions': 'off',
+    },
+  },
+  {
+    files: ['src/features/check-in/application/history-timeframe.store.ts'],
+    rules: {
+      'code-architecture/max-function-lines': 'off',
     },
   },
 );

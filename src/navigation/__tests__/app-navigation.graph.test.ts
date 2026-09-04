@@ -19,7 +19,7 @@ import {
   ONBOARDING_STATES,
   REMINDER_STATES,
 } from '@/constants';
-import { appSettingsStore } from '@/features/settings/application/app-settings.store';
+import { appSettingsStore } from '@/app-stores';
 import {
   appNavigationMachine,
   routeForStateValue,

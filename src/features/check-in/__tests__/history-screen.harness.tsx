@@ -17,9 +17,9 @@ import {
   HISTORY_EVENTS,
 } from '@/constants';
 import { AnalyticsTimeframeSelector } from '@/features/analytics/ui/analytics-timeframe-selector';
-import { appSettingsStore } from '@/features/settings/application/app-settings.store';
+import { appSettingsStore } from '@/app-stores';
 import { AppLocaleProvider } from '@/localization/app-locale-provider';
-import { historyTimeframeStore } from '../application/history-timeframe.store';
+import { historyTimeframeStore } from '@/app-stores';
 
 const FIXED_NOW = new Date(2026, 6, 21, 12);
 const _selectTimeframe = (state: ReturnType<typeof historyTimeframeStore.getSnapshot>) => (
