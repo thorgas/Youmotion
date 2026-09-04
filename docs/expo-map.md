@@ -31,4 +31,6 @@ With a compatible simulator and development build running, replay a saved flow f
 npx @swmansion/argent flow run .expo-map/flows/nav-success-reminder-offer.yaml
 ```
 
+For Youmotion's committed iOS map, resolve and explicitly select the simulator named `Youmotion Expo Map` before launching or replaying a flow, and verify the bundle id is `com.youmotion.mobile`. Do not rely on model/runtime-based auto-selection because another project's simulator can share the same device model and iOS version.
+
 A map refresh is complete only when the route count is reconciled, every new screenshot is visually inspected, changed flows replay successfully, and the resulting `.appmap` bundle contains the new screenshots and flow files.

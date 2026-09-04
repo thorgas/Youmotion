@@ -1,6 +1,6 @@
 # Youmotion Expo map
 
-This directory is a committed `expo-map` result set refreshed on 2026-08-21.
+This directory is a committed `expo-map` result set. Its static route graph was refreshed on 2026-09-04; the latest complete runtime capture bundle remains the 2026-08-21 bundle.
 
 - Source routes: 18 Expo Router routes across a root Stack and tab navigator
 - Primary capture device: iPhone 17 Pro simulator, iOS 26.1
@@ -11,6 +11,12 @@ This directory is a committed `expo-map` result set refreshed on 2026-08-21.
 - Navigation model: Expo Router mirrors the root XState actor, so static JSX parsing correctly reports no navigation edges
 
 `capture-status.json` is the source of truth for captures that need an active XState reflection context. Twenty-two flows cover route visits, the Settings feedback consent path, and reminder runtime variants. The focused-notification flow records its validated-notification prerequisite; context-dependent routes are deliberately retained as findings instead of being mislabeled as successful screens.
+
+## Positive Leitsatz surface refresh
+
+The 2026-09-04 implementation aligns positive Leitsatz content on the guiding-belief editor, belief library, belief-library editor, and all Leitsatz reminder entry states. The static graph still reconciles to 18 routes and 2 layouts, and the affected component tests cover the green semantic surface, neutral explanatory content, crossed-out released Leitsatz, and focused-notification state.
+
+The affected runtime captures are deliberately marked `needs-recapture` in `capture-status.json`. They must be replayed only on the explicitly selected `Youmotion Expo Map` simulator with bundle id `com.youmotion.mobile`. Never use automatic simulator selection or a simulator belonging to another app. Until those captures are replaced and visually inspected, `Youmotion-2026-08-21.appmap` remains the latest complete bundle; do not package the stale images under a newer date.
 
 ## Emotion check-in reminder refresh
 
