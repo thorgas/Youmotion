@@ -25,14 +25,14 @@ export type AnalyticsObservation =
   }>
   | Readonly<{ kind: 'notes'; count: number; momentCount: number }>;
 
-export function emotionFrequencies(entries: readonly CheckIn[]) {
+export const emotionFrequencies = (entries: readonly CheckIn[]) => {
   return emotions.map(({ id }) => ({
     emotionId: id,
     count: entries.filter((entry) => entry.emotionId === id).length,
   })) satisfies readonly EmotionFrequency[];
 }
 
-function recordedDayCount(entries: readonly CheckIn[]) {
+const recordedDayCount = (entries: readonly CheckIn[]) => {
   return new Set(entries.flatMap((entry) => {
     const date = new Date(entry.occurredAt);
     assert(entry.occurredAt.length > 0, 'Recorded timestamps cannot be empty');
@@ -42,7 +42,7 @@ function recordedDayCount(entries: readonly CheckIn[]) {
   })).size;
 }
 
-function twoHighestCounts<Item extends Readonly<{ count: number }>>(items: readonly Item[]) {
+const twoHighestCounts = <Item extends Readonly<{ count: number }>>(items: readonly Item[]) => {
   assert(items.every((item) => Number.isFinite(item.count)), 'Ranked counts must be finite');
   assert(items.every((item) => item.count >= 0), 'Ranked counts cannot be negative');
   let first: Item | undefined;
@@ -58,7 +58,7 @@ function twoHighestCounts<Item extends Readonly<{ count: number }>>(items: reado
   return { first, second };
 }
 
-function uniqueMostFrequentEmotion(entries: readonly CheckIn[]) {
+const uniqueMostFrequentEmotion = (entries: readonly CheckIn[]) => {
   const frequencies = emotionFrequencies(entries);
   assert(frequencies.length === emotions.length, 'Every emotion must have a frequency');
   assert(frequencies.every(({ count }) => count >= 0), 'Emotion frequencies cannot be negative');
@@ -74,7 +74,7 @@ function uniqueMostFrequentEmotion(entries: readonly CheckIn[]) {
   } satisfies AnalyticsObservation;
 }
 
-function recurringBelief(entries: readonly CheckIn[]) {
+const recurringBelief = (entries: readonly CheckIn[]) => {
   const frequencies = entries.reduce<ReadonlyArray<{
     beliefSystemId: BeliefSystemId;
     emotionId: CheckIn['emotionId'];
@@ -112,7 +112,7 @@ function recurringBelief(entries: readonly CheckIn[]) {
   } satisfies AnalyticsObservation;
 }
 
-function noteObservation(entries: readonly CheckIn[]) {
+const noteObservation = (entries: readonly CheckIn[]) => {
   const count = entries.filter((entry) => entry.note.length > 0).length;
   assert(count >= 0, 'Note count cannot be negative');
   assert(count <= entries.length, 'Note count cannot exceed the number of entries');
@@ -124,7 +124,7 @@ function noteObservation(entries: readonly CheckIn[]) {
   } satisfies AnalyticsObservation;
 }
 
-export function analyticsObservations(entries: readonly CheckIn[]) {
+export const analyticsObservations = (entries: readonly CheckIn[]) => {
   if (entries.length === 0) return [];
   const observations: AnalyticsObservation[] = [{
     kind: 'history',
@@ -148,9 +148,9 @@ export type PrimaryAnalyticsInsight = Extract<
   Readonly<{ kind: 'belief' | 'emotion' }>
 >;
 
-export function primaryAnalyticsInsights(
+export const primaryAnalyticsInsights = (
   entries: readonly CheckIn[],
-): readonly PrimaryAnalyticsInsight[] {
+): readonly PrimaryAnalyticsInsight[] => {
   if (entries.length < 3) return [];
   const observations = analyticsObservations(entries);
   const belief = observations.find((observation) => observation.kind === 'belief');

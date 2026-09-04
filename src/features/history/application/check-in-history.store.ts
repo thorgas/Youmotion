@@ -19,7 +19,7 @@ const initialContext = {
   error: string | null;
 };
 
-function _sortEntries(entries: readonly CheckIn[]) {
+const _sortEntries = (entries: readonly CheckIn[]) => {
   const mutableCopy = entries.slice();
   /* oxlint-disable-next-line unicorn/no-array-sort -- Hermes lacks toSorted; the copied array preserves immutable store input. Covered by check-in-history.store.harness.ts. */
   const sorted = mutableCopy.sort((left, right) => {

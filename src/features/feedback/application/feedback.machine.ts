@@ -21,7 +21,7 @@ const FeedbackContextSchema = Schema.Struct({
   failureReason: Schema.NullOr(FeedbackFailureReasonSchema),
 });
 
-function emailFailureReason(cause: unknown) {
+const emailFailureReason = (cause: unknown) => {
   return cause instanceof FeedbackMailError && cause.reason === 'unavailable'
     ? FEEDBACK_FAILURE_REASONS.EMAIL_UNAVAILABLE
     : FEEDBACK_FAILURE_REASONS.EMAIL_COMPOSE;
