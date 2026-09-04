@@ -32,7 +32,9 @@ export function filterHistoryEntries({
     if (filters.content === HISTORY_CONTENT_FILTERS.BELIEFS && entry.beliefSystemId === undefined) {
       return false;
     }
-    return query === '' || searchableText(entry).toLocaleLowerCase().includes(query);
+    const matchesQuery = query === '' || searchableText(entry).toLocaleLowerCase().includes(query);
+    assert(typeof matchesQuery === 'boolean', 'History query matching must produce a boolean.');
+    return matchesQuery;
   });
   assert(filtered.length <= entries.length, 'Filtering must not add history entries.');
   assert(filtered.every((entry) => entries.includes(entry)), 'Filtering must preserve entry identity.');

@@ -308,17 +308,6 @@ export default tseslint.config(
     },
   },
   {
-    files: [
-      'src/features/history/application/check-in-history.store.ts',
-      'src/features/history/application/history-filter.ts',
-      'src/features/beliefs/application/guiding-belief-library.ts',
-      'src/navigation/app-router.adapter.ts',
-    ],
-    rules: {
-      'code-architecture/no-unasserted-return': 'off',
-    },
-  },
-  {
     files: ['src/features/**/domain/**/*.{ts,tsx}'],
     rules: {
       'code-architecture/no-unasserted-return': 'off',
