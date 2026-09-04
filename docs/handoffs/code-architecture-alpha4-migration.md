@@ -1,186 +1,143 @@
-# Code architecture alpha.4 migration handoff
+# Code architecture alpha.6 migration handoff
 
-## Scope
+## Delivered state
 
-Upgrade Youmotion from `eslint-plugin-code-architecture@0.4.0-alpha.4` through
-`0.6.0-alpha.4`, enable every rule that truthfully applies, and resolve the
-resulting findings without behavior changes or ceremonial assertions.
+- Youmotion branch: `codex/eslint-code-architecture-alpha2`; draft PR #26.
+- Installed package: `eslint-plugin-code-architecture@0.6.0-alpha.6`.
+- Plugin branch: `codex/worklet-assertion-default`; draft PR #11.
+- Plugin releases: alpha.5 at `1919e76` made worklet callbacks a default
+  assertion-density exception; alpha.6 at
+  `6bc278881ccb34279e2d46db351193fb0b55d630` added safe compound-component
+  contract delegation. Both GitHub release workflows passed, and npm's `alpha`
+  dist-tag resolves to `0.6.0-alpha.6`.
+- The branch was rebased onto `origin/main`; the rebase was a no-op.
 
-## Git state
+The migration enables every exported architecture rule in a truthful production
+scope. Tests, Harness fixtures, and immutable migrations remain deliberately
+more permissive where production constraints would only add noise.
 
-- Branch: `codex/eslint-code-architecture-alpha2`
-- Base: `2b648e107441fd255a1b3230be0c02b17ae3be08`
-- Base remote: `origin/main`
-- Unrelated untracked screenshots and the root JSON credential are explicitly
-  out of scope and must not be staged, inspected, moved, or removed.
+## Policy decisions
 
-## Published package evidence
+- `require-assertions` is the broad production density policy. Alpha.4's
+  structural assertion detection removed both repeated `assertionNames` lists.
+- Domain contract assertions and application/navigation return assertions have
+  disjoint scopes. Domain contracts currently enforce parameter preconditions
+  for functions with at least five statements; `checkReturns` remains off.
+- Assertions must prove real runtime assumptions. A check such as
+  `assert(typeof matches === 'boolean')` guards predicate/data-boundary drift and
+  is not ceremonial.
+- Explicit `disabled={false}` declarations are intentional interaction API
+  contracts. They make state handling visible to humans and agents and prevent
+  new primitives from omitting disabled UX.
+- All shared and feature UI is covered by bare interactive detection. Alpha.6's
+  `contractComponents` option recognizes `AppBackButton`, `Button.Root`, and
+  `SettingsActionRow` as contract-owning primitives while still requiring a
+  wrapper to accept and forward disabled state and configurable content.
+- The named-import policy uses globs for Expo, Effect subpaths, infrastructure,
+  PNG, and JSON imports plus the irreducible exact package seams.
+- `src/app-stores.ts` is the tested composition root. Its four live stores are
+  declared service locators so application/domain code cannot begin importing
+  them.
+- No new library, UI concept, navigation state, persistence shape, or data model
+  was introduced.
 
-- Version: `0.6.0-alpha.4`
-- Release commit: `e0394c533dbf6a480771cb66c858f238e75eb7cf`
+## Baselines retired
 
-## Initial alpha audit
+- All 41 arrow-function findings were converted, including helpers in the
+  navigation state machine.
+- All three declaration-order exemptions were removed.
+- All 16 interactive primitives now expose or delegate the required contract.
+- The application return-assertion file exemptions were removed and replaced by
+  meaningful result invariants.
+- The duplicate domain `require-assertions: off` block was removed.
 
-The prerelease exposes 37 rules. A practical full-source audit produced 833
-raw findings across 92 files:
+The remaining broad exception is
+`src/navigation/app-navigation.machine.ts`, currently a 3,269-line composition
+root for ambient time and randomness. This is transitional, not intentional
+architecture. Remove it only after time/random factories move to a smaller
+composition module and are injected into the machine boundary.
 
-| Rule | Findings |
-| --- | ---: |
-| `require-contract-assertions` | 308 |
-| `prefer-arrow-functions` | 311 |
-| `named-imports` | 70 |
-| `top-down-declarations` | 47 |
-| `prefer-interface-over-type` | 17 |
-| `prefer-readonly-types` | 12 |
-| `no-implicit-external-dependencies` | 5 |
-| `no-exported-instantiated-store` | 1 |
-| `no-unasserted-return` | 62 |
+## Cherry-pickable commits
 
-All 57 distinct source lines reported by `no-unasserted-return` also appeared
-under `require-contract-assertions`. Their configured scopes must therefore be
-disjoint.
+The ownership extraction and initial migration are followed by these pushed
+cleanup slices:
 
-## Decisions
+- `355e9b7`, `c31f6b0`: declaration order and function length.
+- `9a80860`, `d26d0c1`, `23514d9`, `efe5066`: arrow conversions.
+- `76368bb`: alpha.5 package and worklet policy.
+- `f93f5d4`, `5e8324a`, `c644e4c`, `fc0dd1a`, `1942d1c`, `516d9b8`,
+  `e192e3a`, `fb09cbe`, `6d4e9d4`: explicit interaction contracts.
+- `0648fb1`: application return invariants.
+- `021c58b`: alpha.6 and baseline-free shared/feature UI enforcement.
+- `82f51a3`: clean-device E2E isolation and selector hardening.
 
-- Keep `require-assertions` as the broad existing density policy.
-- Use contract and return assertion rules only in non-overlapping scopes.
-- Contract assertions prove parameter preconditions on eligible domain
-  functions with at least five statements. Return checking remains off until
-  the rule can ignore nested predicate returns consistently.
-- Keep shared XState stores, but export only factories from feature modules.
-  `src/app-stores.ts` is their regression-tested composition root.
-- Declare the four `@/app-stores` exports as service locators so domain,
-  application, and navigation code cannot import the live stores.
-- Use all seven built-in implicit dependency groups. Do not configure a custom
-  `Date.now` capability because alpha.4 now provides the general policy.
-- Do not introduce dependencies, UI concepts, data-model changes, or navigation
-  state.
-- If a refactor unexpectedly changes rendered UI, stop that slice for design
-  review and attach screenshots to its commit.
+## Verification
 
-## Required delivery gates
-
-Every notable green slice is committed and pushed before the next slice. The
-final branch is rebased onto current `origin/main`, then the complete matrix is
-rerun:
+Run from the repository root:
 
 ```sh
 CI=true pnpm install --frozen-lockfile
-pnpm lint:architecture
-pnpm lint:rules
 pnpm verify
+pnpm lint:rules
 pnpm test:coverage
-npx react-doctor@latest --verbose --scope changed
-pnpm test:harness
-pnpm test:e2e
+E2E_DEVICE=<dedicated-simulator-udid> E2E_PLATFORM=ios E2E_PASSES=2 pnpm test:e2e
+pnpm test:harness:ios
+pnpm doctor:react
 git diff --check
 ```
 
-Use a dedicated simulator or emulator for device work. Existing Argent flows
-must be replayed, including modal dismissal coverage. Remove only task-created
-artifacts; ask before removing `node_modules`.
+Confirmed on the delivered production tree:
 
-## Next action
+- Frozen install passed with pnpm 11.18.0.
+- `pnpm verify`: 47 suites and 318 tests passed; Oxlint, ESLint,
+  architecture lint, TypeScript 7, and Jest were green.
+- `pnpm lint:rules`: 2 suites and 49 adversarial contract tests passed.
+- `pnpm test:coverage`: 47 suites and 318 tests passed; 87.46% statements,
+  76.01% branches, 82.85% functions, and 90.34% lines.
+- The installed package was read from `node_modules` and confirmed as alpha.6.
 
-The follow-up ownership audit removed the broad one-module `features` blind
-spot. Production code is now checked as explicit `analytics`, `beliefs`,
-`check-in`, `data-safety`, `feedback`, `history`, `onboarding`, `reminders`,
-`settings`, and `startup` modules, with app routes and navigation declared as
-composition roots. Belief domain types form a leaf boundary so consumers do
-not gain access to belief persistence or UI by default. A contract test proves
-both a forbidden feature edge and an intended analytics-to-check-in edge.
+Device E2E uses dedicated simulator
+`9D5C1782-C1C3-458B-9416-6311D03AD1B9`, Metro port 8091, and the committed
+synthetic flows. All 11 flows passed twice with zero failures and zero errors.
+The suite includes outside-tap dismissal for feedback, reminder-time, and
+reflection-time modals.
 
-Cherry-pickable ownership slices pushed so far:
+Clean-device replay hardened the permanent flows: tab taps avoid the movable
+Expo dev-tools control, first-run notification prompts receive an explicit
+settling window, the owned-belief removal is scoped to its synthetic core
+belief, and analytics verification no longer relies on preloaded history.
 
-- `f6b00e9` moves the shared database runtime/migrations and app locale out of
-  feature ownership.
-- `8d47df8` extracts the shared beliefs vertical and its owned tests.
-- `93478d4` extracts History state, filtering, screen, Harness tests, and visual
-  baseline from check-in.
+The requested `spark_worker` was unavailable because its allowance was
+exhausted, so bounded install, verification, coverage, and device commands were
+delegated to the cheapest available worker (`gpt-5.6-luna`, low reasoning).
 
-`EmotionLabelMode` is also app-wide presentation vocabulary and now lives in
-`src/preferences/emotion-label-mode.ts`; check-in no longer depends on Settings
-for that type. Settings remains an intentional grouped mobile composition
-surface for Feedback, Data Safety, and belief/reminder entry points. That
-existing UI concept matches the mobile Settings design checklist, so no slot
-API or rendered layout change was introduced solely for lint.
+`pnpm test:harness:ios` executed all 19 suites: 4 suites/4 tests passed and 15
+suites/17 tests failed. The failures reproduce the existing native Harness
+backlog: missing `uniffiEnsureInitialized`, fixtures without expected native
+query IDs/labels, and the feedback fixture without `FeedbackProvider`.
 
-Alpha.4 is installed and every exported rule is now accounted for by the
-repository contract. The new rules are active in truthful scopes. Contract and
-return assertion policies are disjoint; the contract rule checks parameter
-preconditions only, and algorithm-heavy domain files retain the established
-assertion-density policy until the contract rule can distinguish public
-boundaries from private helpers. The approved app-settings
-singleton exception was removed: all four live stores now come from the tested
-composition root, while feature modules export factories.
-
-The interactive-component rule now uses bare structural detection for adopted
-shared UI. A repository-wide audit records 16 existing primitives as the
-migration baseline; `AppBackButton` and `SettingsActionRow` are the two explicit
-shared-UI exceptions. The arrow and declaration-order allowlists remain
-load-bearing at 41 findings across ten files and three findings across three
-files. Remove exemptions file by file only after the relevant mechanical
-conversion and tests. The navigation machine remains a temporary composition
-root for time and randomness; its broad exemption must not be treated as the
-desired long-term dependency boundary.
-
-Alpha.4 structurally recognizes the repository assertion helpers, so
-`require-contract-assertions` and `no-unasserted-return` no longer duplicate an
-`assertionNames` list. The named-import exceptions use source globs for Expo,
-Effect, infrastructure modules, and assets plus the six irreducible exact
-seams. The domain `require-assertions` override appears once after the broad
-density policy, preserving flat-config precedence without a duplicate block.
-
-The migration also makes analytics collection contracts readonly, converts two
-plain object aliases to readonly interfaces, and injects reminder timestamps
-and ID randomness into the coordinator. The navigation machine is explicitly a
-composition root for ambient time and randomness.
-
-## Final evidence
-
-The final branch was already based on current `origin/main`, so the requested
-rebase was a no-op. The installed package was read directly from
-`node_modules/eslint-plugin-code-architecture/package.json` and is
-`0.6.0-alpha.4`.
-
-Repository gates passed on the delivered tree:
-
-- `pnpm lint:architecture`: passed.
-- `pnpm lint:rules`: 2 suites and 49 tests passed.
-- `pnpm verify`: 46 suites and 315 tests passed, with Oxlint, ESLint, and
-  TypeScript 7 green.
-- `pnpm test:coverage`: 46 suites and 315 tests passed; 87.30% statements,
-  76.52% branches, 82.85% functions, and 90.19% lines.
-- React Doctor changed-file scope: 76/100 with no actionable findings.
-- `git diff --check`: passed.
-
-The complete 11-flow Argent E2E inventory passed twice on dedicated iOS
-simulator `9D5C1782-C1C3-458B-9416-6311D03AD1B9`, using Metro port 8091 and a
-fresh native development build. Every pass reported zero failures and zero
-errors. This includes backdrop dismissal for the feedback dialog, reminder
-time modal, and reflection time modal. The longest flow creates only fixed
-synthetic records and removes them before completion.
-
-The requested `spark_worker` was unavailable because its model allowance was
-exhausted. The bounded Harness command was therefore delegated to the cheapest
-available worker (`gpt-5.6-luna`, low reasoning), as required by `AGENTS.md`.
-That generic run did not connect to its Metro bundle, so the primary agent
-reran the explicit iOS command `pnpm test:harness:ios`. All 19 suites executed:
-4 suites/4 tests passed and 15 suites/17 tests failed. The failures reproduce
-the existing Harness backlog: the test binary lacks `uniffiEnsureInitialized`,
-several component fixtures do not expose expected native query IDs, and the
-feedback fixture lacks `FeedbackProvider`. The migration's full Jest and E2E
-gates remain green; this PR does not conceal the independent Harness debt.
+Changed-scope React Doctor reports five `rn-no-raw-text` errors for existing
+`<fbt>` nodes returned by `reminderStatusLabel` and `reminderContentLabel`, even
+though both helper results are rendered inside React Native `<Text>` at the
+call sites. This is a static-analysis false positive exposed by the file move,
+not raw text at runtime. It also reports one advisory performance warning and
+no security finding. No suppression was added.
 
 ## UI evidence
 
-The ownership moves changed component paths and imports but intentionally did
-not change layout or behavior. Fresh simulator screenshots document the
-unchanged surfaces with synthetic data:
+The interaction changes intentionally preserve enabled/default rendering while
+making disabled behavior explicit. Fresh screenshots use an empty synthetic
+simulator; the visible gear is the development-client tool, not app UI.
 
-- `8d47df8`: [Belief Library](../../artifacts/code-architecture-alpha4/belief-library.png)
-- `93478d4`: [History](../../artifacts/code-architecture-alpha4/history.png)
-- `a3ee73d`: [Settings composition](../../artifacts/code-architecture-alpha4/settings.png)
+- `f93f5d4`, `516d9b8`, `fc0dd1a`, `1942d1c`, `6d4e9d4`:
+  [Settings and feedback entry](../../artifacts/code-architecture-alpha6/settings.png)
+- `5e8324a`: [Analytics](../../artifacts/code-architecture-alpha6/analytics.png)
+- `c644e4c`: [History](../../artifacts/code-architecture-alpha6/history.png)
+- `e192e3a`, `fb09cbe`, `6d4e9d4`:
+  [Belief Library](../../artifacts/code-architecture-alpha4/belief-library.png)
+- `1942d1c`, `6d4e9d4`:
+  [Feedback dialog](../screenshots/design-system/dismissible-feedback-dialog.png)
 
-No new UI concept, library, persisted-data shape, or navigation state was
-introduced.
+Unrelated pre-existing screenshot directories and the root JSON credential are
+out of scope and must not be staged, inspected, moved, or removed. Remove only
+artifacts created by this task, and ask before deleting `node_modules`.
