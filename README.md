@@ -280,12 +280,12 @@ pnpm start:e2e
 In terminal B, scope every run to a device that no other task is using. The full runner recycles only that target's Argent services and runs each development flow twice unchanged:
 
 ```bash
-export E2E_DEVICE='<iOS UDID or Android emulator serial>'
+export E2E_DEVICE='<iOS UDID, Android emulator serial, or connected test-device serial>'
 export E2E_PLATFORM='ios'
 pnpm test:e2e
 ```
 
-Use `E2E_PLATFORM=android` for an emulator. Run `pnpm test:e2e:smoke` for the short navigation gate. To isolate one journey while keeping the same two-pass contract:
+Use `E2E_PLATFORM=android` for an emulator or connected Android test device. The runner restores ADB reverse and force-stops the development app before every pass. Run `pnpm test:e2e:smoke` for the short navigation gate. To isolate one journey while keeping the same two-pass contract:
 
 ```bash
 pnpm test:e2e --flow reminder-owned-timing.yaml

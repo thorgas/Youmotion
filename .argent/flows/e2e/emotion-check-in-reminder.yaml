@@ -1,32 +1,71 @@
 steps:
+  - when:
+      platform: ios
+    steps:
+      - launch: com.youmotion.mobile
   - echo: Create, test, and delete a device-local emotion check-in reminder.
-  - launch: com.youmotion.mobile
   - tool: open-url
     args:
       url: exp+youmotion://expo-development-client/?url=http%3A%2F%2F127.0.0.1%3A8091
+  - when:
+      visible: { id: onboarding-skip }
+    steps:
+      - tap: { id: onboarding-skip }
+      - await: { visible: { id: emotion-star }, timeout: 10000 }
+  - run: fragments/ensure-english.yaml
   - await: { visible: { id: tab-settings }, timeout: 30000 }
   - when:
       visible: { id: xmark }
     steps:
       - tap: { id: xmark }
       - await: { hidden: { id: xmark }, timeout: 5000 }
-  - tap: { id: tab-settings }
+  - when:
+      platform: ios
+    steps:
+      - tool: gesture-tap
+        args: { x: 0.875, y: 0.96 }
+  - when:
+      platform: android
+    steps:
+      - tool: gesture-tap
+        args: { x: 0.875, y: 0.94 }
   - await: { visible: { text: Your space. }, timeout: 5000 }
   - tap: { id: language-english }
   - scroll-to: { target: { id: open-reminders }, direction: down }
-  - tap: { id: open-reminders }
-  - await: { visible: { text: No emotion check-in reminder yet }, timeout: 10000 }
+  - await: { visible: { id: open-reminders }, timeout: 5000 }
+  - tap: { text: Emotion check-in reminder }
+  - await: { visible: { id: reminder-settings-screen }, timeout: 10000 }
+  - when:
+      visible: { id: reminder-assignment-card }
+    steps:
+      - tap: { text: Delete reminder }
+      - await: { visible: { text: Delete this reminder? }, timeout: 5000 }
+      - when:
+          platform: ios
+        steps:
+          - tool: keyboard
+            args: { key: tab }
+          - tool: keyboard
+            args: { key: arrow-right }
+          - tool: keyboard
+            args: { key: enter }
+      - when:
+          platform: android
+        steps:
+          - tap: { text: { matches: '^(Delete|DELETE)$' } }
+  - await: { visible: { id: reminder-settings-empty }, timeout: 10000 }
   - tap: { id: reminder-settings-new }
   - when:
       visible: { id: reminder-offer-accept }
     steps:
       - tap: { id: reminder-offer-accept }
   - when:
-      visible: { text: { matches: '^Allow$' } }
+      visible: { text: { matches: '^(Allow|Erlauben)$' } }
     steps:
-      - tap: { text: { matches: '^Allow$' } }
+      - tap: { text: { matches: '^(Allow|Erlauben)$' } }
   - await: { visible: { id: reminder-save }, timeout: 10000 }
-  - tap: { id: reminder-time-picker-0 }
+  - await: { idle: true, stableFor: 500, timeout: 5000 }
+  - tap: { text: '09:00' }
   - when:
       platform: ios
     steps:
@@ -38,6 +77,7 @@ steps:
   - when:
       platform: android
     steps:
+      - wait: 1000
       - tool: button
         args: { button: back }
   - assert: { text: { in: { id: reminder-time-picker-0 }, contains: '09:00' } }
@@ -62,5 +102,5 @@ steps:
   - when:
       platform: android
     steps:
-      - tap: { text: { matches: '^Delete$' } }
-  - await: { visible: { text: No emotion check-in reminder yet }, timeout: 15000 }
+      - tap: { text: { matches: '^(Delete|DELETE)$' } }
+  - await: { visible: { id: reminder-settings-empty }, timeout: 15000 }

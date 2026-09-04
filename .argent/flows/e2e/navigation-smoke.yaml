@@ -1,20 +1,56 @@
 steps:
+  - when:
+      platform: ios
+    steps:
+      - launch: com.youmotion.mobile
   - echo: Open Youmotion on the dedicated E2E device and verify primary navigation.
-  - launch: com.youmotion.mobile
   - tool: open-url
     args:
       url: exp+youmotion://expo-development-client/?url=http%3A%2F%2F127.0.0.1%3A8091
+  - when:
+      visible: { id: onboarding-skip }
+    steps:
+      - tap: { id: onboarding-skip }
+      - await: { visible: { id: emotion-star }, timeout: 10000 }
+  - run: fragments/ensure-english.yaml
   - await: { visible: { id: tab-today }, timeout: 30000 }
   - when:
       visible: { id: xmark }
     steps:
       - tap: { id: xmark }
       - await: { hidden: { id: xmark }, timeout: 5000 }
-  - tap: { id: tab-history }
+  - when:
+      platform: ios
+    steps:
+      - tool: gesture-tap
+        args: { x: 0.375, y: 0.96 }
+  - when:
+      platform: android
+    steps:
+      - tool: gesture-tap
+        args: { x: 0.375, y: 0.94 }
   - await: { visible: { id: history-search-input }, timeout: 5000 }
   - await: { idle: true }
-  - tap: { id: tab-settings }
+  - when:
+      platform: ios
+    steps:
+      - tool: gesture-tap
+        args: { x: 0.875, y: 0.96 }
+  - when:
+      platform: android
+    steps:
+      - tool: gesture-tap
+        args: { x: 0.875, y: 0.94 }
   - await: { visible: { text: Your space. }, timeout: 5000 }
   - await: { idle: true }
-  - tap: { id: tab-today }
+  - when:
+      platform: ios
+    steps:
+      - tool: gesture-tap
+        args: { x: 0.125, y: 0.96 }
+  - when:
+      platform: android
+    steps:
+      - tool: gesture-tap
+        args: { x: 0.125, y: 0.94 }
   - await: { visible: { id: emotion-star }, timeout: 5000 }

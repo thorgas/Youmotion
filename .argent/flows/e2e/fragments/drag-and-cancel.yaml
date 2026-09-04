@@ -8,6 +8,14 @@ steps:
       toY: 0.4
       durationMs: 1600
   - await: { visible: { id: reflection-note-input }, timeout: 10000 }
-  - tap: { text: What is present right now? }
+  - when:
+      platform: ios
+    steps:
+      - tap: { text: What is present right now? }
+  - when:
+      platform: android
+    steps:
+      - tool: keyboard
+        args: { key: escape }
   - tap: { id: reflection-back }
   - await: { visible: { id: emotion-star }, timeout: 5000 }

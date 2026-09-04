@@ -1,9 +1,18 @@
 steps:
+  - when:
+      platform: ios
+    steps:
+      - launch: com.youmotion.mobile
   - echo: Open and cancel the destructive data-safety confirmation without changing journal data.
-  - launch: com.youmotion.mobile
   - tool: open-url
     args:
       url: exp+youmotion://expo-development-client/?url=http%3A%2F%2F127.0.0.1%3A8091
+  - when:
+      visible: { id: onboarding-skip }
+    steps:
+      - tap: { id: onboarding-skip }
+      - await: { visible: { id: emotion-star }, timeout: 10000 }
+  - run: fragments/ensure-english.yaml
   - await: { visible: { id: tab-settings }, timeout: 30000 }
   - when:
       visible: { id: xmark }

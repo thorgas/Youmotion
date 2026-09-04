@@ -115,5 +115,19 @@ The requested `spark_worker` could not run because its model usage allowance
 was exhausted. The same commands were delegated to the cheapest available
 worker (`gpt-5.6-luna`, low reasoning) and independently reported back.
 
-Next: perform React Doctor, Harness, full Argent E2E, final rebase, and
-clean-checkout verification.
+React Doctor passed the changed-file scope with a 100/100 score and no
+findings.
+
+The complete committed Argent E2E inventory passed twice on the connected
+Pixel `28261JEGR07474` with `E2E_PLATFORM=android`, `E2E_DEVICE` set to the
+serial, and Metro on port 8091. The runner now restores ADB reverse and
+force-stops the development app before every pass. Shared setup waits for the
+development client, normalizes the app locale to English, and uses explicit
+OS gestures for tab transitions where injected selector taps can retain stale
+frames. Reminder flows accept Android's uppercase native confirmation labels,
+prove time-picker dismissal, and remove only exact-name synthetic records left
+by an interrupted run. Argent can still emit a non-fatal idle warning while
+the Pulse keeps animating; destination assertions remain the pass criterion.
+
+Next: run the native Harness, commit and push the E2E hardening, rebase onto
+current `origin/main`, and repeat the final verification matrix.
