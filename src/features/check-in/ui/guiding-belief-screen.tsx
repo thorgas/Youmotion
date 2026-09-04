@@ -35,7 +35,7 @@ import {
 } from '@/features/beliefs/ui/belief-card-label';
 import { CheckInProgressHeader } from './check-in-progress';
 import { GuidingBeliefWritingHelp } from '@/features/beliefs/ui/guiding-belief-writing-help';
-import { actionColors, palette, type } from '@/theme';
+import { actionColors, borderColors, palette, surfaceColors, type } from '@/theme';
 
 type NavigationSnapshot = ReturnType<
   ReturnType<typeof useAppNavigationActor>['getSnapshot']
@@ -341,7 +341,9 @@ const styles = StyleSheet.create({
     minHeight: 120,
     borderRadius: 18,
     borderCurve: 'continuous',
-    backgroundColor: palette.paper,
+    borderWidth: 1,
+    borderColor: borderColors.moss20,
+    backgroundColor: palette.selectionWash,
     color: palette.ink,
     fontFamily: type.medium,
     fontSize: 17,
@@ -352,13 +354,13 @@ const styles = StyleSheet.create({
   savedGuidingBelief: {
     borderRadius: 16,
     borderCurve: 'continuous',
-    backgroundColor: palette.selectionWash,
+    backgroundColor: surfaceColors.subtle,
     padding: 12,
     gap: 4,
   },
   savedGuidingBeliefTitle: {
     fontFamily: type.semibold,
-    color: palette.moss,
+    color: palette.inkMuted,
     fontSize: 13,
     lineHeight: 18,
   },

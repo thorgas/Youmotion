@@ -37,7 +37,7 @@ import {
 } from '@/features/beliefs/ui/belief-card-label';
 import { GuidingBeliefWritingHelp } from '@/features/beliefs/ui/guiding-belief-writing-help';
 import { PersonalBeliefCreateButton } from '@/features/beliefs/ui/personal-belief-create-button';
-import { actionColors, palette, surfaceColors, type } from '@/theme';
+import { actionColors, borderColors, palette, surfaceColors, type } from '@/theme';
 import type {
   GuidingBeliefReminderAssignment,
   ReminderAssignment,
@@ -235,19 +235,24 @@ function BeliefLibraryStatementHeader({ statement }: { statement: BeliefStatemen
 
   return (
     <View>
-      <Text style={styles.guidingLabel}>
-        <fbt desc="Label above a personal positive guiding belief in settings">
-          GUIDING BELIEF · SUPPORTIVE
-        </fbt>
-      </Text>
-      <Text style={styles.guidingStatement}>{statement.guidingStatement}</Text>
-      <View style={styles.limitingRow}>
-        <Text style={styles.limitingLabel}>
-          <fbt desc="Label above a personal restrictive core belief in settings">
-            CORE BELIEF · LIMITING
+      <View style={styles.releasedRow}>
+        <Text style={styles.releasedLabel}>
+          <fbt desc="Label for a harmful core belief that was reframed in check-in history">
+            Released core belief
           </fbt>
         </Text>
-        <Text style={styles.limitingStatement}>{limitingBelief}</Text>
+        <Text style={styles.releasedStatement}>{limitingBelief}</Text>
+      </View>
+      <View
+        style={styles.guidingStatementSurface}
+        testID={`belief-library-guiding-surface-${statement.beliefSystemId}`}
+      >
+        <Text style={styles.guidingLabel}>
+          <fbt desc="Label above a personal positive guiding belief in settings">
+            GUIDING BELIEF · SUPPORTIVE
+          </fbt>
+        </Text>
+        <Text style={styles.guidingStatement}>{statement.guidingStatement}</Text>
       </View>
     </View>
   );
@@ -504,7 +509,7 @@ function BeliefLibraryEditor() {
               onChangeText={guidingChanged}
               placeholder={guidingBeliefPlaceholder()}
               placeholderTextColor={palette.inkMuted}
-              style={styles.input}
+              style={[styles.input, styles.guidingInput]}
               testID="belief-library-guiding-draft"
               value={snapshot.context.beliefLibraryGuidingDraft}
             />
@@ -610,6 +615,15 @@ const styles = StyleSheet.create({
     fontSize: 11,
     letterSpacing: 1.2,
   },
+  guidingStatementSurface: {
+    backgroundColor: palette.selectionWash,
+    borderColor: borderColors.moss20,
+    borderRadius: 18,
+    borderCurve: 'continuous',
+    borderWidth: 1,
+    marginTop: 12,
+    padding: 14,
+  },
   guidingStatement: {
     fontFamily: type.medium,
     color: palette.ink,
@@ -617,27 +631,26 @@ const styles = StyleSheet.create({
     lineHeight: 30,
     marginTop: 7,
   },
-  limitingRow: {
-    marginTop: 14,
-    paddingTop: 12,
-    borderTopWidth: 1,
-    borderTopColor: palette.hairline,
+  releasedRow: {
+    gap: 4,
   },
-  limitingLabel: {
+  releasedLabel: {
     fontFamily: type.semibold,
     color: palette.inkMuted,
     fontSize: 10,
     letterSpacing: 1.1,
+    textTransform: 'uppercase',
   },
-  limitingStatement: {
+  releasedStatement: {
     fontFamily: type.regular,
-    color: palette.inkMuted,
+    color: palette.releasedInk,
     fontSize: 15,
     lineHeight: 21,
-    marginTop: 4,
+    textDecorationColor: palette.releasedInk,
+    textDecorationLine: 'line-through',
   },
   reminderCard: {
-    backgroundColor: palette.selectionWash,
+    backgroundColor: surfaceColors.subtle,
     borderRadius: 18,
     borderCurve: 'continuous',
     padding: 14,
@@ -655,7 +668,7 @@ const styles = StyleSheet.create({
     fontSize: 10,
     letterSpacing: 1.1,
   },
-  reminderStatus: { fontFamily: type.semibold, color: palette.moss, fontSize: 13 },
+  reminderStatus: { fontFamily: type.semibold, color: palette.inkMuted, fontSize: 13 },
   reminderCopy: {
     fontFamily: type.regular,
     color: palette.inkMuted,
@@ -735,6 +748,11 @@ const styles = StyleSheet.create({
     fontSize: 17,
     lineHeight: 24,
     textAlignVertical: 'top',
+  },
+  guidingInput: {
+    backgroundColor: palette.selectionWash,
+    borderColor: borderColors.moss20,
+    borderWidth: 1,
   },
   saveButton: {
     minHeight: 52,

@@ -4,6 +4,38 @@ This file records source-of-truth examples and continuity rules for this repo.
 
 ## Active Patterns
 
+### Pattern: positive-leitsatz-semantic-surface
+
+- **Status:** active
+- **Scope:** `src/features/**/ui/*.tsx`
+- **Enforcement:** changed-files
+- **Default check:** changed-files
+- **Source of truth:**
+  - `src/features/check-in/ui/history-screen.tsx` - canonical compact positive-Leitsatz card.
+  - `src/features/check-in/ui/success-screen.tsx` - canonical prominent positive-Leitsatz card.
+- **Applies to:**
+  - Read-only and editable surfaces whose primary content is a positive Leitsatz.
+- **Do not apply to:**
+  - Restrictive Leidsatz content, explanatory copy, reminder metadata, status notices, or mixed educational examples.
+- **Rule summary:** The supportive Leitsatz itself owns the calm green semantic surface. Nearby descriptions and operational status use neutral surfaces so green never implies that metadata is the positive content.
+- **Required shape:**
+  - Use `palette.selectionWash` with a moss border and moss label for a positive-Leitsatz surface.
+  - Keep the Leitsatz text at normal high-contrast ink color.
+  - Keep explanatory and status surfaces neutral even when they refer to a positive Leitsatz.
+- **Allowed variations:**
+  - Analytics may use one green insight hero around the Leitsatz and its evidence instead of nesting another card.
+- **Severity:**
+  - medium: green emphasis is attached to explanation or status while the positive Leitsatz remains neutral.
+  - low: border strength or radius varies to match the surrounding hierarchy.
+- **Baseline exceptions:**
+  - `src/features/onboarding/ui/onboarding-example-step.tsx` - a mixed educational example, not a user-owned positive-Leitsatz surface.
+- **Violation signals:**
+  - `guidingStatement` is rendered on `palette.paper` or `palette.paperRaised` while adjacent description or reminder metadata uses `palette.selectionWash`.
+- **CI behavior:** Fail changed positive-Leitsatz surfaces that invert the semantic emphasis.
+- **Fix strategy:** Move the selection wash and moss border to the statement container or editor, then return adjacent explanation and status containers to a neutral surface.
+- **Open questions:**
+  - None.
+
 ### Pattern: leitsatz-owned-reminder-configuration
 
 - **Status:** active
