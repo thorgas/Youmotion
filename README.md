@@ -29,12 +29,17 @@ Persistence and hydration run as root-machine entry effects and report back thro
 src/
   app/                       Expo Router route views
   navigation/                root navigation machine and router projection
+  features/beliefs/           shared belief domain, persistence, and library UI
   features/check-in/
     domain/                  Effect Schemas and pure emotion geometry
     application/             XState Store
     infrastructure/          Effect-based local repository
     ui/                      self-contained screens and feeling pulse
+  features/history/           history state, filtering, and screen
   features/settings/ui/
+  infrastructure/database/    shared SurrealDB runtime and migrations
+  localization/               app-wide locale primitives and providers
+  preferences/                app-wide presentation preference primitives
   constants.ts               shared configuration and domain vocabulary
 oxlint-rules/                tested local architecture plugin
 ```

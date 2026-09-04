@@ -658,4 +658,27 @@ describe('architecture lint contract', () => {
       }),
     ]));
   });
+
+  it('enforces explicit dependencies between production features', () => {
+    const forbiddenMessages = messagesFor({
+      code: "import { DataSafetyControls } from '@/features/data-safety/ui/data-safety-controls';",
+      filePath: 'src/features/check-in/ui/contract-fixture.tsx',
+    });
+    const allowedMessages = messagesFor({
+      code: "import type { CheckIn } from '@/features/check-in/domain/check-in';",
+      filePath: 'src/features/analytics/domain/contract-fixture.ts',
+    });
+
+    expect(forbiddenMessages).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        ruleId: 'code-architecture/enforce-module-boundaries',
+        severity: 2,
+      }),
+    ]));
+    expect(allowedMessages).not.toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        ruleId: 'code-architecture/enforce-module-boundaries',
+      }),
+    ]));
+  });
 });

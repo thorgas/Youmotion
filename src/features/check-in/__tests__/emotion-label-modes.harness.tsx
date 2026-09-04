@@ -12,7 +12,7 @@ import {
   EMOTION_IDS,
   EMOTION_LABEL_MODES,
 } from '@/constants';
-import type { EmotionLabelMode } from '@/features/settings/domain/emotion-label-mode';
+import type { EmotionLabelMode } from '@/preferences/emotion-label-mode';
 import { AppLocaleProvider } from '@/localization/app-locale-provider';
 import { actionColors } from '@/theme';
 import { emotions, type Emotion } from '../domain/emotion';
