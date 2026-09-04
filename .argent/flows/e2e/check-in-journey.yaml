@@ -98,4 +98,4 @@ steps:
   - tap: { id: tab-analytics }
   - await: { visible: { text: YOUR INSIGHTS }, timeout: 5000 }
   - tap: { id: analytics-timeframe-all }
-  - await: { visible: { text: EMOTIONAL CONSTELLATION }, timeout: 5000 }
+  - await: { visible: { text: All recorded moments }, timeout: 5000 }

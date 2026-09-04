@@ -55,6 +55,7 @@ steps:
       visible: { id: reminder-offer-accept }
     steps:
       - tap: { id: reminder-offer-accept }
+  - wait: 2000
   - when:
       visible: { text: { matches: '^(Allow|Erlauben)$' } }
     steps:
