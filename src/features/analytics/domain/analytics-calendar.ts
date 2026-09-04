@@ -105,10 +105,10 @@ export function calendarMonth({ entries, month }: {
   return { year, month: monthIndex, leadingDayCount, days };
 }
 
-function sameLocalMonth({ date, month, year }: {
+const sameLocalMonth = ({ date, month, year }: {
   date: Date;
   month: number;
   year: number;
-}) {
+}) => {
   return date.getFullYear() === year && date.getMonth() === month;
-}
+};
