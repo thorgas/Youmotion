@@ -136,62 +136,51 @@ plain object aliases to readonly interfaces, and injects reminder timestamps
 and ID randomness into the coordinator. The navigation machine is explicitly a
 composition root for ambient time and randomness.
 
-Focused gates passed:
+## Final evidence
 
-```sh
-pnpm exec jest oxlint-rules/__tests__/architecture-lint-contract.test.js \
-  src/features/reminders/__tests__/reminder-coordinator.test.ts \
-  --runInBand --no-watchman
-pnpm lint:architecture
-pnpm exec tsc --noEmit
-git diff --check
-```
+The final branch was already based on current `origin/main`, so the requested
+rebase was a no-op. The installed package was read directly from
+`node_modules/eslint-plugin-code-architecture/package.json` and is
+`0.6.0-alpha.4`.
 
-Repository gates passed after the configuration commit:
+Repository gates passed on the delivered tree:
 
-- `pnpm verify`: 46 suites and 314 tests passed, with Oxlint, ESLint, and
+- `pnpm lint:architecture`: passed.
+- `pnpm lint:rules`: 2 suites and 49 tests passed.
+- `pnpm verify`: 46 suites and 315 tests passed, with Oxlint, ESLint, and
   TypeScript 7 green.
-- `pnpm lint:rules`: 48 architecture-rule tests passed.
-- `pnpm test:coverage`: 46 suites and 314 tests passed; 87.61% statements,
-  76.58% branches, 83.31% functions, and 90.46% lines.
+- `pnpm test:coverage`: 46 suites and 315 tests passed; 87.30% statements,
+  76.52% branches, 82.85% functions, and 90.19% lines.
+- React Doctor changed-file scope: 76/100 with no actionable findings.
 - `git diff --check`: passed.
 
-The requested `spark_worker` could not run because its model usage allowance
-was exhausted. The same commands were delegated to the cheapest available
-worker (`gpt-5.6-luna`, low reasoning) and independently reported back.
+The complete 11-flow Argent E2E inventory passed twice on dedicated iOS
+simulator `9D5C1782-C1C3-458B-9416-6311D03AD1B9`, using Metro port 8091 and a
+fresh native development build. Every pass reported zero failures and zero
+errors. This includes backdrop dismissal for the feedback dialog, reminder
+time modal, and reflection time modal. The longest flow creates only fixed
+synthetic records and removes them before completion.
 
-React Doctor passed the changed-file scope with a 92/100 score and no
-findings.
+The requested `spark_worker` was unavailable because its model allowance was
+exhausted. The bounded Harness command was therefore delegated to the cheapest
+available worker (`gpt-5.6-luna`, low reasoning), as required by `AGENTS.md`.
+That generic run did not connect to its Metro bundle, so the primary agent
+reran the explicit iOS command `pnpm test:harness:ios`. All 19 suites executed:
+4 suites/4 tests passed and 15 suites/17 tests failed. The failures reproduce
+the existing Harness backlog: the test binary lacks `uniffiEnsureInitialized`,
+several component fixtures do not expose expected native query IDs, and the
+feedback fixture lacks `FeedbackProvider`. The migration's full Jest and E2E
+gates remain green; this PR does not conceal the independent Harness debt.
 
-After upgrading the local runner from Argent 0.23.0 to 0.24.0, the complete
-11-flow development inventory passed twice on dedicated iOS simulator
-`9D5C1782-C1C3-458B-9416-6311D03AD1B9` with `E2E_PLATFORM=ios`, Metro on port
-8091, zero failures, and zero warnings. Shared setup now tolerates cold Metro
-startup before onboarding. The reminder-owned-timing flow dismisses the iOS
-keyboard through the screen's interactive scroll contract and verifies that
-the Return key is hidden before saving. Navigation readiness uses semantic
-History controls plus bounded post-identity transition waits; its Settings-tab
-coordinate stays clear of the development-tools overlay.
+## UI evidence
 
-Native Harness was exercised after E2E. The connected Pixel contains a
-non-debuggable production-signed app, so Android Harness correctly stopped
-before tests rather than overwriting its app data. The isolated iOS simulator
-ran all 19 suites: 4 suites/4 tests passed and 15 suites/17 tests exposed the
-pre-existing Harness runtime backlog (`uniffiEnsureInitialized` missing in the
-test runtime, missing native query IDs, and one missing `FeedbackProvider`).
-These failures are outside the ESLint migration and did not appear in Jest or
-the full device E2E suite.
+The ownership moves changed component paths and imports but intentionally did
+not change layout or behavior. Fresh simulator screenshots document the
+unchanged surfaces with synthetic data:
 
-Final rebase onto `origin/main` was a no-op: the branch was already current.
-Post-rebase gates passed again: `pnpm verify` (46 suites/312 tests),
-`pnpm lint:rules` (46 tests), `pnpm test:coverage` (87.6% statements, 76.58%
-branches, 83.25% functions, 90.46% lines), React Doctor (100/100), and
-`git diff --check`.
+- `8d47df8`: [Belief Library](../../artifacts/code-architecture-alpha4/belief-library.png)
+- `93478d4`: [History](../../artifacts/code-architecture-alpha4/history.png)
+- `a3ee73d`: [Settings composition](../../artifacts/code-architecture-alpha4/settings.png)
 
-Every development E2E flow passed twice on the current code using the connected
-Pixel. A later segmented replay reconfirmed all flows; the final physical-device
-segment stopped only when the secured phone auto-locked, and the available
-emulator's Argent server then stalled before flow execution. Because the rebase
-changed no commit, the earlier complete two-pass result remains exact evidence
-for the delivered tree. Keep a secured physical phone unlocked and plugged in
-for long segmented replays.
+No new UI concept, library, persisted-data shape, or navigation state was
+introduced.
