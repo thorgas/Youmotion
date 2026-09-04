@@ -276,9 +276,6 @@ export default tseslint.config(
           allowHoisted: true,
           allowNamedExports: true,
           allowRecursive: true,
-          allowedFiles: [
-            '**/src/navigation/app-navigation.machine.ts',
-          ],
         },
       ],
       'code-architecture/prefer-readonly-types': [

@@ -180,13 +180,13 @@ const AppContextSchema = Schema.Struct({
 
 const EmptyEventSchema = Schema.standardSchemaV1(Schema.Struct({}));
 
-function customBeliefStatementFromDraft({
+const customBeliefStatementFromDraft =({
   beliefStatementDraft,
   beliefStatementDraftId,
 }: {
   beliefStatementDraft: string;
   beliefStatementDraftId: typeof CustomBeliefSystemId.Type | null;
-}): BeliefStatement | null {
+}): BeliefStatement | null  => {
   const harmfulStatement = beliefStatementDraft.trim();
   if (!harmfulStatement || !beliefStatementDraftId) return null;
   assert(harmfulStatement.length > 0, 'A custom belief requires harmful text.');
@@ -196,9 +196,9 @@ function customBeliefStatementFromDraft({
     beliefSystemId: beliefStatementDraftId,
     harmfulStatement,
   };
-}
+};
 
-function guidingBeliefStatementFromDraft({
+const guidingBeliefStatementFromDraft =({
   beliefStatementDraft,
   beliefStatements,
   beliefSystemId,
@@ -208,7 +208,7 @@ function guidingBeliefStatementFromDraft({
   beliefStatements: readonly BeliefStatement[];
   beliefSystemId: BeliefSystemId | null;
   guidingBeliefStatementDraft: string;
-}): BeliefStatement | null {
+}): BeliefStatement | null  => {
   if (!beliefSystemId) return null;
   const guidingStatement = guidingBeliefStatementDraft.trim();
   if (!isCustomBeliefSystemId(beliefSystemId)) {
@@ -225,15 +225,15 @@ function guidingBeliefStatementFromDraft({
   return guidingStatement
     ? { ...existing, harmfulStatement, guidingStatement }
     : { kind: 'custom', beliefSystemId, harmfulStatement };
-}
+};
 
-function guidingBeliefDrafts({
+const guidingBeliefDrafts =({
   beliefStatements,
   beliefSystemId,
 }: {
   beliefStatements: readonly BeliefStatement[];
   beliefSystemId: BeliefSystemId;
-}) {
+}) => {
   const statement = beliefStatementForId({
     beliefSystemId,
     statements: beliefStatements,
@@ -247,9 +247,9 @@ function guidingBeliefDrafts({
     guidingHelpVisible: false,
     error: null,
   };
-}
+};
 
-function beliefLibraryDrafts(statement: CustomBeliefStatement) {
+const beliefLibraryDrafts =(statement: CustomBeliefStatement) => {
   return {
     beliefLibraryStatementId: statement.beliefSystemId,
     beliefLibraryHarmfulDraft: statement.harmfulStatement,
@@ -257,9 +257,9 @@ function beliefLibraryDrafts(statement: CustomBeliefStatement) {
     guidingHelpVisible: false,
     error: null,
   };
-}
+};
 
-function managedBeliefStatementFromDraft({
+const managedBeliefStatementFromDraft =({
   beliefLibraryGuidingDraft,
   beliefLibraryHarmfulDraft,
   beliefLibraryStatementId,
@@ -269,7 +269,7 @@ function managedBeliefStatementFromDraft({
   beliefLibraryHarmfulDraft: string;
   beliefLibraryStatementId: CustomBeliefSystemId | null;
   beliefStatements: readonly BeliefStatement[];
-}): CustomBeliefStatement | null {
+}): CustomBeliefStatement | null  => {
   if (!beliefLibraryStatementId) return null;
   const harmfulStatement = beliefLibraryHarmfulDraft.trim();
   if (!harmfulStatement) return null;
@@ -294,26 +294,26 @@ function managedBeliefStatementFromDraft({
   return guidingStatement
     ? { ...existing, harmfulStatement, guidingStatement }
     : { kind: 'custom', beliefSystemId: existing.beliefSystemId, harmfulStatement };
-}
+};
 
-function reminderTargetForContext({
+const reminderTargetForContext =({
   reminderTargetBeliefSystemId,
   reminderTargetKind,
 }: {
   reminderTargetBeliefSystemId: BeliefSystemId | null;
   reminderTargetKind: typeof REMINDER_TARGET_KINDS[keyof typeof REMINDER_TARGET_KINDS];
-}): ReminderTarget | null {
+}): ReminderTarget | null  => {
   if (reminderTargetKind === REMINDER_TARGET_KINDS.PULSE) {
     return { targetKind: reminderTargetKind };
   }
   return reminderTargetBeliefSystemId
     ? { targetKind: reminderTargetKind, beliefSystemId: reminderTargetBeliefSystemId }
     : null;
-}
+};
 
-function reminderExitState(
+const reminderExitState = (
   entryPoint: typeof REMINDER_ENTRY_POINTS[keyof typeof REMINDER_ENTRY_POINTS],
-) {
+) => {
   assert(Object.values(REMINDER_ENTRY_POINTS).includes(entryPoint), 'Reminder entry point must be supported.');
   const exitState = [
     { matches: entryPoint === REMINDER_ENTRY_POINTS.SETTINGS, state: REMINDER_STATES.SETTINGS },
@@ -333,15 +333,15 @@ function reminderExitState(
     BELIEF_LIBRARY_STATES.LIBRARY,
   ]).has(exitState), 'Reminder exit state must be supported.');
   return exitState;
-}
+};
 
-function reminderOfferExitState(
+const reminderOfferExitState = (
   entryPoint: typeof REMINDER_ENTRY_POINTS[keyof typeof REMINDER_ENTRY_POINTS],
-) {
+) => {
   return reminderExitState(entryPoint);
-}
+};
 
-function successReminderBeliefSystemId({
+const successReminderBeliefSystemId =({
   assignments,
   reminderDataHydrated,
   reminderError,
@@ -353,7 +353,7 @@ function successReminderBeliefSystemId({
   reminderError: string | null;
   savedBeliefSystemId: BeliefSystemId | undefined;
   statements: readonly BeliefStatement[];
-}) {
+}) => {
   if (!reminderDataHydrated || reminderError || !savedBeliefSystemId) return null;
   assert(reminderError === null, 'A reminder offer requires successful hydration.');
   assert(savedBeliefSystemId.length > 0, 'A reminder offer requires a saved belief system.');
@@ -365,15 +365,15 @@ function successReminderBeliefSystemId({
   return assignmentForTarget({ assignments, beliefSystemId: savedBeliefSystemId })
     ? null
     : savedBeliefSystemId;
-}
+};
 
-function reminderTimingFromDraft({
+const reminderTimingFromDraft =({
   reminderTimesDraft,
   reminderWeekdaysDraft,
 }: {
   reminderTimesDraft: readonly (typeof ReminderLocalTime.Type)[];
   reminderWeekdaysDraft: readonly (typeof ReminderWeekday.Type)[];
-}): ReminderTiming | null {
+}): ReminderTiming | null  => {
   if (reminderWeekdaysDraft.length === 0 || reminderTimesDraft.length === 0) return null;
   const [firstWeekday, ...remainingWeekdays] = reminderWeekdaysDraft;
   const [firstTime, ...remainingTimes] = reminderTimesDraft;
@@ -384,9 +384,9 @@ function reminderTimingFromDraft({
     weekdays: [firstWeekday, ...remainingWeekdays],
     times: [firstTime, ...remainingTimes],
   };
-}
+};
 
-function activateReminderFromDraft({
+const activateReminderFromDraft =({
   context,
   timing,
   self,
@@ -398,7 +398,7 @@ function activateReminderFromDraft({
     assignment: ReminderAssignment;
     assignments: readonly ReminderAssignment[];
   } | { type: typeof REMINDER_EVENTS.OPERATION_FAILED; message: string }) => void };
-}) {
+}) => {
   const target = reminderTargetForContext(context);
   assert(timing.weekdays.length > 0, 'Reminder activation requires weekdays.');
   assert(timing.times.length > 0, 'Reminder activation requires times.');
@@ -430,15 +430,15 @@ function activateReminderFromDraft({
       message: 'Your reminder could not be scheduled.',
     }),
   );
-}
+};
 
-function reconcileStoredReminders({
+const reconcileStoredReminders =({
   assignments,
   statements,
 }: {
   assignments: readonly ReminderAssignment[];
   statements: readonly BeliefStatement[];
-}) {
+}) => {
   void getReminderPermission().then(async (permission) => {
     if (permission === REMINDER_PERMISSION_STATES.GRANTED) {
       await reconcileReminderNotifications({
@@ -449,7 +449,7 @@ function reconcileStoredReminders({
     }
     return permission;
   }).catch(() => undefined);
-}
+};
 
 export const appNavigationMachine = setup({
   states: {
@@ -3078,7 +3078,7 @@ export const appNavigationMachine = setup({
   },
 });
 
-function primaryRouteForStateValue(value: StateValue) {
+const primaryRouteForStateValue =(value: StateValue) => {
   assert(
     (typeof value === 'string' && value.length > 0)
       || (typeof value === 'object' && value !== null),
@@ -3112,9 +3112,9 @@ function primaryRouteForStateValue(value: StateValue) {
     'Primary routing returned an unsupported route.',
   );
   return route;
-}
+};
 
-function beliefLibraryRouteForStateValue(value: StateValue) {
+const beliefLibraryRouteForStateValue =(value: StateValue) => {
   assert(
     (typeof value === 'string' && value.length > 0)
       || (typeof value === 'object' && value !== null),
@@ -3140,9 +3140,9 @@ function beliefLibraryRouteForStateValue(value: StateValue) {
     'Belief-library routing returned an unsupported route.',
   );
   return route;
-}
+};
 
-function reminderRouteForStateValue(value: StateValue) {
+const reminderRouteForStateValue =(value: StateValue) => {
   assert(
     (typeof value === 'string' && value.length > 0)
       || (typeof value === 'object' && value !== null),
@@ -3167,9 +3167,9 @@ function reminderRouteForStateValue(value: StateValue) {
     'Reminder routing returned an unsupported route.',
   );
   return route;
-}
+};
 
-function guidingBeliefRouteForStateValue(value: StateValue) {
+const guidingBeliefRouteForStateValue =(value: StateValue) => {
   if (
     matchesState(CHECK_IN_STATES.GUIDING_BELIEF, value)
     || matchesState(CHECK_IN_STATES.PERSISTING_GUIDING_BELIEF, value)
@@ -3178,9 +3178,9 @@ function guidingBeliefRouteForStateValue(value: StateValue) {
     return APP_ROUTES.GUIDING_BELIEF;
   }
   return null;
-}
+};
 
-function beliefSystemRouteForStateValue(value: StateValue) {
+const beliefSystemRouteForStateValue =(value: StateValue) => {
   assert(
     (typeof value === 'string' && value.length > 0)
       || (typeof value === 'object' && value !== null),
@@ -3213,9 +3213,9 @@ function beliefSystemRouteForStateValue(value: StateValue) {
     'Belief-system routing returned an unsupported route.',
   );
   return route;
-}
+};
 
-function reflectionRouteForStateValue(value: StateValue) {
+const reflectionRouteForStateValue =(value: StateValue) => {
   if (
     matchesState(NAVIGATION_STATES.REFLECTION, value)
     || matchesState(CHECK_IN_STATES.SAVING, value)
@@ -3224,7 +3224,7 @@ function reflectionRouteForStateValue(value: StateValue) {
     return APP_ROUTES.REFLECTION;
   }
   return null;
-}
+};
 
 export function routeForStateValue(value: StateValue) {
   assert(
