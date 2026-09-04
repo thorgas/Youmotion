@@ -47,11 +47,15 @@ const localizedDataSafetyMessage = (message: string) => {
 };
 
 export function DataSafetyMessage({
+  disabled = false,
   error,
+  label,
   notice,
   onDismiss,
 }: {
+  disabled?: boolean;
   error: string | null;
+  label?: string;
   notice: string | null;
   onDismiss: () => void;
 }) {
@@ -62,11 +66,13 @@ export function DataSafetyMessage({
   return (
     <Pressable
       accessibilityRole={error ? 'alert' : 'button'}
+      accessibilityState={{ disabled }}
+      disabled={disabled}
       onPress={onDismiss}
-      style={[styles.notice, error ? styles.errorNotice : null]}
+      style={[styles.notice, error ? styles.errorNotice : null, disabled && styles.disabled]}
       testID={error ? 'data-safety-error' : 'data-safety-notice'}
     >
-      <Text style={styles.noticeText}>{localizedDataSafetyMessage(message)}</Text>
+      <Text style={styles.noticeText}>{label ?? localizedDataSafetyMessage(message)}</Text>
     </Pressable>
   );
 }
@@ -80,4 +86,5 @@ const styles = StyleSheet.create({
   },
   errorNotice: { backgroundColor: surfaceColors.dangerNotice },
   noticeText: { fontFamily: type.medium, color: palette.ink, fontSize: 13, lineHeight: 19 },
+  disabled: { opacity: 0.42 },
 });
