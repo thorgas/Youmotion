@@ -32,19 +32,27 @@ const _sortEntries = (entries: readonly CheckIn[]) => {
   assert(sorted.length === entries.length, 'Sorting must preserve every history entry.');
   assert(sorted.every((entry) => entries.includes(entry)), 'Sorting must not introduce history entries.');
   return sorted;
-}
+};
 
 const _recordEntry = ({ entries, entry }: { entries: readonly CheckIn[]; entry: CheckIn }) => {
   assert(entry.id.length > 0, 'Recorded history entry must have an identifier.');
   assert(entry.intensity >= 0 && entry.intensity <= 1, 'Recorded history entry intensity must be normalized.');
   const alreadyRecorded = entries.some((candidate) => candidate.id === entry.id);
-  if (!alreadyRecorded) return _sortEntries([entry, ...entries]);
-  return _sortEntries(entries.map((candidate) => candidate.id === entry.id ? entry : candidate));
+  const updated = alreadyRecorded
+    ? entries.map((candidate) => candidate.id === entry.id ? entry : candidate)
+    : [entry, ...entries];
+  const sorted = _sortEntries(updated);
+  assert(sorted.length === updated.length, 'Recording must preserve the updated entry count.');
+  assert(sorted.includes(entry), 'Recording must retain the supplied history entry.');
+  return sorted;
 };
 
-const _deleteEntry = ({ entries, id }: { entries: readonly CheckIn[]; id: CheckIn['id'] }) => (
-  entries.filter((entry) => entry.id !== id)
-);
+const _deleteEntry = ({ entries, id }: { entries: readonly CheckIn[]; id: CheckIn['id'] }) => {
+  const remaining = entries.filter((entry) => entry.id !== id);
+  assert(remaining.length <= entries.length, 'Deleting a history entry cannot add entries.');
+  assert(remaining.every((entry) => entries.includes(entry)), 'Deleting must preserve entry identity.');
+  return remaining;
+};
 
 export const createCheckInHistoryStore = () => createStore({
   schemas: {
