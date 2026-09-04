@@ -25,9 +25,9 @@ Replace the remaining Maestro development and release journeys with deterministi
 - Development E2E Metro: dedicated port `8091`, `EXPO_PUBLIC_E2E=true`. Port `8082` was already serving other agents' devices and must not be reused or stopped.
 - App ID: `com.youmotion.mobile`.
 - Every command must target a dedicated device explicitly through `E2E_DEVICE`.
-- Default QA proof is two consecutive unchanged passes, with Argent services recycled before pass one.
+- Default QA proof is two consecutive unchanged passes, with Argent services recycled before every pass.
 - Flow failure artifacts go under ignored `artifacts/argent/`.
-- The runner calls `argent flow run` and recycles only the explicitly named device's Argent services before pass one. Never point `E2E_DEVICE` at a simulator another task is using.
+- The runner calls `argent flow run` and recycles only the explicitly named device's Argent services before every pass. On Android it also restores the Metro reverse and force-stops the development app before each pass. Never point `E2E_DEVICE` at a device another task is using.
 
 ## Copy-paste smoke run
 
@@ -48,12 +48,12 @@ pnpm start:e2e
 Run the two-pass smoke proof in terminal B, replacing the placeholder with the dedicated device ID returned above:
 
 ```sh
-export E2E_DEVICE='<dedicated iOS UDID or Android emulator serial>'
+export E2E_DEVICE='<dedicated iOS UDID, Android emulator serial, or connected test-device serial>'
 export E2E_PLATFORM='ios'
 pnpm test:e2e:smoke
 ```
 
-Use `E2E_PLATFORM=android` for an Android emulator. The runner exits before touching a device when the ID or Metro server is missing.
+Use `E2E_PLATFORM=android` for an Android emulator or connected test device. The runner exits before touching a device when the ID or Metro server is missing.
 
 For the Android release-locale proof, put German and English in Android Settings
 under System > Languages, with the locale under test first and the other locale

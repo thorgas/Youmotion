@@ -7,6 +7,10 @@ const flowDirectory = resolve(projectRoot, '.argent', 'flows', 'e2e');
 const artifactDirectory = resolve(projectRoot, 'artifacts', 'argent');
 const metroPort = process.env.E2E_METRO_PORT ?? '8091';
 const metroStatusUrl = `http://127.0.0.1:${metroPort}/status`;
+const androidSdkRoot = process.env.ANDROID_HOME ?? process.env.ANDROID_SDK_ROOT;
+const adb = androidSdkRoot
+  ? resolve(androidSdkRoot, 'platform-tools', 'adb')
+  : 'adb';
 
 function parsePositiveInteger({ name, value }) {
   const parsed = Number.parseInt(value, 10);
@@ -110,8 +114,31 @@ function selectedFlows(flow) {
     .toSorted();
 }
 
+async function prepareDevice({ device, platform }) {
+  await run({
+    arguments_: ['run', 'stop-all-simulator-servers', '--devices', device],
+    command: 'argent',
+  });
+  if (platform !== 'android') return;
+  await run({
+    arguments_: [
+      '-s',
+      device,
+      'reverse',
+      `tcp:${metroPort}`,
+      `tcp:${metroPort}`,
+    ],
+    command: adb,
+  });
+  await run({
+    arguments_: ['-s', device, 'shell', 'am', 'force-stop', 'com.youmotion.mobile'],
+    command: adb,
+  });
+}
+
 async function runPasses({ device, flow, pass, passes, platform }) {
   if (pass > passes) return;
+  await prepareDevice({ device, platform });
   process.stdout.write(`\nArgent E2E pass ${String(pass)}/${String(passes)}: ${flow}\n`);
   const arguments_ = ['flow', 'run', flow, '--device', device, '--output', artifactDirectory];
   if (platform) arguments_.push('--platform', platform);
@@ -122,10 +149,6 @@ async function runPasses({ device, flow, pass, passes, platform }) {
 async function runFlows({ device, flows, index, passes, platform }) {
   const flow = flows[index];
   if (!flow) return;
-  await run({
-    arguments_: ['run', 'stop-all-simulator-servers', '--devices', device],
-    command: 'argent',
-  });
   await runPasses({ device, flow, pass: 1, passes, platform });
   await runFlows({ device, flows, index: index + 1, passes, platform });
 }

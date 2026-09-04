@@ -1,0 +1,24 @@
+steps:
+  - when:
+      visible: { text: ArgentOwnedTimingMoment }
+    steps:
+      - tap: { text: ArgentOwnedTimingMoment, role: button }
+      - await: { visible: { text: EDIT MOMENT }, timeout: 5000 }
+      - tap: { id: reflection-note-input }
+      - tap: { text: Edit this moment. }
+      - tap: { id: delete-edited-moment }
+      - await: { visible: { text: Delete this moment? }, timeout: 5000 }
+      - when:
+          platform: ios
+        steps:
+          - tool: keyboard
+            args: { key: tab }
+          - tool: keyboard
+            args: { key: arrow-right }
+          - tool: keyboard
+            args: { key: enter }
+      - when:
+          platform: android
+        steps:
+          - tap: { text: { matches: '^(Delete|DELETE)$' } }
+      - await: { visible: { text: YOUR HISTORY }, timeout: 15000 }
