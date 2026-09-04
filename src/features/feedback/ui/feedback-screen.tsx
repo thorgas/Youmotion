@@ -54,11 +54,13 @@ const _selectIdle = (
 ) => snapshot.matches(FEEDBACK_STATES.IDLE);
 
 function FeedbackAction({
+  disabled = false,
   label,
   onPress,
   primary = false,
   testID,
 }: {
+  disabled?: boolean;
   label: string;
   onPress: () => void;
   primary?: boolean;
@@ -67,8 +69,10 @@ function FeedbackAction({
   return (
     <Pressable
       accessibilityRole="button"
+      accessibilityState={{ disabled }}
+      disabled={disabled}
       onPress={onPress}
-      style={[styles.action, primary && styles.primaryAction]}
+      style={[styles.action, primary && styles.primaryAction, disabled && styles.disabledAction]}
       testID={testID}>
       <Text style={[styles.actionText, primary && styles.primaryActionText]}>{label}</Text>
     </Pressable>
@@ -318,6 +322,7 @@ const styles = StyleSheet.create({
     borderColor: actionColors.primaryBackground,
   },
   actionText: { color: palette.ink, fontFamily: type.medium, fontSize: 15 },
+  disabledAction: { opacity: 0.42 },
   primaryActionText: { color: actionColors.primaryForeground },
   progress: { alignItems: 'center', gap: 14, paddingVertical: 14 },
   progressText: { color: palette.ink, fontFamily: type.medium, fontSize: 15 },
