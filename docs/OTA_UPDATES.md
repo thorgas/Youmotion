@@ -114,6 +114,16 @@ though nothing tracked changed.
   with the runtime `eas update` printed. A fingerprint mismatch means the
   update was never eligible for this binary; publish against the matching
   runtime, or ship a new binary.
+- **"Update-Suche fehlgeschlagen · UpdatesReloadException".** The switch sets
+  the channel header and then reloads even when the target channel has nothing
+  eligible, and the reload has no update to launch. Expo's message names
+  `appContext`, which is not the real cause — the cause is that no update on
+  the target channel matches this binary's runtime. Publish to that channel at
+  the runtime the installed build reports in its `Laufzeit` line.
+- **The switch is meaningful only on a `production` build.** The footer knows
+  the channels `production` and `qa`. A `testing` or `preview` build maps to
+  `production`, so switching away from it cannot come back — reinstall to
+  return to `testing`.
 - **The wrong code is running.** Check the channel line. A build made from a
   branch, with no `MOBILE_UPDATE_CHANNEL`, subscribes to `production` and will
   replace itself with the store bundle on first launch.
