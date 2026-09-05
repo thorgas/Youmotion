@@ -77,11 +77,31 @@ a locally built binary carries the same fingerprint runtime version as a store
 build, so without it a production update would download on first launch and
 silently replace the code just built.
 
+## Testing a switch on a local Release build
+
+`expo run:ios` does not re-run prebuild, so a channel or runtime-policy change
+in `app.config.js` reaches the binary only after the native project is synced:
+
+```bash
+MOBILE_UPDATE_CHANNEL=production npx expo prebuild -p ios
+```
+
+```bash
+MOBILE_UPDATE_CHANNEL=production npx expo run:ios --configuration Release
+```
+
+Then regenerate `expected-ota-runtimes.json` with `pnpm eas:update:runtimes`
+before publishing: the fingerprint covers local state under the gitignored
+`ios/` directory, so it moves when the native project is regenerated even
+though nothing tracked changed.
+
 ## When an update does not arrive
 
 - **"Updates are disabled in this build."** Expected in development and
   dev-client builds — `expo-updates` never checks there. Use a Release or EAS
   build to exercise a real switch.
+- **The footer says `Kanal development` on a Release build.** The native
+  project predates the config change; prebuild and rebuild as above.
 - **Nothing happens on a Release build.** Compare the footer's `Laufzeit` line
   with the runtime `eas update` printed. A fingerprint mismatch means the
   update was never eligible for this binary; publish against the matching
