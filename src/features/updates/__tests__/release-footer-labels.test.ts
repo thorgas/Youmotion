@@ -1,4 +1,4 @@
-import { appSettingsStore } from '@/features/settings/application/app-settings.store';
+import { appSettingsStore } from '@/app-stores';
 import { configureAppLocale } from '@/localization/app-locale.configuration';
 import { releaseFooterLabels } from '../ui/release-footer-labels';
 

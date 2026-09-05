@@ -1,6 +1,6 @@
 const { execFileSync } = require('node:child_process');
 const { IOSConfig, withXcodeProject } = require('expo/config-plugins');
-const { resolveUpdatesConfig } = require('expo-update-kit/config');
+const { resolveUpdates } = require('./updates.config.js');
 
 function resolveGitCommit() {
   const easBuildCommit = process.env.EAS_BUILD_GIT_COMMIT_HASH;
@@ -12,10 +12,6 @@ function resolveGitCommit() {
     return null;
   }
 }
-
-const isProductionBuild = process.env.EAS_BUILD_PROFILE === 'production';
-
-const harnessUiPackage = '@react-native-harness/ui';
 
 function withArm64Simulator(config) {
   return withXcodeProject(config, (projectConfig) => {
@@ -33,12 +29,6 @@ function withArm64Simulator(config) {
     }
 
     return projectConfig;
-  });
-}
-
-function resolveUpdates(config) {
-  return resolveUpdatesConfig(config.updates, {
-    channel: process.env.MOBILE_UPDATE_CHANNEL?.trim(),
   });
 }
 
