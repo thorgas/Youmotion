@@ -123,12 +123,12 @@ git diff --check
 Confirmed on the delivered production tree:
 
 - Frozen install passed with pnpm 11.18.0.
-- `pnpm verify`: 47 suites and 330 tests passed; Oxlint, ESLint,
+- `pnpm verify`: 47 suites and 331 tests passed; Oxlint, ESLint,
   architecture lint, TypeScript 7, and Jest were green.
 - `pnpm lint:rules`: 2 suites and 59 adversarial contract tests passed after
   the alpha.11 configuration and navigation-boundary changes.
-- `pnpm test:coverage`: 47 suites and 330 tests passed; 87.48% statements,
-  76.32% branches, 82.85% functions, and 90.36% lines.
+- `pnpm test:coverage`: 47 suites and 331 tests passed; 87.46% statements,
+  76.32% branches, 82.85% functions, and 90.34% lines.
 - The installed package was read from `node_modules` and confirmed as alpha.11.
 
 Device E2E uses dedicated simulator
