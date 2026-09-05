@@ -470,3 +470,5 @@ export const SPLASH_LOGO_REVEAL_DURATION = 680;
 export const SPLASH_OVERLAY_VISIBLE_DURATION = 700;
 export const SPLASH_OVERLAY_FADE_DURATION = 180;
 export const ONBOARDING_STEP_COUNT = 3;
+
+export const UPDATE_CHANNELS: ReadonlyArray<string> = ['production', 'testing', 'qa'];

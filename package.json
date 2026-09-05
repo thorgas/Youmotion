@@ -40,7 +40,7 @@
     "expo-status-bar": "~57.0.1",
     "expo-symbols": "~57.0.1",
     "expo-system-ui": "~57.0.1",
-    "expo-update-kit": "0.1.0-alpha.1",
+    "expo-update-kit": "0.1.0-alpha.3",
     "expo-updates": "~57.0.8",
     "expo-web-browser": "~57.0.1",
     "fbtee": "2.0.0",
