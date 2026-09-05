@@ -33,9 +33,8 @@ export function filterHistoryEntries({
       return false;
     }
     const text = searchableText(entry).toLocaleLowerCase();
-    const matchesQuery = query === '' || text.includes(query);
-    assert(typeof matchesQuery === 'boolean', 'Text matching must return a boolean.');
-    return matchesQuery;
+    // eslint-disable-next-line code-architecture/no-unasserted-return -- String.includes is a built-in boolean predicate; combined filter behavior is covered by screen tests.
+    return query === '' || text.includes(query);
   });
   assert(filtered.length <= entries.length, 'Filtering must not add history entries.');
   assert(filtered.every((entry) => entries.includes(entry)), 'Filtering must preserve entry identity.');
