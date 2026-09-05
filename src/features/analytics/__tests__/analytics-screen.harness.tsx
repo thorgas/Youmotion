@@ -163,7 +163,14 @@ afterEach(() => {
 
 describe('analytics on the device runtime', () => {
   test('shows one hero with named tabs when Leitsatz and pattern analytics coexist', async () => {
+    const settingsModule: typeof import('@/app-stores') = require('@/app-stores');
+    const localeModule: typeof import('@/localization/app-locale-provider') = require(
+      '@/localization/app-locale-provider',
+    );
+    settingsModule.appSettingsStore.trigger.languageChanged({ locale: APP_LOCALES.GERMAN });
+    const { AppLocaleProvider } = localeModule;
     await render(
+      <AppLocaleProvider>
       <GestureHandlerRootView style={styles.root}>
         <AnalyticsContent
           entries={competingInsightEntries}
@@ -172,7 +179,8 @@ describe('analytics on the device runtime', () => {
           onEvidencePress={_captureEvidence}
           statements={[]}
         />
-      </GestureHandlerRootView>,
+      </GestureHandlerRootView>
+      </AppLocaleProvider>,
     );
 
     expect(await screen.findByTestId('analytics-insight-tabs')).not.toBeNull();

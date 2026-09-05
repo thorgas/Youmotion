@@ -21,7 +21,11 @@ export default {
       device: appleSimulator('iPhone 17 Pro', '26.1'),
       bundleId: 'com.youmotion.mobile',
       appLaunchOptions: {
-        arguments: ['--initialUrl', `http://localhost:${metroPort}`],
+        arguments: [
+          '--initialUrl', `http://localhost:${metroPort}`,
+          '-EXDevMenuIsOnboardingFinished', 'YES',
+          '-EXDevMenuShowsAtLaunch', 'NO',
+        ],
       },
     }),
     androidPlatform({

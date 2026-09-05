@@ -20,7 +20,9 @@ import {
   APP_LOCALES,
   CHECK_IN_EVENTS,
   EMOTION_IDS,
+  EMOTION_LABEL_MODES,
   NAVIGATION_STATES,
+  SETTINGS_EVENTS,
 } from '@/constants';
 import { appSettingsStore } from '@/app-stores';
 import { AppLocaleProvider } from '@/localization/app-locale-provider';
@@ -85,6 +87,14 @@ describe('moment time editor on the device runtime', () => {
       '../ui/reflection-screen',
     );
     actor = createActor(navigationModule.appNavigationMachine).start();
+    currentActor().send({
+      type: SETTINGS_EVENTS.APP_SETTINGS_HYDRATED,
+      settings: {
+        locale: APP_LOCALES.ENGLISH,
+        emotionLabelMode: EMOTION_LABEL_MODES.EMOJI,
+        onboardingCompleted: true,
+      },
+    });
     await waitUntil(
       () => currentActor().getSnapshot().matches(NAVIGATION_STATES.TABS),
       { timeout: 5_000 },

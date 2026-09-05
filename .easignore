@@ -53,3 +53,8 @@ example
 # generated native folders
 /ios
 /android
+
+# Local QA evidence and navigation map (not runtime inputs)
+artifacts/
+.argent/
+.expo-map/

@@ -105,40 +105,77 @@ Use this path when you want a release-ready binary for both app stores' testing 
 pnpm build:testing
 ```
 
-Then send the latest builds:
+Submit the latest successful `testing` build from the terminal:
 
 ```bash
 pnpm submit:testflight:testing
 pnpm submit:play:testing
 ```
 
-One fire-and-forget command queues both store builds and automatically submits each successful build:
+These commands query EAS for the latest finished store build with the `testing` profile, print its commit and ID, and submit that exact ID. The iOS command downloads the selected IPA and runs `verify:ios:archive` before submitting. No browser or manual ID lookup is needed. Use `--dry-run` to print the selected build without downloading or submitting, or `--id EXACT_BUILD_ID` to select an earlier testing build. `--latest` is accepted explicitly as well.
+
+To list build IDs yourself:
+
+```bash
+pnpm exec eas build:list --platform ios --build-profile testing --status finished --limit 5
+pnpm exec eas build:list --platform android --build-profile testing --status finished --limit 5
+```
+
+Queue both testing builds without waiting or submitting:
 
 ```bash
 pnpm release:testing
 ```
 
-Notes:
+Wait for both builds to finish, then run the submit commands above. When builds overlap, use their printed IDs to select the intended revision. iOS uploads enter TestFlight processing; Android uses Play internal testing. EAS holds and increments store build numbers remotely.
 
-- iOS uploads land in TestFlight through App Store Connect and use Apple's standard TestFlight processing time.
-- Android uploads go to the Play Console internal track.
-- Store build numbers are held remotely by EAS and `autoIncrement` is enabled for this profile.
-- The first Play internal release can be submitted by EAS. Creating that release manually in Play Console remains an optional fallback if Google rejects the automated bootstrap.
-
-Before submitting an iOS archive, download its IPA from the EAS build page and scan the shipped payload for the private touch-injection selectors that trigger Apple error 90338:
-
-```bash
-pnpm verify:ios:archive -- /absolute/path/to/Youmotion.ipa
-```
-
-The command must print `iOS archive is free of the known HarnessUI private selectors.` before TestFlight submission.
+The archive guard must print `iOS archive is free of the known HarnessUI private selectors.` It can also be run manually with `pnpm verify:ios:archive -- /absolute/path/to/Youmotion.ipa`.
 
 If Play reports that a versionCode was already submitted, its counter is ahead of EAS (usually after a manual or differently sourced upload). Resynchronize once, entering a value at least as high as Play's current maximum, then rebuild; `autoIncrement` will use the next value:
 
 ```bash
 pnpm version:android:set
 pnpm build:testing:android
-pnpm submit:play:testing
+pnpm submit:play:testing --id EXACT_BUILD_ID
+```
+
+## Local iOS Harness testing
+
+Use the local native Harness recipe when running the React Native Harness suites on an iOS simulator. Run `preios` first. If the `ios/` directory is absent, generate it without installing dependencies:
+
+```bash
+pnpm preios
+pnpm exec expo prebuild --platform ios --no-install
+```
+
+Then prepare the local HarnessUI pods and restore the package exclusion:
+
+```bash
+pnpm prepare:harness:ios
+```
+
+Build the app for the running simulator, replacing `ACTUAL_UDID` with the device UDID:
+
+```bash
+pnpm exec xcodebuild \
+  -workspace ios/Youmotion.xcworkspace \
+  -scheme Youmotion \
+  -configuration Debug \
+  -sdk iphonesimulator \
+  -destination 'id=ACTUAL_UDID' \
+  build
+```
+
+Reinstall the resulting `.app` on the simulator with Argent, then run:
+
+```bash
+pnpm test:harness:ios
+```
+
+Do not use an Expo run command that can replace the prepared test binary from its cache. Do not run EAS while temporary Harness preparation is in progress. With pnpm 11, disable automatic dependency recreation for concurrent scripts:
+
+```bash
+pnpm_config_verify_deps_before_run=false pnpm --config.verify-deps-before-run=false SCRIPT
 ```
 
 ## iOS: TestFlight and App Store

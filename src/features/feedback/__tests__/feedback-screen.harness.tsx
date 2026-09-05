@@ -21,7 +21,7 @@ afterEach(() => {
 });
 
 describe('feedback screen interaction', () => {
-  test('opens the email choice from the global feedback button', async () => {
+  test('opens the email choice from the settings feedback action', async () => {
     mock('../infrastructure/feedback-mail', () => ({
       composeFeedbackEmail: () => Promise.resolve(),
       FeedbackMailError: class FeedbackMailError extends Error {},
@@ -32,7 +32,7 @@ describe('feedback screen interaction', () => {
     const feedbackModule: typeof import('../ui/feedback-screen') = require(
       '../ui/feedback-screen',
     );
-    const { FeedbackOverlay } = feedbackModule;
+    const { FeedbackOverlay, FeedbackProvider, FeedbackSettingsAction } = feedbackModule;
     appSettingsStore.trigger.hydrated({
       settings: {
         locale: APP_LOCALES.ENGLISH,
@@ -45,6 +45,7 @@ describe('feedback screen interaction', () => {
       <GestureHandlerRootView style={styles.root}>
         <SafeAreaProvider>
           <AppLocaleProvider>
+            <FeedbackProvider>
             <View style={styles.page}>
               <Text style={styles.eyebrow}>TODAY</Text>
               <Text style={styles.title}>How are you feeling right now?</Text>
@@ -52,8 +53,10 @@ describe('feedback screen interaction', () => {
                 <Text style={styles.cardSymbol}>✦</Text>
                 <Text style={styles.cardCopy}>Your private reflection stays on this device.</Text>
               </View>
+              <FeedbackSettingsAction />
               <FeedbackOverlay />
             </View>
+            </FeedbackProvider>
           </AppLocaleProvider>
         </SafeAreaProvider>
       </GestureHandlerRootView>,

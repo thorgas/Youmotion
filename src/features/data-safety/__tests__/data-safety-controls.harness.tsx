@@ -22,7 +22,6 @@ import {
   NAVIGATION_STATES,
 } from '@/constants';
 import { appSettingsStore } from '@/app-stores';
-import { AppLocaleProvider } from '@/localization/app-locale-provider';
 
 type NavigationMachine = typeof import('@/navigation/app-navigation.composition')['appNavigationMachine'];
 
@@ -92,7 +91,16 @@ describe('data safety controls on the device runtime', () => {
       '../ui/data-safety-message',
     );
     const { DataSafetyMessage } = messageModule;
-    appSettingsStore.trigger.hydrated({
+    const settingsModule: typeof import('@/app-stores') = require('@/app-stores');
+    const localeModule: typeof import('@/localization/app-locale-provider') = require(
+      '@/localization/app-locale-provider',
+    );
+    const { AppLocaleProvider } = localeModule;
+    const localeConfiguration: typeof import('@/localization/app-locale.configuration') = require(
+      '@/localization/app-locale.configuration',
+    );
+    localeConfiguration.configureAppLocale(settingsModule.appSettingsStore);
+    settingsModule.appSettingsStore.trigger.hydrated({
       settings: {
         locale: APP_LOCALES.GERMAN,
         emotionLabelMode: EMOTION_LABEL_MODES.EMOJI,
@@ -104,6 +112,15 @@ describe('data safety controls on the device runtime', () => {
     currentActor().send({ type: DATA_SAFETY_EVENTS.EXPORT_REQUESTED });
     await waitUntil(() => currentActor().getSnapshot().context.dataSafetyNotice !== null);
     const notice = currentActor().getSnapshot().context.dataSafetyNotice;
+    settingsModule.appSettingsStore.trigger.hydrated({
+      settings: {
+        locale: APP_LOCALES.GERMAN,
+        emotionLabelMode: EMOTION_LABEL_MODES.EMOJI,
+        onboardingCompleted: true,
+      },
+    });
+    expect(settingsModule.appSettingsStore.getSnapshot().context.locale).toBe(APP_LOCALES.GERMAN);
+    localeConfiguration.configureAppLocale(settingsModule.appSettingsStore);
 
     await render(
       <GestureHandlerRootView>
