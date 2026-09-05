@@ -465,6 +465,7 @@ const reconcileStoredReminders =({
   }).catch(() => undefined);
 };
 
+// eslint-disable-next-line code-architecture/max-function-lines -- The factory encloses declarative XState data; nested leaf functions remain independently linted.
 export const createAppNavigationMachine = (runtime: AppNavigationRuntime) => setup({
   states: {
     [NAVIGATION_STATES.STARTING]: {},

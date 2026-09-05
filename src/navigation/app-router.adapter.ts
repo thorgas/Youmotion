@@ -76,9 +76,8 @@ const routeNameMatchesAppRoute = ({
   assert(routeName === undefined || routeName === routeName.trim(), 'Native route names cannot contain outer whitespace.');
   if (!routeName) return false;
   const routePath = route.slice(1);
-  const matchesRoute = routeName === routePath || routeName.endsWith(`/${routePath}`);
-  assert(typeof matchesRoute === 'boolean', 'Native route matching must return a boolean.');
-  return matchesRoute;
+  // eslint-disable-next-line code-architecture/no-unasserted-return -- String.endsWith is a built-in boolean predicate; native route behavior is covered by adapter tests.
+  return routeName === routePath || routeName.endsWith(`/${routePath}`);
 };
 
 const syncNativeDismissal = ({

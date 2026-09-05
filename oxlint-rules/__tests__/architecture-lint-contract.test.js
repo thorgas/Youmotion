@@ -521,7 +521,7 @@ describe('architecture lint contract', () => {
 
     expect(machineRules['code-architecture/no-implicit-external-dependencies']?.[0]).toBe(2);
     expect(compositionRules['code-architecture/no-implicit-external-dependencies']?.[0]).toBe(2);
-    expect(machineRules['code-architecture/max-function-lines']?.[0]).toBe(0);
+    expect(machineRules['code-architecture/max-function-lines']?.[0]).toBe(2);
     expect(compositionRules['code-architecture/max-function-lines']?.[0]).toBe(2);
     expect(compositionRules['code-architecture/no-exported-dependency-instances']?.[0]).toBe(2);
 
@@ -543,6 +543,30 @@ describe('architecture lint contract', () => {
     expect(compositionMessages).not.toEqual(expect.arrayContaining([
       expect.objectContaining({ ruleId: 'code-architecture/no-implicit-external-dependencies' }),
     ]));
+  });
+
+  it('keeps oversized helpers and nested handlers checked in the navigation machine file', () => {
+    const statements = Array.from(
+      { length: 71 },
+      (_, index) => `const value${index} = ${index};`,
+    ).join('\n');
+    const messages = messagesFor({
+      code: `
+        const handlers = {
+          oversized: () => {
+            ${statements}
+            return value70;
+          },
+        };
+        function oversizedHelper() {
+          ${statements}
+          return value70;
+        }
+      `,
+      filePath: 'src/navigation/app-navigation.machine.ts',
+    }).filter(({ ruleId }) => ruleId === 'code-architecture/max-function-lines');
+
+    expect(messages).toHaveLength(2);
   });
 
   it.each([

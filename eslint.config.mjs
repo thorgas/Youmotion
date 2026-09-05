@@ -518,12 +518,6 @@ export default tseslint.config(
     },
   },
   {
-    files: ['src/navigation/app-navigation.machine.ts'],
-    rules: {
-      'code-architecture/max-function-lines': 'off',
-    },
-  },
-  {
     files: [
       'src/**/__tests__/**',
       'src/**/*.harness.{ts,tsx}',
