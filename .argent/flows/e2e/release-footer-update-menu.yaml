@@ -11,7 +11,7 @@ steps:
       - tap: { id: xmark }
       - await: { hidden: { id: xmark }, timeout: 5000 }
   - tap: { id: tab-settings }
-  - await: { visible: { id: app-release-info }, timeout: 10000 }
+  - await: { visible: { text: Your space. }, timeout: 10000 }
   - echo: Scroll settings to the bottom so the release footer is on screen.
   - tool: gesture-swipe
     args: { fromX: 0.5, fromY: 0.8, toX: 0.5, toY: 0.2, durationMs: 400, momentum: false }
@@ -42,6 +42,7 @@ steps:
   - assert: { visible: { text: This is a development or dev-client build; expo-updates never checks here. } }
   - tap: { text: OK }
   - await: { hidden: { text: Updates are disabled in this build }, timeout: 5000 }
+  - await: { idle: true }
   - echo: Cancel closes the menu without acting.
   - tool: gesture-custom
     args:
@@ -51,6 +52,7 @@ steps:
   - await: { visible: { text: Check for update now }, timeout: 5000 }
   - tap: { text: Cancel }
   - await: { hidden: { text: Check for update now }, timeout: 5000 }
+  - await: { idle: true }
   - echo: A press outside the sheet dismisses it too.
   - tool: gesture-custom
     args:
