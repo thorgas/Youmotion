@@ -60,17 +60,16 @@ describe('app.config updates resolution', () => {
     expect(updates?.requestHeaders?.[CHANNEL_HEADER]).toBe('qa');
   });
 
-  it('disables updates for a locally built binary with no channel requested', () => {
+  it('leaves a build without a requested channel on its app.json defaults', () => {
     const updates = resolvedUpdates({});
-
-    expect(updates?.enabled).toBe(false);
-    expect(updates?.requestHeaders?.[CHANNEL_HEADER]).toBe('production');
-  });
-
-  it('leaves an EAS build without a requested channel on its app.json defaults', () => {
-    const updates = resolvedUpdates({ EAS_BUILD_PROFILE: 'production' });
 
     expect(updates?.enabled).toBeUndefined();
     expect(updates?.requestHeaders?.[CHANNEL_HEADER]).toBe('production');
+  });
+
+  it('resolves identically wherever the config is evaluated', () => {
+    expect(resolvedUpdates({ EAS_BUILD_PROFILE: 'testing' })).toEqual(resolvedUpdates({}));
+    expect(resolvedUpdates({ EAS_BUILD_PROFILE: 'testing', MOBILE_UPDATE_CHANNEL: 'qa' }))
+      .toEqual(resolvedUpdates({ MOBILE_UPDATE_CHANNEL: 'qa' }));
   });
 });
