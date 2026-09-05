@@ -42,9 +42,10 @@ more permissive where production constraints would only add noise.
   per-function minimum is stricter than TigerStyle's average target. Tolerant
   parsers, typed operational errors, and missing-resource results keep their
   intentional behavior; assertions protect internal invariants.
-- Assertions must prove real runtime assumptions. The former textual predicate
-  exceptions now capture their return values and assert the boolean boundary;
-  domain contracts prefer stronger ownership, bounds, and identity relations.
+- Assertions must prove real runtime assumptions. Built-in predicate call sites
+  use narrow suppressions where a boolean type check would be filler; behavior
+  tests cover the filtering and matching results instead. Domain contracts
+  prefer stronger ownership, bounds, and identity relations.
 - Explicit `disabled={false}` declarations are intentional interaction API
   contracts. They make state handling visible to humans and agents and prevent
   new primitives from omitting disabled UX.
@@ -104,6 +105,8 @@ cleanup slices:
 - `77fb796`: injected navigation runtime and deterministic replay.
 - `3f20c82`: factory-only function-length directive and call-site predicate
   exceptions with same-file adversarial coverage.
+- `d729019`: warning-free native time-picker readiness for the permanent
+  reminder E2E flow.
 
 ## Verification
 
@@ -133,14 +136,13 @@ Confirmed on the delivered production tree:
 
 Device E2E uses dedicated simulator
 `9D5C1782-C1C3-458B-9416-6311D03AD1B9`, Metro port 8091, and the committed
-synthetic flows. All 11 flows passed twice with zero failures and zero errors.
-The suite includes outside-tap dismissal for feedback, reminder-time, and
-reflection-time modals.
-
-Those device results predate `65f9a57`. Post-alpha.11 device replay and fresh
-screenshots remain pending because this Codex session exposes the Argent CLI
-but not the required Argent MCP device controls. The alpha.11 follow-up changes
-configuration, assertions, and dependency injection without changing rendered UI.
+synthetic flows. A fresh post-alpha.11 run executed all 11 flows twice: all 22
+executions passed with zero failures and zero errors. The suite includes
+outside-tap dismissal for feedback, reminder-time, and reflection-time modals.
+The native time picker initially produced a cold-pass pixel-settling warning;
+`d729019` extended its stability window, after which both fresh-service reminder
+passes completed with 53 checks and zero warnings. No rendered UI changed, so
+this verification does not require new screenshots.
 
 Clean-device replay hardened the permanent flows: tab taps avoid the movable
 Expo dev-tools control, first-run notification prompts receive an explicit
