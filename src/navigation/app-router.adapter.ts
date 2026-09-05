@@ -36,31 +36,25 @@ const isAppNavigationSnapshot = (
   snapshot: Snapshot<unknown>,
 ): snapshot is AppNavigationSnapshot => {
   assert(typeof snapshot === 'object' && snapshot !== null, 'Navigation snapshot must be an object.');
-  const matches = 'machine' in snapshot && snapshot.machine === appNavigationMachine;
-  assert(typeof matches === 'boolean', 'Navigation snapshot matching must produce a boolean.');
-  return matches;
+  return 'machine' in snapshot && snapshot.machine === appNavigationMachine;
 };
 
 const isAppNavigationTransition = (
   event: InspectionEvent,
 ): event is AppNavigationTransition => {
   assert(typeof event.type === 'string', 'Navigation event type must be a string.');
-  const matches = event.type === '@xstate.transition'
+  return event.type === '@xstate.transition'
     && isAppNavigationSnapshot(event.snapshot);
-  assert(typeof matches === 'boolean', 'Navigation transition matching must produce a boolean.');
-  return matches;
 };
 
 const isTabRoute = (route: AppRoute) => {
   assert(route.startsWith('/'), 'Tab route matching requires an absolute app route.');
-  const matches = (
+  return (
     route === APP_ROUTES.TODAY
     || route === APP_ROUTES.HISTORY
     || route === APP_ROUTES.ANALYTICS
     || route === APP_ROUTES.SETTINGS
   );
-  assert(typeof matches === 'boolean', 'Tab route matching must produce a boolean.');
-  return matches;
 };
 
 const replaceRoute = (route: AppRoute) => {
@@ -82,9 +76,7 @@ const routeNameMatchesAppRoute = ({
   assert(routeName === undefined || routeName === routeName.trim(), 'Native route names cannot contain outer whitespace.');
   if (!routeName) return false;
   const routePath = route.slice(1);
-  const matches = routeName === routePath || routeName.endsWith(`/${routePath}`);
-  assert(typeof matches === 'boolean', 'Route matching must produce a boolean.');
-  return matches;
+  return routeName === routePath || routeName.endsWith(`/${routePath}`);
 };
 
 const syncNativeDismissal = ({
