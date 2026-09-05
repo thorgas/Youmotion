@@ -46,7 +46,9 @@ phone could receive. After shipping a new binary, record its runtime:
 pnpm eas:update:runtimes
 ```
 
-and commit the changed file with the build.
+and commit the changed file with the build. Resolve it from a clean working
+tree: uncommitted changes are part of the fingerprint, so a dirty tree records
+a runtime no binary carries.
 
 ## Channels
 
