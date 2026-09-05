@@ -1,6 +1,7 @@
 import { useSelector as useActorSelector } from '@xstate/react';
 import { useSelector } from '@xstate/store-react';
 import { fbs } from 'fbtee';
+import { PressableScale } from 'pressto';
 import assert from '@/assert';
 import {
   Pressable,
@@ -132,7 +133,7 @@ function InsightTab({ label, onPress, selected, disabled = false, testID }: {
   testID: string;
 }) {
   return (
-    <Pressable
+    <PressableScale
       accessibilityRole="tab"
       accessibilityState={{ selected, disabled }}
       disabled={disabled}
@@ -143,7 +144,7 @@ function InsightTab({ label, onPress, selected, disabled = false, testID }: {
       <Text style={[styles.insightTabText, selected ? styles.insightTabTextSelected : null]}>
         {label}
       </Text>
-    </Pressable>
+    </PressableScale>
   );
 }
 

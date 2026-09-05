@@ -1,5 +1,6 @@
 import { fbs } from 'fbtee';
-import { Pressable, StyleSheet, Text } from 'react-native';
+import { PressableScale } from 'pressto';
+import { StyleSheet, Text } from 'react-native';
 import assert from '@/assert';
 
 import {
@@ -64,7 +65,7 @@ export function DataSafetyMessage({
   assert(message.trim().length > 0, 'Displayed data safety messages must not be blank.');
   assert(error === null || message === error, 'Errors must take precedence over notices.');
   return (
-    <Pressable
+    <PressableScale
       accessibilityRole={error ? 'alert' : 'button'}
       accessibilityState={{ disabled }}
       disabled={disabled}
@@ -73,7 +74,7 @@ export function DataSafetyMessage({
       testID={error ? 'data-safety-error' : 'data-safety-notice'}
     >
       <Text style={styles.noticeText}>{label ?? localizedDataSafetyMessage(message)}</Text>
-    </Pressable>
+    </PressableScale>
   );
 }
 

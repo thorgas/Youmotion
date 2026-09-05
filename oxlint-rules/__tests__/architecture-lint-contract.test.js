@@ -1,10 +1,15 @@
 const { spawnSync } = require('node:child_process');
+const { readFileSync } = require('node:fs');
 const path = require('node:path');
 
 const packageJson = require('../../package.json');
 
 const cwd = path.resolve(__dirname, '../..');
 const eslint = path.join(cwd, 'node_modules', '.bin', 'eslint');
+const buttonSource = readFileSync(
+  path.join(cwd, 'src/components/ui/button.tsx'),
+  'utf8',
+);
 
 const messagesFor = ({ code, filePath }) => {
   const result = spawnSync(
@@ -43,7 +48,7 @@ const exportedRuleNames = () => {
 describe('architecture lint contract', () => {
   it('keeps the alpha plugin in the main verification path', () => {
     expect(packageJson.devDependencies['eslint-plugin-code-architecture']).toBe(
-      '0.6.0-alpha.6',
+      '0.6.0-alpha.10',
     );
     expect(packageJson.scripts.lint).toContain('pnpm lint:architecture');
     expect(packageJson.scripts.verify).toContain('pnpm lint');
@@ -199,7 +204,7 @@ describe('architecture lint contract', () => {
       )).toBe(true);
     }
     expect(domainRules['code-architecture/no-unasserted-return']?.[0]).toBe(0);
-    expect(domainRules['code-architecture/require-assertions']?.[0]).toBe(0);
+    expect(domainRules['code-architecture/require-assertions']?.[0]).toBe(2);
     expect(applicationRules['code-architecture/require-contract-assertions']?.[0]).toBe(0);
   });
 
@@ -217,11 +222,17 @@ describe('architecture lint contract', () => {
       2,
       expect.objectContaining({
         contractComponents: ['AppBackButton', 'Button.Root', 'SettingsActionRow'],
+        feedbackComponents: ['PressableScale'],
       }),
     ];
 
     expect(storeRules['code-architecture/no-exported-dependency-instances']?.[0]).toBe(2);
     expect(otherApplicationRules['code-architecture/no-exported-dependency-instances']?.[0]).toBe(2);
+    expect(otherApplicationRules['code-architecture/no-unasserted-return']?.[1]?.allowedReturnCalls).toEqual([
+      'assignments.some',
+      'routeName.endsWith',
+      'text.includes',
+    ]);
     expect(algorithmRules['code-architecture/require-contract-assertions']).toBeUndefined();
     expect(algorithmRules['code-architecture/require-assertions']?.[0]).toBe(2);
     expect(configuredRulesFor(
@@ -233,6 +244,26 @@ describe('architecture lint contract', () => {
     expect(configuredRulesFor(
       'src/components/ui/contract-fixture.tsx',
     )['code-architecture/require-interactive-component-contract']).toEqual(interactionRule);
+  });
+
+  it('does not trust an arbitrary project method that shares a predicate name', () => {
+    const messages = messagesFor({
+      code: `
+        function loadResult(repository, input) {
+          const normalized = prepare(input);
+          validate(normalized);
+          return repository.some(normalized);
+        }
+      `,
+      filePath: 'src/features/reminders/application/trusted-return-fixture.ts',
+    });
+
+    expect(messages).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        ruleId: 'code-architecture/no-unasserted-return',
+        severity: 2,
+      }),
+    ]));
   });
 
   it('limits logic functions without forcing JSX component extraction', () => {
@@ -292,6 +323,46 @@ describe('architecture lint contract', () => {
     expect(testMessages).not.toEqual(expect.arrayContaining([
       expect.objectContaining({
         ruleId: 'code-architecture/require-assertions',
+      }),
+    ]));
+  });
+
+  it('keeps broad assertion density beside domain parameter contracts', () => {
+    const messages = messagesFor({
+      code: `
+        function normalize(value) {
+          const trimmed = value.trim();
+          const result = trimmed.toLowerCase();
+          return result;
+        }
+      `,
+      filePath: 'src/features/reminders/domain/contract-fixture.ts',
+    });
+
+    expect(messages).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        ruleId: 'code-architecture/require-assertions',
+        severity: 2,
+      }),
+    ]));
+  });
+
+  it('requires substantial worklets to use the recognized invariant helper', () => {
+    const messages = messagesFor({
+      code: `
+        function updatePosition(value) {
+          'worklet';
+          const next = value + 1;
+          return next;
+        }
+      `,
+      filePath: 'src/features/check-in/ui/worklet-contract-fixture.ts',
+    });
+
+    expect(messages).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        ruleId: 'code-architecture/require-assertions',
+        severity: 2,
       }),
     ]));
   });
@@ -559,6 +630,44 @@ describe('architecture lint contract', () => {
         }
       `,
       filePath: 'src/components/ui/contract-fixture.tsx',
+    });
+
+    expect(messages).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        ruleId: 'code-architecture/require-interactive-component-contract',
+        severity: 2,
+      }),
+    ]));
+  });
+
+  it.each([
+    {
+      name: 'disabled forwarding',
+      source: buttonSource.replace(
+        'disabled={disabled || loading}',
+        'disabled={false}',
+      ),
+    },
+    {
+      name: 'accessibility state',
+      source: buttonSource.replace(
+        '          accessibilityState={{ busy: loading, disabled: unavailable }}\n',
+        '',
+      ),
+    },
+    {
+      name: 'loading disabled behavior',
+      source: buttonSource
+        .replace(
+          'accessibilityState={{ busy: loading, disabled: unavailable }}',
+          'accessibilityState={{ busy: loading, disabled }}',
+        )
+        .replace('disabled={disabled || loading}', 'disabled={disabled}'),
+    },
+  ])('protects ButtonRoot $name through its real provider structure', ({ source }) => {
+    const messages = messagesFor({
+      code: source,
+      filePath: 'src/components/ui/button.tsx',
     });
 
     expect(messages).toEqual(expect.arrayContaining([

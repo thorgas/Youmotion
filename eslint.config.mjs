@@ -205,6 +205,20 @@ export default tseslint.config(
             'Button.Root',
             'SettingsActionRow',
           ],
+          feedbackComponents: ['PressableScale'],
+        },
+      ],
+    },
+  },
+  {
+    files: ['src/components/ui/button.tsx'],
+    rules: {
+      'code-architecture/require-interactive-component-contract': [
+        'error',
+        {
+          componentNames: ['ButtonRoot'],
+          disabledProps: ['disabled', 'loading'],
+          feedbackComponents: ['PressableScale'],
         },
       ],
     },
@@ -265,6 +279,11 @@ export default tseslint.config(
       'code-architecture/no-unasserted-return': [
         'error',
         {
+          allowedReturnCalls: [
+            'assignments.some',
+            'routeName.endsWith',
+            'text.includes',
+          ],
           ignoreDelegates: true,
           ignoreDirectCallbacks: true,
           ignoreJSXCallbacks: true,
@@ -336,7 +355,6 @@ export default tseslint.config(
       'src/features/check-in/domain/emotion-selection.ts',
     ],
     rules: {
-      'code-architecture/require-assertions': 'off',
       'code-architecture/require-contract-assertions': [
         'error',
         {

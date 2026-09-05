@@ -50,7 +50,7 @@ const _recordEntry = ({ entries, entry }: { entries: readonly CheckIn[]; entry: 
 const _deleteEntry = ({ entries, id }: { entries: readonly CheckIn[]; id: CheckIn['id'] }) => {
   const remaining = entries.filter((entry) => entry.id !== id);
   assert(remaining.length <= entries.length, 'Deleting a history entry cannot add entries.');
-  assert(remaining.every((entry) => entries.includes(entry)), 'Deleting must preserve entry identity.');
+  assert(remaining.every((entry) => entry.id !== id), 'Deleting must remove every matching history entry.');
   return remaining;
 };
 

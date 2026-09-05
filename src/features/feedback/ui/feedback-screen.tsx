@@ -1,5 +1,6 @@
 import { fbs } from 'fbtee';
 import { useMachine, useSelector } from '@xstate/react';
+import { PressableScale } from 'pressto';
 import {
   ActivityIndicator,
   Modal,
@@ -67,7 +68,7 @@ function FeedbackAction({
   testID: string;
 }) {
   return (
-    <Pressable
+    <PressableScale
       accessibilityRole="button"
       accessibilityState={{ disabled }}
       disabled={disabled}
@@ -75,7 +76,7 @@ function FeedbackAction({
       style={[styles.action, primary && styles.primaryAction, disabled && styles.disabledAction]}
       testID={testID}>
       <Text style={[styles.actionText, primary && styles.primaryActionText]}>{label}</Text>
-    </Pressable>
+    </PressableScale>
   );
 }
 
