@@ -1,34 +1,10 @@
 {
   "fb-locale": "de-DE",
   "translations": {
-    "K+2VdLvU+um30ukKF9VA0g==": {
-      "description": "Title of the release menu while on the QA update channel",
-      "tokens": [],
-      "translations": [{ "translation": "Updates · QA", "variations": {} }],
-      "types": []
-    },
-    "OBOhrrGAL81yc+EK64XuqQ==": {
-      "description": "Title of the release menu while on the production update channel",
-      "tokens": [],
-      "translations": [{ "translation": "Updates · Produktion", "variations": {} }],
-      "types": []
-    },
     "140QAhauBUZz/anKZbwF8Q==": {
       "description": "Release menu action fetching an over-the-air update",
       "tokens": [],
       "translations": [{ "translation": "Jetzt nach Update suchen", "variations": {} }],
-      "types": []
-    },
-    "uh+hIuNyPnEIon1U/SEjPg==": {
-      "description": "Release menu action moving the app to the QA update channel",
-      "tokens": [],
-      "translations": [{ "translation": "Zu QA wechseln", "variations": {} }],
-      "types": []
-    },
-    "+aAsjlJ941W2X8J54ry2aQ==": {
-      "description": "Release menu action moving the app back to the production update channel",
-      "tokens": [],
-      "translations": [{ "translation": "Zu Produktion wechseln", "variations": {} }],
       "types": []
     },
     "LpqGzBiAOVlBMCdRisgAYw==": {
@@ -83,6 +59,54 @@
       "description": "Release footer prefix naming the runtime version",
       "tokens": [],
       "translations": [{ "translation": "Laufzeit", "variations": {} }],
+      "types": []
+    },
+    "0m0c8OYdzkrvhRjqukFang==": {
+      "description": "Display name of the production update channel",
+      "tokens": [],
+      "translations": [{ "translation": "Produktion", "variations": {} }],
+      "types": []
+    },
+    "2PgybdJntC0q/jBdFtfpCA==": {
+      "description": "Display name of the testing update channel used by TestFlight and Play internal builds",
+      "tokens": [],
+      "translations": [{ "translation": "Testing", "variations": {} }],
+      "types": []
+    },
+    "Bsszg+q32ldIwN+y/gdt1g==": {
+      "description": "Display name of the QA update channel",
+      "tokens": [],
+      "translations": [{ "translation": "QA", "variations": {} }],
+      "types": []
+    },
+    "klMK5F72/XcX0nW1MPn7rg==": {
+      "description": "Release menu row revealing further update channels on Android",
+      "tokens": [],
+      "translations": [{ "translation": "Weitere Kanäle…", "variations": {} }],
+      "types": []
+    },
+    "RTg0BDtP4Kxt80HQCTJF6g==": {
+      "description": "Alert explaining that a channel switch applies on the next check or launch",
+      "tokens": [],
+      "translations": [{ "translation": "Die nächste Update-Suche oder der nächste App-Start nutzt diesen Kanal.", "variations": {} }],
+      "types": []
+    },
+    "2YLTz5NcQx79WsZfll5PgA==": {
+      "description": "Title of the release menu naming the active update channel",
+      "tokens": ["channel"],
+      "translations": [{ "translation": "Updates · {channel}", "variations": {} }],
+      "types": []
+    },
+    "kp7T+jHWiTJFW/YsJ0F1hA==": {
+      "description": "Release menu action moving the app to another update channel",
+      "tokens": ["channel"],
+      "translations": [{ "translation": "Zu {channel} wechseln", "variations": {} }],
+      "types": []
+    },
+    "IZhm0RyTlzYeWj/Cn9A8Lg==": {
+      "description": "Alert title confirming the app now follows another update channel",
+      "tokens": ["channel"],
+      "translations": [{ "translation": "Gewechselt zu {channel}", "variations": {} }],
       "types": []
     },
     "pxU3DuGXoYyJueKhl5vDiQ==": {

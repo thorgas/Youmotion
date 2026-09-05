@@ -1,9 +1,12 @@
 # Over-the-air updates
 
-Youmotion publishes JavaScript-only updates through EAS Update. Two channels
-matter: `production`, which store builds subscribe to, and `qa`, which exists
-so a tester can see a fix before it ships. The switch between them lives in the
-app, behind a long press, and needs no new binary.
+Youmotion publishes JavaScript-only updates through EAS Update. Three channels
+matter to testers: `production`, which store builds subscribe to; `testing`,
+which TestFlight and Play internal builds subscribe to; and `qa`, which exists
+so a tester can see a fix before it ships. The switch between them lives in
+the app, behind a long press, and needs no new binary. The list is
+`UPDATE_CHANNELS` in `src/constants.ts`; its first entry is the store channel
+an unrecognised bundle channel resolves to.
 
 ## The release footer
 
@@ -19,12 +22,17 @@ string is ours, in fbtee ([release-footer-labels.ts](../src/features/updates/ui/
 | `Kanal … · App …` | which channel this binary asks for, and its marketing version   |
 | `Laufzeit …`      | the runtime fingerprint an update must match to be eligible      |
 
-A long press (500 ms) opens the platform action sheet with three rows: check
-for an update now, switch to the other channel, cancel. Cancel and a press
-outside both dismiss it. A tap does nothing — the menu is deliberately hidden.
+A long press (500 ms) opens the platform action sheet: check for an update
+now, one "switch to" row per channel other than the current one, cancel.
+Cancel and a press outside both dismiss it. A tap does nothing — the menu is
+deliberately hidden. Android's native alert holds two actions, so with three
+channels it shows "More channels…" first and the switch rows behind it.
 
-Switching is transactional: if the target channel has no eligible update, the
-previous channel is restored rather than left half-applied.
+If the target channel has an eligible update, the app downloads it and
+reloads. If it has none, the switch still succeeds — the channel header is
+persisted natively and the alert says the next check or launch uses the new
+channel — instead of attempting a reload with nothing to launch. A failed
+download restores the previous channel.
 
 ## Publishing
 
@@ -125,16 +133,15 @@ though nothing tracked changed.
   with the runtime `eas update` printed. A fingerprint mismatch means the
   update was never eligible for this binary; publish against the matching
   runtime, or ship a new binary.
-- **"Update-Suche fehlgeschlagen · UpdatesReloadException".** The switch sets
-  the channel header and then reloads even when the target channel has nothing
-  eligible, and the reload has no update to launch. Expo's message names
-  `appContext`, which is not the real cause — the cause is that no update on
-  the target channel matches this binary's runtime. Publish to that channel at
-  the runtime the installed build reports in its `Laufzeit` line.
-- **The switch is meaningful only on a `production` build.** The footer knows
-  the channels `production` and `qa`. A `testing` or `preview` build maps to
-  `production`, so switching away from it cannot come back — reinstall to
-  return to `testing`.
+- **"Gewechselt zu …" but nothing changed on screen.** The target channel has
+  no update matching this binary's runtime, so only the header moved. Publish
+  to that channel at the runtime the footer's `Laufzeit` line reports, then
+  check again. (Before `expo-update-kit` 0.1.0-alpha.2 this case surfaced as
+  `UpdatesReloadException`; the kit no longer reloads with nothing to launch.)
+- **A `development` or `preview` build shows `Updates · Production`.** Only
+  the channels in `UPDATE_CHANNELS` are known; anything else resolves to the
+  first entry. Those builds are dev-client or internal builds that never take
+  updates anyway.
 - **The wrong code is running.** Check the channel line. A build made from a
   branch, with no `MOBILE_UPDATE_CHANNEL`, subscribes to `production` and will
   replace itself with the store bundle on first launch.
