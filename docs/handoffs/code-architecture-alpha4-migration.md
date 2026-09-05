@@ -1,16 +1,24 @@
-# Code architecture alpha.6 migration handoff
+# Code architecture alpha.10 migration handoff
 
 ## Delivered state
 
 - Youmotion branch: `codex/eslint-code-architecture-alpha2`; draft PR #26.
-- Installed package: `eslint-plugin-code-architecture@0.6.0-alpha.6`.
+- Installed package: `eslint-plugin-code-architecture@0.6.0-alpha.10`.
 - Plugin branch: `codex/worklet-assertion-default`; draft PR #11.
-- Plugin releases: alpha.5 at `1919e76` made worklet callbacks a default
-  assertion-density exception; alpha.6 at
+- Plugin releases: alpha.5 at `1919e76` made `assertWorkletInvariant` a
+  recognized helper rather than a worklet exemption; alpha.6 at
   `6bc278881ccb34279e2d46db351193fb0b55d630` added safe compound-component
-  contract delegation. Both GitHub release workflows passed, and npm's `alpha`
-  dist-tag resolves to `0.6.0-alpha.6`.
+  contract delegation. Alpha.7 at `381de391612c2577a1e79bbd396ca937478c8016`
+  closes awaited-return, property-mutation, local-binding, and interaction-path
+  gaps. Alpha.8 at `1f818cee83389a1754bc215bf9abeeb62d10acd8`
+  models feedback-owning primitives and conditional noninteractive paths.
+  Alpha.9 at `ae264b0730e0e131f260d2a55e087196fe10d0a5` adds narrow
+  return-call patterns. Alpha.10 at `496669c8f63320fcafdd5b8ba6aa81e7d4249bac`
+  checks every alternative local-return call, shares mutation invalidation, and
+  makes unknown JSX spreads conservative and order-aware. All release workflows
+  passed, and npm's `alpha` dist-tag resolves to `0.6.0-alpha.10`.
 - The branch was rebased onto `origin/main`; the rebase was a no-op.
+- Alpha.10 consumer migration: `65f9a57`.
 
 The migration enables every exported architecture rule in a truthful production
 scope. Tests, Harness fixtures, and immutable migrations remain deliberately
@@ -23,16 +31,23 @@ more permissive where production constraints would only add noise.
 - Domain contract assertions and application/navigation return assertions have
   disjoint scopes. Domain contracts currently enforce parameter preconditions
   for functions with at least five statements; `checkReturns` remains off.
-- Assertions must prove real runtime assumptions. A check such as
-  `assert(typeof matches === 'boolean')` guards predicate/data-boundary drift and
-  is not ceremonial.
+  Broad `require-assertions` density stays enabled alongside that policy.
+- Assertions must prove real runtime assumptions. Tautological boolean checks
+  on equality predicates were removed; those helpers now return their predicate
+  directly while retaining meaningful input and state invariants.
 - Explicit `disabled={false}` declarations are intentional interaction API
   contracts. They make state handling visible to humans and agents and prevent
   new primitives from omitting disabled UX.
-- All shared and feature UI is covered by bare interactive detection. Alpha.6's
+- Shared and feature UI use bare interactive detection. `ButtonRoot` is pinned
+  to its owner file because two context providers wrap its pressable. Alpha.6's
   `contractComponents` option recognizes `AppBackButton`, `Button.Root`, and
   `SettingsActionRow` as contract-owning primitives while still requiring a
   wrapper to accept and forward disabled state and configurable content.
+- `PressableScale` is trusted only for the feedback part of that contract.
+  Three plain pressables that lacked feedback now use the established primitive.
+- `no-unasserted-return` trusts only the receiver-specific method names
+  `assignments.some`, `text.includes`, and `routeName.endsWith`. These are
+  naming exceptions rather than type evidence; all other returned calls remain strict.
 - The named-import policy uses globs for Expo, Effect subpaths, infrastructure,
   PNG, and JSON imports plus the irreducible exact package seams.
 - `src/app-stores.ts` is the tested composition root. Its four live stores are
@@ -70,6 +85,8 @@ cleanup slices:
 - `0648fb1`: application return invariants.
 - `021c58b`: alpha.6 and baseline-free shared/feature UI enforcement.
 - `82f51a3`: clean-device E2E isolation and selector hardening.
+- Alpha.7 follow-up: real-structure button protection, restored domain density,
+  concise predicates, and a linear deletion postcondition.
 
 ## Verification
 
@@ -89,18 +106,24 @@ git diff --check
 Confirmed on the delivered production tree:
 
 - Frozen install passed with pnpm 11.18.0.
-- `pnpm verify`: 47 suites and 318 tests passed; Oxlint, ESLint,
+- `pnpm verify`: 47 suites and 324 tests passed; Oxlint, ESLint,
   architecture lint, TypeScript 7, and Jest were green.
-- `pnpm lint:rules`: 2 suites and 49 adversarial contract tests passed.
-- `pnpm test:coverage`: 47 suites and 318 tests passed; 87.46% statements,
-  76.01% branches, 82.85% functions, and 90.34% lines.
-- The installed package was read from `node_modules` and confirmed as alpha.6.
+- `pnpm lint:rules`: 2 suites and 55 adversarial contract tests passed.
+- `pnpm test:coverage`: 47 suites and 324 tests passed; 87.45% statements,
+  76.28% branches, 82.85% functions, and 90.33% lines.
+- The installed package was read from `node_modules` and confirmed as alpha.10.
 
 Device E2E uses dedicated simulator
 `9D5C1782-C1C3-458B-9416-6311D03AD1B9`, Metro port 8091, and the committed
 synthetic flows. All 11 flows passed twice with zero failures and zero errors.
 The suite includes outside-tap dismissal for feedback, reminder-time, and
 reflection-time modals.
+
+Those device results predate `65f9a57`. Post-alpha.10 device replay and fresh
+screenshots remain pending because this Codex session exposes the Argent CLI
+but not the required Argent MCP device controls. The production change only
+replaces three plain `Pressable` roots with the already-used `PressableScale`
+feedback primitive; resting visuals are intended to remain unchanged.
 
 Clean-device replay hardened the permanent flows: tab taps avoid the movable
 Expo dev-tools control, first-run notification prompts receive an explicit

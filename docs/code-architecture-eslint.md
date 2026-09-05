@@ -1,6 +1,6 @@
 # Code architecture ESLint policy
 
-Youmotion uses `eslint-plugin-code-architecture@0.6.0-alpha.6` as a blocking part of
+Youmotion uses `eslint-plugin-code-architecture@0.6.0-alpha.10` as a blocking part of
 `pnpm verify`. The effective configuration is in `eslint.config.mjs`, and its
 repository contract is tested in
 `oxlint-rules/__tests__/architecture-lint-contract.test.js`.
@@ -29,7 +29,7 @@ repository contract is tested in
 | `no-raw-design-properties` | Error | Previously unknown literal colors are rejected in production UI even when they were not in the earlier value inventory. Tests are excluded. |
 | `no-raw-design-values` | Error | Shared palette values are forbidden in object styles and JSX color props outside `src/theme.ts`. |
 | `no-root-owned-compound-parts` | Error | Compound roots expose consumer-owned composition instead of rendering their own namespaced parts. |
-| `no-unasserted-return` | Error | Application and navigation functions that directly return delegated calls must prove their result. Domain functions use the contract rule instead. |
+| `no-unasserted-return` | Error | Application and navigation functions that return call results, directly or through a local binding, must prove that result. The receiver-specific `assignments.some`, `text.includes`, and `routeName.endsWith` entries are trusted method-name exceptions, not type evidence; other calls remain strict. Domain functions use the contract rule instead. |
 | `no-unsafe-type-assertions` | Error | Runtime validation or narrowing replaces assertions and non-null escapes. |
 | `no-unvalidated-json-parse` | Error | Parsed JSON flows directly into an approved schema decoder. |
 | `prefer-composition-over-configuration` | Error | Structural component APIs use consumer composition instead of configuration props. |
@@ -42,17 +42,17 @@ repository contract is tested in
 | `require-contract-assertions` | Error | Eligible domain functions with at least five statements enforce semantic parameter preconditions. Return checking is deliberately off because it currently reports nested predicate returns despite callback ignores; algorithm-heavy files retain the established density rule. |
 | `require-consumer-owned-compound-usage` | Error | Compound consumers select the parts rendered beneath a boundary. |
 | `require-dismissible-modal-backdrop` | Error | Every transparent native modal has request-close handling and a pressable outside-dismiss surface. |
-| `require-interactive-component-contract` | Error | Bare structural detection protects all shared and feature UI. Interactive primitives explicitly expose disabled state, accessible feedback, and configurable content. Wrappers may delegate the primitive-owned contract through `AppBackButton`, `Button.Root`, or `SettingsActionRow`, but must still accept and forward their own state and content. An explicit `disabled={false}` is intentional API documentation, not a suppression. |
+| `require-interactive-component-contract` | Error | Bare structural detection protects shared and feature UI. `PressableScale` owns press feedback only; wrappers still expose role, state, disabled behavior, and content. `ButtonRoot` has an owner-file override because its pressable is nested beneath two providers, including both disabled and loading behavior. Other wrappers may delegate through `AppBackButton`, `Button.Root`, or `SettingsActionRow`. An explicit `disabled={false}` is intentional API documentation, not a suppression. |
 | `sort-dependency-types` | Error | Future intersections of Evolu-style `*Dep` wrappers use deterministic ordering. |
 | `top-down-declarations` | Error | Modules put public contracts above private details while preserving runtime dependencies. There is no file baseline. |
-| `require-assertions` | Error | Production functions with at least three statements require two runtime assertions. XState actions, guards, transitions, and named React components remain covered. Worklets are excluded by the plugin because JavaScript-thread assertions cannot run there. Tests, Harness files, and test-support directories are excluded. Assertions must express real input, output, state, schema, or cardinality invariants rather than typed-shape or tautological filler. |
+| `require-assertions` | Error | Production functions with at least three statements require two runtime assertions, including domain functions also governed by parameter contracts. XState actions, guards, transitions, named React components, and substantial worklets remain covered. Tests, Harness files, and test-support directories are excluded. Assertions must express real input, output, state, schema, or cardinality invariants rather than typed-shape or tautological filler. |
 
 JavaScript-runtime invariants use the Hermes-safe assertion function in
 `src/assert.ts`; no Node compatibility layer is required. Reanimated UI-runtime
-callbacks use the local `assertWorkletInvariant` helper when they need a
-worklet-local invariant. Alpha.5 made the safe worklet exclusion a plugin
-default, because importing a JavaScript-runtime assertion into a worklet would
-attempt a synchronous cross-runtime call. The rules recognize `@/assert`,
+callbacks use the local `assertWorkletInvariant` helper for worklet-local
+invariants. Alpha.5 made that helper a recognized assertion name by default; it
+did not exempt worklets. Importing a JavaScript-runtime assertion into a
+worklet would attempt a synchronous cross-runtime call. The rules recognize `@/assert`,
 `nodeAssert.ok`, and TypeScript `asserts` functions structurally. The former
 repeated assertion-name lists are gone.
 
@@ -60,9 +60,9 @@ repeated assertion-name lists are gone.
 function. Domain files use the former; application and navigation files use the
 latter. Existing algorithm-heavy domain modules remain on `require-assertions`
 until the contract rule can distinguish public boundaries from private reducer
-and sorting helpers. This avoids duplicate diagnostics while retaining
-meaningful runtime checks such as validating that a predicate result is
-actually boolean.
+and sorting helpers. Broad assertion density stays enabled in both domain
+scopes. Predicate helpers remain concise instead of asserting the tautological
+result type of an equality expression.
 
 ## Remaining architecture exception
 
