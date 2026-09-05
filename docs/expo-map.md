@@ -28,9 +28,11 @@ Runtime states that require hydrated local data must be populated by restoring t
 With a compatible simulator and development build running, replay a saved flow from the repository root:
 
 ```bash
-npx @swmansion/argent flow run .expo-map/flows/nav-success-reminder-offer.yaml
+argent flow run .expo-map/flows/nav-combined-release.yaml --device YOUR_MAP_SIMULATOR_UDID
 ```
 
 For Youmotion's committed iOS map, resolve and explicitly select the simulator named `Youmotion Expo Map` before launching or replaying a flow, and verify the bundle id is `com.youmotion.mobile`. Do not rely on model/runtime-based auto-selection because another project's simulator can share the same device model and iOS version.
 
 A map refresh is complete only when the route count is reconciled, every new screenshot is visually inspected, changed flows replay successfully, and the resulting `.appmap` bundle contains the new screenshots and flow files.
+
+The 2026-09-05 bundle refreshes the affected combined-PR screens. Unaffected captures retain their earlier provenance. `capture-status.json` identifies remaining bare-deep-link limitations. The combined flow uses Metro 8091, an onboarded English app, and the committed fixture staged in On My iPhone as `youmotion-combined-synthetic-archive.json`; keep it first in the Files grid. Remove the synthetic always-functioning reminder before replay because restoring journal data preserves reminder settings.

@@ -1,0 +1,61 @@
+steps:
+  - launch: com.youmotion.mobile
+  - echo: Restore the committed synthetic archive fixture before capturing the populated release path. The fixture contains 133 moments and 15 guiding beliefs and must already be staged in the simulator Files app.
+  - tool: open-url
+    args:
+      url: exp+youmotion://expo-development-client/?url=http%3A%2F%2F127.0.0.1%3A8091
+  - await: { visible: { id: emotion-star }, timeout: 30000 }
+  - await: { idle: true }
+  - tap: { id: tab-settings }
+  - await: { visible: { id: settings-screen }, timeout: 10000 }
+  - await: { idle: true }
+  - scroll-to: { target: { id: restore-data-archive }, direction: down }
+  - tap: { id: restore-data-archive }
+  - tool: await-ui-element
+    args:
+      condition: visible
+      selector: { identifier: "youmotion-combined-synthetic-archive.json, json" }
+      timeoutMs: 10000
+  - tool: describe
+    args: {}
+  - tool: gesture-tap
+    args: { x: 0.1765, y: 0.3515 }
+  - await: { visible: { text: "Replace this device's data?" }, timeout: 10000 }
+  - scroll-to: { target: { text: Replace data }, direction: down }
+  - tap: { text: Replace data }
+  - await: { visible: { text: Your backup replaced the data on this device. }, timeout: 10000 }
+  - await: { idle: true }
+  - scroll-to: { target: { id: open-belief-library }, direction: up }
+  - tap: { id: open-belief-library }
+  - await: { visible: { id: belief-library-screen }, timeout: 10000 }
+  - await: { idle: true }
+  - await: { visible: { text: What supports you. }, timeout: 10000 }
+  - tap: { text: Back }
+  - await: { visible: { id: settings-screen }, timeout: 10000 }
+  - tap: { id: tab-today }
+  - await: { visible: { id: emotion-star }, timeout: 10000 }
+  - await: { idle: true }
+  - tool: gesture-swipe
+    args:
+      fromX: 0.5
+      fromY: 0.507
+      toX: 0.7
+      toY: 0.4
+      duration: 1
+  - await: { visible: { id: reflection-note-input }, timeout: 10000 }
+  - tap: { id: reflection-note-input }
+  - tap: { text: What is present right now? }
+  - tap: { text: Continue reflection }
+  - await: { visible: { id: belief-system-suggestion-always-functioning }, timeout: 10000 }
+  - await: { idle: true }
+  - tap: { id: belief-system-suggestion-always-functioning }
+  - tap: { text: Attach and continue }
+  - await: { visible: { id: guiding-belief-draft }, timeout: 10000 }
+  - await: { idle: true }
+  - scroll-to: { target: { id: guiding-belief-finish }, direction: down }
+  - tap: { id: guiding-belief-finish }
+  - await: { visible: { text: Plan reminder }, timeout: 10000 }
+  - await: { idle: true }
+  - tap: { text: Plan reminder }
+  - await: { visible: { text: Choose when it should return. }, timeout: 10000 }
+  - await: { idle: true }
