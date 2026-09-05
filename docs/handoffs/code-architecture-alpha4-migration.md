@@ -55,9 +55,10 @@ more permissive where production constraints would only add noise.
   wrapper to accept and forward disabled state and configurable content.
 - `PressableScale` is trusted only for the feedback part of that contract.
   Three plain pressables that lacked feedback now use the established primitive.
-- Youmotion no longer uses textual `allowedReturnCalls`. The former built-in
-  predicate sites keep explicit boolean-result invariants, while alpha.11's
-  import/export identity matching is available for genuinely trusted helpers.
+- Youmotion no longer uses configuration-wide textual `allowedReturnCalls`.
+  Three built-in predicate returns use narrow, justified call-site directives
+  backed by behavior tests. Alpha.11's import/export identity matching remains
+  available for genuinely trusted project helpers.
 - The named-import policy uses globs for Expo, Effect subpaths, infrastructure,
   PNG, and JSON imports plus the irreducible exact package seams.
 - `src/app-stores.ts` is the tested composition root. Its four live stores are
@@ -79,9 +80,10 @@ more permissive where production constraints would only add noise.
 The navigation machine is no longer a composition root. The new
 `src/navigation/app-navigation.composition.ts` owns ambient time, randomness,
 and live stores and supplies `AppNavigationRuntime` to the machine factory.
-Deterministic replay covers time/nonce transitions. The machine retains an exact
-`max-function-lines` exception because the injected factory encloses the large
-declarative XState object; leaf functions still use the 70-line rule.
+Deterministic replay covers time/nonce transitions. Only the machine factory has
+a line-level `max-function-lines` directive because it encloses the large
+declarative XState object. The rule remains enabled for the file, with
+adversarial tests proving oversized nested handlers and standalone helpers fail.
 
 ## Cherry-pickable commits
 
@@ -98,6 +100,10 @@ cleanup slices:
 - `82f51a3`: clean-device E2E isolation and selector hardening.
 - Alpha.7 follow-up: real-structure button protection, restored domain density,
   concise predicates, and a linear deletion postcondition.
+- `e298c4a`, `52834d1`: alpha.11 and initial full domain contracts.
+- `77fb796`: injected navigation runtime and deterministic replay.
+- `3f20c82`: factory-only function-length directive and call-site predicate
+  exceptions with same-file adversarial coverage.
 
 ## Verification
 
@@ -119,7 +125,7 @@ Confirmed on the delivered production tree:
 - Frozen install passed with pnpm 11.18.0.
 - `pnpm verify`: 47 suites and 330 tests passed; Oxlint, ESLint,
   architecture lint, TypeScript 7, and Jest were green.
-- `pnpm lint:rules`: 2 suites and 58 adversarial contract tests passed after
+- `pnpm lint:rules`: 2 suites and 59 adversarial contract tests passed after
   the alpha.11 configuration and navigation-boundary changes.
 - `pnpm test:coverage`: 47 suites and 330 tests passed; 87.48% statements,
   76.32% branches, 82.85% functions, and 90.36% lines.

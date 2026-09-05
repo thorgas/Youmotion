@@ -29,7 +29,7 @@ repository contract is tested in
 | `no-raw-design-properties` | Error | Previously unknown literal colors are rejected in production UI even when they were not in the earlier value inventory. Tests are excluded. |
 | `no-raw-design-values` | Error | Shared palette values are forbidden in object styles and JSX color props outside `src/theme.ts`. |
 | `no-root-owned-compound-parts` | Error | Compound roots expose consumer-owned composition instead of rendering their own namespaced parts. |
-| `no-unasserted-return` | Error | Application and navigation functions that return call results, directly or through local conditional/logical bindings, must prove that result. Youmotion has no textual return-call exceptions. Domain functions use the contract rule instead. |
+| `no-unasserted-return` | Error | Application and navigation functions that return call results, directly or through local conditional/logical bindings, must prove that result. Youmotion has no configuration-wide textual exceptions. Three built-in boolean predicates use justified call-site directives backed by filtering and routing behavior tests. Domain functions use the contract rule instead. |
 | `no-unsafe-type-assertions` | Error | Runtime validation or narrowing replaces assertions and non-null escapes. |
 | `no-unvalidated-json-parse` | Error | Parsed JSON flows directly into an approved schema decoder. |
 | `prefer-composition-over-configuration` | Error | Structural component APIs use consumer composition instead of configuration props. |
@@ -81,10 +81,11 @@ remain deliberately more permissive and do not block production architecture.
 `src/navigation/app-navigation.composition.ts` is the narrow owner of the live
 clock, nonce source, settings store, and history store. The machine receives
 those dependencies through `AppNavigationRuntime`; deterministic tests replay
-time- and nonce-dependent transitions. The machine file retains one exact
-`max-function-lines` exception because injecting runtime dependencies makes the
-factory syntactically enclose the declarative XState definition. Leaf action
-functions remain covered by the 70-line policy.
+time- and nonce-dependent transitions. Only the machine factory diagnostic has
+a justified line-level `max-function-lines` directive because injection makes
+that factory syntactically enclose the declarative XState definition. The rule
+stays enabled for the file; adversarial configuration tests prove oversized
+nested handlers and standalone helpers still fail.
 
 ## Design-system ownership
 
