@@ -117,12 +117,12 @@ git diff --check
 Confirmed on the delivered production tree:
 
 - Frozen install passed with pnpm 11.18.0.
-- `pnpm verify`: 47 suites and 324 tests passed; Oxlint, ESLint,
+- `pnpm verify`: 47 suites and 330 tests passed; Oxlint, ESLint,
   architecture lint, TypeScript 7, and Jest were green.
 - `pnpm lint:rules`: 2 suites and 58 adversarial contract tests passed after
   the alpha.11 configuration and navigation-boundary changes.
-- `pnpm test:coverage`: 47 suites and 324 tests passed; 87.45% statements,
-  76.28% branches, 82.85% functions, and 90.33% lines.
+- `pnpm test:coverage`: 47 suites and 330 tests passed; 87.48% statements,
+  76.32% branches, 82.85% functions, and 90.36% lines.
 - The installed package was read from `node_modules` and confirmed as alpha.11.
 
 Device E2E uses dedicated simulator
@@ -150,12 +150,12 @@ suites/17 tests failed. The failures reproduce the existing native Harness
 backlog: missing `uniffiEnsureInitialized`, fixtures without expected native
 query IDs/labels, and the feedback fixture without `FeedbackProvider`.
 
-Changed-scope React Doctor reports five `rn-no-raw-text` errors for existing
-`<fbt>` nodes returned by `reminderStatusLabel` and `reminderContentLabel`, even
-though both helper results are rendered inside React Native `<Text>` at the
-call sites. This is a static-analysis false positive exposed by the file move,
-not raw text at runtime. It also reports one advisory performance warning and
-no security finding. No suppression was added.
+React Doctor reports 70 repository-wide findings. Its security error is the
+pre-existing, untracked root credential JSON that this task did not inspect or
+modify. Eleven raw-text findings begin at an existing `<fbt>` fallback rendered
+through React Native `<Text>` call sites; the remaining findings are advisory
+security, correctness, performance, and maintainability warnings. No
+suppression was added.
 
 ## UI evidence
 
