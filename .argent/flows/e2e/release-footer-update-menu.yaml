@@ -1,9 +1,14 @@
 steps:
+  - when:
+      platform: ios
+    steps:
+      - launch: com.youmotion.mobile
   - echo: Long-press the release footer in settings and verify the hidden update menu and the disabled-build alert.
-  - launch: com.youmotion.mobile
   - tool: open-url
     args:
       url: exp+youmotion://expo-development-client/?url=http%3A%2F%2F127.0.0.1%3A8091
+  - run: fragments/ensure-onboarded.yaml
+  - run: fragments/ensure-english.yaml
   - await: { visible: { id: tab-settings }, timeout: 30000 }
   - when:
       visible: { id: xmark }

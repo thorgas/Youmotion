@@ -1,5 +1,5 @@
-import appConfig from '../../app.config.js';
-import appJson from '../../app.json';
+import { resolveUpdates } from '../../updates.config.js';
+import { expo as appConfig } from '../../app.json';
 
 const CHANNEL_HEADER = 'expo-channel-name';
 
@@ -25,7 +25,7 @@ const resolvedUpdates = (environment: {
   });
 
   try {
-    return appConfig({ config: appJson.expo }).updates;
+    return resolveUpdates(appConfig);
   } finally {
     applyEnvironment(previous);
   }
@@ -33,11 +33,11 @@ const resolvedUpdates = (environment: {
 
 describe('app.config updates resolution', () => {
   it('ships a fingerprint runtime version so an update matches the binary it was built against', () => {
-    expect(appJson.expo.runtimeVersion.policy).toBe('fingerprint');
+    expect(appConfig.runtimeVersion.policy).toBe('fingerprint');
   });
 
   it('embeds the production channel header the runtime override needs', () => {
-    expect(appJson.expo.updates.requestHeaders[CHANNEL_HEADER]).toBe('production');
+    expect(appConfig.updates.requestHeaders[CHANNEL_HEADER]).toBe('production');
   });
 
   it('disables updates entirely for MOBILE_UPDATE_CHANNEL=none', () => {
