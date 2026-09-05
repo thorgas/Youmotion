@@ -1,9 +1,9 @@
-# Code architecture alpha.10 migration handoff
+# Code architecture alpha.11 migration handoff
 
 ## Delivered state
 
 - Youmotion branch: `codex/eslint-code-architecture-alpha2`; draft PR #26.
-- Installed package: `eslint-plugin-code-architecture@0.6.0-alpha.10`.
+- Installed package: `eslint-plugin-code-architecture@0.6.0-alpha.11`.
 - Plugin branch: `codex/worklet-assertion-default`; draft PR #11.
 - Plugin releases: alpha.5 at `1919e76` made `assertWorkletInvariant` a
   recognized helper rather than a worklet exemption; alpha.6 at
@@ -16,9 +16,14 @@
   return-call patterns. Alpha.10 at `496669c8f63320fcafdd5b8ba6aa81e7d4249bac`
   checks every alternative local-return call, shares mutation invalidation, and
   makes unknown JSX spreads conservative and order-aware. All release workflows
-  passed, and npm's `alpha` dist-tag resolves to `0.6.0-alpha.10`.
+  passed. Alpha.11 at `4ebddacefb7c9c99abf73c51042056e377307053`
+  clarifies tolerant error contracts and density heuristics, follows local
+  bindings inside conditional/logical returns, and adds import/export-identity
+  matching for trusted return helpers. npm's `alpha` dist-tag resolves to
+  `0.6.0-alpha.11`.
 - The branch was rebased onto `origin/main`; the rebase was a no-op.
-- Alpha.10 consumer migration: `65f9a57`.
+- Alpha.11 consumer migration: `e298c4a`; branded fixture correction: `52834d1`;
+  navigation runtime extraction: `77fb796`.
 
 The migration enables every exported architecture rule in a truthful production
 scope. Tests, Harness fixtures, and immutable migrations remain deliberately
@@ -29,12 +34,17 @@ more permissive where production constraints would only add noise.
 - `require-assertions` is the broad production density policy. Alpha.4's
   structural assertion detection removed both repeated `assertionNames` lists.
 - Domain contract assertions and application/navigation return assertions have
-  disjoint scopes. Domain contracts currently enforce parameter preconditions
-  for functions with at least five statements; `checkReturns` remains off.
-  Broad `require-assertions` density stays enabled alongside that policy.
-- Assertions must prove real runtime assumptions. Tautological boolean checks
-  on equality predicates were removed; those helpers now return their predicate
-  directly while retaining meaningful input and state invariants.
+  disjoint scopes. `selectionForCheckIn` and `normalizedReminderTiming` now own
+  full parameter and return contracts. Other eligible domain functions retain
+  partial parameter coverage, while the six algorithm-heavy modules retain only
+  broad density coverage.
+- Assertion density is a heuristic, not contract completeness. The plugin's
+  per-function minimum is stricter than TigerStyle's average target. Tolerant
+  parsers, typed operational errors, and missing-resource results keep their
+  intentional behavior; assertions protect internal invariants.
+- Assertions must prove real runtime assumptions. The former textual predicate
+  exceptions now capture their return values and assert the boolean boundary;
+  domain contracts prefer stronger ownership, bounds, and identity relations.
 - Explicit `disabled={false}` declarations are intentional interaction API
   contracts. They make state handling visible to humans and agents and prevent
   new primitives from omitting disabled UX.
@@ -45,9 +55,9 @@ more permissive where production constraints would only add noise.
   wrapper to accept and forward disabled state and configurable content.
 - `PressableScale` is trusted only for the feedback part of that contract.
   Three plain pressables that lacked feedback now use the established primitive.
-- `no-unasserted-return` trusts only the receiver-specific method names
-  `assignments.some`, `text.includes`, and `routeName.endsWith`. These are
-  naming exceptions rather than type evidence; all other returned calls remain strict.
+- Youmotion no longer uses textual `allowedReturnCalls`. The former built-in
+  predicate sites keep explicit boolean-result invariants, while alpha.11's
+  import/export identity matching is available for genuinely trusted helpers.
 - The named-import policy uses globs for Expo, Effect subpaths, infrastructure,
   PNG, and JSON imports plus the irreducible exact package seams.
 - `src/app-stores.ts` is the tested composition root. Its four live stores are
@@ -66,11 +76,12 @@ more permissive where production constraints would only add noise.
   meaningful result invariants.
 - The duplicate domain `require-assertions: off` block was removed.
 
-The remaining broad exception is
-`src/navigation/app-navigation.machine.ts`, currently a 3,269-line composition
-root for ambient time and randomness. This is transitional, not intentional
-architecture. Remove it only after time/random factories move to a smaller
-composition module and are injected into the machine boundary.
+The navigation machine is no longer a composition root. The new
+`src/navigation/app-navigation.composition.ts` owns ambient time, randomness,
+and live stores and supplies `AppNavigationRuntime` to the machine factory.
+Deterministic replay covers time/nonce transitions. The machine retains an exact
+`max-function-lines` exception because the injected factory encloses the large
+declarative XState object; leaf functions still use the 70-line rule.
 
 ## Cherry-pickable commits
 
@@ -108,10 +119,11 @@ Confirmed on the delivered production tree:
 - Frozen install passed with pnpm 11.18.0.
 - `pnpm verify`: 47 suites and 324 tests passed; Oxlint, ESLint,
   architecture lint, TypeScript 7, and Jest were green.
-- `pnpm lint:rules`: 2 suites and 55 adversarial contract tests passed.
+- `pnpm lint:rules`: 2 suites and 58 adversarial contract tests passed after
+  the alpha.11 configuration and navigation-boundary changes.
 - `pnpm test:coverage`: 47 suites and 324 tests passed; 87.45% statements,
   76.28% branches, 82.85% functions, and 90.33% lines.
-- The installed package was read from `node_modules` and confirmed as alpha.10.
+- The installed package was read from `node_modules` and confirmed as alpha.11.
 
 Device E2E uses dedicated simulator
 `9D5C1782-C1C3-458B-9416-6311D03AD1B9`, Metro port 8091, and the committed
@@ -119,11 +131,10 @@ synthetic flows. All 11 flows passed twice with zero failures and zero errors.
 The suite includes outside-tap dismissal for feedback, reminder-time, and
 reflection-time modals.
 
-Those device results predate `65f9a57`. Post-alpha.10 device replay and fresh
+Those device results predate `65f9a57`. Post-alpha.11 device replay and fresh
 screenshots remain pending because this Codex session exposes the Argent CLI
-but not the required Argent MCP device controls. The production change only
-replaces three plain `Pressable` roots with the already-used `PressableScale`
-feedback primitive; resting visuals are intended to remain unchanged.
+but not the required Argent MCP device controls. The alpha.11 follow-up changes
+configuration, assertions, and dependency injection without changing rendered UI.
 
 Clean-device replay hardened the permanent flows: tab taps avoid the movable
 Expo dev-tools control, first-run notification prompts receive an explicit
