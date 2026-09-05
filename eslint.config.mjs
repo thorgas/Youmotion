@@ -374,6 +374,29 @@ export default tseslint.config(
   },
   {
     files: [
+      'src/features/check-in/domain/emotion.ts',
+      'src/features/reminders/domain/reminder-timing.ts',
+    ],
+    rules: {
+      'code-architecture/require-contract-assertions': [
+        'error',
+        {
+          checkParameters: true,
+          checkReturns: true,
+          ignoreDelegates: true,
+          ignoreDirectCallbacks: true,
+          ignoreJSXCallbacks: true,
+          ignoreJSXComponents: true,
+          ignoreNoInputClosures: true,
+          ignoreReactHooks: true,
+          ignoreTrivialConstructors: true,
+          minimumStatements: 5,
+        },
+      ],
+    },
+  },
+  {
+    files: [
       'src/features/**/application/**/*.{ts,tsx}',
       'src/navigation/**/*.{ts,tsx}',
     ],

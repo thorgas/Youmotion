@@ -48,7 +48,7 @@ const exportedRuleNames = () => {
 describe('architecture lint contract', () => {
   it('keeps the alpha plugin in the main verification path', () => {
     expect(packageJson.devDependencies['eslint-plugin-code-architecture']).toBe(
-      '0.6.0-alpha.10',
+      '0.6.0-alpha.11',
     );
     expect(packageJson.scripts.lint).toContain('pnpm lint:architecture');
     expect(packageJson.scripts.verify).toContain('pnpm lint');
@@ -344,6 +344,53 @@ describe('architecture lint contract', () => {
         ruleId: 'code-architecture/require-assertions',
         severity: 2,
       }),
+    ]));
+  });
+
+  it('fully checks selected domain contract owners without overlapping return rules', () => {
+    const timingRules = configuredRulesFor(
+      'src/features/reminders/domain/reminder-timing.ts',
+    );
+    const emotionRules = configuredRulesFor(
+      'src/features/check-in/domain/emotion.ts',
+    );
+    const adjacentRules = configuredRulesFor(
+      'src/features/reminders/domain/reminder-assignment.ts',
+    );
+
+    expect(timingRules['code-architecture/require-contract-assertions']?.[1]
+      ?.checkReturns).toBe(true);
+    expect(emotionRules['code-architecture/require-contract-assertions']?.[1]
+      ?.checkReturns).toBe(true);
+    expect(timingRules['code-architecture/no-unasserted-return']?.[0]).toBe(0);
+    expect(emotionRules['code-architecture/no-unasserted-return']?.[0]).toBe(0);
+    expect(adjacentRules['code-architecture/require-contract-assertions']?.[1]
+      ?.checkReturns).toBe(false);
+  });
+
+  it('reports an unchecked return only inside a selected domain contract-owner file', () => {
+    const messages = messagesFor({
+      code: `
+        function normalize(input) {
+          assert(input.length > 0);
+          assert(input.length <= 100);
+          const trimmed = input.trim();
+          const normalized = trimmed.toLowerCase();
+          const result = normalized.slice(0, 20);
+          return result;
+        }
+      `,
+      filePath: 'src/features/reminders/domain/reminder-timing.ts',
+    });
+
+    expect(messages).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        ruleId: 'code-architecture/require-contract-assertions',
+        severity: 2,
+      }),
+    ]));
+    expect(messages).not.toEqual(expect.arrayContaining([
+      expect.objectContaining({ ruleId: 'code-architecture/no-unasserted-return' }),
     ]));
   });
 

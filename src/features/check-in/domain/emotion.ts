@@ -61,7 +61,7 @@ export function selectionForCheckIn(checkIn: CheckIn): EmotionSelection {
   const emotion = emotions.find((candidate) => candidate.id === checkIn.emotionId);
   if (!emotion) throw new Error('A decoded check-in must reference a known emotion.');
 
-  return {
+  const selection = {
     emotionId: checkIn.emotionId,
     intensity: checkIn.intensity,
     level: Math.min(
@@ -70,4 +70,7 @@ export function selectionForCheckIn(checkIn: CheckIn): EmotionSelection {
     ),
     color: emotion.color,
   };
+  assert(selection.emotionId === checkIn.emotionId, 'Selection must preserve the recorded emotion.');
+  assert(selection.level >= 0 && selection.level < emotion.nuanceCount, 'Selection level must remain inside the emotion catalog.');
+  return selection;
 }
