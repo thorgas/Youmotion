@@ -29,7 +29,7 @@ import {
 } from '@/features/beliefs/domain/belief-statement';
 import { appSettingsStore } from '@/app-stores';
 import { AppLocaleProvider } from '@/localization/app-locale-provider';
-import { appNavigationMachine } from '@/navigation/app-navigation.machine';
+import { appNavigationMachine } from '@/navigation/app-navigation.composition';
 import { AppNavigationActorProvider } from '@/navigation/app-navigation.provider';
 import { pressLaidOutUntil } from '@/testing/harness-ui';
 

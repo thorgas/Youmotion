@@ -20,9 +20,9 @@ import { checkInHistoryStore } from '@/app-stores';
 import { appSettingsStore } from '@/app-stores';
 import { AppLocaleProvider } from '@/localization/app-locale-provider';
 import {
-  appNavigationMachine,
   routeForStateValue,
 } from '@/navigation/app-navigation.machine';
+import { appNavigationMachine } from '@/navigation/app-navigation.composition';
 import {
   mockSurrealDatabase,
   resetSurrealDatabaseMock,

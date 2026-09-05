@@ -33,7 +33,9 @@ export function filterHistoryEntries({
       return false;
     }
     const text = searchableText(entry).toLocaleLowerCase();
-    return query === '' || text.includes(query);
+    const matchesQuery = query === '' || text.includes(query);
+    assert(typeof matchesQuery === 'boolean', 'Text matching must return a boolean.');
+    return matchesQuery;
   });
   assert(filtered.length <= entries.length, 'Filtering must not add history entries.');
   assert(filtered.every((entry) => entries.includes(entry)), 'Filtering must preserve entry identity.');

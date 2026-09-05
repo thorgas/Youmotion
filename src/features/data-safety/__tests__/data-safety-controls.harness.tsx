@@ -24,7 +24,7 @@ import {
 import { appSettingsStore } from '@/app-stores';
 import { AppLocaleProvider } from '@/localization/app-locale-provider';
 
-type NavigationMachine = typeof import('@/navigation/app-navigation.machine')['appNavigationMachine'];
+type NavigationMachine = typeof import('@/navigation/app-navigation.composition')['appNavigationMachine'];
 
 let actor: Actor<NavigationMachine> | undefined;
 
@@ -52,8 +52,8 @@ describe('data safety controls on the device runtime', () => {
     mock('@/navigation/app-navigation.provider', () => ({
       useAppNavigationActor: currentActor,
     }));
-    const navigationModule: typeof import('@/navigation/app-navigation.machine') = require(
-      '@/navigation/app-navigation.machine',
+    const navigationModule: typeof import('@/navigation/app-navigation.composition') = require(
+      '@/navigation/app-navigation.composition',
     );
     const { appNavigationMachine } = navigationModule;
     appSettingsStore.trigger.hydrated({
@@ -84,8 +84,8 @@ describe('data safety controls on the device runtime', () => {
     mock('@/navigation/app-navigation.provider', () => ({
       useAppNavigationActor: currentActor,
     }));
-    const navigationModule: typeof import('@/navigation/app-navigation.machine') = require(
-      '@/navigation/app-navigation.machine',
+    const navigationModule: typeof import('@/navigation/app-navigation.composition') = require(
+      '@/navigation/app-navigation.composition',
     );
     const { appNavigationMachine } = navigationModule;
     const messageModule: typeof import('../ui/data-safety-message') = require(

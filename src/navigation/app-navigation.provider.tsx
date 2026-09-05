@@ -3,7 +3,7 @@ import { createContext, type PropsWithChildren, useContext } from 'react';
 import assert from '@/assert';
 import type { ActorRefFrom } from 'xstate';
 
-import { appNavigationMachine } from './app-navigation.machine';
+import { appNavigationMachine } from './app-navigation.composition';
 import { inspectAppNavigation } from './app-router.adapter';
 
 export type AppNavigationActor = ActorRefFrom<typeof appNavigationMachine>;

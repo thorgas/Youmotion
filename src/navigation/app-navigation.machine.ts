@@ -81,7 +81,7 @@ import {
   persistBeliefStatement,
   retireCustomBeliefStatement,
 } from '@/features/beliefs/infrastructure/belief-statement.repository';
-import { checkInHistoryStore } from '@/app-stores';
+import { createCheckInHistoryStore } from '@/features/history/application/check-in-history.store';
 import {
   DataArchiveSchema,
 } from '@/features/data-safety/domain/data-archive';
@@ -91,7 +91,7 @@ import {
   pickDataArchive,
   restoreDataArchive,
 } from '@/features/data-safety/infrastructure/data-archive.repository';
-import { appSettingsStore } from '@/app-stores';
+import { createAppSettingsStore } from '@/features/settings/application/app-settings.store';
 import { AppLocaleSchema } from '@/localization/app-locale';
 import { AppSettingsSchema } from '@/features/settings/domain/app-settings';
 import { EmotionLabelModeSchema } from '@/preferences/emotion-label-mode';
@@ -133,6 +133,13 @@ import {
   sendTestReminder,
 } from '@/features/reminders/infrastructure/local-reminder.scheduler';
 import { loadReminderData } from '@/features/reminders/infrastructure/reminder.repository';
+
+export interface AppNavigationRuntime {
+  readonly appSettingsStore: ReturnType<typeof createAppSettingsStore>;
+  readonly checkInHistoryStore: ReturnType<typeof createCheckInHistoryStore>;
+  readonly nonce: () => string;
+  readonly now: () => Date;
+}
 
 const AppContextSchema = Schema.Struct({
   selection: Schema.NullOr(EmotionSelectionSchema),
@@ -388,10 +395,16 @@ const reminderTimingFromDraft =({
 
 const activateReminderFromDraft =({
   context,
+  locale,
+  nonce,
+  now,
   timing,
   self,
 }: {
   context: typeof AppContextSchema.Type;
+  locale: typeof AppLocaleSchema.Type;
+  nonce: string;
+  now: Date;
   timing: ReminderTiming;
   self: { send: (event: {
     type: typeof REMINDER_EVENTS.SAVED;
@@ -409,12 +422,11 @@ const activateReminderFromDraft =({
     });
     return;
   }
-  const locale = appSettingsStore.getSnapshot().context.locale;
   void activateReminder({
     assignments: context.reminderAssignments,
     locale,
-    nonce: Math.random().toString(16).slice(2),
-    now: new Date(),
+    nonce,
+    now,
     notificationContent: context.reminderNotificationContentDraft,
     statements: context.beliefStatements,
     target,
@@ -434,16 +446,18 @@ const activateReminderFromDraft =({
 
 const reconcileStoredReminders =({
   assignments,
+  locale,
   statements,
 }: {
   assignments: readonly ReminderAssignment[];
+  locale: typeof AppLocaleSchema.Type;
   statements: readonly BeliefStatement[];
 }) => {
   void getReminderPermission().then(async (permission) => {
     if (permission === REMINDER_PERMISSION_STATES.GRANTED) {
       await reconcileReminderNotifications({
         assignments,
-        locale: appSettingsStore.getSnapshot().context.locale,
+        locale,
         statements,
       });
     }
@@ -451,7 +465,7 @@ const reconcileStoredReminders =({
   }).catch(() => undefined);
 };
 
-export const appNavigationMachine = setup({
+export const createAppNavigationMachine = (runtime: AppNavigationRuntime) => setup({
   states: {
     [NAVIGATION_STATES.STARTING]: {},
     [NAVIGATION_STATES.ONBOARDING]: {
@@ -839,10 +853,10 @@ export const appNavigationMachine = setup({
   },
   on: {
     [CHECK_IN_EVENTS.HISTORY_HYDRATED]: ({ event }, enq) => {
-      enq(() => checkInHistoryStore.trigger.hydrated({ entries: event.entries }));
+      enq(() => runtime.checkInHistoryStore.trigger.hydrated({ entries: event.entries }));
     },
     [CHECK_IN_EVENTS.HISTORY_HYDRATION_FAILED]: ({ event }, enq) => {
-      enq(() => checkInHistoryStore.trigger.hydrationFailed({ message: event.message }));
+      enq(() => runtime.checkInHistoryStore.trigger.hydrationFailed({ message: event.message }));
     },
     [CHECK_IN_EVENTS.BELIEF_STATEMENTS_HYDRATED]: ({ context, event }, enq) => {
       assert(Schema.is(BeliefStatementListSchema)(event.statements), 'Hydrated belief statements must satisfy the domain schema.');
@@ -856,6 +870,7 @@ export const appNavigationMachine = setup({
         );
       enq(() => reconcileStoredReminders({
         assignments: context.reminderAssignments,
+        locale: runtime.appSettingsStore.getSnapshot().context.locale,
         statements: beliefStatements,
       }));
       return { context: { beliefStatements, beliefStatementsHydrated: true } };
@@ -866,6 +881,7 @@ export const appNavigationMachine = setup({
     [REMINDER_EVENTS.HYDRATED]: ({ context, event }, enq) => {
       enq(() => reconcileStoredReminders({
         assignments: event.assignments,
+        locale: runtime.appSettingsStore.getSnapshot().context.locale,
         statements: context.beliefStatements,
       }));
       return { context: {
@@ -880,6 +896,7 @@ export const appNavigationMachine = setup({
     [REMINDER_EVENTS.RECONCILE_REQUESTED]: ({ context }, enq) => {
       enq(() => reconcileStoredReminders({
         assignments: context.reminderAssignments,
+        locale: runtime.appSettingsStore.getSnapshot().context.locale,
         statements: context.beliefStatements,
       }));
     },
@@ -914,7 +931,7 @@ export const appNavigationMachine = setup({
     [CHECK_IN_EVENTS.DELETED]: ({ context, event }, enq) => {
       assert(event.id.length > 0, 'Deleted check-in requires an identifier.');
       assert(context.editing === null || context.editing.id.length > 0, 'Editing check-in requires an identifier.');
-      enq(() => checkInHistoryStore.trigger.deleted({ id: event.id }));
+      enq(() => runtime.checkInHistoryStore.trigger.deleted({ id: event.id }));
       if (context.editing?.id !== event.id) return undefined;
       return {
         target: `#appNavigation.${NAVIGATION_STATES.TABS}.${NAVIGATION_STATES.HISTORY}`,
@@ -929,17 +946,17 @@ export const appNavigationMachine = setup({
       };
     },
     [CHECK_IN_EVENTS.DELETE_FAILED]: ({ event }, enq) => {
-      enq(() => checkInHistoryStore.trigger.deletionFailed({ message: event.message }));
+      enq(() => runtime.checkInHistoryStore.trigger.deletionFailed({ message: event.message }));
     },
     [SETTINGS_EVENTS.EMOTION_LABEL_MODE_CHANGED]: ({ event, self }, enq) => {
       enq(() => {
         assert(Object.values(EMOTION_LABEL_MODES).includes(event.mode), 'Emotion label mode must be supported.');
-        assert(Schema.is(AppSettingsSchema)(appSettingsStore.getSnapshot().context), 'Current settings must satisfy their domain schema.');
-        appSettingsStore.trigger.emotionLabelModeChanged({ mode: event.mode });
+        assert(Schema.is(AppSettingsSchema)(runtime.appSettingsStore.getSnapshot().context), 'Current settings must satisfy their domain schema.');
+        runtime.appSettingsStore.trigger.emotionLabelModeChanged({ mode: event.mode });
         const {
           locale,
           onboardingCompleted,
-        } = appSettingsStore.getSnapshot().context;
+        } = runtime.appSettingsStore.getSnapshot().context;
         void Effect.runPromise(persistAppSettings({
           locale,
           emotionLabelMode: event.mode,
@@ -953,12 +970,12 @@ export const appNavigationMachine = setup({
     [SETTINGS_EVENTS.LANGUAGE_CHANGED]: ({ event, self }, enq) => {
       enq(() => {
         assert(Object.values(APP_LOCALES).includes(event.locale), 'App locale must be supported.');
-        assert(Schema.is(AppSettingsSchema)(appSettingsStore.getSnapshot().context), 'Current settings must satisfy their domain schema.');
-        appSettingsStore.trigger.languageChanged({ locale: event.locale });
+        assert(Schema.is(AppSettingsSchema)(runtime.appSettingsStore.getSnapshot().context), 'Current settings must satisfy their domain schema.');
+        runtime.appSettingsStore.trigger.languageChanged({ locale: event.locale });
         const {
           emotionLabelMode,
           onboardingCompleted,
-        } = appSettingsStore.getSnapshot().context;
+        } = runtime.appSettingsStore.getSnapshot().context;
         void Effect.runPromise(persistAppSettings({
           locale: event.locale,
           emotionLabelMode,
@@ -970,19 +987,19 @@ export const appNavigationMachine = setup({
       });
     },
     [SETTINGS_EVENTS.APP_SETTINGS_HYDRATED]: ({ event }, enq) => {
-      enq(() => appSettingsStore.trigger.hydrated({ settings: event.settings }));
+      enq(() => runtime.appSettingsStore.trigger.hydrated({ settings: event.settings }));
     },
     [SETTINGS_EVENTS.APP_SETTINGS_HYDRATION_FAILED]: ({ event }, enq) => {
-      enq(() => appSettingsStore.trigger.hydrationFailed({ message: event.message }));
+      enq(() => runtime.appSettingsStore.trigger.hydrationFailed({ message: event.message }));
     },
     [SETTINGS_EVENTS.APP_SETTINGS_PERSISTENCE_FAILED]: ({ event }, enq) => {
-      enq(() => appSettingsStore.trigger.persistenceFailed({ message: event.message }));
+      enq(() => runtime.appSettingsStore.trigger.persistenceFailed({ message: event.message }));
     },
   },
   states: {
     [NAVIGATION_STATES.STARTING]: {
       always: () => {
-        const settings = appSettingsStore.getSnapshot().context;
+        const settings = runtime.appSettingsStore.getSnapshot().context;
         assert(settings.locale.length > 0, 'Startup settings require a locale.');
         assert(Object.values(EMOTION_LABEL_MODES).includes(settings.emotionLabelMode), 'Startup settings require a label mode.');
         if (!settings.hydrated) return undefined;
@@ -998,7 +1015,7 @@ export const appNavigationMachine = setup({
       },
       on: {
         [SETTINGS_EVENTS.APP_SETTINGS_HYDRATED]: ({ event }, enq) => {
-          enq(() => appSettingsStore.trigger.hydrated({ settings: event.settings }));
+          enq(() => runtime.appSettingsStore.trigger.hydrated({ settings: event.settings }));
           return event.settings.onboardingCompleted
             ? { target: `#appNavigation.${NAVIGATION_STATES.TABS}` }
             : {
@@ -1010,7 +1027,7 @@ export const appNavigationMachine = setup({
               };
         },
         [SETTINGS_EVENTS.APP_SETTINGS_HYDRATION_FAILED]: ({ event }, enq) => {
-          enq(() => appSettingsStore.trigger.hydrationFailed({ message: event.message }));
+          enq(() => runtime.appSettingsStore.trigger.hydrationFailed({ message: event.message }));
           return {
             target: `#appNavigation.${NAVIGATION_STATES.ONBOARDING}`,
             context: {
@@ -1032,13 +1049,13 @@ export const appNavigationMachine = setup({
           );
           if (firstLaunch) {
             enq(() => {
-              assert(!appSettingsStore.getSnapshot().context.onboardingCompleted, 'Skipped first launch must not already be complete.');
-              assert(Schema.is(AppSettingsSchema)(appSettingsStore.getSnapshot().context), 'Settings must be valid before onboarding completion.');
-              appSettingsStore.trigger.onboardingCompletedChanged({ completed: true });
+              assert(!runtime.appSettingsStore.getSnapshot().context.onboardingCompleted, 'Skipped first launch must not already be complete.');
+              assert(Schema.is(AppSettingsSchema)(runtime.appSettingsStore.getSnapshot().context), 'Settings must be valid before onboarding completion.');
+              runtime.appSettingsStore.trigger.onboardingCompletedChanged({ completed: true });
               const {
                 emotionLabelMode,
                 locale,
-              } = appSettingsStore.getSnapshot().context;
+              } = runtime.appSettingsStore.getSnapshot().context;
               void Effect.runPromise(persistAppSettings({
                 locale,
                 emotionLabelMode,
@@ -1067,13 +1084,13 @@ export const appNavigationMachine = setup({
           );
           if (firstLaunch) {
             enq(() => {
-              assert(Schema.is(AppSettingsSchema)(appSettingsStore.getSnapshot().context), 'Settings must be valid before onboarding completion.');
-              assert(Object.values(APP_LOCALES).includes(appSettingsStore.getSnapshot().context.locale), 'Onboarding completion requires a supported locale.');
-              appSettingsStore.trigger.onboardingCompletedChanged({ completed: true });
+              assert(Schema.is(AppSettingsSchema)(runtime.appSettingsStore.getSnapshot().context), 'Settings must be valid before onboarding completion.');
+              assert(Object.values(APP_LOCALES).includes(runtime.appSettingsStore.getSnapshot().context.locale), 'Onboarding completion requires a supported locale.');
+              runtime.appSettingsStore.trigger.onboardingCompletedChanged({ completed: true });
               const {
                 emotionLabelMode,
                 locale,
-              } = appSettingsStore.getSnapshot().context;
+              } = runtime.appSettingsStore.getSnapshot().context;
               void Effect.runPromise(persistAppSettings({
                 locale,
                 emotionLabelMode,
@@ -1281,7 +1298,7 @@ export const appNavigationMachine = setup({
                     : CHECK_IN_STATES.IDLE,
                   context: context.selection && !context.editing
                     ? {
-                        occurredAtDraft: checkInTimestampFromDate(new Date()),
+                        occurredAtDraft: checkInTimestampFromDate(runtime.now()),
                         occurredAtCustomized: false,
                         momentTimeEditorOpen: false,
                         momentTimeEditorDraft: null,
@@ -1478,8 +1495,8 @@ export const appNavigationMachine = setup({
                 [NAVIGATION_EVENTS.ANALYTICS_OPENED]: {},
                 [DATA_SAFETY_EVENTS.RESTORE_SUCCEEDED]: ({ event }, enq) => {
                   enq(() => {
-                    checkInHistoryStore.trigger.hydrated({ entries: event.archive.checkIns });
-                    appSettingsStore.trigger.hydrated({ settings: event.archive.settings });
+                    runtime.checkInHistoryStore.trigger.hydrated({ entries: event.archive.checkIns });
+                    runtime.appSettingsStore.trigger.hydrated({ settings: event.archive.settings });
                   });
                   return {
                     target: DATA_SAFETY_STATES.IDLE,
@@ -1528,7 +1545,7 @@ export const appNavigationMachine = setup({
                 [NAVIGATION_EVENTS.HISTORY_OPENED]: {},
                 [NAVIGATION_EVENTS.ANALYTICS_OPENED]: {},
                 [DATA_SAFETY_EVENTS.DELETE_SUCCEEDED]: (_args, enq) => {
-                  enq(() => checkInHistoryStore.trigger.hydrated({ entries: [] }));
+                  enq(() => runtime.checkInHistoryStore.trigger.hydrated({ entries: [] }));
                   return {
                     target: DATA_SAFETY_STATES.IDLE,
                     context: {
@@ -1572,16 +1589,16 @@ export const appNavigationMachine = setup({
         },
         [BELIEF_LIBRARY_EVENTS.CREATE_REQUESTED]: {
           target: BELIEF_LIBRARY_STATES.EDITOR,
-          context: {
+          context: () => ({
             beliefLibraryStatementId: createCustomBeliefSystemId({
-              timestamp: Date.now(),
-              nonce: Math.random().toString(16).slice(2),
+              timestamp: runtime.now().getTime(),
+              nonce: runtime.nonce(),
             }),
             beliefLibraryHarmfulDraft: '',
             beliefLibraryGuidingDraft: '',
             guidingHelpVisible: false,
             error: null,
-          },
+          }),
         },
         [BELIEF_LIBRARY_EVENTS.EDIT_REQUESTED]: ({ context, event }) => {
           const statement = beliefStatementForId({
@@ -1641,8 +1658,8 @@ export const appNavigationMachine = setup({
               assignment,
               assignments: context.reminderAssignments,
               enabled: !assignment.enabled,
-              locale: appSettingsStore.getSnapshot().context.locale,
-              now: new Date(),
+              locale: runtime.appSettingsStore.getSnapshot().context.locale,
+              now: runtime.now(),
               statements: context.beliefStatements,
             }).then(
               (assignments) => self.send({
@@ -1670,7 +1687,7 @@ export const appNavigationMachine = setup({
             void deleteReminder({
               assignment,
               assignments: context.reminderAssignments,
-              locale: appSettingsStore.getSnapshot().context.locale,
+              locale: runtime.appSettingsStore.getSnapshot().context.locale,
               statements: context.beliefStatements,
             }).then(
               (assignments) => self.send({
@@ -1797,6 +1814,7 @@ export const appNavigationMachine = setup({
           });
           enq(() => reconcileStoredReminders({
             assignments: context.reminderAssignments,
+            locale: runtime.appSettingsStore.getSnapshot().context.locale,
             statements: beliefStatements,
           }));
           return {
@@ -1857,7 +1875,7 @@ export const appNavigationMachine = setup({
           assert(statement.archivedAt === undefined, 'An active belief cannot already be archived.');
           void Effect.runPromise(retireCustomBeliefStatement({
             statement,
-            archivedAt: BeliefStatementArchiveTimestamp.make(new Date().toISOString()),
+            archivedAt: BeliefStatementArchiveTimestamp.make(runtime.now().toISOString()),
           })).then(
             (archivedStatement) => self.send({
               type: BELIEF_LIBRARY_EVENTS.STATEMENT_RETIRED,
@@ -1886,6 +1904,7 @@ export const appNavigationMachine = setup({
                 });
           enq(() => reconcileStoredReminders({
             assignments: context.reminderAssignments,
+            locale: runtime.appSettingsStore.getSnapshot().context.locale,
             statements: beliefStatements,
           }));
           return {
@@ -1926,9 +1945,9 @@ export const appNavigationMachine = setup({
         },
         [REMINDER_EVENTS.RETRY_REQUESTED]: ({ self }, enq) => {
           enq(() => {
-            assert(appSettingsStore.getSnapshot().context.hydrated, 'Reminder retry requires hydrated app settings.');
+            assert(runtime.appSettingsStore.getSnapshot().context.hydrated, 'Reminder retry requires hydrated app settings.');
             assert(
-              Object.values(APP_LOCALES).includes(appSettingsStore.getSnapshot().context.locale),
+              Object.values(APP_LOCALES).includes(runtime.appSettingsStore.getSnapshot().context.locale),
               'Reminder retry requires a supported locale.',
             );
             void Effect.runPromise(loadReminderData).then(
@@ -1981,8 +2000,8 @@ export const appNavigationMachine = setup({
               assignment,
               assignments: context.reminderAssignments,
               enabled: !assignment.enabled,
-              locale: appSettingsStore.getSnapshot().context.locale,
-              now: new Date(),
+              locale: runtime.appSettingsStore.getSnapshot().context.locale,
+              now: runtime.now(),
               statements: context.beliefStatements,
             }).then(
               (assignments) => self.send({
@@ -2010,7 +2029,7 @@ export const appNavigationMachine = setup({
             void deleteReminder({
               assignment,
               assignments: context.reminderAssignments,
-              locale: appSettingsStore.getSnapshot().context.locale,
+              locale: runtime.appSettingsStore.getSnapshot().context.locale,
               statements: context.beliefStatements,
             }).then(
               (assignments) => self.send({
@@ -2235,8 +2254,8 @@ export const appNavigationMachine = setup({
               void updateReminder({
                 assignment,
                 assignments: context.reminderAssignments,
-                locale: appSettingsStore.getSnapshot().context.locale,
-                now: new Date(),
+                locale: runtime.appSettingsStore.getSnapshot().context.locale,
+                now: runtime.now(),
                 notificationContent: context.reminderNotificationContentDraft,
                 statements: context.beliefStatements,
                 timing,
@@ -2254,7 +2273,14 @@ export const appNavigationMachine = setup({
             });
             return { target: REMINDER_STATES.SAVING, context: { reminderError: null } };
           }
-          enq(() => activateReminderFromDraft({ context, timing, self }));
+          enq(() => activateReminderFromDraft({
+            context,
+            locale: runtime.appSettingsStore.getSnapshot().context.locale,
+            nonce: runtime.nonce(),
+            now: runtime.now(),
+            timing,
+            self,
+          }));
           return { target: REMINDER_STATES.SAVING, context: { reminderError: null } };
         },
       },
@@ -2301,7 +2327,7 @@ export const appNavigationMachine = setup({
           enq(() => {
             void sendTestReminder({
               assignment,
-              locale: appSettingsStore.getSnapshot().context.locale,
+              locale: runtime.appSettingsStore.getSnapshot().context.locale,
               statements: context.beliefStatements,
             });
           });
@@ -2402,7 +2428,7 @@ export const appNavigationMachine = setup({
           context: { momentTimePickerMode: null },
         },
         [CHECK_IN_EVENTS.MOMENT_TIME_CHANGED]: ({ event }) => (
-          event.occurredAt <= checkInTimestampFromDate(new Date())
+          event.occurredAt <= checkInTimestampFromDate(runtime.now())
             ? {
                 context: {
                   momentTimeEditorDraft: event.occurredAt,
@@ -2413,7 +2439,7 @@ export const appNavigationMachine = setup({
         ),
         [CHECK_IN_EVENTS.MOMENT_TIME_RESET]: {
           context: () => ({
-            momentTimeEditorDraft: checkInTimestampFromDate(new Date()),
+            momentTimeEditorDraft: checkInTimestampFromDate(runtime.now()),
             momentTimeEditorCustomized: false,
             momentTimePickerMode: null,
           }),
@@ -2481,7 +2507,7 @@ export const appNavigationMachine = setup({
       },
       on: {
         [CHECK_IN_EVENTS.PERSISTED]: ({ context, event }, enq) => {
-          enq(() => checkInHistoryStore.trigger.recorded({ entry: event.saved }));
+          enq(() => runtime.checkInHistoryStore.trigger.recorded({ entry: event.saved }));
           return {
             target: context.saveDestination === CHECK_IN_SAVE_DESTINATIONS.COMPLETE
               ? CHECK_IN_STATES.SUCCESS
@@ -2560,8 +2586,8 @@ export const appNavigationMachine = setup({
             beliefSystemId: null,
             beliefStatementDraft: '',
             beliefStatementDraftId: createCustomBeliefSystemId({
-              timestamp: Date.now(),
-              nonce: Math.random().toString(16).slice(2),
+              timestamp: runtime.now().getTime(),
+              nonce: runtime.nonce(),
             }),
             guidingBeliefStatementDraft: '',
             error: null,
@@ -2682,7 +2708,7 @@ export const appNavigationMachine = setup({
             note: context.note,
             occurredAt: context.saved?.occurredAt
               ?? context.editing?.occurredAt
-              ?? checkInTimestampFromDate(new Date()),
+              ?? checkInTimestampFromDate(runtime.now()),
             beliefSystemId: context.beliefSystemId,
             existing: context.saved,
           })).then(
@@ -2698,7 +2724,7 @@ export const appNavigationMachine = setup({
         [CHECK_IN_EVENTS.PERSISTED]: ({ context, event }, enq) => {
           assert(event.saved.id.length > 0, 'Persisted check-in requires an identifier.');
           assert(Schema.is(CheckInSchema)(event.saved), 'Persisted check-in must satisfy its domain schema.');
-          enq(() => checkInHistoryStore.trigger.recorded({ entry: event.saved }));
+          enq(() => runtime.checkInHistoryStore.trigger.recorded({ entry: event.saved }));
           if (event.saved.beliefSystemId) {
             return {
               target: CHECK_IN_STATES.GUIDING_BELIEF,
@@ -2857,7 +2883,7 @@ export const appNavigationMachine = setup({
                   guidingStatement: persisted.guidingStatement,
                 }).pipe(
                   Effect.tap((saved) => Effect.sync(() => {
-                    checkInHistoryStore.trigger.recorded({ entry: saved });
+                    runtime.checkInHistoryStore.trigger.recorded({ entry: saved });
                   })),
                   Effect.as(persisted),
                 );
