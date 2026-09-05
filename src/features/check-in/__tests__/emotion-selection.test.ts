@@ -5,7 +5,8 @@ import {
   selectionFromPoint,
 } from '../domain/emotion-selection';
 import { EMOTION_IDS } from '@/constants';
-import type { EmotionSelection } from '../domain/check-in';
+import { CheckInSchema, type EmotionSelection } from '../domain/check-in';
+import { selectionForCheckIn } from '../domain/emotion';
 
 const joySelection = {
   emotionId: EMOTION_IDS.JOY,
@@ -13,6 +14,31 @@ const joySelection = {
   level: 3,
   color: '#E7AD32',
 } satisfies EmotionSelection;
+
+const checkIn = (level?: number) => CheckInSchema.make({
+  id: 'selection-contract',
+  createdAt: '2026-09-05T07:00:00.000Z',
+  occurredAt: '2026-09-05T07:00:00.000Z',
+  emotionId: EMOTION_IDS.JOY,
+  intensity: 0.5,
+  level,
+  note: '',
+});
+
+describe('selectionForCheckIn', () => {
+  it('preserves the decoded emotion and intensity while deriving its level', () => {
+    expect(selectionForCheckIn(checkIn())).toEqual({
+      emotionId: EMOTION_IDS.JOY,
+      intensity: 0.5,
+      level: 3,
+      color: '#E7AD32',
+    });
+  });
+
+  it('clamps a persisted level to the emotion catalog', () => {
+    expect(selectionForCheckIn(checkIn(99)).level).toBe(6);
+  });
+});
 
 describe('selectionFromPoint', () => {
   const center = { x: 100, y: 100 };
