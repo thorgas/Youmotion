@@ -5,7 +5,12 @@ import {
   selectionFromPoint,
 } from '../domain/emotion-selection';
 import { EMOTION_IDS } from '@/constants';
-import { CheckInSchema, type EmotionSelection } from '../domain/check-in';
+import {
+  CheckInId,
+  CheckInSchema,
+  CheckInTimestamp,
+  type EmotionSelection,
+} from '../domain/check-in';
 import { selectionForCheckIn } from '../domain/emotion';
 
 const joySelection = {
@@ -16,9 +21,9 @@ const joySelection = {
 } satisfies EmotionSelection;
 
 const checkIn = (level?: number) => CheckInSchema.make({
-  id: 'selection-contract',
-  createdAt: '2026-09-05T07:00:00.000Z',
-  occurredAt: '2026-09-05T07:00:00.000Z',
+  id: CheckInId.make('selection-contract'),
+  createdAt: CheckInTimestamp.make('2026-09-05T07:00:00.000Z'),
+  occurredAt: CheckInTimestamp.make('2026-09-05T07:00:00.000Z'),
   emotionId: EMOTION_IDS.JOY,
   intensity: 0.5,
   level,
