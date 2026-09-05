@@ -47,8 +47,19 @@ pnpm eas:update:runtimes
 ```
 
 and commit the changed file with the build. Resolve it from a clean working
-tree: uncommitted changes are part of the fingerprint, so a dirty tree records
-a runtime no binary carries.
+tree: the fingerprint hashes `app.config.js`, `package.json` and the other
+native inputs as files, so an uncommitted edit to one of them records a
+runtime no binary carries.
+
+`fingerprint.config.js` excludes the `extra` section of the Expo config from
+the fingerprint. `app.config.js` writes the current git commit into
+`extra.gitCommit`; without the exclusion every commit produced a new runtime
+version, and no update could ever match a binary built from a different
+commit. EAS honours the same file, so local and builder resolutions agree.
+Changing that file is itself a native-affecting change: the runtime moves, and
+`expected-ota-runtimes.json` keeps naming the binaries actually installed until
+the next store build ships — `verify-runtime` refusing to publish in between
+is the guard doing its job.
 
 ## Channels
 
