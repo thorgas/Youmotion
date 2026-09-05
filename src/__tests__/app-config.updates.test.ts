@@ -1,5 +1,9 @@
+import { SourceSkips } from '@expo/fingerprint';
 import { resolveUpdates } from '../../updates.config.js';
 import { expo as appConfig } from '../../app.json';
+import { sourceSkips } from '../../fingerprint.config.js';
+
+const fingerprintConfig = { sourceSkips };
 
 const CHANNEL_HEADER = 'expo-channel-name';
 
@@ -71,5 +75,13 @@ describe('app.config updates resolution', () => {
     expect(resolvedUpdates({ EAS_BUILD_PROFILE: 'testing' })).toEqual(resolvedUpdates({}));
     expect(resolvedUpdates({ EAS_BUILD_PROFILE: 'testing', MOBILE_UPDATE_CHANNEL: 'qa' }))
       .toEqual(resolvedUpdates({ MOBILE_UPDATE_CHANNEL: 'qa' }));
+  });
+});
+
+describe('fingerprint configuration', () => {
+  it('keeps the git commit out of the runtime version', () => {
+    expect(fingerprintConfig.sourceSkips & SourceSkips.ExpoConfigExtraSection).toBe(
+      SourceSkips.ExpoConfigExtraSection,
+    );
   });
 });
