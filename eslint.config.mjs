@@ -520,8 +520,6 @@ export default tseslint.config(
   {
     files: ['src/navigation/app-navigation.machine.ts'],
     rules: {
-      // The XState definition is data, but injecting its runtime makes the enclosing factory
-      // syntactically span the definition. Leaf actions remain covered by the 70-line rule.
       'code-architecture/max-function-lines': 'off',
     },
   },
