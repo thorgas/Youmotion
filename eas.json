@@ -34,6 +34,10 @@
         "buildType": "apk"
       }
     },
+    "qa": {
+      "extends": "preview",
+      "channel": "qa"
+    },
     "testing": {
       "extends": "production",
       "channel": "testing"
