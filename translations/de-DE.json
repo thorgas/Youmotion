@@ -1,6 +1,90 @@
 {
   "fb-locale": "de-DE",
   "translations": {
+    "K+2VdLvU+um30ukKF9VA0g==": {
+      "description": "Title of the release menu while on the QA update channel",
+      "tokens": [],
+      "translations": [{ "translation": "Updates · QA", "variations": {} }],
+      "types": []
+    },
+    "OBOhrrGAL81yc+EK64XuqQ==": {
+      "description": "Title of the release menu while on the production update channel",
+      "tokens": [],
+      "translations": [{ "translation": "Updates · Produktion", "variations": {} }],
+      "types": []
+    },
+    "140QAhauBUZz/anKZbwF8Q==": {
+      "description": "Release menu action fetching an over-the-air update",
+      "tokens": [],
+      "translations": [{ "translation": "Jetzt nach Update suchen", "variations": {} }],
+      "types": []
+    },
+    "uh+hIuNyPnEIon1U/SEjPg==": {
+      "description": "Release menu action moving the app to the QA update channel",
+      "tokens": [],
+      "translations": [{ "translation": "Zu QA wechseln", "variations": {} }],
+      "types": []
+    },
+    "+aAsjlJ941W2X8J54ry2aQ==": {
+      "description": "Release menu action moving the app back to the production update channel",
+      "tokens": [],
+      "translations": [{ "translation": "Zu Produktion wechseln", "variations": {} }],
+      "types": []
+    },
+    "LpqGzBiAOVlBMCdRisgAYw==": {
+      "description": "Release menu action dismissing the update menu",
+      "tokens": [],
+      "translations": [{ "translation": "Abbrechen", "variations": {} }],
+      "types": []
+    },
+    "FQ1uSiNGcbciYZCQGFDQIg==": {
+      "description": "Alert title shown when the running build never checks for updates",
+      "tokens": [],
+      "translations": [{ "translation": "Updates sind in diesem Build deaktiviert", "variations": {} }],
+      "types": []
+    },
+    "WYpUs9Gy6YFhyYryJL//vw==": {
+      "description": "Alert explaining why a development build cannot check for updates",
+      "tokens": [],
+      "translations": [{ "translation": "Dies ist ein Development- oder Dev-Client-Build; expo-updates sucht hier nie nach Updates.", "variations": {} }],
+      "types": []
+    },
+    "qg/3ohCMXzvIfsxSLFHnsQ==": {
+      "description": "Alert title shown when an over-the-air update check failed",
+      "tokens": [],
+      "translations": [{ "translation": "Update-Suche fehlgeschlagen", "variations": {} }],
+      "types": []
+    },
+    "UYU81OSEwJ+xAwJajMKmHQ==": {
+      "description": "Alert title confirming the running build already carries the newest update",
+      "tokens": ["updateId"],
+      "translations": [{ "translation": "Du bist aktuell · {updateId}", "variations": {} }],
+      "types": []
+    },
+    "PXKHje902l5/+Jb+FWCVnA==": {
+      "description": "Placeholder shown when the running build has no update identifier",
+      "tokens": [],
+      "translations": [{ "translation": "keine", "variations": {} }],
+      "types": []
+    },
+    "ydVsauxjZ1+7aOFTP4keog==": {
+      "description": "Release footer prefix naming the EAS update channel",
+      "tokens": [],
+      "translations": [{ "translation": "Kanal", "variations": {} }],
+      "types": []
+    },
+    "Iz235PFfnUZQnQpEXRg7Vw==": {
+      "description": "Release footer prefix naming the app version",
+      "tokens": [],
+      "translations": [{ "translation": "App", "variations": {} }],
+      "types": []
+    },
+    "NEPTlLodgWeS6fZB/MhEPQ==": {
+      "description": "Release footer prefix naming the runtime version",
+      "tokens": [],
+      "translations": [{ "translation": "Laufzeit", "variations": {} }],
+      "types": []
+    },
     "pxU3DuGXoYyJueKhl5vDiQ==": {
       "description": "Explanation that a Leitsatz reminder sends a notification",
       "tokens": [],

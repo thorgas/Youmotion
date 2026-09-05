@@ -34,6 +34,7 @@ import { SettingsActionRow } from '@/components/ui/settings-action-row';
 import { actionColors, palette, surfaceColors, type } from '@/theme';
 import { DataSafetyControls } from '@/features/data-safety/ui/data-safety-controls';
 import { FeedbackSettingsAction } from '@/features/feedback/ui/feedback-screen';
+import { ReleaseFooter } from '@/features/updates/ui/release-footer';
 import { useAppNavigationActor } from '@/navigation/app-navigation.provider';
 import { appSettingsStore } from '@/app-stores';
 import { guidingBeliefLibraryStatements } from '@/features/beliefs/application/guiding-belief-library';
@@ -295,6 +296,7 @@ export function SettingsScreen() {
           gitCommit={gitCommit}
           updateChannel={updateChannel}
         />
+        <ReleaseFooter testID="workspace-release" />
         </ScrollView>
       </SafeAreaView>
     </View>
