@@ -1,5 +1,6 @@
 const { execFileSync } = require('node:child_process');
 const { IOSConfig, withXcodeProject } = require('expo/config-plugins');
+const { resolveUpdatesConfig } = require('expo-update-kit/config');
 
 function resolveGitCommit() {
   const easBuildCommit = process.env.EAS_BUILD_GIT_COMMIT_HASH;
@@ -10,6 +11,17 @@ function resolveGitCommit() {
   } catch {
     return null;
   }
+}
+
+function isLocallyBuiltBinary() {
+  return process.env.EAS_BUILD_PROFILE === undefined;
+}
+
+function resolveUpdates(config) {
+  return resolveUpdatesConfig(config.updates, {
+    channel: process.env.MOBILE_UPDATE_CHANNEL?.trim(),
+    disableByDefault: isLocallyBuiltBinary(),
+  });
 }
 
 function withArm64Simulator(config) {
@@ -31,11 +43,16 @@ function withArm64Simulator(config) {
   });
 }
 
-module.exports = ({ config }) => ({
-  ...config,
-  plugins: [...(config.plugins ?? []), withArm64Simulator],
-  extra: {
-    ...config.extra,
-    gitCommit: resolveGitCommit(),
-  },
-});
+module.exports = ({ config }) => {
+  const updates = resolveUpdates(config);
+
+  return {
+    ...config,
+    ...(updates === undefined ? {} : { updates }),
+    plugins: [...(config.plugins ?? []), withArm64Simulator],
+    extra: {
+      ...config.extra,
+      gitCommit: resolveGitCommit(),
+    },
+  };
+};
