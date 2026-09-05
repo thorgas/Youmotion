@@ -1,0 +1,36 @@
+{
+  "formatVersion": 2,
+  "name": "nav-combined-release",
+  "route": "combined-release",
+  "title": "Restore the synthetic archive and capture the populated release journey",
+  "device": "Youmotion Expo Map",
+  "date": "2026-09-05",
+  "source": "4c8f207",
+  "steps": {
+    "22": {
+      "capture": "belief-library.png",
+      "note": "Populated library after restoring the staged synthetic archive fixture with 133 moments and 15 guiding beliefs"
+    },
+    "30": {
+      "capture": "reflection--keyboard.png",
+      "note": "Reflection note screen with the native keyboard open after the recorded emotion pulse"
+    },
+    "31": {
+      "capture": "reflection.png",
+      "note": "Reflection note screen after dismissing the keyboard"
+    },
+    "35": {
+      "capture": "belief-system.png",
+      "note": "Guiding-belief suggestion flow for the always-functioning synthetic belief"
+    },
+    "42": {
+      "capture": "success--reminder-offer.png",
+      "note": "Completed reflection offering reminder planning"
+    },
+    "45": {
+      "capture": "leitsatz-reminder--success-origin-schedule-picker.png",
+      "note": "Schedule picker opened from the completed reflection; flow ends before activating the reminder"
+    }
+  },
+  "result": "Replayed 2026-09-05: 45 passed, 0 failed, 0 errored. Pulse idle warnings are expected while the pulse animates. Fixture file must be the first item in On My iPhone; its tap was derived from the system accessibility tree. Remove any existing always-functioning reminder in the library before replay; journal restore preserves reminder settings."
+}
