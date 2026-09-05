@@ -1,0 +1,91 @@
+# Over-the-air updates
+
+Youmotion publishes JavaScript-only updates through EAS Update. Two channels
+matter: `production`, which store builds subscribe to, and `qa`, which exists
+so a tester can see a fix before it ships. The switch between them lives in the
+app, behind a long press, and needs no new binary.
+
+## The release footer
+
+The bottom of Settings shows three lines of muted text — the release label, the
+channel and app version, and the runtime version. They come from
+[`expo-update-kit`](https://github.com/thorgas/expo-update-kit); the adapter is
+[release-footer.tsx](../src/features/updates/ui/release-footer.tsx) and every
+string is ours, in fbtee ([release-footer-labels.ts](../src/features/updates/ui/release-footer-labels.ts)).
+
+| line              | what it answers                                                 |
+| ----------------- | --------------------------------------------------------------- |
+| release label     | which update is running, or that the build launched embedded    |
+| `Kanal … · App …` | which channel this binary asks for, and its marketing version   |
+| `Laufzeit …`      | the runtime fingerprint an update must match to be eligible      |
+
+A long press (500 ms) opens the platform action sheet with three rows: check
+for an update now, switch to the other channel, cancel. Cancel and a press
+outside both dismiss it. A tap does nothing — the menu is deliberately hidden.
+
+Switching is transactional: if the target channel has no eligible update, the
+previous channel is restored rather than left half-applied.
+
+## Publishing
+
+```bash
+pnpm eas:update:qa
+```
+
+```bash
+pnpm eas:update:production
+```
+
+Both run `expo-update-kit verify-runtime` first. It compares the runtime
+fingerprint resolved from the current working tree against
+[expected-ota-runtimes.json](../expected-ota-runtimes.json) — the runtimes the
+installed binaries were built from — and refuses to publish an update that no
+phone could receive. After shipping a new binary, record its runtime:
+
+```bash
+pnpm eas:update:runtimes
+```
+
+and commit the changed file with the build.
+
+## Channels
+
+`production`, `qa`, `preview`, `testing` and `development` already exist. A new
+one is created once, from the app directory:
+
+```bash
+npx eas channel:create <name>
+```
+
+See the package README's "EAS setup" section for branch mapping. Build profiles
+name their channel in [eas.json](../eas.json); the `qa` profile extends
+`preview` and distributes internally.
+
+## Which channel a build subscribes to
+
+`app.config.js` resolves `updates` through `resolveUpdatesConfig`:
+
+| `MOBILE_UPDATE_CHANNEL` | result                                                     |
+| ----------------------- | ---------------------------------------------------------- |
+| `none`                  | updates disabled; the build keeps the JS it was built with |
+| a channel name          | enabled, subscribed to that channel                        |
+| unset, on EAS           | the `app.json` default (`production`)                      |
+| unset, built locally    | disabled                                                   |
+
+`pnpm ios` and `pnpm android` pin `MOBILE_UPDATE_CHANNEL=none` for this reason:
+a locally built binary carries the same fingerprint runtime version as a store
+build, so without it a production update would download on first launch and
+silently replace the code just built.
+
+## When an update does not arrive
+
+- **"Updates are disabled in this build."** Expected in development and
+  dev-client builds — `expo-updates` never checks there. Use a Release or EAS
+  build to exercise a real switch.
+- **Nothing happens on a Release build.** Compare the footer's `Laufzeit` line
+  with the runtime `eas update` printed. A fingerprint mismatch means the
+  update was never eligible for this binary; publish against the matching
+  runtime, or ship a new binary.
+- **The wrong code is running.** Check the channel line. A build made from a
+  branch, with no `MOBILE_UPDATE_CHANNEL`, subscribes to `production` and will
+  replace itself with the store bundle on first launch.
