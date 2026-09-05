@@ -16,7 +16,8 @@ import {
   mockSurrealDatabase,
   resetSurrealDatabaseMock,
 } from '@/test-utils/surrealdb.repository.mock';
-import { appNavigationMachine, routeForStateValue } from '../app-navigation.machine';
+import { appNavigationMachine } from '../app-navigation.composition';
+import { routeForStateValue } from '../app-navigation.machine';
 import {
   handleNativeRouteRemoval,
   inspectAppNavigation,

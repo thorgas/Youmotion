@@ -32,7 +32,7 @@ import {
 } from '@/constants';
 import { AppLocaleProvider } from '@/localization/app-locale-provider';
 import { formatHistoryDate } from '@/localization/date-copy';
-import { appNavigationMachine } from '@/navigation/app-navigation.machine';
+import { appNavigationMachine } from '@/navigation/app-navigation.composition';
 import {
   CheckInId,
   CheckInTimestamp,

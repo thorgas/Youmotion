@@ -53,7 +53,8 @@ import {
   mockSurrealQuery,
   resetSurrealDatabaseMock,
 } from '@/test-utils/surrealdb.repository.mock';
-import { appNavigationMachine, routeForStateValue } from '../app-navigation.machine';
+import { appNavigationMachine } from '../app-navigation.composition';
+import { createAppNavigationMachine, routeForStateValue } from '../app-navigation.machine';
 import * as reminderScheduler from '@/features/reminders/infrastructure/local-reminder.scheduler';
 import {
   ReminderAssignmentId,
@@ -233,6 +234,31 @@ describe('app navigation model', () => {
     mockRequestReminderPermission.mockResolvedValue(REMINDER_PERMISSION_STATES.GRANTED);
     mockGetReminderPermission.mockClear();
     mockGetReminderPermission.mockResolvedValue(REMINDER_PERMISSION_STATES.UNDETERMINED);
+  });
+
+  it('replays time and nonce-dependent transitions deterministically', () => {
+    const fixedRuntime = {
+      appSettingsStore,
+      checkInHistoryStore,
+      nonce: () => 'fixed-nonce',
+      now: () => new Date('2026-09-05T08:15:00.000Z'),
+    };
+    const replay = () => {
+      const actor = createActor(createAppNavigationMachine(fixedRuntime)).start();
+      actor.send({ type: CHECK_IN_EVENTS.TOUCH_STARTED });
+      actor.send({ type: CHECK_IN_EVENTS.SELECTION_CHANGED, selection });
+      actor.send({ type: CHECK_IN_EVENTS.SELECTION_RELEASED });
+      const occurredAtDraft = actor.getSnapshot().context.occurredAtDraft;
+      actor.send({ type: NAVIGATION_EVENTS.SETTINGS_OPENED });
+      actor.send({ type: BELIEF_LIBRARY_EVENTS.OPENED });
+      actor.send({ type: BELIEF_LIBRARY_EVENTS.CREATE_REQUESTED });
+      const beliefLibraryStatementId = actor.getSnapshot().context.beliefLibraryStatementId;
+      actor.stop();
+      return { beliefLibraryStatementId, occurredAtDraft };
+    };
+
+    expect(replay()).toEqual(replay());
+    expect(replay().occurredAtDraft).toBe('2026-09-05T08:15:00.000Z');
   });
 
   it('exports a local backup from an explicit Settings model path', async () => {

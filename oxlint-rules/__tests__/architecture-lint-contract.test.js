@@ -228,11 +228,8 @@ describe('architecture lint contract', () => {
 
     expect(storeRules['code-architecture/no-exported-dependency-instances']?.[0]).toBe(2);
     expect(otherApplicationRules['code-architecture/no-exported-dependency-instances']?.[0]).toBe(2);
-    expect(otherApplicationRules['code-architecture/no-unasserted-return']?.[1]?.allowedReturnCalls).toEqual([
-      'assignments.some',
-      'routeName.endsWith',
-      'text.includes',
-    ]);
+    expect(otherApplicationRules['code-architecture/no-unasserted-return']?.[1]
+      ?.allowedReturnCalls).toBeUndefined();
     expect(algorithmRules['code-architecture/require-contract-assertions']).toBeUndefined();
     expect(algorithmRules['code-architecture/require-assertions']?.[0]).toBe(2);
     expect(configuredRulesFor(
@@ -516,6 +513,36 @@ describe('architecture lint contract', () => {
     ));
 
     expect(messages).toHaveLength(7);
+  });
+
+  it('keeps ambient navigation inputs in the narrow composition module', () => {
+    const machineRules = configuredRulesFor('src/navigation/app-navigation.machine.ts');
+    const compositionRules = configuredRulesFor('src/navigation/app-navigation.composition.ts');
+
+    expect(machineRules['code-architecture/no-implicit-external-dependencies']?.[0]).toBe(2);
+    expect(compositionRules['code-architecture/no-implicit-external-dependencies']?.[0]).toBe(2);
+    expect(machineRules['code-architecture/max-function-lines']?.[0]).toBe(0);
+    expect(compositionRules['code-architecture/max-function-lines']?.[0]).toBe(2);
+    expect(compositionRules['code-architecture/no-exported-dependency-instances']?.[0]).toBe(2);
+
+    const machineMessages = messagesFor({
+      code: 'export const value = new Date();',
+      filePath: 'src/navigation/app-navigation.machine.ts',
+    });
+    const compositionMessages = messagesFor({
+      code: 'export const value = new Date();',
+      filePath: 'src/navigation/app-navigation.composition.ts',
+    });
+
+    expect(machineMessages).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        ruleId: 'code-architecture/no-implicit-external-dependencies',
+        severity: 2,
+      }),
+    ]));
+    expect(compositionMessages).not.toEqual(expect.arrayContaining([
+      expect.objectContaining({ ruleId: 'code-architecture/no-implicit-external-dependencies' }),
+    ]));
   });
 
   it.each([

@@ -13,7 +13,7 @@ import {
 } from '@/constants';
 import { appSettingsStore } from '@/app-stores';
 import { configureAppLocale } from '@/localization/app-locale.configuration';
-import { appNavigationMachine } from '@/navigation/app-navigation.machine';
+import { appNavigationMachine } from '@/navigation/app-navigation.composition';
 import { AppNavigationActorProvider } from '@/navigation/app-navigation.provider';
 import {
   mockSurrealDatabase,

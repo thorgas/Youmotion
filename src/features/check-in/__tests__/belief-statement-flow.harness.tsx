@@ -19,7 +19,7 @@ import {
   NAVIGATION_STATES,
 } from '@/constants';
 import { appSettingsStore } from '@/app-stores';
-import { appNavigationMachine } from '@/navigation/app-navigation.machine';
+import { appNavigationMachine } from '@/navigation/app-navigation.composition';
 import type { BeliefSystemId } from '@/features/beliefs/domain/belief-statement';
 import type {
   CheckInId,

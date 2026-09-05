@@ -21,9 +21,9 @@ import {
 } from '@/constants';
 import { appSettingsStore } from '@/app-stores';
 import {
-  appNavigationMachine,
   routeForStateValue,
 } from '../app-navigation.machine';
+import { appNavigationMachine } from '../app-navigation.composition';
 
 type AppRoute = typeof APP_ROUTES[keyof typeof APP_ROUTES];
 type DirectedGraph = ReturnType<typeof toDirectedGraph>;

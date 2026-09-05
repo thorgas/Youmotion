@@ -22,7 +22,7 @@ import {
   type AppNavigationActor,
   useAppNavigationActor,
 } from '@/navigation/app-navigation.provider';
-import { appNavigationMachine } from '@/navigation/app-navigation.machine';
+import { appNavigationMachine } from '@/navigation/app-navigation.composition';
 import {
   handleNativeRouteRemoval,
   nativeRouteTransitionEnded,

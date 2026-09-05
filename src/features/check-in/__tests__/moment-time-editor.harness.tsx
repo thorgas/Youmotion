@@ -28,7 +28,7 @@ import { CheckInTimestamp, type EmotionSelection } from '../domain/check-in';
 import { palette } from '@/theme';
 
 type NavigationMachine = typeof import(
-  '@/navigation/app-navigation.machine'
+  '@/navigation/app-navigation.composition'
 )['appNavigationMachine'];
 
 let actor: Actor<NavigationMachine> | undefined;
@@ -78,8 +78,8 @@ describe('moment time editor on the device runtime', () => {
       });
       return mocked;
     });
-    const navigationModule: typeof import('@/navigation/app-navigation.machine') = require(
-      '@/navigation/app-navigation.machine',
+    const navigationModule: typeof import('@/navigation/app-navigation.composition') = require(
+      '@/navigation/app-navigation.composition',
     );
     const reflectionModule: typeof import('../ui/reflection-screen') = require(
       '../ui/reflection-screen',

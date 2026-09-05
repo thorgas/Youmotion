@@ -15,10 +15,12 @@ export function guidingBeliefLibraryStatements({
     assert(statement.kind === 'built-in' || statement.harmfulStatement.trim().length > 0, 'Custom library belief must have limiting copy');
     if (statement.kind === 'custom' && statement.archivedAt !== undefined) return false;
     if (statement.guidingStatement !== undefined) return true;
-    return assignments.some((assignment) => (
+    const hasReminderAssignment = assignments.some((assignment) => (
       assignment.targetKind === REMINDER_TARGET_KINDS.GUIDING_BELIEF
       && assignment.beliefSystemId === statement.beliefSystemId
     ));
+    assert(typeof hasReminderAssignment === 'boolean', 'Reminder assignment lookup must return a boolean.');
+    return hasReminderAssignment;
   });
   assert(visible.length <= statements.length, 'Filtering cannot add belief statements');
   assert(visible.every((statement) => statements.includes(statement)), 'Visible beliefs must come from the input library');

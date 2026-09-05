@@ -13,9 +13,9 @@ import {
   NAVIGATION_STATES,
 } from '@/constants';
 import {
-  appNavigationMachine,
   routeForStateValue,
 } from './app-navigation.machine';
+import { appNavigationMachine } from './app-navigation.composition';
 import { bindReminderNotificationActor } from '@/features/reminders/infrastructure/reminder-notification.bridge';
 
 type AppNavigationActor = ActorRefFrom<typeof appNavigationMachine>;
@@ -76,7 +76,9 @@ const routeNameMatchesAppRoute = ({
   assert(routeName === undefined || routeName === routeName.trim(), 'Native route names cannot contain outer whitespace.');
   if (!routeName) return false;
   const routePath = route.slice(1);
-  return routeName === routePath || routeName.endsWith(`/${routePath}`);
+  const matchesRoute = routeName === routePath || routeName.endsWith(`/${routePath}`);
+  assert(typeof matchesRoute === 'boolean', 'Native route matching must return a boolean.');
+  return matchesRoute;
 };
 
 const syncNativeDismissal = ({
