@@ -69,8 +69,14 @@ name their channel in [eas.json](../eas.json); the `qa` profile extends
 | ----------------------- | ---------------------------------------------------------- |
 | `none`                  | updates disabled; the build keeps the JS it was built with |
 | a channel name          | enabled, subscribed to that channel                        |
-| unset, on EAS           | the `app.json` default (`production`)                      |
-| unset, built locally    | disabled                                                   |
+| unset                   | the `app.json` default (`production`)                      |
+
+The resolution must not depend on anything that differs between your machine
+and the EAS builder. EAS computes the runtime fingerprint twice — once locally
+when the job is submitted, once on the builder — and fails the build when they
+disagree, because an update published from a config that resolved differently
+would never match the binary. `EAS_BUILD_PROFILE` in particular is set only
+inside the builder, so it must not feed this decision.
 
 `pnpm ios` and `pnpm android` pin `MOBILE_UPDATE_CHANNEL=none` for this reason:
 a locally built binary carries the same fingerprint runtime version as a store

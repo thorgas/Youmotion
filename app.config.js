@@ -13,16 +13,9 @@ function resolveGitCommit() {
   }
 }
 
-function isLocallyBuiltBinary() {
-  return process.env.EAS_BUILD_PROFILE === undefined;
-}
+const isProductionBuild = process.env.EAS_BUILD_PROFILE === 'production';
 
-function resolveUpdates(config) {
-  return resolveUpdatesConfig(config.updates, {
-    channel: process.env.MOBILE_UPDATE_CHANNEL?.trim(),
-    disableByDefault: isLocallyBuiltBinary(),
-  });
-}
+const harnessUiPackage = '@react-native-harness/ui';
 
 function withArm64Simulator(config) {
   return withXcodeProject(config, (projectConfig) => {
@@ -40,6 +33,12 @@ function withArm64Simulator(config) {
     }
 
     return projectConfig;
+  });
+}
+
+function resolveUpdates(config) {
+  return resolveUpdatesConfig(config.updates, {
+    channel: process.env.MOBILE_UPDATE_CHANNEL?.trim(),
   });
 }
 
