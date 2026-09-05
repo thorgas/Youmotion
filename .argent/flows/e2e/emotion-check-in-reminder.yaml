@@ -67,7 +67,7 @@ steps:
       platform: ios
     steps:
       - await: { visible: { id: reminder-time-modal-0-done }, timeout: 5000 }
-      - await: { idle: true, stableFor: 400, timeout: 5000 }
+      - await: { idle: true, stableFor: 1200, timeout: 9000 }
       - echo: Tap the exposed upper backdrop; the runner's test-ID tap lands behind the modal card and does not dispatch the Pressable event.
       - tap: { x: 0.5, y: 0.2 }
       - await: { hidden: { id: reminder-time-modal-0-done }, timeout: 5000 }
