@@ -145,11 +145,11 @@
     "build:production:android": "eas build --platform android --profile production",
     "build:production:ios": "eas build --platform ios --profile production",
     "submit:testflight": "eas submit --platform ios --profile production --latest",
-    "submit:testflight:testing": "eas submit --platform ios --profile testing --latest",
+    "submit:testflight:testing": "node scripts/submit-testing.mjs ios",
     "submit:play:internal": "eas submit --platform android --profile internal --latest",
-    "submit:play:testing": "eas submit --platform android --profile testing --latest",
+    "submit:play:testing": "node scripts/submit-testing.mjs android",
     "submit:play:production": "eas submit --platform android --profile production --latest",
-    "release:testing": "eas build --platform all --profile testing --auto-submit --no-wait",
+    "release:testing": "eas build --platform all --profile testing --no-wait",
     "release:testflight": "eas build --platform ios --profile production --auto-submit",
     "version:ios": "eas build:version:get --platform ios",
     "version:android": "eas build:version:get --platform android",
@@ -186,6 +186,7 @@
     "test:harness:android": "node scripts/run-android-harness.mjs android 8084",
     "test:harness:android:pixel": "node scripts/run-android-harness.mjs android-pixel-6a 8084",
     "test:harness:ios": "RN_HARNESS_METRO_PORT=8083 harness --config jest.harness.config.mjs --no-watchman --harnessRunner ios",
+    "prepare:harness:ios": "node scripts/prepare-ios-harness.mjs",
     "verify": "pnpm lint && pnpm typecheck && pnpm test"
   },
   "expo": {
