@@ -49,7 +49,9 @@ argent flow run .argent/flows/store-00-restore-fixture.yaml --device "$E2E_DEVIC
 
 The flow imports only
 `src/features/data-safety/__tests__/fixtures/legacy-archive.fixture.json`, a
-neutral 133-moment/15-belief archive. It must never be replaced with a
+neutral 133-moment/15-belief archive generated with irregular timing,
+intensities, and emotion frequencies for credible release imagery. Regenerate
+it with `pnpm generate:store-screenshot-fixture`; never replace it with a
 personal backup.
 
 Goldie replays scene flows independently. Do not assume data created or restored

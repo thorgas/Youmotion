@@ -51,4 +51,28 @@ describe('legacy archive fixture', () => {
       (statement) => statement.guidingStatement !== undefined,
     )).toBe(true);
   });
+
+  it('uses irregular synthetic activity for credible store screenshots', async () => {
+    const contents = await readFile(committedArchivePath, 'utf8');
+    const archive = currentDataArchive(await Effect.runPromise(
+      Schema.decodeUnknown(DataArchiveFromJson)(contents),
+    ));
+    const emotionCountsById = new Map();
+    for (const checkIn of archive.checkIns) {
+      emotionCountsById.set(
+        checkIn.emotionId,
+        (emotionCountsById.get(checkIn.emotionId) ?? 0) + 1,
+      );
+    }
+    const emotionCounts = [...emotionCountsById.values()];
+    const intervals = archive.checkIns.slice(1).map((checkIn, index) => (
+      Date.parse(archive.checkIns[index].createdAt) - Date.parse(checkIn.createdAt)
+    ));
+
+    expect(new Set(emotionCounts).size).toBeGreaterThan(3);
+    expect(Math.max(...emotionCounts) - Math.min(...emotionCounts)).toBeGreaterThan(10);
+    expect(new Set(intervals).size).toBeGreaterThan(50);
+    expect(new Set(archive.checkIns.map((checkIn) => checkIn.intensity)).size).toBeGreaterThan(40);
+    expect(archive.checkIns.every((checkIn) => !checkIn.note.includes('placeholder'))).toBe(true);
+  });
 });

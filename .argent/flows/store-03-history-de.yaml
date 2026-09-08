@@ -3,5 +3,5 @@ steps:
   - wait: 1000
   - tool: gesture-tap
     args: { x: 0.375, y: 0.94 }
-  - await: { visible: { text: "Momente, die du wahrgenommen hast." }, timeout: 10000 }
+  - await: { visible: { id: "history-search-input" }, timeout: 10000 }
   - await: { idle: true }
