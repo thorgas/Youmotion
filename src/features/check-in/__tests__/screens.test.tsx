@@ -1468,6 +1468,12 @@ describe('check-in screens', () => {
     expect(settings.getByText('Your journal belongs to you.')).toBeTruthy();
     expect(settings.getByRole('button', { name: /Privacy policy/ })).toBeEnabled();
     expect(settings.getByRole('button', { name: /Terms of use/ })).toBeEnabled();
+    const dataControls = settings.getByTestId('data-safety-controls');
+    const legalSection = settings.getByTestId('settings-legal-section');
+    expect(legalSection.parent).toBe(dataControls.parent);
+    expect(legalSection.parent?.children.indexOf(legalSection)).toBeGreaterThan(
+      dataControls.parent?.children.indexOf(dataControls) ?? -1,
+    );
     expect(settings.getByText('Emotion check-in reminder')).toBeTruthy();
     expect(settings.getByText(
       'Choose days and times for a gentle invitation to notice how you feel.',

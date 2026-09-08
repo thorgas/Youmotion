@@ -246,10 +246,6 @@ export function SettingsScreen({
           <FeedbackSettingsAction />
         </View>
         <Text style={styles.sectionHeading}>
-          <fbt desc="Heading grouping legal documents in settings">LEGAL</fbt>
-        </Text>
-        <LegalSettingsActions />
-        <Text style={styles.sectionHeading}>
           <fbt desc="Heading for the Settings onboarding replay action">UNDERSTAND YOUMOTION</fbt>
         </Text>
         <View style={styles.actionGroup}>
@@ -313,6 +309,12 @@ export function SettingsScreen({
           updateChannel={updateChannel}
         />
         {showTechnicalDetails ? <ReleaseFooter testID="workspace-release" /> : null}
+        <View testID="settings-legal-section">
+          <Text style={styles.sectionHeading}>
+            <fbt desc="Heading grouping legal documents in settings">LEGAL</fbt>
+          </Text>
+          <LegalSettingsActions />
+        </View>
         </ScrollView>
       </SafeAreaView>
     </View>
