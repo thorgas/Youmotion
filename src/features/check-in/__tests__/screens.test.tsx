@@ -1468,6 +1468,12 @@ describe('check-in screens', () => {
     expect(settings.getByText('Your journal belongs to you.')).toBeTruthy();
     expect(settings.getByRole('button', { name: /Privacy policy/ })).toBeEnabled();
     expect(settings.getByRole('button', { name: /Terms of use/ })).toBeEnabled();
+    const terms = settings.getByTestId('open-terms-of-use');
+    const privacy = settings.getByTestId('open-privacy-policy');
+    expect(terms.parent).toBe(privacy.parent);
+    expect(terms.parent?.children.indexOf(terms)).toBeLessThan(
+      privacy.parent?.children.indexOf(privacy) ?? -1,
+    );
     const dataControls = settings.getByTestId('data-safety-controls');
     const legalSection = settings.getByTestId('settings-legal-section');
     expect(legalSection.parent).toBe(dataControls.parent);

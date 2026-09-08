@@ -37,21 +37,21 @@ export function LegalSettingsActions() {
       <View style={styles.actions}>
         <SettingsActionRow
           description={String(fbs(
-            'Learn how Youmotion handles app and journal data.',
-            'Settings privacy policy link explanation',
-          ))}
-          onPress={_openPrivacyPolicy}
-          testID="open-privacy-policy"
-          title={String(fbs('Privacy policy', 'Settings privacy policy link title'))}
-        />
-        <SettingsActionRow
-          description={String(fbs(
             'Read the terms that apply when you use Youmotion.',
             'Settings terms of use link explanation',
           ))}
           onPress={_openTerms}
           testID="open-terms-of-use"
           title={String(fbs('Terms of use', 'Settings terms of use link title'))}
+        />
+        <SettingsActionRow
+          description={String(fbs(
+            'Learn how Youmotion handles app and journal data.',
+            'Settings privacy policy link explanation',
+          ))}
+          onPress={_openPrivacyPolicy}
+          testID="open-privacy-policy"
+          title={String(fbs('Privacy policy', 'Settings privacy policy link title'))}
         />
       </View>
       {failed ? (
