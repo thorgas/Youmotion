@@ -163,6 +163,7 @@
     "version:android:set": "eas build:version:set --platform android",
     "verify:ios:archive": "bash scripts/verify-ios-store-archive.sh",
     "verify:store-screenshots": "node scripts/verify-store-screenshot-provenance.mjs",
+    "verify:website": "node scripts/verify-website.mjs",
     "fingerprint:android": "fingerprint fingerprint:generate --platform android",
     "fingerprint:ios": "fingerprint fingerprint:generate --platform ios",
     "i18n:all": "pnpm i18n:collect && pnpm i18n:compile",
@@ -195,7 +196,7 @@
     "test:harness:android:pixel": "node scripts/run-android-harness.mjs android-pixel-6a 8084",
     "test:harness:ios": "RN_HARNESS_METRO_PORT=8083 harness --config jest.harness.config.mjs --no-watchman --harnessRunner ios",
     "prepare:harness:ios": "node scripts/prepare-ios-harness.mjs",
-    "verify": "pnpm lint && pnpm typecheck && pnpm test"
+    "verify": "pnpm lint && pnpm typecheck && pnpm verify:website && pnpm test"
   },
   "expo": {
     "autolinking": {
