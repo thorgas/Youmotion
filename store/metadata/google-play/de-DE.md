@@ -35,7 +35,7 @@ BEHUTSAM UND WERTFREI
 
 Youmotion beschreibt, was du festgehalten hast, ohne ein Gefühl als besser oder schlechter zu bewerten.
 
-Youmotion unterstützt die Selbstwahrnehmung und ersetzt keine psychotherapeutische oder medizinische Behandlung.
+Youmotion unterstützt die Selbstwahrnehmung. Die App ist kein Medizinprodukt und dient nicht der Diagnose, Behandlung, Heilung oder Vorbeugung von Erkrankungen. Sie ersetzt keine psychotherapeutische oder medizinische Behandlung.
 
 ## Versionshinweise — Version 1.0.3
 

@@ -114,3 +114,11 @@ owner's attestation, and only then use `gplay data-safety update`.
 Account agreements, identity verification, content rating, target audience,
 ads/app-access attestations, health declarations, testing eligibility, and the
 final review submission remain owner-controlled Play Console steps.
+
+The app category and store tags are also manual Play Console fields because
+Google's official Publishing API does not expose them. For launch, use
+**Health & Fitness** and choose the closest available tags to **Mood tracker**,
+**Journal**, **Mindfulness**, **Mental wellbeing**, and **Stress management**.
+Only select tags that the Console currently offers; its taxonomy can vary by
+category and locale. This positioning is comparable to How We Feel, but that
+app's private Console tag selections cannot be read from its public listing.

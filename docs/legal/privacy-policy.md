@@ -17,7 +17,7 @@ This is not legal advice and must be reviewed before publication.
 
 Youmotion is a private, local-first self-reflection application. It allows recording emotions, intensity and nuance, optional reflection notes, optional belief entries and guiding statements, reminders, and local history/insight data.
 
-Youmotion is not a medical device and does not provide diagnosis, treatment, or emergency services. It is a support tool only.
+Youmotion is not a medical device and does not diagnose, treat, cure, or prevent any medical condition. It is not a crisis or emergency service and does not replace psychotherapeutic or medical treatment.
 
 ## 3. Data processed on this device / Verarbeitete Daten auf dem Gerät
 
@@ -125,8 +125,10 @@ Youmotion ist eine private, lokal-fokussierte Selbstreflexions-App. Du kannst
 Gefühle mit Intensität und Nuance, optionale Notizen, optionale Glaubens- und
 Leitsatztexte, Erinnerungen sowie lokale Verlaufsauswertungen erfassen.
 
-Youmotion ist kein Medizinprodukt und bietet weder Diagnose noch Behandlung oder
-Notfallhilfe.
+Youmotion ist kein Medizinprodukt und dient nicht der Diagnose, Behandlung,
+Heilung oder Vorbeugung von Erkrankungen. Die App ist kein Krisen- oder
+Notfalldienst und ersetzt keine psychotherapeutische oder medizinische
+Behandlung.
 
 ## 2. Verarbeitete Daten
 

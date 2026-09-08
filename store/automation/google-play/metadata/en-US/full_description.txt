@@ -23,4 +23,4 @@ CAREFUL, NON-JUDGMENTAL LANGUAGE
 
 Youmotion describes what you recorded without rating one feeling as better or worse than another.
 
-Youmotion supports self-awareness and does not replace psychotherapeutic or medical treatment.
+Youmotion supports self-awareness. It is not a medical device and does not diagnose, treat, cure, or prevent any medical condition. It does not replace psychotherapeutic or medical treatment.
