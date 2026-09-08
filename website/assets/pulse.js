@@ -49,8 +49,8 @@
   const scrollToDownload = () => {
     const target = document.querySelector('#download');
     if (matchMedia('(prefers-reduced-motion: reduce)').matches || !directTouch) { target.scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' }); return; }
-    const start = window.scrollY; const destination = target.getBoundingClientRect().top + start; const distance = destination - start; const duration = Math.min(2800, Math.max(2000, Math.abs(distance) * .72)); const startedAt = performance.now();
-    const step = (now) => { const progress = Math.min(1, (now - startedAt) / duration); const eased = progress < .5 ? 2 * progress * progress : 1 - Math.pow(-2 * progress + 2, 2) / 2; window.scrollTo(0, start + distance * eased); if (progress < 1) requestAnimationFrame(step); };
+    const start = window.scrollY; const destination = target.getBoundingClientRect().top + start; const distance = destination - start; const duration = Math.min(2200, Math.max(1800, Math.abs(distance) * .55)); const startedAt = performance.now();
+    const step = (now) => { const progress = Math.min(1, (now - startedAt) / duration); const eased = 1 - Math.pow(1 - progress, 1.35); window.scrollTo(0, start + distance * eased); if (progress < 1) requestAnimationFrame(step); };
     requestAnimationFrame(step);
   };
   const activate = () => {
