@@ -4,9 +4,9 @@
 
 Youmotion: Gefühle verstehen
 
-## Untertitel — 19/30
+## Untertitel — 29/30
 
-Privat reflektieren
+Entdecke und verstehe Gefühle
 
 ## Werbetext — 141/170
 

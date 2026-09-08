@@ -59,7 +59,7 @@ Youmotion has no account and keeps your journal on this device. It supports self
 ### German (de-DE)
 
 - App name: `Youmotion`
-- Untertitel (<=30 Zeichen): **Selbstcheck mit Gefühlspuls** *(27)*
+- Untertitel (<=30 Zeichen): **Entdecke und verstehe Gefühle** *(29)*
 - Werbetext (<=170 Zeichen): **Nutze den ruhigen Gefühlspuls mit sieben Richtungen. Ergänze optional Reflexion und Leidsatz/Leitsatz-Arbeit. Verlauf, Einblicke und Erinnerungen bleiben lokal.** *(160)*
 - Keywords/Guidance (<=100 Zeichen): **Gefühle,Gefühlspuls,Gefühlsmoment,Journal,Reflexion,Leidsatz,Leitsatz,Verlauf,Einblicke,Erinnerung** *(98)*
 - Kategorie: Health & Fitness
