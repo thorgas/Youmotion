@@ -1,27 +1,45 @@
 steps:
   - echo: Restore the committed neutral archive fixture before populated store captures.
   - launch: com.youmotion.mobile
-  - await: { visible: { text: "Make space for what is here." }, timeout: 30000 }
-  - await: { idle: true }
-  - echo: Skip the first-run guide so Settings is available.
-  - tap: { x: 0.89, y: 0.09 }
+  - wait: 3000
+  - when:
+      visible: { id: onboarding-skip }
+    steps:
+      - when:
+          platform: ios
+        steps:
+          - tap: { id: onboarding-skip }
+      - when:
+          platform: android
+        steps:
+          - tool: gesture-tap
+            args: { x: 0.82, y: 0.06 }
   - await: { visible: { id: emotion-star }, timeout: 10000 }
   - tap: { id: tab-settings }
-  - await: { visible: { text: "Your space." }, timeout: 10000 }
-  - tool: gesture-swipe
-    args:
-      fromX: 0.5
-      fromY: 0.75
-      toX: 0.5
-      toY: 0.35
-      durationMs: 700
-  - await: { idle: true }
+  - await: { visible: { id: settings-screen }, timeout: 10000 }
+  - scroll-to: { target: { id: delete-all-journal-data }, direction: down }
+  - await: { visible: { id: restore-data-archive }, timeout: 5000 }
   - tap: { id: restore-data-archive }
-  - await: { visible: { text: "Browse" }, timeout: 10000 }
-  - tap: { id: DOC.sidebar.item.On My iPhone }
-  - await: { visible: { text: "youmotion-demo-backup.json" }, timeout: 10000 }
-  - tap: { text: "youmotion-demo-backup.json" }
-  - await: { visible: { text: "Replace this device's data?" }, timeout: 15000 }
+  - when:
+      platform: ios
+    steps:
+      - wait: 3000
+      - echo: Tap the fixture at the center of its frame from the iOS document-picker accessibility tree.
+      - tool: gesture-tap
+        args: { x: 0.176, y: 0.325 }
+  - when:
+      platform: android
+    steps:
+      - await: { visible: { text: "youmotion-demo-backup.json" }, timeout: 30000 }
+      - tap: { text: "youmotion-demo-backup.json" }
+  - await: { visible: { id: restore-preview }, timeout: 15000 }
+  - scroll-to: { target: { text: "133" }, direction: down }
+  - assert: { visible: { text: "133" } }
+  - scroll-to: { target: { id: app-release-info }, direction: down }
+  - await: { visible: { id: confirm-data-restore }, timeout: 5000 }
   - tap: { id: confirm-data-restore }
-  - await: { visible: { id: emotion-star }, timeout: 30000 }
+  - await: { visible: { id: data-safety-notice }, timeout: 30000 }
+  - assert: { hidden: { id: restore-preview } }
+  - tap: { id: data-safety-notice }
+  - await: { hidden: { id: data-safety-notice }, timeout: 5000 }
   - await: { idle: true }

@@ -1,6 +1,7 @@
 steps:
-  - launch: com.youmotion.mobile
-  - await: { visible: { id: emotion-star }, timeout: 10000 }
-  - tap: { id: tab-history }
+  - run: store-00-restore-fixture.yaml
+  - wait: 1000
+  - tool: gesture-tap
+    args: { x: 0.375, y: 0.94 }
   - await: { visible: { id: history-search-input }, timeout: 10000 }
   - await: { idle: true }

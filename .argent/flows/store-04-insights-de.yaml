@@ -1,7 +1,8 @@
 steps:
-  - launch: com.youmotion.mobile
-  - await: { visible: { text: Wie fühlst du dich gerade? }, timeout: 10000 }
-  - tap: { text: Einblicke }
+  - run: store-00-restore-fixture.yaml
+  - wait: 1000
+  - tool: gesture-tap
+    args: { x: 0.625, y: 0.94 }
   - await: { visible: { text: "Muster, die du wahrgenommen hast." }, timeout: 10000 }
   - tap: { text: Gesamt }
   - await: { visible: { text: Alle festgehaltenen Momente }, timeout: 10000 }

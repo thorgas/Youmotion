@@ -1,4 +1,9 @@
 const appRoot = process['cwd']();
+const locale = process.env['GOLDIE_LOCALE'] ?? 'en-US';
+
+if (locale !== 'en-US' && locale !== 'de-DE') {
+  throw new Error('GOLDIE_LOCALE must be en-US or de-DE.');
+}
 
 export const config = {
   appRoot,
@@ -7,7 +12,7 @@ export const config = {
     `${process.env['HOME']}/Library/Developer/Xcode/DerivedData/Youmotion-*/Build/Products/Release-iphonesimulator/Youmotion.app`,
   bundleId: 'com.youmotion.mobile',
   devices: ['iphone-6.9'],
-  locales: ['en-US', 'de-DE'],
+  locales: [locale],
   appearance: 'light',
   frame: { variant: '17-pro-blue' },
   theme: {
@@ -39,7 +44,7 @@ export const config = {
     {
       kind: 'screenshot',
       id: 'onboarding',
-      flow: 'store-01-pulse',
+      flow: locale === 'de-DE' ? 'store-01-pulse-de' : 'store-01-pulse',
       headline: {
         'en-US': 'Make space for what is here',
         'de-DE': 'Raum für das, was gerade da ist',
@@ -65,7 +70,7 @@ export const config = {
     {
       kind: 'screenshot',
       id: 'history',
-      flow: 'store-03-history',
+      flow: locale === 'de-DE' ? 'store-03-history-de' : 'store-03-history',
       headline: {
         'en-US': 'Return to your moments',
         'de-DE': 'Kehre zu deinen Momenten zurück',
@@ -78,7 +83,7 @@ export const config = {
     {
       kind: 'screenshot',
       id: 'insights',
-      flow: 'store-04-insights',
+      flow: locale === 'de-DE' ? 'store-04-insights-de' : 'store-04-insights',
       headline: {
         'en-US': 'See your patterns',
         'de-DE': 'Erkenne deine Muster',
@@ -91,7 +96,7 @@ export const config = {
     {
       kind: 'screenshot',
       id: 'settings',
-      flow: 'store-05-settings',
+      flow: locale === 'de-DE' ? 'store-05-settings-de' : 'store-05-settings',
       headline: {
         'en-US': 'Keep your space private',
         'de-DE': 'Bewahre deinen Raum privat',

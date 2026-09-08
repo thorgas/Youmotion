@@ -292,6 +292,12 @@ export function SettingsScreen({
             ))}
           />
         </View>
+        <View testID="settings-legal-section">
+          <Text style={styles.sectionHeading}>
+            <fbt desc="Heading grouping legal documents in settings">LEGAL</fbt>
+          </Text>
+          <LegalSettingsActions />
+        </View>
         <Text style={styles.sectionHeading}>
           <fbt desc="Heading grouping data and product information in settings">YOUR DATA</fbt>
         </Text>
@@ -309,12 +315,6 @@ export function SettingsScreen({
           updateChannel={updateChannel}
         />
         {showTechnicalDetails ? <ReleaseFooter testID="workspace-release" /> : null}
-        <View testID="settings-legal-section">
-          <Text style={styles.sectionHeading}>
-            <fbt desc="Heading grouping legal documents in settings">LEGAL</fbt>
-          </Text>
-          <LegalSettingsActions />
-        </View>
         </ScrollView>
       </SafeAreaView>
     </View>
