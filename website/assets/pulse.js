@@ -30,8 +30,8 @@
   };
   const selectionFromPoint = ({ clientX, clientY }) => {
     const box = field.getBoundingClientRect(); const centerX = box.left + box.width / 2; const centerY = box.top + box.height / 2;
-    const dx = clientX - centerX; const dy = clientY - centerY; const distance = Math.hypot(dx, dy); const deadZone = box.width * .055; const maxRadius = box.width * .36;
-    if (distance < deadZone) return null;
+    const dx = clientX - centerX; const dy = clientY - centerY; const distance = Math.hypot(dx, dy); const deadZone = box.width * .055; const maxRadius = box.width * .36; const hitRadius = box.width * .48;
+    if (distance < deadZone || distance > hitRadius) return null;
     const angle = Math.atan2(dy, dx); let nearest = 0; let nearestDistance = Infinity;
     order.forEach((_, index) => { const axis = -Math.PI / 4 + index * Math.PI / 4; const raw = Math.abs(angle - axis) % (Math.PI * 2); const circular = Math.min(raw, Math.PI * 2 - raw); if (circular < nearestDistance) { nearest = index; nearestDistance = circular; } });
     const constrained = Math.min(distance, maxRadius); const scale = constrained / distance; const x = 50 + dx * scale / box.width * 100; const y = 50 + dy * scale / box.height * 100; const intensity = Math.max(0, Math.min(1, (distance - deadZone) / (maxRadius - deadZone)));
@@ -50,7 +50,7 @@
     const target = document.querySelector('#download');
     if (matchMedia('(prefers-reduced-motion: reduce)').matches || !directTouch) { target.scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' }); return; }
     const start = window.scrollY; const destination = target.getBoundingClientRect().top + start; const distance = destination - start; const duration = Math.min(2200, Math.max(1800, Math.abs(distance) * .55)); const startedAt = performance.now();
-    const step = (now) => { const progress = Math.min(1, (now - startedAt) / duration); const eased = 1 - Math.pow(1 - progress, 1.35); window.scrollTo(0, start + distance * eased); if (progress < 1) requestAnimationFrame(step); };
+    const step = (now) => { const progress = Math.min(1, (now - startedAt) / duration); window.scrollTo(0, start + distance * progress); if (progress < 1) requestAnimationFrame(step); };
     requestAnimationFrame(step);
   };
   const activate = () => {

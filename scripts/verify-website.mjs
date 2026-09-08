@@ -22,6 +22,8 @@ if (/localStorage|sessionStorage|document\.cookie/.test(script)) throw new Error
 for (const behavior of ['pointerdown', 'setPointerCapture', 'pointerup', 'pointercancel', 'directTouch', 'scrollToDownload']) {
   if (!script.includes(behavior)) throw new Error(`The responsive pulse interaction is missing ${behavior}.`);
 }
+if (!script.includes('distance > hitRadius')) throw new Error('The pulse must reject interaction outside its circular hit area.');
+if (!script.includes('distance * progress')) throw new Error('Mobile scrolling must use constant-speed progress.');
 if (!script.includes('apps.apple.com/app/id6807357236') || !script.includes('play.google.com/store/apps/details?id=com.youmotion.mobile')) throw new Error('Canonical future store destinations are missing.');
 
 console.log('Website structure, launch state, privacy boundary, and store destinations verified.');
