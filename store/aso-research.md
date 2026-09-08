@@ -32,8 +32,8 @@ This supports Youmotion's current story—feeling, reflection, patterns—but al
 
 Keep the brand plus a high-relevance descriptor:
 
-- English title: `Youmotion: Emotion Journal`
-- English subtitle/short-description theme: private mood reflection and personal patterns
+- English title: `Youmotion: Understand Feelings`
+- English subtitle/short-description theme: discovering and understanding feelings
 - German title: `Youmotion: Gefühle verstehen`
 - German subtitle/short-description theme: privates Gefühlstagebuch and Reflexion
 

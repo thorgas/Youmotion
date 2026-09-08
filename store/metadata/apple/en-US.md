@@ -1,12 +1,12 @@
 # Apple App Store — en-US
 
-## App name — 26/30
+## App name — 30/30
 
-Youmotion: Emotion Journal
+Youmotion: Understand Feelings
 
-## Subtitle — 25/30
+## Subtitle — 30/30
 
-Private mood & reflection
+Discover & understand feelings
 
 ## Promotional text — 149/170
 

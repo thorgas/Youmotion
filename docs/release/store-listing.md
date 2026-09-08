@@ -16,8 +16,8 @@ Keep every claim aligned with the submitted build and repository source.
 
 ### English (en-US)
 
-- App name: `Youmotion`
-- Subtitle (<=30 chars): **Self-check with Feeling Pulse** *(29)*
+- App name: `Youmotion: Understand Feelings`
+- Subtitle (<=30 chars): **Discover & understand feelings** *(30)*
 - Promotional text (<=170 chars): **Use the seven-direction Feeling Pulse to check in, add optional reflection/belief work, review local history and insights. All data stays on-device; no account required.** *(169)*
 - Keywords (<=100 chars): **feeling,pulse,emotion,check-in,self-reflection,journal,beliefs,reminders,insights,local** *(87)*
 - Category: Health & Fitness

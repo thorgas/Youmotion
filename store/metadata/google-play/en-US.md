@@ -1,8 +1,8 @@
 # Google Play — en-US
 
-## App name — 26/30
+## App name — 30/30
 
-Youmotion: Emotion Journal
+Youmotion: Understand Feelings
 
 ## Short description — 79/80
 
