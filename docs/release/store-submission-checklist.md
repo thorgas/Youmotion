@@ -13,8 +13,15 @@
 - [x] Controller, address, register, and contact placeholders replaced from
   `https://thorgas.com/`; bilingual legal drafts completed.
 - [x] Google Play 1024x500 feature graphic prepared.
-- [x] Clean synthetic-data phone screenshot set prepared.
-- [x] Apple 13-inch iPad screenshot set prepared for the tablet-capable build.
+- [ ] Fresh synthetic-data phone screenshots captured and approved against the
+  signed release build. The reused set is currently blocked by
+  `pnpm verify:store-screenshots`.
+- [ ] Fresh Apple 13-inch iPad screenshots captured and approved for the
+  tablet-capable build.
+- [x] Production Android version 13 and iOS build 17 finished from release
+  commit `d44bddc5c61c2c74173660baac43e13ffcec75a7`.
+- [x] Production Pages deployment created for commit `afc6f58`; custom-domain
+  DNS remains pending.
 
 ## Publisher/legal-owner actions
 
@@ -33,6 +40,8 @@
 - [ ] If applicable, complete Google's 12-tester/14-day closed-test gate.
 - [ ] Confirm all screenshots against the signed production build and upload
   the matching iPhone, iPad, and Google Play assets.
+- [ ] Require `pnpm verify:store-screenshots` to pass before any screenshot
+  upload or final review submission.
 - [ ] Confirm each localized screenshot set shows the app UI in that same
   language, especially the German App Store set.
 - [ ] Test final production binaries on real devices and store testing tracks.

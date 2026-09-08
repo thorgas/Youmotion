@@ -7,6 +7,10 @@ store until it resolves publicly over HTTPS.
 
 Deploy `website/` to Cloudflare Pages and attach the `youmotion.app` domain.
 
+Production Pages deployment `c53a8156` was created from commit `afc6f58` on
+8 September 2026. The `youmotion.app` DNS/custom-domain binding still must be
+completed before the URLs below are entered in either store.
+
 Verify these URLs:
 
 - Marketing: `https://youmotion.app/`
@@ -38,6 +42,10 @@ purpose; use store binaries for material feature changes.
 
 ## 3. App Store Connect
 
+iOS 1.0.3 build 17 was scheduled for App Store Connect upload through EAS
+submission `899822f9-391f-4197-bafb-f60c833f7122`. Confirm processing before
+selecting it for review.
+
 Use the copy in:
 
 - `metadata/apple/en-US.md`
@@ -68,6 +76,10 @@ optionally reflect → open History and Insights → open Settings for local rem
 backup, deletion, feedback, privacy, and terms controls.
 
 ## 4. Google Play Console
+
+Android 1.0.3 version code 13 was scheduled as a draft production-track upload
+through EAS submission `409b55fd-1c24-4f51-a5b1-3988635dcebb`. Confirm the
+draft and complete the required declarations before review.
 
 Use the copy in:
 

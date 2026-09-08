@@ -4,7 +4,7 @@ This audit applies the useful launch-stage parts of `Eronred/aso-skills` to Youm
 
 ## Launch blockers
 
-1. **Deploy the prepared website.** The privacy, terms, support, and marketing pages are prepared under `website/`; deploy them to the matching HTTPS URLs before submission.
+1. **Attach the production website domain.** Pages deployment `c53a8156` is live at `youmotion-app.pages.dev`; attach `youmotion.app`, wait for DNS/TLS, and verify every matching HTTPS URL before submission.
 2. **Resolve Apple distribution ownership.** The previously observed Apple setup exposed only a free Personal Team associated with the existing organization. App Store distribution needs the intended owner’s paid Apple Developer Program membership and matching App Store Connect access.
 3. **Complete the owner privacy attestation.** `privacy-data-safety.md` inventories the release behavior and supplies draft answers. The owner must confirm Expo service retention, the final production dependency set, and every declaration in App Store Connect and Play Console.
 4. **Create and verify store records.** Confirm the bundle/package ID `com.youmotion.mobile`, app ownership, signing, agreements, tax/banking state where applicable, content rating, age rating, and review contacts.
@@ -13,8 +13,9 @@ This audit applies the useful launch-stage parts of `Eronred/aso-skills` to Youm
 
 ## Completed in this branch
 
-- Captured Release-build Google Play phone sets in English and German.
-- Added German 13-inch iPad coverage alongside the English iPad set.
+- Inventoried the reused screenshot sets and added a provenance gate. The
+  current assets are intentionally unapproved because they predate the signed
+  build; History/Insights also lack the required 133-moment fixture.
 - Added a reproducible, flattened 1024 × 500 Google Play feature graphic.
 - Hid update-channel switching and Git/channel diagnostics from production Settings while retaining them in development and testing builds.
 - Removed unused legacy storage and overlay-window permissions from the Android release manifest.

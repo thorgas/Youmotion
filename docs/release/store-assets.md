@@ -36,16 +36,9 @@ The store screenshot set is defined in `goldie/goldie.config.ts` and driven by
 the flows in `.argent/flows/store-*.yaml`. Goldie captures the app as a Release
 iOS Simulator build, then frames the raw captures for App Store Connect.
 
-For populated History and Insights captures, the `store-02-today` flow first
-creates four neutral, synthetic moments through the normal check-in journey.
-Replay it from a clean install when recapturing. The optional archive restore
-flow can also be used when a larger fixture is needed:
-
-```sh
-argent flow run .argent/flows/store-02-today.yaml --device "$E2E_DEVICE"
-```
-
-For the larger fixture, first replay
+Every History/Verlauf and Insights/Einblicke capture must use the complete
+committed archive fixture. The smaller `store-02-today` demo is not valid for
+release screenshots. Before each populated capture, replay
 `.argent/flows/store-00-restore-fixture.yaml` after making the committed
 fixture available to the simulator Files app as
 `youmotion-demo-backup.json`:
@@ -58,6 +51,11 @@ The flow imports only
 `src/features/data-safety/__tests__/fixtures/legacy-archive.fixture.json`, a
 neutral 133-moment/15-belief archive. It must never be replaced with a
 personal backup.
+
+Goldie replays scene flows independently. Do not assume data created or restored
+for an earlier scene is available to a later one. Restore and verify the fixture
+immediately before each History or Insights capture, select `All time` / `Gesamt`,
+and confirm the populated UI before framing.
 
 Build the simulator app first, then capture and verify the assets:
 
@@ -83,3 +81,6 @@ archive when they are ready for upload.
 - For every localized set, inspect at least one raw capture and confirm that
   the app controls, headings, navigation labels, dates, and empty/populated
   states are localized before framing or uploading it.
+- Update `store/screenshots/provenance.json` with the final PNG hashes, exact
+  signed-build commit, fixture count, and visual approval. Run
+  `pnpm verify:store-screenshots`; do not upload while it fails.
