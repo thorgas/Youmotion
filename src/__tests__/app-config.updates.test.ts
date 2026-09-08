@@ -87,6 +87,12 @@ describe('fingerprint configuration', () => {
 });
 
 describe('store release permissions', () => {
+  it('matches the App Store Connect Health & Fitness category', () => {
+    expect(appConfig.ios.infoPlist.LSApplicationCategoryType).toBe(
+      'public.app-category.healthcare-fitness',
+    );
+  });
+
   it('uses the Apple team that owns the active App Store credentials', () => {
     expect(appConfig.ios.appleTeamId).toBe('WL832FKGWX');
   });

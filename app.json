@@ -14,7 +14,8 @@
       "bundleIdentifier": "com.youmotion.mobile",
       "supportsTablet": true,
       "infoPlist": {
-        "ITSAppUsesNonExemptEncryption": false
+        "ITSAppUsesNonExemptEncryption": false,
+        "LSApplicationCategoryType": "public.app-category.healthcare-fitness"
       },
       "appleTeamId": "WL832FKGWX"
     },
