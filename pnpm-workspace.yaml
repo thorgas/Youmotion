@@ -71,7 +71,3 @@ minimumReleaseAgeExclude:
   - expo-update-kit@0.1.0-alpha.1 || 0.1.0-alpha.3
 overrides:
   tslib: 2.8.1
-patchedDependencies:
-  expo-dev-launcher@57.0.6: patches/expo-dev-launcher@57.0.6.patch
-  expo-modules-core@57.0.5: patches/expo-modules-core@57.0.5.patch
-  expo-modules-jsi@57.0.3: patches/expo-modules-jsi@57.0.3.patch

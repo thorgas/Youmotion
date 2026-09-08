@@ -85,3 +85,27 @@ describe('fingerprint configuration', () => {
     );
   });
 });
+
+describe('store release permissions', () => {
+  it('removes the iOS remote-push entitlement after notifications configuration', () => {
+    const pluginNames = appConfig.plugins.map((plugin) => (
+      typeof plugin === 'string' ? plugin : plugin[0]
+    ));
+
+    expect(pluginNames.indexOf('expo-no-push-entitlement')).toBeLessThan(
+      pluginNames.indexOf('expo-notifications'),
+    );
+    expect(appConfig.plugins).toContainEqual([
+      'expo-notifications',
+      expect.objectContaining({ enableBackgroundRemoteNotifications: false }),
+    ]);
+  });
+
+  it('blocks permissions that do not belong in the Android release', () => {
+    expect(appConfig.android.blockedPermissions).toEqual([
+      'android.permission.READ_EXTERNAL_STORAGE',
+      'android.permission.SYSTEM_ALERT_WINDOW',
+      'android.permission.WRITE_EXTERNAL_STORAGE',
+    ]);
+  });
+});

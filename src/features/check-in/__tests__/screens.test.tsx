@@ -1466,6 +1466,8 @@ describe('check-in screens', () => {
       borderRadius: 14,
     });
     expect(settings.getByText('Your journal belongs to you.')).toBeTruthy();
+    expect(settings.getByRole('button', { name: /Privacy policy/ })).toBeEnabled();
+    expect(settings.getByRole('button', { name: /Terms of use/ })).toBeEnabled();
     expect(settings.getByText('Emotion check-in reminder')).toBeTruthy();
     expect(settings.getByText(
       'Choose days and times for a gentle invitation to notice how you feel.',
@@ -1482,6 +1484,16 @@ describe('check-in screens', () => {
     expect(settings.getByText('App-Informationen')).toBeTruthy();
     await fireEvent.press(settings.getByText('Englisch'));
     await waitFor(() => expect(settings.getByText('Your journal belongs to you.')).toBeTruthy());
+  });
+
+  it('hides update channels and build diagnostics in the production settings surface', async () => {
+    const settings = await _renderLocalized(<SettingsScreen showTechnicalDetails={false} />);
+
+    expect(settings.getByText('App information')).toBeTruthy();
+    expect(settings.getByText('1.0.0')).toBeTruthy();
+    expect(settings.queryByText('Channel')).not.toBeOnTheScreen();
+    expect(settings.queryByText('Git')).not.toBeOnTheScreen();
+    expect(settings.queryByTestId('workspace-release')).not.toBeOnTheScreen();
   });
 
   it('offers reminder setup for the completed Leitsatz and opens its permission flow', async () => {
