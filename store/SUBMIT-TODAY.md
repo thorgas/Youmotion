@@ -51,6 +51,10 @@ Use the copy in:
 - `metadata/apple/en-US.md`
 - `metadata/apple/de-DE.md`
 
+The root `store.config.json` contains the same listing copy in EAS Metadata
+format. Follow `store/automation/README.md` to validate/push it and use `asc`
+only for readiness checks and fields EAS does not cover.
+
 Upload screenshots from:
 
 - `screenshots/ios/en-US/iphone-6.9/`
@@ -85,6 +89,11 @@ Use the copy in:
 
 - `metadata/google-play/en-US.md`
 - `metadata/google-play/de-DE.md`
+
+CLI-ready copies live under `automation/google-play/metadata/`. Follow
+`automation/README.md` for offline validation and a non-mutating `gplay`
+preview. Keep EAS Submit as the binary uploader; do not upload the AAB again
+with `gplay`.
 
 Use the 1024×500 graphic at `assets/google-play-feature-graphic.png` and the
 current framed phone sets at:

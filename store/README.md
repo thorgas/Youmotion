@@ -13,6 +13,8 @@ The copy is intentionally factual. It does not claim clinical benefits, diagnosi
 
 - `metadata/apple/`: App Store name, subtitle, promotional text, keywords, description, release notes, and review notes.
 - `metadata/google-play/`: Play title, short description, full description, and release notes.
+- `automation/`: reversible draft-only EAS Metadata, `asc`, and `gplay` workflows.
+- `../store.config.json`: Apple metadata source consumed by EAS Metadata.
 - `app-marketing-context.md`: audience, positioning, differentiators, proof boundaries, and launch goals.
 - `screenshot-plan.md`: capture order, headlines, device requirements, and upload mapping.
 - `launch-readiness.md`: launch blockers and recommended improvements.

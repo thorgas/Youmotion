@@ -1,0 +1,14 @@
+{
+  "privacyPolicyUrl": "https://youmotion.app/privacy/app/",
+  "supportEmail": "youmotion@thorgas.com",
+  "ads": "no",
+  "appAccess": "all-accessible",
+  "dataSafetyStatus": "owner-review-required",
+  "contentRatingStatus": "owner-review-required",
+  "category": "Health & Fitness",
+  "policyDeclarationsReviewed": false,
+  "sensitivePermissionsReviewed": false,
+  "declarations": {
+    "health": "owner-review-required"
+  }
+}
