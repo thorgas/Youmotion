@@ -15,16 +15,20 @@
   const emotionText = pulse.querySelector('[data-pulse-emotion]');
   const nuanceText = pulse.querySelector('[data-pulse-nuance]');
   const status = pulse.querySelector('[data-pulse-status]');
+  const readout = pulse.querySelector('.pulse-readout');
   const locale = pulse.dataset.locale === 'de' ? 'de' : 'en';
+  const directTouch = matchMedia('(hover: none), (pointer: coarse)').matches;
   let committed = false;
-  const setSelection = (emotionId, intensity, x, y) => {
+  let activePointerId = null;
+  const setSelection = ({ emotionId, intensity, x, y }) => {
     const entry = catalog[locale][emotionId];
     const level = Math.min(Math.floor(intensity * entry[1].length), entry[1].length - 1);
     pulse.style.setProperty('--pulse-x', `${x}%`); pulse.style.setProperty('--pulse-y', `${y}%`); pulse.style.setProperty('--pulse-color', entry[2]);
+    readout.dataset.selected = 'true';
     nuanceText.textContent = entry[1][level]; emotionText.textContent = entry[0];
     pulse.querySelectorAll('[data-emotion]').forEach((node) => node.dataset.active = String(node.dataset.emotion === emotionId));
   };
-  const selectionFromPoint = (clientX, clientY) => {
+  const selectionFromPoint = ({ clientX, clientY }) => {
     const box = field.getBoundingClientRect(); const centerX = box.left + box.width / 2; const centerY = box.top + box.height / 2;
     const dx = clientX - centerX; const dy = clientY - centerY; const distance = Math.hypot(dx, dy); const deadZone = box.width * .055; const maxRadius = box.width * .36;
     if (distance < deadZone) return null;
@@ -33,21 +37,32 @@
     const constrained = Math.min(distance, maxRadius); const scale = constrained / distance; const x = 50 + dx * scale / box.width * 100; const y = 50 + dy * scale / box.height * 100; const intensity = Math.max(0, Math.min(1, (distance - deadZone) / (maxRadius - deadZone)));
     return { emotionId: order[nearest], intensity, x, y };
   };
-  const previewPoint = (event) => { if (committed || event.pointerType === 'touch') return; const next = selectionFromPoint(event.clientX, event.clientY); if (next) setSelection(next.emotionId, next.intensity, next.x, next.y); };
-  const previewButton = (event) => { if (committed) return; const button = event.currentTarget; const box = field.getBoundingClientRect(); const point = button.getBoundingClientRect(); setSelection(button.dataset.emotion, .72, (point.left + point.width / 2 - box.left) / box.width * 100, (point.top + point.height / 2 - box.top) / box.height * 100); };
+  const previewPoint = (event) => { if (committed || event.pointerType === 'touch') return; const next = selectionFromPoint({ clientX: event.clientX, clientY: event.clientY }); if (next) setSelection(next); };
+  const previewButton = (event) => { if (committed) return; const button = event.currentTarget; const box = field.getBoundingClientRect(); const point = button.getBoundingClientRect(); setSelection({ emotionId: button.dataset.emotion, intensity: .72, x: (point.left + point.width / 2 - box.left) / box.width * 100, y: (point.top + point.height / 2 - box.top) / box.height * 100 }); };
   const resetSelection = () => {
     pulse.style.removeProperty('--pulse-x'); pulse.style.removeProperty('--pulse-y'); pulse.style.removeProperty('--pulse-color');
+    readout.removeAttribute('data-selected');
     nuanceText.textContent = locale === 'de' ? 'Berühre den Punkt und bewege dich.' : 'Touch the point, then move.';
     emotionText.textContent = locale === 'de' ? 'Sieben Richtungen. Deine eigene Intensität.' : 'Seven directions. Your own intensity.';
     pulse.querySelectorAll('[data-emotion]').forEach((node) => node.removeAttribute('data-active'));
   };
+  const scrollToDownload = () => {
+    const target = document.querySelector('#download');
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches || !directTouch) { target.scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' }); return; }
+    const start = window.scrollY; const destination = target.getBoundingClientRect().top + start; const distance = destination - start; const duration = Math.min(2800, Math.max(2000, Math.abs(distance) * .72)); const startedAt = performance.now();
+    const step = (now) => { const progress = Math.min(1, (now - startedAt) / duration); const eased = progress < .5 ? 2 * progress * progress : 1 - Math.pow(-2 * progress + 2, 2) / 2; window.scrollTo(0, start + distance * eased); if (progress < 1) requestAnimationFrame(step); };
+    requestAnimationFrame(step);
+  };
   const activate = () => {
     committed = true;
-    if (document.documentElement.dataset.storeState !== 'live') { document.querySelector('#download').scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' }); status.textContent = locale === 'de' ? 'Youmotion kommt bald. Die Store-Links werden nach der Freigabe aktiviert.' : 'Youmotion is coming soon. Store links activate after release.'; requestAnimationFrame(() => requestAnimationFrame(resetSelection)); return; }
+    if (document.documentElement.dataset.storeState !== 'live') { scrollToDownload(); status.textContent = locale === 'de' ? 'Youmotion kommt bald. Die Store-Links werden nach der Freigabe aktiviert.' : 'Youmotion is coming soon. Store links activate after release.'; requestAnimationFrame(() => requestAnimationFrame(resetSelection)); return; }
     const isAndroid = /Android/i.test(navigator.userAgent); window.location.assign(isAndroid ? storeLinks.google : storeLinks.apple);
   };
-  field.addEventListener('pointermove', previewPoint);
-  field.addEventListener('click', (event) => { const next = selectionFromPoint(event.clientX, event.clientY); if (next) { setSelection(next.emotionId, next.intensity, next.x, next.y); activate(); } });
+  field.addEventListener('pointermove', (event) => { if (activePointerId === event.pointerId) { const next = selectionFromPoint({ clientX: event.clientX, clientY: event.clientY }); if (next) setSelection(next); return; } previewPoint(event); });
+  field.addEventListener('pointerdown', (event) => { if (!directTouch || event.button !== 0 || event.target.closest('[data-emotion]')) return; activePointerId = event.pointerId; committed = false; field.setPointerCapture(event.pointerId); const next = selectionFromPoint({ clientX: event.clientX, clientY: event.clientY }); if (next) setSelection(next); });
+  field.addEventListener('pointerup', (event) => { if (activePointerId !== event.pointerId) return; activePointerId = null; const next = selectionFromPoint({ clientX: event.clientX, clientY: event.clientY }); if (next) { setSelection(next); activate(); } else resetSelection(); });
+  field.addEventListener('pointercancel', (event) => { if (activePointerId !== event.pointerId) return; activePointerId = null; resetSelection(); });
+  field.addEventListener('click', (event) => { if (directTouch) return; const next = selectionFromPoint({ clientX: event.clientX, clientY: event.clientY }); if (next) { setSelection(next); activate(); } });
   pulse.querySelectorAll('[data-emotion]').forEach((button) => {
     button.addEventListener('focus', previewButton); button.addEventListener('pointerenter', previewButton);
     button.addEventListener('click', (event) => { event.stopPropagation(); previewButton(event); activate(); });
