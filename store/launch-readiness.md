@@ -4,7 +4,7 @@ This audit applies the useful launch-stage parts of `Eronred/aso-skills` to Youm
 
 ## Launch blockers
 
-1. **Deploy the prepared website.** The privacy, terms, support, and marketing pages are prepared under `youmotion.app/`; deploy them to the matching HTTPS URLs before submission.
+1. **Deploy the prepared website.** The privacy, terms, support, and marketing pages are prepared under `website/`; deploy them to the matching HTTPS URLs before submission.
 2. **Resolve Apple distribution ownership.** The previously observed Apple setup exposed only a free Personal Team associated with the existing organization. App Store distribution needs the intended owner’s paid Apple Developer Program membership and matching App Store Connect access.
 3. **Complete the owner privacy attestation.** `privacy-data-safety.md` inventories the release behavior and supplies draft answers. The owner must confirm Expo service retention, the final production dependency set, and every declaration in App Store Connect and Play Console.
 4. **Create and verify store records.** Confirm the bundle/package ID `com.youmotion.mobile`, app ownership, signing, agreements, tax/banking state where applicable, content rating, age rating, and review contacts.

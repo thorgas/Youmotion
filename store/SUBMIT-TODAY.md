@@ -5,7 +5,7 @@ store until it resolves publicly over HTTPS.
 
 ## 1. Deploy the website
 
-Deploy `youmotion.app/` to Cloudflare Pages and attach `youmotion.app`.
+Deploy `website/` to Cloudflare Pages and attach the `youmotion.app` domain.
 
 Verify these URLs:
 

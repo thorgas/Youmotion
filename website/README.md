@@ -11,8 +11,8 @@ store URLs exist.
 
 1. Create a Pages project named `youmotion-app` from this repository, or run
    `npx wrangler pages project create youmotion-app`.
-2. Set the build output directory to `youmotion.app`; no build command is needed.
-3. Deploy with `npx wrangler pages deploy youmotion.app --project-name youmotion-app`.
+2. Set the build output directory to `website`; no build command is needed.
+3. Deploy with `npx wrangler pages deploy website --project-name youmotion-app`.
 4. Attach the custom domain `youmotion.app` and verify HTTPS.
 5. Verify every URL in `../store/SUBMIT-TODAY.md` before adding it to a store.
 

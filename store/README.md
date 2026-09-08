@@ -17,9 +17,9 @@ The copy is intentionally factual. It does not claim clinical benefits, diagnosi
 - `screenshot-plan.md`: capture order, headlines, device requirements, and upload mapping.
 - `launch-readiness.md`: launch blockers and recommended improvements.
 - `privacy-data-safety.md`: release-binary privacy inventory and draft store declarations.
-- `../youmotion.app/privacy/app/`: publication-formatted app privacy policy.
-- `../youmotion.app/privacy/website/`: separate Cloudflare website privacy policy.
-- `../youmotion.app/support/`: publication-formatted support page and FAQ.
+- `../website/privacy/app/`: publication-formatted app privacy policy.
+- `../website/privacy/website/`: separate Cloudflare website privacy policy.
+- `../website/support/`: publication-formatted support page and FAQ.
 - `aso-research.md`: dated public-listing research and the limits of the available keyword evidence.
 - `screenshots/`: full-resolution, unframed Release-build Apple and Google Play screenshots.
 - `assets/google-play-feature-graphic.png`: 1024 × 500, flattened Play feature graphic.
