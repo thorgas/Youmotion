@@ -8,8 +8,8 @@ store until it resolves publicly over HTTPS.
 Deploy `website/` to Cloudflare Pages and attach the `youmotion.app` domain.
 
 Production Pages deployment `c53a8156` was created from commit `afc6f58` on
-8 September 2026. The `youmotion.app` DNS/custom-domain binding still must be
-completed before the URLs below are entered in either store.
+8 September 2026. The `youmotion.app` custom domain is active with SSL enabled.
+All URLs below returned HTTP 200 after the DNS record propagated.
 
 Verify these URLs:
 
