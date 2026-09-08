@@ -1,0 +1,6 @@
+steps:
+  - launch: com.youmotion.mobile
+  - await: { visible: { text: Wie fühlst du dich gerade? }, timeout: 10000 }
+  - tap: { text: Verlauf }
+  - await: { visible: { text: "Momente, die du wahrgenommen hast." }, timeout: 10000 }
+  - await: { idle: true }

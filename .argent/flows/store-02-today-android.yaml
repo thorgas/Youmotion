@@ -1,0 +1,34 @@
+steps:
+  - launch: com.youmotion.mobile
+  - await: { visible: { id: onboarding-progress }, timeout: 30000 }
+  - await: { idle: true }
+  - tap: { x: 0.89, y: 0.09 }
+  - await: { visible: { id: emotion-star }, timeout: 10000 }
+  - echo: Create two locale-neutral synthetic E2E moments for populated store captures.
+  - tool: gesture-swipe
+    args: { fromX: 0.5, fromY: 0.47, toX: 0.5, toY: 0.34, durationMs: 700 }
+  - await: { visible: { id: reflection-note-input }, timeout: 10000 }
+  - when:
+      visible: { text: Try out your stylus }
+    steps:
+      - tap: { text: Cancel }
+  - tap: { id: reflection-save }
+  - await: { visible: { id: belief-system-step }, timeout: 10000 }
+  - tap: { id: belief-system-finish }
+  - await: { visible: { id: success-screen }, timeout: 10000 }
+  - tap: { x: 0.5, y: 0.63 }
+  - await: { visible: { id: emotion-star }, timeout: 10000 }
+  - tool: gesture-swipe
+    args: { fromX: 0.5, fromY: 0.47, toX: 0.72, toY: 0.47, durationMs: 700 }
+  - await: { visible: { id: reflection-note-input }, timeout: 10000 }
+  - when:
+      visible: { text: Try out your stylus }
+    steps:
+      - tap: { text: Cancel }
+  - tap: { id: reflection-save }
+  - await: { visible: { id: belief-system-step }, timeout: 10000 }
+  - tap: { id: belief-system-finish }
+  - await: { visible: { id: success-screen }, timeout: 10000 }
+  - tap: { x: 0.5, y: 0.63 }
+  - await: { visible: { id: emotion-star }, timeout: 10000 }
+  - await: { idle: true }

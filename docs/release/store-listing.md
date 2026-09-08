@@ -22,9 +22,9 @@ Keep every claim aligned with the submitted build and repository source.
 - Keywords (<=100 chars): **feeling,pulse,emotion,check-in,self-reflection,journal,beliefs,reminders,insights,local** *(87)*
 - Category: Health & Fitness
 - Support: **youmotion@thorgas.com** (email)
-- Marketing URL: **https://thorgas.com/**
-- Privacy URL: **Release blocker: publish the reviewed app privacy policy at a stable HTTPS URL.**
-- Terms URL: **Release blocker: publish the reviewed terms, or select Apple's Standard EULA where appropriate.**
+- Marketing URL: **https://youmotion.app/**
+- Privacy URL: **https://youmotion.app/privacy/app/**
+- Terms URL: **https://youmotion.app/terms/** (or select Apple's Standard EULA)
 - Reviewer notes:
   - No account, no social login, no cloud login flow.
   - Open app → complete onboarding or skip → use Feeling Pulse → optional reflection → optional Leidsatz/Leitsatz work.
@@ -59,14 +59,14 @@ Youmotion has no account and keeps your journal on this device. It supports self
 ### German (de-DE)
 
 - App name: `Youmotion`
-- Untertitel (<=30 Zeichen): **Selbstcheck mit Gefühlspuls** *(26)*
+- Untertitel (<=30 Zeichen): **Selbstcheck mit Gefühlspuls** *(27)*
 - Werbetext (<=170 Zeichen): **Nutze den ruhigen Gefühlspuls mit sieben Richtungen. Ergänze optional Reflexion und Leidsatz/Leitsatz-Arbeit. Verlauf, Einblicke und Erinnerungen bleiben lokal.** *(160)*
 - Keywords/Guidance (<=100 Zeichen): **Gefühle,Gefühlspuls,Gefühlsmoment,Journal,Reflexion,Leidsatz,Leitsatz,Verlauf,Einblicke,Erinnerung** *(98)*
 - Kategorie: Health & Fitness
 - Support: **youmotion@thorgas.com** (E-Mail)
-- Marketing-URL: **https://thorgas.com/**
-- Datenschutz-URL: **Release-Blocker: geprüfte App-Datenschutzerklärung unter einer stabilen HTTPS-URL veröffentlichen.**
-- Nutzungsbedingungen-URL: **Release-Blocker: geprüfte Nutzungsbedingungen veröffentlichen oder, soweit passend, Apples Standard-EULA wählen.**
+- Marketing-URL: **https://youmotion.app/de/**
+- Datenschutz-URL: **https://youmotion.app/de/privacy/app/**
+- Nutzungsbedingungen-URL: **https://youmotion.app/de/terms/** (oder Apples Standard-EULA wählen)
 - Hinweise für den Reviewer:
   - Kein Account, kein Login, kein lokales-/Cloud-Konto erforderlich.
   - App öffnen, Onboarding starten oder überspringen, Gefühlspuls nutzen, optionale Reflexion und optionalen Leidsatz/Leitsatz durchlaufen.
@@ -120,9 +120,9 @@ Du benötigst kein Konto. Dein Journal bleibt auf deinem Gerät. Die App unterst
   - Prioritize: `feeling pulse`, `emotion check-in`, `local diary`, `reminders`, `insights`, `beliefs`, `offline`, `privacy`.
   - Keep wording exact to shipped behavior and avoid unsupported promises (no cloud sync, no diagnosis, no medical treatment).
 - Support email: **youmotion@thorgas.com**
-- Marketing URL: **https://thorgas.com/**
-- Privacy policy URL: **Release blocker: publish the reviewed app privacy policy at a stable HTTPS URL.**
-- Terms URL: **Release blocker: publish the reviewed terms at a stable HTTPS URL if used for the listing.**
+- Website: **https://youmotion.app/**
+- Privacy policy URL: **https://youmotion.app/privacy/app/**
+- Support URL: **https://youmotion.app/support/**
 - Reviewer notes:
   - No credentials required to start and test.
 - In-app review path for Google Play testers:
@@ -156,9 +156,9 @@ Du benötigst kein Konto. Dein Journal bleibt auf deinem Gerät. Die App unterst
 - Keywords/Keyword-Hinweise:
   - Priorisiere: `Gefühlspuls`, `Gefühle`, `Reflexion`, `Leidsatz`, `Leitsatz`, `Verlauf`, `Einblicke`, `Erinnerung`, `lokal`.
 - Support-E-Mail: **youmotion@thorgas.com**
-- Marketing-URL: **https://thorgas.com/**
-- Datenschutz-URL: **Release-Blocker: geprüfte App-Datenschutzerklärung unter einer stabilen HTTPS-URL veröffentlichen.**
-- Nutzungsbedingungen-URL: **Release-Blocker: geprüfte Nutzungsbedingungen unter einer stabilen HTTPS-URL veröffentlichen, sofern für den Store-Eintrag verwendet.**
+- Website: **https://youmotion.app/de/**
+- Datenschutz-URL: **https://youmotion.app/de/privacy/app/**
+- Support-URL: **https://youmotion.app/de/support/**
 - Reviewer notes:
   - Kein Login, kein Konto, kein Sync.
   - Alle Kernfunktionen sind auf dem Gerät ausgeführt.

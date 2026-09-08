@@ -1,0 +1,16 @@
+steps:
+  - launch: com.youmotion.mobile
+  - await: { visible: { text: Make space for what is here. }, timeout: 30000 }
+  - echo: Finish the initial guide, select German in Settings, then reopen the guide for capture.
+  - tap: { text: Skip }
+  - await: { visible: { text: How are you feeling right now? }, timeout: 10000 }
+  - tap: { text: Settings }
+  - await: { visible: { text: Your space. }, timeout: 10000 }
+  - tap: { text: German }
+  - await: { visible: { text: Dein Raum. }, timeout: 10000 }
+  - tool: gesture-swipe
+    args: { fromX: 0.5, fromY: 0.72, toX: 0.5, toY: 0.32, durationMs: 700 }
+  - await: { visible: { text: Kurze Einführung öffnen }, timeout: 10000 }
+  - tap: { text: Kurze Einführung öffnen }
+  - wait: 800
+  - await: { idle: true }

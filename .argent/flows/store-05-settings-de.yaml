@@ -1,0 +1,9 @@
+steps:
+  - launch: com.youmotion.mobile
+  - await: { visible: { text: Wie fühlst du dich gerade? }, timeout: 10000 }
+  - tap: { text: Einstellungen }
+  - await: { visible: { text: Dein Raum. }, timeout: 10000 }
+  - tool: gesture-swipe
+    args: { fromX: 0.5, fromY: 0.78, toX: 0.5, toY: 0.28, durationMs: 700 }
+  - await: { visible: { text: Datenschutzerklärung }, timeout: 10000 }
+  - await: { idle: true }

@@ -62,6 +62,24 @@ Youmotion uses platform components and open-source libraries including Expo,
 React Native, and SurrealDB for local storage and app behavior. Confirm provider
 declarations against the submitted build before final publication.
 
+### App updates
+
+To keep the app secure, compatible, and functional, the app may check for and
+download compatible app updates over HTTPS. This can transmit technical request
+data such as the operating system, app/runtime version, project or release
+channel information, and a random installation token. The update provider may
+also receive the IP address technically transmitted with the request. No journal,
+belief, note, or other user-entered content is sent as part of this update check.
+The legal basis is our legitimate interest under Article 6(1)(f) GDPR in
+maintaining a secure and working app. The update provider and necessary
+hosting/CDN infrastructure may process these data as our processors. Depending
+on provider infrastructure, processing in the United States cannot be excluded;
+applicable Chapter V GDPR safeguards are used. Technical request and service
+logs are retained only as long as necessary for delivery, security,
+troubleshooting, and legal obligations. The exact provider, transfer mechanism,
+and retention period must be confirmed against the production build, traffic,
+and applicable data-processing agreement before publication.
+
 ## 8. Retention, deletion, and backup behavior / Aufbewahrung, Löschung und Backup
 
 - Journal data remains on-device until you edit/delete it, uninstall the app, or replace it via restore.
@@ -151,6 +169,27 @@ Remote-Push-Dienste werden in der aktuellen Konfiguration nicht eingesetzt.
 Youmotion nutzt Plattform- und Open-Source-Komponenten (u. a. Expo, React Native,
 SurrealDB). Für die endgültige Rechtsfassung ist die tatsächlich veröffentlichte
 Build-Konfiguration maßgeblich.
+
+### App-Aktualisierungen
+
+Für Sicherheit, Kompatibilität und Funktionsfähigkeit kann die App über HTTPS
+prüfen, ob eine kompatible Aktualisierung verfügbar ist, und diese bei Bedarf
+herunterladen. Dabei können technische Anfrageinformationen wie Betriebssystem,
+App-/Laufzeitversion, Projekt- oder Release-Kanal und eine zufällige
+Installationskennung übertragen werden. Der Aktualisierungsanbieter kann außerdem
+die mit der Anfrage technisch übermittelte IP-Adresse erhalten. Journaleinträge,
+Glaubens- oder Leitsatztexte, Notizen und andere von dir eingegebene Inhalte
+werden bei dieser Prüfung nicht übermittelt. Rechtsgrundlage ist unser
+berechtigtes Interesse nach Art. 6 Abs. 1 lit. f DSGVO an einer sicheren und
+funktionsfähigen App. Der Aktualisierungsanbieter und die erforderliche Hosting- /
+CDN-Infrastruktur können diese Daten als unsere Auftragsverarbeiter verarbeiten.
+Je nach Infrastruktur kann eine Verarbeitung in den USA nicht ausgeschlossen
+werden; hierfür werden die anwendbaren Garantien nach Kapitel V DSGVO genutzt.
+Technische Anfrage- und Servicelogs werden nur so lange gespeichert, wie dies für
+Bereitstellung, Sicherheit, Fehleranalyse und gesetzliche Pflichten erforderlich
+ist. Anbieter, Übermittlungsmechanismus und konkrete Speicherfrist müssen vor der
+Veröffentlichung anhand des Produktions-Builds, des tatsächlichen Datenverkehrs
+und der anwendbaren Auftragsverarbeitungsvereinbarung bestätigt werden.
 
 ## 7. Speicherfristen, Löschung, Wiederherstellung
 

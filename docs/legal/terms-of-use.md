@@ -70,7 +70,10 @@ permitted by law.
 ## 8. App availability and changes / Verfügbarkeit und Änderungen
 
 Youmotion features may change over time. The app is provided as-is, subject to
-normal availability limits and maintenance updates.
+normal availability limits and maintenance updates. The app may check for and
+download compatible security, compatibility, and maintenance updates over HTTPS.
+This does not provide cloud storage, account recovery, or automatic syncing of
+your journal data.
 
 ## 9. Legal status note / Rechtsstand
 
@@ -148,7 +151,10 @@ die gesetzlichen Voraussetzungen dafür vorliegen.
 ## 8. Änderungen
 
 Die Bedingungen können bei Anpassung der Funktionen aktualisiert werden; das
-Wirksamkeitsdatum wird dann angepasst.
+Wirksamkeitsdatum wird dann angepasst. Die App kann über HTTPS kompatible
+Sicherheits-, Kompatibilitäts- und Wartungsaktualisierungen prüfen und
+herunterladen. Dadurch werden weder Cloud-Speicherung noch Kontowiederherstellung
+oder automatischer Abgleich deiner Journaldaten bereitgestellt.
 
 ## Hinweis
 
