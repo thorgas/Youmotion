@@ -71,6 +71,25 @@ reverted. No replacement screenshot was accepted from these failed runs.
 
 ## Next work
 
+## Alternative capture route — 2026-09-09
+
+Agent-device 0.20.10 successfully navigated the iPhone and Android app where
+the Argent flow stalled. All-time Insights explicitly showed 34 of 133 moments.
+Native captures are staged under `goldie/out/agent-device/`, separated by target
+and language. These are review artifacts, not yet replacements for the approved
+store inventory. The iPad uses the freshly rebuilt iOS Release artifact;
+Android currently uses the existing September 9 00:35 Release APK.
+
+Goldie 0.3.1's standalone `frame` command successfully rendered an agent-device
+capture using a capture manifest. Capture and framing can therefore run
+independently. The matrix now isolates each scene's output and retains raw
+evidence, because Goldie clears the destination PNG directory before framing.
+
+The bundled Argent version is not a proven cause of the failed tab transition:
+the matrix explicitly overrides it with the global executable. A restore-success
+message was observed as an interactive button; its possible interception of the
+next tap remains a hypothesis until verified in a controlled replay.
+
 Finish emulator accessibility recovery, then replay native Android Settings.
 Apply the verified fresh-install setup and explicit locale selection to the
 remaining populated scenes; verify all 133 moments after fixture restore.

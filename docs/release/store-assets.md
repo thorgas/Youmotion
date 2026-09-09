@@ -127,6 +127,25 @@ archive when they are ready for upload.
 
 ## Capture guardrails
 
+### Alternative: native capture followed by Goldie framing
+
+When Argent replay cannot complete, agent-device can navigate the same Release
+app and save native screenshots independently. Select the app language explicitly,
+restore the committed synthetic archive, and verify 133 moments in All-time
+Insights before capturing. Dismiss restore confirmation notices before navigating.
+Use fresh snapshot references for duplicate accessibility labels.
+
+Save iPhone images at pixel density 3 (1320×2868), and 13-inch iPad images at
+pixel density 2 (2064×2752). Keep native Android images from the Android app.
+Never substitute an iPhone capture for Android. Keep raw inputs and final frames
+in separate folders. Goldie's `frame` command consumes a capture manifest and
+does not navigate or reinstall the app; `verify` checks the rendered dimensions.
+
+The alternative's working captures live under `goldie/out/agent-device/`.
+These are review candidates until visual inspection and release-artifact
+provenance are reconciled. A successful interactive capture does not by itself
+prove unattended replay from a fresh installation.
+
 - Captures contain no development overlay, notifications, fingers, or personal
   data.
 - Keep the final binary and listing claims aligned with the current local-only

@@ -1,7 +1,7 @@
 import { createHash } from 'node:crypto';
 import { existsSync } from 'node:fs';
-import { readFile, writeFile, mkdir, readdir, stat } from 'node:fs/promises';
-import { dirname, isAbsolute, relative, resolve } from 'node:path';
+import { cp, mkdtemp, readFile, writeFile, mkdir, readdir, stat } from 'node:fs/promises';
+import { dirname, isAbsolute, join, relative, resolve } from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
@@ -72,10 +72,60 @@ export function createCapturePlan({ config, options, repositoryRoot }) {
       artifactPath,
       goldieConfig,
       locale,
+      outputDirectory: resolve(repositoryRoot, 'goldie/out/.matrix', platform, locale, scene),
       platform,
       scene,
     })));
   });
+}
+
+async function prepareIsolatedGoldieConfig(item) {
+  await mkdir(dirname(item.outputDirectory), { recursive: true });
+  const isolatedDirectory = await mkdtemp(join(dirname(item.outputDirectory), `${item.platform}-${item.locale}-${item.scene}-`));
+  const configPath = resolve(isolatedDirectory, 'goldie.config.ts');
+  await writeFile(configPath, `export { default } from ${JSON.stringify(pathToFileURL(item.goldieConfig).href)};\n`);
+  return { configPath, isolatedDirectory };
+}
+
+async function preserveCaptureOutputs({ isolatedDirectory, repositoryRoot }) {
+  const screenshots = resolve(isolatedDirectory, 'out/screenshots');
+  const destination = resolve(repositoryRoot, 'goldie/out/screenshots');
+  await cp(screenshots, destination, { recursive: true, force: true });
+}
+
+export async function runCaptureItem({ config, item, repositoryRoot }) {
+  const started = Date.now();
+  const { configPath, isolatedDirectory } = await prepareIsolatedGoldieConfig(item);
+  let exitCode = null;
+  let error = null;
+  const [command, ...commandArguments] = config.command;
+  const result = spawnSync(command, commandArguments, {
+    cwd: repositoryRoot,
+    encoding: 'utf8',
+    env: {
+      ...process.env,
+      GOLDIE_ARGENT_BIN: process.env.GOLDIE_ARGENT_BIN ?? 'argent',
+      GOLDIE_CONFIG: configPath,
+      GOLDIE_LOCALE: item.locale,
+      GOLDIE_SCENE: item.scene,
+      [item.artifactEnv]: item.artifactPath,
+    },
+    stdio: 'inherit',
+    timeout: 600000,
+    killSignal: 'SIGTERM',
+  });
+  exitCode = result.status;
+  error = result.error?.message ?? null;
+  if (result.status === 0) await preserveCaptureOutputs({ isolatedDirectory, repositoryRoot });
+  return {
+    durationMs: Date.now() - started,
+    error,
+    exitCode,
+    isolatedDirectory,
+    locale: item.locale,
+    platform: item.platform,
+    scene: item.scene,
+  };
 }
 
 async function collectArtifactFiles(directory) {
@@ -127,35 +177,15 @@ async function run() {
   const artifactHashes = new Map(artifactPaths.map((path, index) => [path, hashes[index]]));
   const results = [];
   const startedAt = new Date().toISOString();
-  for (const item of plan) {
-    const started = Date.now();
+  async function captureNext(index) {
+    if (index >= plan.length) return;
+    const item = plan[index];
     console.log(`Capturing ${item.platform} / ${item.locale} / ${item.scene}`);
-    const [command, ...commandArguments] = config.command;
-    const result = spawnSync(command, commandArguments, {
-      cwd: repositoryRoot,
-      encoding: 'utf8',
-      env: {
-        ...process.env,
-        GOLDIE_ARGENT_BIN: process.env.GOLDIE_ARGENT_BIN ?? 'argent',
-        GOLDIE_CONFIG: item.goldieConfig,
-        GOLDIE_LOCALE: item.locale,
-        GOLDIE_SCENE: item.scene,
-        [item.artifactEnv]: item.artifactPath,
-      },
-      stdio: 'inherit',
-      timeout: 600000,
-      killSignal: 'SIGTERM',
-    });
-    results.push({
-      durationMs: Date.now() - started,
-      exitCode: result.status,
-      error: result.error?.message ?? null,
-      locale: item.locale,
-      platform: item.platform,
-      scene: item.scene,
-    });
-    if (result.status !== 0) break;
+    const result = await runCaptureItem({ config, item, repositoryRoot });
+    results.push(result);
+    if (result.exitCode === 0) await captureNext(index + 1);
   }
+  await captureNext(0);
 
   const reportPath = resolve(repositoryRoot, config.reportPath);
   await mkdir(dirname(reportPath), { recursive: true });

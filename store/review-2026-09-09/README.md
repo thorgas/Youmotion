@@ -1,0 +1,52 @@
+# Native screenshot review — 9 September 2026
+
+Fresh agent-device captures from Youmotion Release builds, using the committed
+synthetic archive (133 moments, 15 beliefs). No personal journal data was used.
+These are review candidates, not uploaded or approved store assets.
+
+## Native images
+
+- `native/ios/de-DE/iphone-6.9/` and `native/ios/en-US/iphone-6.9/`: 1320×2868.
+- `native/ios/de-DE/ipad-13/` and `native/ios/en-US/ipad-13/`: 2064×2752.
+- `native/android/de-DE/phone/` and `native/android/en-US/phone/`: 1280×2856.
+
+Each set includes `pulse.png`, `history-all-time.png`, `insights-all-time.png`,
+`insights-august-calendar.png`, and `settings-data.png`. Extra iPhone Insights
+captures are diagnostic alternatives. The all-time phone view shows the insight
+and only part of the chart; the separate calendar image supplies a complete
+populated calendar. Settings focuses on local data, backup and deletion.
+
+## Provenance and limits
+
+## Framed phone images
+
+`framed/ios/{de-DE,en-US}/` contains six images per locale at 1320×2868.
+`framed/android/{de-DE,en-US}/` contains six images per locale at 1080×1920.
+Goldie dimension verification passed for all four sets. These remain design
+candidates: Android framing clips the status-bar edges, and the iPhone editorial
+Insights crop does not show the whole chart. Native images remain available for
+choosing a different composition. iPad images are native, not framed.
+
+Re-render existing captures with `pnpm exec node scripts/frame-native-store-captures.mjs`.
+This does not restore data or capture the app; inputs currently live under
+`goldie/out/agent-device/`. Retained copies are under this folder's `native/` tree.
+
+## Build correspondence
+
+iOS uses the Release simulator app rebuilt on September 9 during this task.
+Android uses `android/app/build/outputs/apk/release/app-release.apk`, built at
+00:35 on September 9; it was not rebuilt in this capture run. Confirm correspondence
+with the exact submitted store build before uploading. The capture source checkout
+was `e7f1e9f` with screenshot-tooling changes in progress; no app behavior changed.
+
+Agent-device navigated the native app and captured full-resolution PNGs. The
+restore preview and populated All-time Insights established the 133-moment data
+set. The August calendar was selected because it contains a complete recorded
+month. Screenshots were reviewed for language and content; final owner approval
+is pending. No store submission was performed.
+
+Goldie framing is a separate stage, using `scripts/frame-native-store-captures.mjs`.
+Its generated report records each isolated output directory. The native capture
+route worked interactively under agent control; unattended fresh-install replay
+is not yet proven. Preview videos and reflection/belief screens are not included
+in this review bundle.
