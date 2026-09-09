@@ -2,7 +2,7 @@ steps:
   - launch: com.youmotion.mobile
   - await: { visible: { id: onboarding-progress }, timeout: 30000 }
   - await: { idle: true }
-  - tap: { x: 0.89, y: 0.09 }
+  - tap: { id: onboarding-skip }
   - await: { visible: { id: emotion-star }, timeout: 10000 }
   - echo: Create two locale-neutral synthetic E2E moments for populated store captures.
   - tool: gesture-swipe

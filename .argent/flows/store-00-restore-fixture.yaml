@@ -1,19 +1,19 @@
 steps:
   - echo: Restore the committed neutral archive fixture before populated store captures.
   - launch: com.youmotion.mobile
-  - wait: 3000
+  - wait: 15000
   - when:
-      visible: { id: onboarding-skip }
+      platform: ios
     steps:
       - when:
-          platform: ios
+          visible: { id: onboarding-skip }
         steps:
           - tap: { id: onboarding-skip }
-      - when:
-          platform: android
-        steps:
-          - tool: gesture-tap
-            args: { x: 0.82, y: 0.06 }
+  - when:
+      platform: android
+    steps:
+      - tool: gesture-tap
+        args: { x: 0.89, y: 0.05 }
   - await: { visible: { id: emotion-star }, timeout: 10000 }
   - tap: { id: tab-settings }
   - await: { visible: { id: settings-screen }, timeout: 10000 }
@@ -30,6 +30,8 @@ steps:
   - when:
       platform: android
     steps:
+      - tap: { text: "Show roots" }
+      - tap: { text: "Downloads" }
       - await: { visible: { text: "youmotion-demo-backup.json" }, timeout: 30000 }
       - tap: { text: "youmotion-demo-backup.json" }
   - await: { visible: { id: restore-preview }, timeout: 15000 }
