@@ -4,7 +4,7 @@ Branch: `codex/store-release-2026-09-08`. Starting commit: `8baab88`.
 
 ## Confirmed causes
 
-- Goldie 0.3.0 resolves bundled Argent 0.22.1 by default; manual authoring
+- Goldie 0.3.1 resolves bundled Argent 0.22.1 by default; manual authoring
   used global Argent 0.24.0. The matrix now sets `GOLDIE_ARGENT_BIN=argent`.
 - Goldie reinstalls for each invocation. Settings checked optional onboarding
   immediately after launch, before hydration made the screen visible.
@@ -55,11 +55,19 @@ Local failure reports are ignored under `.asc/`.
 
 ## Goldie version
 
-The repository uses Goldie 0.3.0; npm latest is 0.3.1 (published 2026-09-02).
+The repository now uses Goldie 0.3.1 (published 2026-09-02).
 The patch improves cross-platform image inspection/export and documentation,
 but still declares Argent `^0.22.0`; it does not fix this flow-driver mismatch.
 Keep `GOLDIE_ARGENT_BIN=argent` until Goldie updates its dependency or the
 project deliberately aligns on the bundled version.
+
+The 0.3.1 retry used a freshly rebuilt iOS Release app. Restarting Argent's
+tool server repaired the initial native-devtools registration failure, and the
+German Insights flow then reached its final tab transition. The runner reported
+the `tab-analytics` tap as completed but remained on Settings; direct live
+coordinate interaction reached Insights successfully. Two bounded selector and
+coordinate flow corrections reproduced the swallowed in-flow tap, so they were
+reverted. No replacement screenshot was accepted from these failed runs.
 
 ## Next work
 

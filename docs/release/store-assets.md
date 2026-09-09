@@ -101,7 +101,7 @@ generated review bundle; it is generated evidence and is not committed.
 
 The runner explicitly uses the `argent` executable on PATH via
 `GOLDIE_ARGENT_BIN` (override it with an absolute executable path if needed).
-Goldie 0.3.0 otherwise selects its bundled Argent 0.22.1, whereas the flows
+Goldie 0.3.1 otherwise selects its bundled Argent 0.22.1, whereas the flows
 were authored with Argent 0.24.0. Check `argent --version` before capture.
 Do not run another Goldie/Argent capture concurrently, even on another platform:
 Goldie may restart the shared tool-server when changing iOS locale.
