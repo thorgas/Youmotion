@@ -99,6 +99,20 @@ with the exact Git commit, capture config hash, release artifact hashes, command
 duration, and result for every attempted matrix cell. Keep this report with the
 generated review bundle; it is generated evidence and is not committed.
 
+The runner explicitly uses the `argent` executable on PATH via
+`GOLDIE_ARGENT_BIN` (override it with an absolute executable path if needed).
+Goldie 0.3.0 otherwise selects its bundled Argent 0.22.1, whereas the flows
+were authored with Argent 0.24.0. Check `argent --version` before capture.
+Do not run another Goldie/Argent capture concurrently, even on another platform:
+Goldie may restart the shared tool-server when changing iOS locale.
+Each matrix command has a ten-minute timeout and records command errors.
+
+Fresh-install Settings capture starts with `store-fresh-onboarding`, which
+waits for the onboarding screen before skipping it. An immediate optional
+`when` after launch races hydration and can skip the setup entirely. The
+onboarding Skip ID does exist in the native tree; an unavailable native
+devtools connection must be repaired before diagnosing it as a missing ID.
+
 Portability stops at the product boundary. Bundle/application IDs, device
 profiles, store copy and frames remain in the Goldie configs. Navigation IDs,
 locale switching, fixture import and post-import assertions remain in the app's

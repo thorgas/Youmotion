@@ -1,13 +1,9 @@
 steps:
-  - launch: com.youmotion.mobile
-  - when:
-      visible: { id: onboarding-skip }
-    steps:
-      - tap: { id: onboarding-skip }
-  - await: { visible: { id: emotion-star }, timeout: 30000 }
+  - run: store-fresh-onboarding.yaml
   - tap: { id: tab-settings }
   - await: { visible: { id: settings-screen }, timeout: 10000 }
-  - scroll-to: { target: { id: delete-all-journal-data }, direction: down }
+  - await: { idle: true }
+  - scroll-to: { target: { id: app-release-info }, direction: down }
   - await: { visible: { id: data-safety-controls }, timeout: 10000 }
   - await: { visible: { id: delete-all-journal-data }, timeout: 10000 }
   - await: { idle: true }

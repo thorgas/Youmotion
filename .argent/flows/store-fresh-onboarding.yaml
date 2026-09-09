@@ -1,0 +1,7 @@
+steps:
+  - launch: com.youmotion.mobile
+  - await: { visible: { id: onboarding-progress }, timeout: 30000 }
+  - await: { idle: true }
+  - tap: { id: onboarding-skip }
+  - await: { visible: { id: emotion-star }, timeout: 30000 }
+  - await: { idle: true }

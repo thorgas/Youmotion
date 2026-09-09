@@ -136,16 +136,20 @@ async function run() {
       encoding: 'utf8',
       env: {
         ...process.env,
+        GOLDIE_ARGENT_BIN: process.env.GOLDIE_ARGENT_BIN ?? 'argent',
         GOLDIE_CONFIG: item.goldieConfig,
         GOLDIE_LOCALE: item.locale,
         GOLDIE_SCENE: item.scene,
         [item.artifactEnv]: item.artifactPath,
       },
       stdio: 'inherit',
+      timeout: 600000,
+      killSignal: 'SIGTERM',
     });
     results.push({
       durationMs: Date.now() - started,
       exitCode: result.status,
+      error: result.error?.message ?? null,
       locale: item.locale,
       platform: item.platform,
       scene: item.scene,

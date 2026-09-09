@@ -58,3 +58,6 @@ example
 
 # Goldie generated captures and studio output
 /goldie/out/
+
+# Local App Store Connect reports and authentication workspace
+/.asc/
