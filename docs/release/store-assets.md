@@ -129,6 +129,10 @@ archive when they are ready for upload.
 
 ### Alternative: native capture followed by Goldie framing
 
+See [the repeatability runbook](../../scripts/store-capture/README.md) for the
+verified committed-input render command, tool-version gate, prerequisites and
+the explicitly unproven native recapture route.
+
 Current corrected review images: `store/review-2026-09-09/framed-corrected/`.
 The renderer uses uncropped classic layouts with explicit sizing, unmasked
 Android screenshots and full-chart iPhone Insights captures.

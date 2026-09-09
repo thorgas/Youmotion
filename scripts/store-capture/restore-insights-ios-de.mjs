@@ -3,6 +3,10 @@ import { mkdirSync } from 'node:fs';
 import { isAbsolute, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 
+export function assertCaptureVersion(version) {
+  if (version.trim() !== '0.20.10') throw new Error(`Capture requires the verified agent-device 0.20.10; received ${version.trim() || 'no version'}. Revalidate the workflow before changing this pin.`);
+}
+
 export function captureSteps({ device, output }) {
   if (!device) throw new Error('An explicit dedicated simulator UDID is required.');
   return [
@@ -35,8 +39,7 @@ export function runCapture(args) {
   if (confirmation !== '--confirm-synthetic-device' || !output) {
     throw new Error('Usage: pnpm exec node scripts/store-capture/restore-insights-ios-de.mjs UDID OUTPUT --confirm-synthetic-device');
   }
-  const executable = process.env.AGENT_DEVICE_BIN;
-  if (!executable || !isAbsolute(executable)) throw new Error('AGENT_DEVICE_BIN must explicitly name the absolute verified agent-device executable; pnpm may shadow it.');
+  const executable = verifiedExecutable();
   const steps = captureSteps({ device, output });
   mkdirSync(output, { recursive: true });
   const session = `store-restore-${process.pid}`;
@@ -51,6 +54,15 @@ export function runCapture(args) {
   } finally {
     spawnSync(executable, ['close', '--session', session], { stdio: 'inherit', timeout: 15000 });
   }
+}
+
+function verifiedExecutable() {
+  const executable = process.env.AGENT_DEVICE_BIN;
+  if (!executable || !isAbsolute(executable)) throw new Error('AGENT_DEVICE_BIN must explicitly name the absolute verified agent-device executable; pnpm may shadow it.');
+  const version = spawnSync(executable, ['--version'], { encoding: 'utf8', timeout: 10000 });
+  if (version.error || version.status !== 0) throw new Error('Unable to verify AGENT_DEVICE_BIN before device access.');
+  assertCaptureVersion(version.stdout);
+  return executable;
 }
 
 if (import.meta.url === pathToFileURL(process.argv[1] ?? '').href) runCapture(process.argv.slice(2));

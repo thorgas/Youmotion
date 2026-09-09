@@ -135,3 +135,13 @@ Next diagnostic: compare Files-picker snapshot acquisition between interactive
 and immediate scripted transitions with the same executable and daemon. Do not
 weaken the archive checks or substitute personal data. User navigation is not
 needed to review the already completed corrected images.
+
+## Repeatability handoff
+
+`scripts/store-capture/README.md` is the consolidated runbook. The frame renderer
+now accepts `--input-root store/review-2026-09-09/native`, using committed,
+normalized locale paths rather than ignored capture folders. All four cells
+were regenerated from those committed inputs on September 9. The capture
+reproducer checks the explicit CLI executable's version before opening any
+device and refuses versions other than the tested 0.20.10. No device rerun or
+new claim of Files-picker reliability accompanies this documentation update.

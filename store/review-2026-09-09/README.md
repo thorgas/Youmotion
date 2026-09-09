@@ -46,9 +46,10 @@ for comparison only: Android framing clips the status-bar edges, and the iPhone 
 Insights crop does not show the whole chart. Native images remain available for
 choosing a different composition. iPad images are native, not framed.
 
-Re-render existing captures with `pnpm exec node scripts/frame-native-store-captures.mjs`.
-This does not restore data or capture the app; inputs currently live under
-`goldie/out/agent-device/`. Retained copies are under this folder's `native/` tree.
+Re-render committed inputs from the repository root:
+`pnpm exec node scripts/frame-native-store-captures.mjs --input-root store/review-2026-09-09/native --output goldie/out/repeatability-proof`.
+This does not restore data or capture the app and does not require ignored local
+inputs. See `scripts/store-capture/README.md` for setup and validation.
 
 ## Build correspondence
 

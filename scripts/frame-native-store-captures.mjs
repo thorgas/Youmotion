@@ -27,7 +27,7 @@ export function parseArguments(args) {
   const options = { output: 'goldie/out/native-frame', platform: 'all', locale: 'all', root: repositoryRoot };
   for (let i = 0; i < args.length; i += 1) {
     const key = args[i]?.startsWith('--') ? args[i].slice(2) : undefined;
-    if (!key || !['output', 'platform', 'locale', 'root'].includes(key)) throw new Error(`Unknown argument: ${args[i]}`);
+    if (!key || !['output', 'platform', 'locale', 'root', 'input-root'].includes(key)) throw new Error(`Unknown argument: ${args[i]}`);
     const value = args[i + 1];
     if (!value || value.startsWith('--')) throw new Error(`Missing value for --${key}`);
     options[key] = value;
@@ -36,7 +36,7 @@ export function parseArguments(args) {
   return options;
 }
 
-export function buildRenderPlan({ root, output, platform, locale }) {
+export function buildRenderPlan({ root, output, platform, locale, 'input-root': inputRoot }) {
   const platforms = platform === 'all' ? ['ios', 'android'] : platform.split(',');
   const locales = locale === 'all' ? ['en-US', 'de-DE'] : locale.split(',');
   for (const value of platforms) if (!['ios', 'android'].includes(value)) throw new Error(`Unknown platform: ${value}`);
@@ -44,7 +44,7 @@ export function buildRenderPlan({ root, output, platform, locale }) {
   return platforms.flatMap((target) => locales.map((targetLocale) => {
     const sourceLocale = target === 'android' ? (targetLocale === 'en-US' ? 'en' : 'de') : targetLocale;
     const device = target === 'ios' ? 'iphone-6.9' : 'pixel-10-pro';
-    const sourceDir = target === 'ios'
+    const sourceDir = inputRoot ? resolve(root, inputRoot, target, targetLocale, target === 'ios' ? 'iphone-6.9' : 'phone') : target === 'ios'
       ? join(root, 'goldie/out/agent-device/ios', sourceLocale, 'iphone-6.9')
       : join(root, 'goldie/out/agent-device/android', sourceLocale, 'phone');
     const files = SCENES.map(([id, file]) => ({

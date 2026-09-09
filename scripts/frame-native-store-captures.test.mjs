@@ -2,6 +2,14 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import { buildRenderPlan, parseArguments, presentationOverrides } from './frame-native-store-captures.mjs';
 
+test('renders committed inputs without relying on ignored capture directories', () => {
+  const options = parseArguments(['--input-root', 'store/review-2026-09-09/native']);
+  const plan = buildRenderPlan(options);
+  assert.ok(plan.every(({ files }) => files.every(({ path }) => path.includes('/store/review-2026-09-09/native/'))));
+  assert.ok(plan[2].files[0].path.endsWith('/android/en-US/phone/pulse.png'));
+  assert.ok(plan[1].files[2].path.endsWith('/ios/de-DE/iphone-6.9/insights-chart-full.png'));
+});
+
 test('keeps all screens inside the canvas and preserves Android status-bar corners', () => {
   const ios = presentationOverrides({ platform: 'ios' });
   assert.deepEqual(ios.theme, { template: 'uniform', layout: 'classic', copyHeightRatio: 0.27, deviceWidthRatio: 0.84, screenOnly: false });

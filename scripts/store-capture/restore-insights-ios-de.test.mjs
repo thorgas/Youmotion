@@ -1,6 +1,11 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { captureSteps, runCapture } from './restore-insights-ios-de.mjs';
+import { assertCaptureVersion, captureSteps, runCapture } from './restore-insights-ios-de.mjs';
+
+test('rejects shadowed and unvalidated CLI versions before capture', () => {
+  assertCaptureVersion('0.20.10\n');
+  for (const version of ['0.20.0', '', '0.21.0']) assert.throws(() => assertCaptureVersion(version), /verified/);
+});
 
 test('requires explicit synthetic-device acknowledgement before any device work', () => {
   assert.throws(() => runCapture(['device', '/tmp/output']), /Usage/);
