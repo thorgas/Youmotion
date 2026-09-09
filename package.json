@@ -164,6 +164,8 @@
     "verify:ios:archive": "bash scripts/verify-ios-store-archive.sh",
     "verify:store-screenshots": "node scripts/verify-store-screenshot-provenance.mjs",
     "generate:store-screenshot-fixture": "node scripts/generate-store-screenshot-fixture.mjs",
+    "capture:store-screenshots": "node scripts/store-screenshot-matrix.mjs",
+    "test:store-screenshot-runner": "node --test scripts/store-screenshot-matrix.test.mjs",
     "verify:website": "node scripts/verify-website.mjs",
     "fingerprint:android": "fingerprint fingerprint:generate --platform android",
     "fingerprint:ios": "fingerprint fingerprint:generate --platform ios",

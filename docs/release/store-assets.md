@@ -59,13 +59,52 @@ for an earlier scene is available to a later one. Restore and verify the fixture
 immediately before each History or Insights capture, select `All time` / `Gesamt`,
 and confirm the populated UI before framing.
 
-Build the simulator app first, then capture and verify the assets:
+Build both release artifacts first. Then run the checked-in matrix runner. It
+executes every platform, locale, and scene as an independent Goldie invocation,
+so a flow cannot accidentally inherit onboarding, locale, or restored data from
+an earlier screenshot:
 
 ```sh
 pnpm exec expo run:ios --configuration Release --no-bundler
 RELEASE_APP=$(find "$HOME/Library/Developer/Xcode/DerivedData" -path '*/Build/Products/Release-iphonesimulator/Youmotion.app' -print -quit)
-GOLDIE_CONFIG="$PWD/goldie/goldie.config.ts" GOLDIE_APP_PATH="$RELEASE_APP" npx -y goldie@0 all
+./android/gradlew -p android app:assembleRelease
+GOLDIE_APP_PATH="$RELEASE_APP" \
+GOLDIE_ANDROID_APP_PATH="$PWD/android/app/build/outputs/apk/release/app-release.apk" \
+pnpm capture:store-screenshots
 ```
+
+Use filters for a bounded repair or a preflight that performs no capture:
+
+```sh
+GOLDIE_APP_PATH="$RELEASE_APP" \
+GOLDIE_ANDROID_APP_PATH="$PWD/android/app/build/outputs/apk/release/app-release.apk" \
+pnpm capture:store-screenshots -- --dry-run
+
+GOLDIE_APP_PATH="$RELEASE_APP" \
+pnpm capture:store-screenshots -- --platform ios --locale de-DE --scene insights
+```
+
+The portable orchestration lives in
+`scripts/store-screenshot-matrix.mjs`. App-specific choices live only in
+`store/screenshots/pipeline.config.json`, the Goldie configs, and the Argent
+flows. To reuse the runner in another app, copy the script and its test, then
+replace the JSON locales, scenes, platform config paths, artifact environment
+variables, and capture command. The other app supplies its own deterministic
+fixture and flows; no Youmotion flow or test data belongs in the reusable layer.
+
+The runner is deliberately sequential so two emulators never compete for the
+same Goldie or Argent state. It rejects missing artifacts and unknown filters
+before launching a device. A real run writes `goldie/out/capture-report.json`
+with the exact Git commit, capture config hash, release artifact hashes, command,
+duration, and result for every attempted matrix cell. Keep this report with the
+generated review bundle; it is generated evidence and is not committed.
+
+Portability stops at the product boundary. Bundle/application IDs, device
+profiles, store copy and frames remain in the Goldie configs. Navigation IDs,
+locale switching, fixture import and post-import assertions remain in the app's
+Argent flows. Fixture counts and expected output dimensions remain in the app's
+provenance policy. A reused runner must replace those inputs rather than copying
+Youmotion selectors or its synthetic archive.
 
 The framed PNGs are written under `goldie/out/` at 1320×2868 pixels for the
 6.9-inch iPhone store slot. `goldie/out/` is intentionally ignored because it

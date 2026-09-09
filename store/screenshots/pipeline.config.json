@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "locales": ["en-US", "de-DE"],
+  "scenes": ["onboarding", "today", "history", "insights", "settings"],
+  "command": ["pnpm", "exec", "goldie", "all"],
+  "reportPath": "goldie/out/capture-report.json",
+  "platforms": {
+    "ios": {
+      "goldieConfig": "goldie/goldie.config.ts",
+      "artifactEnv": "GOLDIE_APP_PATH"
+    },
+    "android": {
+      "goldieConfig": "goldie/google-play.config.ts",
+      "artifactEnv": "GOLDIE_ANDROID_APP_PATH"
+    }
+  }
+}
