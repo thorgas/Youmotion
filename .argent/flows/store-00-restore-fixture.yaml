@@ -40,8 +40,6 @@ steps:
   - scroll-to: { target: { id: app-release-info }, direction: down }
   - await: { visible: { id: confirm-data-restore }, timeout: 5000 }
   - tap: { id: confirm-data-restore }
-  - await: { visible: { id: data-safety-notice }, timeout: 30000 }
+  - await: { visible: { id: settings-screen }, timeout: 30000 }
   - assert: { hidden: { id: restore-preview } }
-  - tap: { id: data-safety-notice }
-  - await: { hidden: { id: data-safety-notice }, timeout: 5000 }
   - await: { idle: true }

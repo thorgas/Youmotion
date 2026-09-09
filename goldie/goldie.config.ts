@@ -1,46 +1,12 @@
 const appRoot = process['cwd']();
 const locale = process.env['GOLDIE_LOCALE'] ?? 'en-US';
+const scene = process.env['GOLDIE_SCENE'];
 
 if (locale !== 'en-US' && locale !== 'de-DE') {
   throw new Error('GOLDIE_LOCALE must be en-US or de-DE.');
 }
 
-export const config = {
-  appRoot,
-  appPath:
-    process.env['GOLDIE_APP_PATH'] ??
-    `${process.env['HOME']}/Library/Developer/Xcode/DerivedData/Youmotion-*/Build/Products/Release-iphonesimulator/Youmotion.app`,
-  bundleId: 'com.youmotion.mobile',
-  devices: ['iphone-6.9'],
-  locales: [locale],
-  appearance: 'light',
-  frame: { variant: '17-pro-blue' },
-  theme: {
-    background: 'linear-gradient(150deg, #E8E4D9 0%, #F4F0E8 52%, #DCE3D5 100%)',
-    headlineColor: '#273328',
-    subheadColor: '#5E6B52',
-    fontFamily: 'DM Sans, -apple-system, system-ui, sans-serif',
-    template: 'editorial',
-    layout: 'classic',
-  },
-  store: {
-    name: 'Youmotion',
-    subtitle: {
-        'en-US': 'Notice. Reflect. Return.',
-        'de-DE': 'Wahrnehmen. Reflektieren. Zurückkehren.',
-      },
-    developer: 'Vastor Holding UG',
-    category: 'Health & Fitness',
-    ageRating: '4+',
-    price: 'Free',
-    description: {
-      'en-US':
-        'A calm, private way to notice what you feel, reflect with care, and revisit your own patterns.',
-      'de-DE':
-        'Eine ruhige, private Möglichkeit, Gefühle wahrzunehmen, achtsam zu reflektieren und eigene Muster wiederzuentdecken.',
-    },
-  },
-  scenes: [
+const scenes = [
     {
       kind: 'screenshot',
       id: 'onboarding',
@@ -106,7 +72,48 @@ export const config = {
         'de-DE': 'Dein Journal bleibt auf deinem Gerät und du behältst die Kontrolle.',
       },
     },
-  ],
+];
+
+if (scene && !scenes.some((candidate) => candidate.id === scene)) {
+  throw new Error(`GOLDIE_SCENE does not match a configured scene: ${scene}`);
+}
+
+export const config = {
+  appRoot,
+  appPath:
+    process.env['GOLDIE_APP_PATH'] ??
+    `${process.env['HOME']}/Library/Developer/Xcode/DerivedData/Youmotion-*/Build/Products/Release-iphonesimulator/Youmotion.app`,
+  bundleId: 'com.youmotion.mobile',
+  devices: ['iphone-6.9'],
+  locales: [locale],
+  appearance: 'light',
+  frame: { variant: '17-pro-blue' },
+  theme: {
+    background: 'linear-gradient(150deg, #E8E4D9 0%, #F4F0E8 52%, #DCE3D5 100%)',
+    headlineColor: '#273328',
+    subheadColor: '#5E6B52',
+    fontFamily: 'DM Sans, -apple-system, system-ui, sans-serif',
+    template: 'editorial',
+    layout: 'classic',
+  },
+  store: {
+    name: 'Youmotion',
+    subtitle: {
+      'en-US': 'Notice. Reflect. Return.',
+      'de-DE': 'Wahrnehmen. Reflektieren. Zurückkehren.',
+    },
+    developer: 'Vastor Holding UG',
+    category: 'Health & Fitness',
+    ageRating: '4+',
+    price: 'Free',
+    description: {
+      'en-US':
+        'A calm, private way to notice what you feel, reflect with care, and revisit your own patterns.',
+      'de-DE':
+        'Eine ruhige, private Möglichkeit, Gefühle wahrzunehmen, achtsam zu reflektieren und eigene Muster wiederzuentdecken.',
+    },
+  },
+  scenes: scenes.filter((candidate) => !scene || candidate.id === scene),
 };
 
 export default config;

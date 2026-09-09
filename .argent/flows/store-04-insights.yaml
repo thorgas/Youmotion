@@ -1,9 +1,8 @@
 steps:
   - run: store-00-restore-fixture.yaml
-  - wait: 1000
-  - tool: gesture-tap
-    args: { x: 0.625, y: 0.94 }
+  - tap: { id: tab-analytics }
   - await: { visible: { id: analytics-screen }, timeout: 10000 }
   - echo: Select All time so the current synthetic E2E moments appear in the store capture.
-  - tap: { x: 0.798, y: 0.241 }
+  - tap: { id: analytics-timeframe-all }
+  - await: { visible: { id: analytics-primary-insight }, timeout: 10000 }
   - await: { idle: true }
