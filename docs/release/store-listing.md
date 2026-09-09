@@ -16,8 +16,8 @@ Keep every claim aligned with the submitted build and repository source.
 
 ### English (en-US)
 
-- App name: `Youmotion: Understand Feelings`
-- Subtitle (<=30 chars): **Discover & understand feelings** *(30)*
+- App name: `Youmotion: Discover Feelings` *(28)*
+- Subtitle (<=30 chars): **Reflect & understand feelings** *(29)*
 - Promotional text (<=170 chars): **Use the seven-direction Feeling Pulse to check in, add optional reflection/belief work, review local history and insights. All data stays on-device; no account required.** *(169)*
 - Keywords (<=100 chars): **feeling,pulse,emotion,check-in,self-reflection,journal,beliefs,reminders,insights,local** *(87)*
 - Category: Health & Fitness
@@ -58,8 +58,8 @@ Youmotion has no account and keeps your journal on this device. It supports self
 
 ### German (de-DE)
 
-- App name: `Youmotion`
-- Untertitel (<=30 Zeichen): **Entdecke und verstehe Gefühle** *(29)*
+- App name: `Youmotion: Gefühle entdecken` *(28)*
+- Untertitel (<=30 Zeichen): **Reflektiere & verstehe Gefühle** *(30)*
 - Werbetext (<=170 Zeichen): **Nutze den ruhigen Gefühlspuls mit sieben Richtungen. Ergänze optional Reflexion und Leidsatz/Leitsatz-Arbeit. Verlauf, Einblicke und Erinnerungen bleiben lokal.** *(160)*
 - Keywords/Guidance (<=100 Zeichen): **Gefühle,Gefühlspuls,Gefühlsmoment,Journal,Reflexion,Leidsatz,Leitsatz,Verlauf,Einblicke,Erinnerung** *(98)*
 - Kategorie: Health & Fitness

@@ -32,10 +32,12 @@ This supports Youmotion's current story—feeling, reflection, patterns—but al
 
 Keep the brand plus a high-relevance descriptor:
 
-- English title: `Youmotion: Understand Feelings`
-- English subtitle/short-description theme: discovering and understanding feelings
-- German title: `Youmotion: Gefühle verstehen`
-- German subtitle/short-description theme: privates Gefühlstagebuch and Reflexion
+- English title: `Youmotion: Discover Feelings`
+- English subtitle theme: `Reflect & understand feelings`
+- English short-description theme: discovering and understanding feelings
+- German title: `Youmotion: Gefühle entdecken`
+- German subtitle theme: `Reflektiere & verstehe Gefühle`
+- German short-description theme: privates Gefühlstagebuch and Reflexion
 
 The Apple keyword hypotheses were adjusted toward terms visibly used by comparable listings. Do not repeat title/subtitle terms in Apple's keyword field when final measured research can replace them with incremental terms.
 

@@ -1,8 +1,8 @@
 # Google Play — en-US
 
-## App name — 30/30
+## App name — 28/30
 
-Youmotion: Understand Feelings
+Youmotion: Discover Feelings
 
 ## Short description — 79/80
 

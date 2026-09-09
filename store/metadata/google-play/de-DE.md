@@ -2,7 +2,7 @@
 
 ## App-Name — 28/30
 
-Youmotion: Gefühle verstehen
+Youmotion: Gefühle entdecken
 
 ## Kurzbeschreibung — 73/80
 

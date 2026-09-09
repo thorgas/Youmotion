@@ -99,8 +99,8 @@ export const config = {
   store: {
     name: 'Youmotion',
     subtitle: {
-      'en-US': 'Notice. Reflect. Return.',
-      'de-DE': 'Wahrnehmen. Reflektieren. Zurückkehren.',
+      'en-US': 'Reflect & understand feelings',
+      'de-DE': 'Reflektiere & verstehe Gefühle',
     },
     developer: 'Vastor Holding UG',
     category: 'Health & Fitness',

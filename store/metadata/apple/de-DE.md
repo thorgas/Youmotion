@@ -2,11 +2,11 @@
 
 ## App-Name — 28/30
 
-Youmotion: Gefühle verstehen
+Youmotion: Gefühle entdecken
 
-## Untertitel — 29/30
+## Untertitel — 30/30
 
-Entdecke und verstehe Gefühle
+Reflektiere & verstehe Gefühle
 
 ## Werbetext — 141/170
 

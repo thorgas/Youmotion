@@ -1,12 +1,12 @@
 # Apple App Store — en-US
 
-## App name — 30/30
+## App name — 28/30
 
-Youmotion: Understand Feelings
+Youmotion: Discover Feelings
 
-## Subtitle — 30/30
+## Subtitle — 29/30
 
-Discover & understand feelings
+Reflect & understand feelings
 
 ## Promotional text — 149/170
 
