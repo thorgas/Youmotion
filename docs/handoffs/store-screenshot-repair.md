@@ -69,8 +69,6 @@ coordinate interaction reached Insights successfully. Two bounded selector and
 coordinate flow corrections reproduced the swallowed in-flow tap, so they were
 reverted. No replacement screenshot was accepted from these failed runs.
 
-## Next work
-
 ## Alternative capture route — 2026-09-09
 
 Agent-device 0.20.10 successfully navigated the iPhone and Android app where
@@ -95,3 +93,45 @@ Apply the verified fresh-install setup and explicit locale selection to the
 remaining populated scenes; verify all 133 moments after fixture restore.
 Do not label a dry-run, a passing frame renderer, or reused raw PNGs as proof
 of successful fresh native capture.
+
+## Framing correction — 2026-09-09
+
+Use `store/review-2026-09-09/framed-corrected/` for current phone review.
+All four locale/platform cells contain five uncropped classic-layout images.
+The renderer explicitly sets `copyHeightRatio` and `deviceWidthRatio`, required
+by Goldie 0.3.1 to render a classic device at all. Android uses screen-only
+geometry with radius zero, preserving native status-bar corners. iPhone Insights
+uses newly captured full-chart PNGs; the chart, labels and counts are visible.
+No app code or native build changed. iPad captures remain unchanged.
+
+Agent-device native replay exposed separate failures: retained-runner ownership
+before the first tap, duplicated wrapper/button identity on restore, and a Files
+picker identifier wait that timed out despite the file appearing in the failure
+snapshot. Stopping the idle daemon with retained-runner cleanup removed the first
+failure; a new live recording using app test IDs removed the second. These are
+automation failures, not evidence that restore or Insights is broken.
+
+`scripts/store-capture/restore-insights-ios-de.mjs` is a bounded serial-CLI
+fallback. Its contract requires a dedicated German iPhone 17 Pro Max simulator,
+the Release app installed, onboarding already completed, and the committed
+fixture staged as `youmotion-demo-backup.json` in the picker's current On My
+iPhone folder. It replaces only the explicitly acknowledged synthetic test
+device's data. Each command has a 60-second deadline and any failure stops capture.
+Do not run it on a personal device. Full multi-platform fresh-install replay is
+not established by the unit tests or the successful interactive walkthrough.
+
+The direct-CLI experiment identified executable shadowing: login-shell
+`agent-device --version` is 0.20.10, while `pnpm exec agent-device --version`
+is 0.20.0. The older repository-local copy rejects `scroll --settle`, which
+the verified CLI supports. The serial runner therefore requires the absolute
+`AGENT_DEVICE_BIN`; resolve it before pnpm changes PATH. Do not infer that
+this explains every Argent or native-replay failure above.
+
+Final direct-CLI verdict: **blocked at step 7/21**, the Files fixture wait.
+With explicit 0.20.10 the failure says no readable snapshot completed before
+the timeout. The script closed its own session and did not reach replacement
+in this run. Keep it as a bounded reproducer, not a validated release pipeline.
+Next diagnostic: compare Files-picker snapshot acquisition between interactive
+and immediate scripted transitions with the same executable and daemon. Do not
+weaken the archive checks or substitute personal data. User navigation is not
+needed to review the already completed corrected images.

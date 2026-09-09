@@ -129,6 +129,29 @@ archive when they are ready for upload.
 
 ### Alternative: native capture followed by Goldie framing
 
+Current corrected review images: `store/review-2026-09-09/framed-corrected/`.
+The renderer uses uncropped classic layouts with explicit sizing, unmasked
+Android screenshots and full-chart iPhone Insights captures.
+
+For the bounded German iPhone restore/capture runner, first stage the committed
+synthetic fixture in the current Files picker folder and use a dedicated
+iPhone 17 Pro Max simulator with German selected and onboarding completed:
+
+**Experimental reproducer, not a proven capture pipeline:** the latest run
+stopped at the Files-picker snapshot wait. The corrected review images were
+captured through supervised automation, not this unattended script.
+
+```sh
+AGENT_DEVICE_BIN="$(command -v agent-device)" pnpm exec node scripts/store-capture/restore-insights-ios-de.mjs "$E2E_DEVICE" goldie/out/cli-restore-proof --confirm-synthetic-device
+```
+
+Verify that the selected executable is 0.20.10 before running. The explicit
+absolute path is required: pnpm currently shadows the global CLI with local
+0.20.0. Never acknowledge a personal-data device. This restores 133 synthetic
+moments and 15 beliefs, dismisses the success notice, selects All time and
+captures the full chart. Consult the repair handoff for the current device-run
+verdict; script unit tests alone do not prove replay reliability.
+
 When Argent replay cannot complete, agent-device can navigate the same Release
 app and save native screenshots independently. Select the app language explicitly,
 restore the committed synthetic archive, and verify 133 moments in All-time

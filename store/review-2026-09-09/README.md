@@ -16,14 +16,33 @@ captures are diagnostic alternatives. The all-time phone view shows the insight
 and only part of the chart; the separate calendar image supplies a complete
 populated calendar. Settings focuses on local data, backup and deletion.
 
-## Provenance and limits
+## Corrected phone images — use these for review
 
-## Framed phone images
+`framed-corrected/ios/{de-DE,en-US}/` contains five images per locale at
+1320×2868. `framed-corrected/android/{de-DE,en-US}/` contains five images per
+locale at 1080×1920. All four sets passed Goldie verification.
+
+The uniform classic layout preserves the whole screen. iPhone Insights uses
+new `insights-chart-full.png` captures with all seven chart labels and counts.
+Android uses an unmasked, frameless native screenshot so its square emulator
+status-bar corners are not clipped by a physical-device bezel. Headlines and
+supporting copy are retained for every scene, including Settings.
+
+The renderer sets explicit classic-layout sizing; Goldie 0.3.1 otherwise renders
+copy without a device image. Seven focused tests and `pnpm verify` passed.
+No app code or native build changed for this correction.
+
+Unattended restore was tested but remains blocked on acquiring the Apple Files
+picker snapshot. The bounded reproducer and precise failure are documented in
+`docs/handoffs/store-screenshot-repair.md`. Corrected PNG rendering is verified;
+this must not be confused with complete fresh-install capture automation.
+
+## Previous framed phone images — superseded
 
 `framed/ios/{de-DE,en-US}/` contains six images per locale at 1320×2868.
 `framed/android/{de-DE,en-US}/` contains six images per locale at 1080×1920.
-Goldie dimension verification passed for all four sets. These remain design
-candidates: Android framing clips the status-bar edges, and the iPhone editorial
+Goldie dimension verification passed for all four old sets. These are retained
+for comparison only: Android framing clips the status-bar edges, and the iPhone editorial
 Insights crop does not show the whole chart. Native images remain available for
 choosing a different composition. iPad images are native, not framed.
 

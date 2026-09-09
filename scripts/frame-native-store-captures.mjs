@@ -14,6 +14,15 @@ const SCENES = [
   ['settings', 'settings-data'],
 ];
 
+export function presentationOverrides(cell) {
+  const theme = { template: 'uniform', layout: 'classic', copyHeightRatio: 0.27, deviceWidthRatio: 0.84, screenOnly: cell.platform === 'android' };
+  if (cell.platform !== 'android') return { theme };
+  return { theme, android: { frame: {
+    image: cell.files[0].path, width: 1280, height: 2856,
+    screen: { x: 0, y: 0, width: 1280, height: 2856 }, screenRadius: 0,
+  } } };
+}
+
 export function parseArguments(args) {
   const options = { output: 'goldie/out/native-frame', platform: 'all', locale: 'all', root: repositoryRoot };
   for (let i = 0; i < args.length; i += 1) {
@@ -40,7 +49,7 @@ export function buildRenderPlan({ root, output, platform, locale }) {
       : join(root, 'goldie/out/agent-device/android', sourceLocale, 'phone');
     const files = SCENES.map(([id, file]) => ({
       id,
-      path: join(sourceDir, `${file}.png`),
+      path: join(sourceDir, `${target === 'ios' && id === 'insights' ? 'insights-chart-full' : file}.png`),
     }));
     return { device, locale: targetLocale, output: resolve(root, output, target, targetLocale), platform: target, files };
   }));
@@ -52,10 +61,12 @@ async function renderCell({ cell, root }) {
   const configPath = join(isolated, 'goldie.config.mjs');
   const baseConfig = pathToFileURL(join(root, 'goldie/goldie.config.ts')).href;
   const sceneIds = JSON.stringify(cell.files.map(({ id }) => id));
+  const presentation = JSON.stringify(presentationOverrides(cell));
   await writeFile(configPath, `import base from ${JSON.stringify(baseConfig)};
+const presentation = ${presentation};
 const selected = base.scenes.filter(({ id }) => ${sceneIds}.includes(id));
 const calendar = Object.assign({}, selected.find(({ id }) => id === 'insights'), { id: 'insights-calendar' });
-export default { ...base, devices: [${JSON.stringify(cell.device)}], locales: [${JSON.stringify(cell.locale)}], scenes: [...selected, calendar] };
+export default { ...base, ...presentation, theme: { ...base.theme, ...presentation.theme }, devices: [${JSON.stringify(cell.device)}], locales: [${JSON.stringify(cell.locale)}], scenes: [...selected, calendar] };
 `);
   const loaded = await goldie.loadConfig(configPath);
   await mkdir(join(loaded.outDir, 'raw', cell.device), { recursive: true });

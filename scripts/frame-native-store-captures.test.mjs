@@ -1,6 +1,15 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { buildRenderPlan, parseArguments } from './frame-native-store-captures.mjs';
+import { buildRenderPlan, parseArguments, presentationOverrides } from './frame-native-store-captures.mjs';
+
+test('keeps all screens inside the canvas and preserves Android status-bar corners', () => {
+  const ios = presentationOverrides({ platform: 'ios' });
+  assert.deepEqual(ios.theme, { template: 'uniform', layout: 'classic', copyHeightRatio: 0.27, deviceWidthRatio: 0.84, screenOnly: false });
+  const android = presentationOverrides({ platform: 'android', files: [{ path: '/native.png' }] });
+  assert.equal(android.theme.screenOnly, true);
+  assert.equal(android.android.frame.screenRadius, 0);
+  assert.deepEqual(android.android.frame.screen, { x: 0, y: 0, width: 1280, height: 2856 });
+});
 
 test('maps native agent-device captures to isolated phone render cells', () => {
   const plan = buildRenderPlan({ root: '/repo', output: 'goldie/out/native-frame', platform: 'all', locale: 'all' });
