@@ -16,6 +16,11 @@ Branch: `codex/store-release-2026-09-08`. Starting commit: `8baab88`.
   iOS locale preparation, so device captures must be serialized.
 - Android API 33 emulator logs show accessibility window timeouts; its flow
   tree responds once and then hangs during Settings scroll or settling.
+  Replacing the first Settings `idle` with bounded pacing plus stable element
+  checks let both English and German Android Settings flows complete once, but
+  later replay froze at `scroll-to` and a fresh recording froze before its
+  first screen check. The German raw capture is visually correct; no current
+  locale-specific framed Android Settings output was proven.
 
 ## Evidence
 
@@ -40,11 +45,21 @@ History/Insights and the remaining platform/locale cells remain unverified.
 
 App `6807357236`, editable iOS version `1.0.3`, version ID
 `e809b30d-7ec4-48c7-9921-f7509ad048bc`.
-Canonical pull, validation and dry-run succeeded. All four localization writes
-were rejected by Apple because the API key does not permit them. Readback
-confirmed no changes. No authenticated ASC web session is cached.
-An authorized write-capable API key or web login is required to retry.
+Canonical pull, validation and dry-run succeeded. The retry applied and read
+back the German subtitle, English name, and English subtitle. A field-specific
+retry then applied and verified the English description, keywords, marketing
+URL, promotional text, and support URL. German version fields already matched.
+Apple continues to reject `whatsNew` because it cannot be edited in the current
+version state. No authenticated ASC web session is cached.
 Local failure reports are ignored under `.asc/`.
+
+## Goldie version
+
+The repository uses Goldie 0.3.0; npm latest is 0.3.1 (published 2026-09-02).
+The patch improves cross-platform image inspection/export and documentation,
+but still declares Argent `^0.22.0`; it does not fix this flow-driver mismatch.
+Keep `GOLDIE_ARGENT_BIN=argent` until Goldie updates its dependency or the
+project deliberately aligns on the bundled version.
 
 ## Next work
 

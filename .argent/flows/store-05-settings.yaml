@@ -2,8 +2,10 @@ steps:
   - run: store-fresh-onboarding.yaml
   - tap: { id: tab-settings }
   - await: { visible: { id: settings-screen }, timeout: 10000 }
-  - await: { idle: true }
+  - echo: Give native Settings layout a bounded moment before scrolling; readiness is proven below.
+  - wait: 800
   - scroll-to: { target: { id: app-release-info }, direction: down }
   - await: { visible: { id: data-safety-controls }, timeout: 10000 }
   - await: { visible: { id: delete-all-journal-data }, timeout: 10000 }
-  - await: { idle: true }
+  - await: { visible: { id: app-release-info }, timeout: 10000 }
+  - wait: 500
