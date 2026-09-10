@@ -785,6 +785,23 @@ describe('app navigation model', () => {
     expect(actor.getSnapshot().matches(CHECK_IN_STATES.SUCCESS)).toBe(true);
   });
 
+  it('keeps reminder timing valid when toggling the last selected weekday', async () => {
+    mockGetReminderPermission.mockResolvedValue(REMINDER_PERMISSION_STATES.GRANTED);
+    const actor = createActor(appNavigationMachine).start();
+    await finishWithGuidingBelief({ actor });
+    actor.send({ type: REMINDER_EVENTS.SUCCESS_OFFER_ACCEPTED });
+    await waitFor(actor, (candidate) => candidate.matches(REMINDER_STATES.EDITOR));
+
+    actor.send({ type: REMINDER_EVENTS.WEEKDAY_TOGGLED, weekday: 2 });
+    actor.send({ type: REMINDER_EVENTS.WEEKDAY_TOGGLED, weekday: 3 });
+    actor.send({ type: REMINDER_EVENTS.WEEKDAY_TOGGLED, weekday: 4 });
+    actor.send({ type: REMINDER_EVENTS.WEEKDAY_TOGGLED, weekday: 5 });
+    actor.send({ type: REMINDER_EVENTS.WEEKDAY_TOGGLED, weekday: 6 });
+
+    expect(actor.getSnapshot().context.reminderWeekdaysDraft).toEqual([6]);
+    expect(actor.getSnapshot().matches(REMINDER_STATES.EDITOR)).toBe(true);
+  });
+
   it('does not enter reminder setup when reminder data failed to load', async () => {
     const actor = createActor(appNavigationMachine).start();
     await finishWithGuidingBelief({ actor });
