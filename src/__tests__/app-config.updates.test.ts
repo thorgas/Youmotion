@@ -3,6 +3,8 @@ import { resolveUpdates } from '../../updates.config.js';
 import { expo as appConfig } from '../../app.json';
 import { sourceSkips } from '../../fingerprint.config.js';
 
+const appConfigFactory = require('../../app.config.js');
+
 const fingerprintConfig = { sourceSkips };
 
 const CHANNEL_HEADER = 'expo-channel-name';
@@ -36,6 +38,21 @@ const resolvedUpdates = (environment: {
 };
 
 describe('app.config updates resolution', () => {
+  it('stamps one embedded release identity from the EAS build commit', () => {
+    const previousCommit = process.env['EAS_BUILD_GIT_COMMIT_HASH'];
+    process.env['EAS_BUILD_GIT_COMMIT_HASH'] = 'abcdef1234567890';
+
+    try {
+      expect(appConfigFactory({ config: appConfig }).extra).toMatchObject({
+        gitCommit: 'abcdef1234567890',
+        releaseTag: 'release-abcdef1234567890',
+      });
+    } finally {
+      if (previousCommit === undefined) delete process.env['EAS_BUILD_GIT_COMMIT_HASH'];
+      else process.env['EAS_BUILD_GIT_COMMIT_HASH'] = previousCommit;
+    }
+  });
+
   it('ships a fingerprint runtime version so an update matches the binary it was built against', () => {
     expect(appConfig.runtimeVersion.policy).toBe('fingerprint');
   });

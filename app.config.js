@@ -34,6 +34,7 @@ function withArm64Simulator(config) {
 
 module.exports = ({ config }) => {
   const updates = resolveUpdates(config);
+  const gitCommit = resolveGitCommit();
 
   return {
     ...config,
@@ -41,7 +42,8 @@ module.exports = ({ config }) => {
     plugins: [...(config.plugins ?? []), withArm64Simulator],
     extra: {
       ...config.extra,
-      gitCommit: resolveGitCommit(),
+      gitCommit,
+      releaseTag: gitCommit ? `release-${gitCommit}` : null,
     },
   };
 };

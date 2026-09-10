@@ -1,12 +1,11 @@
 import { appSettingsStore } from '@/app-stores';
 import { configureAppLocale } from '@/localization/app-locale.configuration';
-import type { UpdateKitAction, UpdateOutcome } from 'expo-update-kit';
+import type { UpdateKitActionDescriptor } from 'expo-update-kit';
 import { releaseFooterLabels } from '../ui/release-footer-labels';
 
 configureAppLocale(appSettingsStore);
 
-const run = (): Promise<UpdateOutcome> => Promise.resolve({ kind: 'reloading' });
-const switchTo = (channel: string): UpdateKitAction => ({ channel, id: 'switch', run });
+const switchTo = (channel: string): UpdateKitActionDescriptor => ({ channel, id: 'switch' });
 
 describe('releaseFooterLabels', () => {
   const labels = releaseFooterLabels();
@@ -22,7 +21,7 @@ describe('releaseFooterLabels', () => {
   });
 
   it('labels the check action and one switch action per channel', () => {
-    expect(labels.action({ id: 'check', run })).toBe('Check for update now');
+    expect(labels.action({ id: 'check' })).toBe('Check for update now');
     expect(labels.action(switchTo('qa'))).toBe('Switch to QA');
     expect(labels.action(switchTo('testing'))).toBe('Switch to Testing');
     expect(labels.action(switchTo('production'))).toBe('Switch to Production');

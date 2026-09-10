@@ -1,5 +1,5 @@
 import { fbs } from 'fbtee';
-import type { UpdateKitAction, UpdateOutcome } from 'expo-update-kit';
+import type { UpdateKitActionDescriptor, UpdateOutcome } from 'expo-update-kit';
 import type { UpdateMenuLabels } from 'expo-update-kit/ui';
 import assert from '@/assert';
 
@@ -44,7 +44,7 @@ const upToDateTitle = (updateId: string) => String(fbs(
   'Alert title confirming the running build already carries the newest update',
 ));
 
-const actionLabel = (action: UpdateKitAction) => {
+const actionLabel = (action: UpdateKitActionDescriptor) => {
   assert(action.id.length > 0, 'Update action id must not be empty.');
   if (action.id === 'check') return checkAction();
   assert(action.id === 'switch', 'Unknown update action id: ' + action.id);

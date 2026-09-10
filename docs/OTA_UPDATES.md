@@ -18,6 +18,11 @@ channel and app version, and the runtime version. They come from
 [release-footer.tsx](../src/features/updates/ui/release-footer.tsx) and every
 string is ours, in fbtee ([release-footer-labels.ts](../src/features/updates/ui/release-footer-labels.ts)).
 
+The release label prefers the `EXPO_PUBLIC_RELEASE` stamp bundled into an OTA.
+When the embedded bundle is running, `app.config.js` supplies
+`releaseTagFallback` from `EAS_BUILD_GIT_COMMIT_HASH`, so store builds identify
+their exact source instead of displaying `Release unknown`.
+
 | line              | what it answers                                                 |
 | ----------------- | --------------------------------------------------------------- |
 | release label     | which update is running, or that the build launched embedded    |

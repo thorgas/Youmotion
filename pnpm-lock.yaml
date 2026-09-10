@@ -120,8 +120,8 @@ importers:
         specifier: ~57.0.3
         version: 57.0.3(expo@57.0.20)(react-native-web@0.21.2(react-dom@19.2.3(react@19.2.3))(react@19.2.3))(react-native@0.86.3(@babel/core@7.29.7(supports-color@8.1.1))(@react-native/jest-preset@0.86.0(@babel/core@7.29.7(supports-color@8.1.1))(react@19.2.3)(supports-color@8.1.1))(@react-native/metro-config@0.86.3(@babel/core@7.29.7(supports-color@8.1.1))(supports-color@8.1.1))(@types/react@19.2.17)(react@19.2.3)(supports-color@8.1.1))(supports-color@8.1.1)
       expo-update-kit:
-        specifier: 0.1.0-alpha.3
-        version: 0.1.0-alpha.3(5415921cba155190a0c0b3500396c2d3)
+        specifier: 0.1.0-alpha.7
+        version: 0.1.0-alpha.7(5415921cba155190a0c0b3500396c2d3)
       expo-updates:
         specifier: ~57.0.21
         version: 57.0.21(expo-dev-client@57.0.18(expo@57.0.20)(react-native@0.86.3(@babel/core@7.29.7(supports-color@8.1.1))(@react-native/jest-preset@0.86.0(@babel/core@7.29.7(supports-color@8.1.1))(react@19.2.3)(supports-color@8.1.1))(@react-native/metro-config@0.86.3(@babel/core@7.29.7(supports-color@8.1.1))(supports-color@8.1.1))(@types/react@19.2.17)(react@19.2.3)(supports-color@8.1.1)))(expo@57.0.20)(react-native@0.86.3(@babel/core@7.29.7(supports-color@8.1.1))(@react-native/jest-preset@0.86.0(@babel/core@7.29.7(supports-color@8.1.1))(react@19.2.3)(supports-color@8.1.1))(@react-native/metro-config@0.86.3(@babel/core@7.29.7(supports-color@8.1.1))(supports-color@8.1.1))(@types/react@19.2.17)(react@19.2.3)(supports-color@8.1.1))(react@19.2.3)(supports-color@8.1.1)
@@ -4914,13 +4914,13 @@ packages:
       react-native-web:
         optional: true
 
-  expo-update-kit@0.1.0-alpha.3:
-    resolution: {integrity: sha512-Cn8Oo10ELR1aTfvZy9zKsXdsuv7PsLvLVttKdsgQL7rjHISLNIbxSg4hrHryiUa/pKRvkpo4/CjyMcU8dHUNVQ==}
+  expo-update-kit@0.1.0-alpha.7:
+    resolution: {integrity: sha512-sCg5sXpWZNhlpYqrP6zQ8EzpXDiDGji4FhMYa18plRF+eTVomqhewwkZhSrvbjXXRRU6DrincHCd/Qi2oWyapA==}
     engines: {node: '>=20'}
     hasBin: true
     peerDependencies:
       expo-constants: '*'
-      expo-updates: '>=0.28.0'
+      expo-updates: '>=0.29.0'
       react: '>=18.0.0'
       react-native: '>=0.76.0'
     peerDependenciesMeta:
@@ -13533,7 +13533,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  expo-update-kit@0.1.0-alpha.3(5415921cba155190a0c0b3500396c2d3):
+  expo-update-kit@0.1.0-alpha.7(5415921cba155190a0c0b3500396c2d3):
     dependencies:
       expo-updates: 57.0.21(expo-dev-client@57.0.18(expo@57.0.20)(react-native@0.86.3(@babel/core@7.29.7(supports-color@8.1.1))(@react-native/jest-preset@0.86.0(@babel/core@7.29.7(supports-color@8.1.1))(react@19.2.3)(supports-color@8.1.1))(@react-native/metro-config@0.86.3(@babel/core@7.29.7(supports-color@8.1.1))(supports-color@8.1.1))(@types/react@19.2.17)(react@19.2.3)(supports-color@8.1.1)))(expo@57.0.20)(react-native@0.86.3(@babel/core@7.29.7(supports-color@8.1.1))(@react-native/jest-preset@0.86.0(@babel/core@7.29.7(supports-color@8.1.1))(react@19.2.3)(supports-color@8.1.1))(@react-native/metro-config@0.86.3(@babel/core@7.29.7(supports-color@8.1.1))(supports-color@8.1.1))(@types/react@19.2.17)(react@19.2.3)(supports-color@8.1.1))(react@19.2.3)(supports-color@8.1.1)
     optionalDependencies:
