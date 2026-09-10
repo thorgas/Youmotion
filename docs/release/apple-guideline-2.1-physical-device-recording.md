@@ -21,9 +21,29 @@ mirroring do not satisfy Apple's request for a physical-device capture.
 - Start iOS screen recording from Control Center, then return to a clean Home
   Screen with the Youmotion icon visible. Do not trim away the app launch.
 
+## Audio and explanatory text
+
+Use the original device screen recording with **no spoken narration** for this
+submission. Apple asks for evidence of the real app running on a physical device,
+not a produced App Preview, and does not require audio. Youmotion's flow is short,
+visual, and available in English, so narration adds little while introducing
+background-noise, privacy, localization, and synchronization risks.
+
+Do not add a title card before launch: the recording must begin with launching
+the app. Do not add decorative captions, arrows, zooms, cuts, a presenter window,
+or music. They can obscure the actual interface and make a verification recording
+look edited. Put the detailed explanation in App Review Notes and the Resolution
+Center response instead.
+
+If a tester cannot understand one otherwise invisible gesture after watching the
+raw clip, a minimal English caption may be added near an unused edge of the screen,
+for example `Drag from the center to choose feeling and intensity`. Keep the app
+fully visible, use no more than one or two captions, and retain a continuous flow.
+This is a fallback, not the recommended first recording.
+
 ## Recording script (about 90 seconds)
 
-Record one continuous clip without edits. Narration is optional.
+Record one continuous clip without edits or narration.
 
 | Time | Action | What the recording proves |
 | --- | --- | --- |
