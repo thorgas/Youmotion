@@ -1,10 +1,12 @@
 # Over-the-air updates
 
 Youmotion publishes JavaScript-only updates through EAS Update. Three channels
-matter to testers: `production`, which store builds subscribe to; `testing`,
-which TestFlight and Play internal builds subscribe to; and `qa`, which exists
-so a tester can see a fix before it ships. The switch between them lives in
-the app, behind a long press, and needs no new binary. The list is
+matter to testers: `production`, which normal store builds subscribe to;
+`testing`, which QA-control TestFlight and Play internal builds subscribe to;
+and `qa`, which exists so a tester can see a fix before it ships. The switch
+between them lives behind a long press in QA-control binaries. Normal
+production binaries intentionally do not expose the manual update menu. The
+list is
 `UPDATE_CHANNELS` in `src/constants.ts`; its first entry is the store channel
 an unrecognised bundle channel resolves to.
 
@@ -27,6 +29,15 @@ now, one "switch to" row per channel other than the current one, cancel.
 Cancel and a press outside both dismiss it. A tap does nothing — the menu is
 deliberately hidden. Android's native alert holds two actions, so with three
 channels it shows "More channels…" first and the switch rows behind it.
+
+The controls are present in development and in binaries whose embedded channel
+is `testing` or `qa`. They stay available after switching channels because
+`Updates.channel` identifies the channel baked into the binary. A production
+binary still checks `production` automatically on launch; with the configured
+zero launch wait, it launches immediately and applies a newly downloaded update
+on the next cold launch. There is no user-facing refresh button in that binary,
+so allow up to two cold launches when verifying a newly published production
+update.
 
 If the target channel has an eligible update, the app downloads it and
 reloads. If it has none, the switch still succeeds — the channel header is
@@ -68,6 +79,30 @@ Changing that file is itself a native-affecting change: the runtime moves, and
 `expected-ota-runtimes.json` keeps naming the binaries actually installed until
 the next store build ships — `verify-runtime` refusing to publish in between
 is the guard doing its job.
+
+## TestFlight binary types
+
+Use the QA-control release when a tester must manually switch among `testing`,
+`qa`, and `production` or request an immediate update check:
+
+```bash
+pnpm release:testflight:qa-controls
+```
+
+This builds with the `testing` profile, exposes the release footer and manual
+menu, and automatically submits the finished build to TestFlight.
+
+Use the production-only release for the ordinary App Store candidate:
+
+```bash
+pnpm release:testflight:production
+```
+
+The compatibility alias `pnpm release:testflight` runs the production-only
+command. Production-only binaries subscribe to `production` and receive
+compatible production updates automatically on launch, but they do not expose
+the manual channel selector. Build without automatic submission with
+`pnpm build:testflight:qa-controls` or `pnpm build:testflight:production`.
 
 ## Channels
 

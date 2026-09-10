@@ -36,6 +36,7 @@ import { DataSafetyControls } from '@/features/data-safety/ui/data-safety-contro
 import { FeedbackSettingsAction } from '@/features/feedback/ui/feedback-screen';
 import { LegalSettingsActions } from '@/features/legal/ui/legal-settings-actions';
 import { ReleaseFooter } from '@/features/updates/ui/release-footer';
+import { shouldShowUpdateControls } from '@/features/updates/domain/update-controls';
 import { useAppNavigationActor } from '@/navigation/app-navigation.provider';
 import { appSettingsStore } from '@/app-stores';
 import { guidingBeliefLibraryStatements } from '@/features/beliefs/application/guiding-belief-library';
@@ -143,7 +144,7 @@ function AppReleaseInfoCard({
 }
 
 export function SettingsScreen({
-  showTechnicalDetails = __DEV__,
+  showTechnicalDetails,
 }: {
   showTechnicalDetails?: boolean;
 } = {}) {
@@ -155,6 +156,10 @@ export function SettingsScreen({
     updateChannel,
     gitCommit,
   } = useSelector(appSettingsStore, _selectSettings);
+  const technicalDetailsVisible = showTechnicalDetails ?? shouldShowUpdateControls({
+    isDevelopment: __DEV__,
+    updateChannel,
+  });
   const guidingBeliefCount = useActorSelector(actor, _selectGuidingBeliefCount);
   assert(locale === APP_LOCALES.ENGLISH || locale === APP_LOCALES.GERMAN, 'Settings locale must be supported');
   assert(emotionLabelMode === EMOTION_LABEL_MODES.EMOJI || emotionLabelMode === EMOTION_LABEL_MODES.TEXT || emotionLabelMode === EMOTION_LABEL_MODES.BOTH, 'Emotion label mode must be supported');
@@ -311,10 +316,10 @@ export function SettingsScreen({
         <AppReleaseInfoCard
           appVersion={appVersion}
           gitCommit={gitCommit}
-          showTechnicalDetails={showTechnicalDetails}
+          showTechnicalDetails={technicalDetailsVisible}
           updateChannel={updateChannel}
         />
-        {showTechnicalDetails ? <ReleaseFooter testID="workspace-release" /> : null}
+        {technicalDetailsVisible ? <ReleaseFooter testID="workspace-release" /> : null}
         </ScrollView>
       </SafeAreaView>
     </View>

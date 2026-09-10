@@ -105,6 +105,14 @@ Use this path when you want a release-ready binary for both app stores' testing 
 pnpm build:testing
 ```
 
+An iOS `testing` build exposes the hidden release footer and manual channel
+selector, so it can switch among `testing`, `qa`, and `production`. Build and
+submit that TestFlight variant in one command:
+
+```bash
+pnpm release:testflight:qa-controls
+```
+
 Submit the latest successful `testing` build from the terminal:
 
 ```bash
@@ -128,6 +136,18 @@ pnpm release:testing
 ```
 
 Wait for both builds to finish, then run the submit commands above. When builds overlap, use their printed IDs to select the intended revision. iOS uploads enter TestFlight processing; Android uses Play internal testing. EAS holds and increments store build numbers remotely.
+
+For an ordinary production-only TestFlight/App Store candidate, use:
+
+```bash
+pnpm release:testflight:production
+```
+
+`pnpm release:testflight` remains an alias for this production-only path. The
+binary has no manual channel selector, but it automatically checks the
+`production` channel on launch. Because launch waiting is zero, a compatible
+update downloaded during one cold launch is applied on the next; allow up to
+two cold launches when verifying a new production OTA.
 
 The archive guard must print `iOS archive is free of the known HarnessUI private selectors.` It can also be run manually with `pnpm verify:ios:archive -- /absolute/path/to/Youmotion.ipa`.
 
