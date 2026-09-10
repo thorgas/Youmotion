@@ -1,5 +1,8 @@
 # Store submission checklist
 
+For a Guideline 2.1 information request, follow the
+[physical-device recording and reviewer-response guide](apple-guideline-2.1-physical-device-recording.md).
+
 ## Completed in the repository
 
 - [x] App identifiers configured as `com.youmotion.mobile`.
