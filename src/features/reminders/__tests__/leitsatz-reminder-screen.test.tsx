@@ -190,6 +190,26 @@ describe('Leitsatz reminder screen', () => {
     });
   });
 
+  it('keeps the last selected day active when it is pressed again', async () => {
+    const actor = await actorAtReminderOffer();
+    await renderReminder(actor);
+    await fireEvent.press(screen.getByRole('button', {
+      name: 'Allow notifications and continue',
+    }));
+    expect(await screen.findByRole('button', { name: 'Activate reminder' })).toBeEnabled();
+
+    await fireEvent.press(screen.getByTestId('reminder-weekday-2'));
+    await fireEvent.press(screen.getByTestId('reminder-weekday-3'));
+    await fireEvent.press(screen.getByTestId('reminder-weekday-4'));
+    await fireEvent.press(screen.getByTestId('reminder-weekday-5'));
+    await fireEvent.press(screen.getByTestId('reminder-weekday-6'));
+
+    expect(actor.getSnapshot().context.reminderWeekdaysDraft).toEqual([6]);
+    expect(screen.getByTestId('reminder-weekday-6'))
+      .toHaveProp('accessibilityState', { selected: true });
+    expect(screen.getByRole('button', { name: 'Activate reminder' })).toBeEnabled();
+  });
+
   it('keeps permission denial side-effect free and exposes repair actions', async () => {
     mockRequestReminderPermission.mockResolvedValueOnce(REMINDER_PERMISSION_STATES.DENIED);
     const actor = await actorAtReminderOffer();

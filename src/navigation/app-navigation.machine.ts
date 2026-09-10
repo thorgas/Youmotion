@@ -393,6 +393,35 @@ const reminderTimingFromDraft =({
   };
 };
 
+const toggleReminderWeekdayDraft =({
+  reminderWeekdaysDraft,
+  weekday,
+}: {
+  reminderWeekdaysDraft: readonly (typeof ReminderWeekday.Type)[];
+  weekday: typeof ReminderWeekday.Type;
+}) => {
+  assert(reminderWeekdaysDraft.length > 0, 'Reminder weekday draft must start with a weekday.');
+  assert(weekday >= 1 && weekday <= 7, 'Reminder weekday toggle must be valid.');
+  if (!reminderWeekdaysDraft.includes(weekday)) {
+    // oxlint-disable-next-line unicorn/no-array-sort -- Hermes lacks toSorted; this receiver is a fresh copy.
+    const expanded = [...reminderWeekdaysDraft, weekday].sort(
+      (left, right) => left - right,
+    );
+    assert(expanded.length === reminderWeekdaysDraft.length + 1, 'Adding a weekday must grow the draft.');
+    assert(expanded.includes(weekday), 'Adding a weekday must include the selected day.');
+    return expanded;
+  }
+  if (reminderWeekdaysDraft.length === 1) {
+    assert(reminderWeekdaysDraft.includes(weekday), 'The retained weekday must be selected.');
+    assert(reminderWeekdaysDraft.length > 0, 'The retained weekday draft must stay non-empty.');
+    return reminderWeekdaysDraft;
+  }
+  const reduced = reminderWeekdaysDraft.filter((candidate) => candidate !== weekday);
+  assert(reduced.length === reminderWeekdaysDraft.length - 1, 'Removing a weekday must shrink the draft.');
+  assert(reduced.length > 0, 'Removing a weekday must retain at least one day.');
+  return reduced;
+};
+
 const activateReminderFromDraft =({
   context,
   locale,
@@ -2161,12 +2190,10 @@ export const createAppNavigationMachine = (runtime: AppNavigationRuntime) => set
         },
         [REMINDER_EVENTS.WEEKDAY_TOGGLED]: {
           context: ({ context, event }) => ({
-            reminderWeekdaysDraft: context.reminderWeekdaysDraft.includes(event.weekday)
-              ? context.reminderWeekdaysDraft.filter((weekday) => weekday !== event.weekday)
-              // oxlint-disable-next-line unicorn/no-array-sort -- Hermes lacks toSorted; this receiver is a fresh copy.
-              : [...context.reminderWeekdaysDraft, event.weekday].sort(
-                  (left, right) => left - right,
-                ),
+            reminderWeekdaysDraft: toggleReminderWeekdayDraft({
+              reminderWeekdaysDraft: context.reminderWeekdaysDraft,
+              weekday: event.weekday,
+            }),
           }),
         },
         [REMINDER_EVENTS.TIME_SHIFTED]: {
