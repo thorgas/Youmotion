@@ -10,7 +10,7 @@ Reflektiere & verstehe Gefühle
 
 ## Werbetext — 141/170
 
-Halte kurz inne, benenne dein Gefühl und bewahre den Moment. Youmotion speichert Reflexionen und Muster privat auf deinem Gerät – ohne Konto.
+Halte kurz inne, erkenne dein Gefühl und bewahre den Moment. Youmotion speichert Reflexionen und Muster privat auf deinem Gerät – ohne Konto.
 
 ## Keywords — 75/100
 
@@ -22,28 +22,30 @@ Diese Keywords sind eine produktbezogene Hypothese für den Start. Suchvolumen u
 
 Youmotion ist ein privater Ort, an dem du wahrnehmen kannst, was du fühlst, und den Moment festhältst.
 
-Beginne mit dem Pulse: Bewege dich von der Mitte in Richtung Furcht, Freude, Wut, Liebe, Traurigkeit, Scham oder Ekel. Die Entfernung beschreibt die Intensität. Positionen dazwischen helfen dir, feinere Nuancen festzuhalten.
+BEGINNE MIT DEM PULSE
 
-Danach kannst du in deinen eigenen Worten reflektieren. Wenn es dir hilft, benennst du den Leidsatz, der sich gezeigt hat, und wählst einen Leitsatz, den du mitnehmen möchtest. Beide Schritte sind freiwillig.
+Bewege dich von der Mitte in Richtung Furcht, Freude, Wut, Liebe, Traurigkeit, Scham oder Ekel. Die Entfernung beschreibt die Intensität. Positionen dazwischen helfen dir, feinere Nuancen festzuhalten.
 
-DEIN CHECK-IN
+REFLEKTIERE IN DEINEN EIGENEN WORTEN
 
-• Wähle Gefühl, Intensität und Nuance mit einer Geste
-• Ergänze eine kurze Notiz – oder lasse den Moment unkommentiert
-• Halte optional einen Leidsatz und einen unterstützenden Leitsatz fest
+Ergänze eine kurze Notiz, wenn sie dir hilft – oder lasse den Moment unkommentiert. Du kannst außerdem den Leidsatz benennen, der das Gefühl ausgelöst hat. Und du kannst einen positiven unterstützenden Leitsatz erstellen, der dir hilft eine neue Richtung für dich zu finden. Beide Schritte sind freiwillig.
+
+KEHRE ZU DEINEN MOMENTEN ZURÜCK
+
 • Sieh dir Momente im Verlauf an, bearbeite oder lösche sie
-• Entdecke Muster und einen Kalender über deinen gesamten aufgezeichneten Verlauf
-• Nutze die App auf Deutsch oder Englisch
+• Nutze einen Kalender über deinen gesamten aufgezeichneten Verlauf
+• Entdecke erkannte Muster in deinen Einblicken
+• Verwende die App auf Deutsch oder Englisch
 
 PRIVAT GEDACHT
 
 Deine Einträge bleiben auf diesem Gerät. Du brauchst kein Konto. Du entscheidest, was du festhältst, und kannst jeden Moment jederzeit bearbeiten oder löschen.
 
-FÜR REFLEXION GEMACHT
+BEHUTSAM UND WERTFREI
 
-Youmotion verwendet eine behutsame, wertfreie Sprache. Die Einblicke beschreiben, was du festgehalten hast, ohne ein Gefühl als besser oder schlechter zu bewerten.
+Youmotion beschreibt, was du festgehalten hast, ohne ein Gefühl als besser oder schlechter zu bewerten.
 
-Youmotion unterstützt die Selbstwahrnehmung und ersetzt keine psychotherapeutische oder medizinische Behandlung.
+Youmotion unterstützt die Selbstwahrnehmung. Die App ist kein Medizinprodukt und dient nicht der Diagnose, Behandlung, Heilung oder Vorbeugung von Erkrankungen. Sie ersetzt keine psychotherapeutische oder medizinische Behandlung.
 
 ## Neu in Version 1.0.3
 

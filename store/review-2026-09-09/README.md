@@ -4,6 +4,11 @@ Fresh agent-device captures from Youmotion Release builds, using the committed
 synthetic archive (133 moments, 15 beliefs). No personal journal data was used.
 These are review candidates, not uploaded or approved store assets.
 
+Upload status update: the owner subsequently requested upload of the corrected
+sets. See [the dated upload record](../../docs/handoffs/store-upload-2026-09-09.md)
+for completed Apple uploads and saved Google drafts. The capture-time notes
+below describe their original review state, not current remote listing status.
+
 ## Native images
 
 - `native/ios/de-DE/iphone-6.9/` and `native/ios/en-US/iphone-6.9/`: 1320×2868.

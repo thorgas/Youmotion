@@ -18,13 +18,13 @@ Bewege dich von der Mitte in Richtung Furcht, Freude, Wut, Liebe, Traurigkeit, S
 
 REFLEKTIERE IN DEINEN EIGENEN WORTEN
 
-Ergänze eine kurze Notiz, wenn sie dir hilft – oder lasse den Moment unkommentiert. Du kannst außerdem den Leidsatz benennen, der sich gezeigt hat, und einen unterstützenden Leitsatz wählen. Beide Schritte sind freiwillig.
+Ergänze eine kurze Notiz, wenn sie dir hilft – oder lasse den Moment unkommentiert. Du kannst außerdem den Leidsatz benennen, der das Gefühl ausgelöst hat. Und du kannst einen positiven unterstützenden Leitsatz erstellen, der dir hilft eine neue Richtung für dich zu finden. Beide Schritte sind freiwillig.
 
 KEHRE ZU DEINEN MOMENTEN ZURÜCK
 
 • Sieh dir Momente im Verlauf an, bearbeite oder lösche sie
 • Nutze einen Kalender über deinen gesamten aufgezeichneten Verlauf
-• Entdecke sachlich formulierte Muster in deinen Einblicken
+• Entdecke erkannte Muster in deinen Einblicken
 • Verwende die App auf Deutsch oder Englisch
 
 PRIVAT GEDACHT

@@ -22,28 +22,30 @@ These keywords are a launch hypothesis based on product relevance. Validate sear
 
 Youmotion is a private space to notice what you feel and hold on to the moment.
 
-Start with Pulse: move from the center toward Fear, Joy, Anger, Love, Sadness, Shame, or Disgust. The distance captures intensity, while nearby positions help you describe emotional nuance.
+START WITH PULSE
 
-Then reflect in your own words. If it helps, name the core belief that appeared and choose a guiding belief you want to carry forward. Both belief steps are optional.
+Move from the center toward Fear, Joy, Anger, Love, Sadness, Shame, or Disgust. The distance captures intensity, while positions in between help you describe emotional nuance.
 
-CHECK IN, YOUR WAY
+REFLECT IN YOUR OWN WORDS
 
-• Choose a feeling, intensity, and nuance with one gesture
-• Add a short note—or leave the moment unexplained
-• Record an optional core belief and guiding belief
-• Revisit, edit, or delete moments in History
-• See patterns and a calendar across your complete recorded history
+Add a short note if it helps—or leave the moment unexplained. You can also name the core belief that triggered the feeling. And you can create a positive, supportive guiding belief to help you find a new direction for yourself. Both belief steps are optional.
+
+REVISIT YOUR MOMENTS
+
+• Review, edit, or delete moments in History
+• See a calendar across your complete recorded history
+• Discover patterns identified in Insights
 • Use the app in English or German
 
 PRIVATE BY DESIGN
 
 Your entries stay on this device. There is no account to create. You decide what to record and can edit or remove it at any time.
 
-BUILT FOR REFLECTION
+CAREFUL, NON-JUDGMENTAL LANGUAGE
 
-Youmotion uses careful, non-judgmental language. Its insights describe what you recorded without rating one feeling as better or worse than another.
+Youmotion describes what you recorded without rating one feeling as better or worse than another.
 
-Youmotion supports self-awareness and does not replace psychotherapeutic or medical treatment.
+Youmotion supports self-awareness. It is not a medical device and does not diagnose, treat, cure, or prevent any medical condition. It does not replace psychotherapeutic or medical treatment.
 
 ## What’s new — version 1.0.3
 

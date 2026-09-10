@@ -2,7 +2,19 @@
 
 Expo remains the owner of builds and binary submission. The complementary CLIs
 prepare and validate store data that EAS does not currently cover. None of the
-commands in this document submit an app for review.
+preparation steps should submit an app for review. Google edit commits can do
+so implicitly: follow the safeguards in the runbook below.
+
+## Repeatable upload runbook
+
+For another app, start with the [full store upload blueprint](STORE-UPLOAD-BLUEPRINT.md).
+It covers all listing fields and asset families, CLI and UI paths, persistence,
+verification and separate review gates without Youmotion-specific identifiers.
+
+Use [metadata and screenshot uploads](UPLOAD-RUNBOOK.md) for exact source paths,
+staging, CLI commands, Console draft fallback, and remote verification.
+The [9 September upload record](../../docs/handoffs/store-upload-2026-09-09.md)
+distinguishes completed uploads from unfinished work; it is not a reusable edit ID.
 
 ## Installed tools
 
@@ -72,27 +84,19 @@ GPLAY_NO_UPDATE=1 GPLAY_NO_STAR_PROMPT=1 gplay metadata validate \
   --dir store/automation/google-play/metadata --output table
 ```
 
-After authentication, preview without remote mutation:
-
-```sh
-GPLAY_NO_UPDATE=1 GPLAY_NO_STAR_PROMPT=1 gplay metadata push \
-  --package com.youmotion.mobile \
-  --dir store/automation/google-play/metadata \
-  --dry-run --output table
-```
-
-A real metadata push is manually editable later, but still requires a separate
-owner-authorized command with `--confirm`. Do not mix an active Play Console
-draft with an API edit; committing either invalidates the other.
+For remote changes, follow the blueprint's explicit edit → preview → import →
+readback → validation → persistence gate. Do not use a high-level metadata push
+without checking whether it also commits or sends changes for review. Never
+mix an active API edit with Console writes; reconcile persisted state first.
 
 ## Google Play screenshots
 
-The reviewed source assets remain in `store/screenshots/google-play/` and the
-framed upload candidates remain in `artifacts/release-store/google-play/`.
-Do not upload screenshots until `store/screenshots/provenance.json` and the
-screenshot-quality gate confirm that every locale is current. Stage only the
-approved set into the layout shown by `gplay images plan --help`, then run the
-read-only plan before any sync.
+For the 9 September release, the selected corrected phone assets are under
+`store/review-2026-09-09/framed-corrected/android/`, not the older
+`store/screenshots/google-play/` or `artifacts/release-store/google-play/` trees.
+See the runbook for the locale/image-type staging layout. Future releases need
+fresh capture provenance and visual approval; do not silently reuse dated assets
+or mark the older provenance inventory approved to bypass its checks.
 
 ## Policy declarations
 
