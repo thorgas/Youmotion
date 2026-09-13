@@ -134,13 +134,6 @@
       "skillPath": "packages/skills/skills/argent-tv-interact/SKILL.md",
       "computedHash": "d8d1d57d42cdcd88a6ad68fca6b72e6c3bb1bf4a5e433e287b3b60b426ce5787"
     },
-    "continuity": {
-      "source": "peterpme/skills",
-      "ref": "a031863b9dd1ab45afd6d0fb0b0a81ec96f373c5",
-      "sourceType": "github",
-      "skillPath": "skills/engineering/continuity/SKILL.md",
-      "computedHash": "4034bd84b1e778f15629ff77805ee8e1061d2f2d54b4b026ef7d37c3a3dee517"
-    },
     "diagnose": {
       "source": "LegendApp/legend-skills",
       "ref": "5a4be517989496d0bc59520a93976360dd1bff51",

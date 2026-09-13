@@ -304,6 +304,7 @@ Reminder changes should additionally run the focused Jest suites and follow [the
 ## Local Codex skills
 
 Project-local skills are installed under `.agents/skills`, including Software Mansion's React Native debugging workflows, Emil Kowalski's design and animation reviews, Builder.io's visual planning workflow, and Callstack's React Native Harness guidance.
+Their upstream sources, pinned revisions, copyright notices, and license terms are recorded in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
 
 ## Source material
 
