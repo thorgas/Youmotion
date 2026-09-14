@@ -1,3 +1,25 @@
+@font-face {
+  font-family: "Instrument Sans";
+  src: url("/assets/instrument-sans-regular.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Instrument Sans";
+  src: url("/assets/instrument-sans-medium.ttf") format("truetype");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Instrument Sans";
+  src: url("/assets/instrument-sans-semibold.ttf") format("truetype");
+  font-weight: 600 900;
+  font-style: normal;
+  font-display: swap;
+}
+
 :root {
   color-scheme: light;
   --paper: #f4f0e8;
@@ -7,7 +29,7 @@
   --moss: #5e6b52;
   --line: rgba(36, 50, 41, 0.14);
   --wash: #e5eadf;
-  font-family: "Instrument Sans", "Avenir Next", Avenir, system-ui, sans-serif;
+  font-family: "Instrument Sans", system-ui, sans-serif;
 }
 
 * { box-sizing: border-box; }

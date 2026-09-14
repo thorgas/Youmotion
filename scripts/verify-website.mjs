@@ -1,4 +1,4 @@
-import { readFile } from 'node:fs/promises';
+import { access, readFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
 
 const root = resolve(import.meta.dirname, '..');
@@ -6,6 +6,11 @@ const read = (path) => readFile(resolve(root, path), 'utf8');
 const pages = await Promise.all(['website/index.html', 'website/de/index.html'].map(read));
 const script = await read('website/assets/pulse.js');
 const headers = await read('website/_headers');
+const websiteFonts = [
+  'website/assets/instrument-sans-regular.ttf',
+  'website/assets/instrument-sans-medium.ttf',
+  'website/assets/instrument-sans-semibold.ttf',
+];
 
 for (const page of pages) {
   if (!page.includes('data-store-state="coming-soon"')) throw new Error('Store links must remain in coming-soon mode before launch.');
@@ -18,6 +23,9 @@ for (const page of pages) {
 }
 
 if (!headers.includes("script-src 'self'")) throw new Error('The website CSP must restrict scripts to the same origin.');
+const websiteStyles = await read('website/assets/site.css');
+if (!websiteStyles.includes('font-family: "Instrument Sans"')) throw new Error('The website must use the app’s Instrument Sans family.');
+await Promise.all(websiteFonts.map((path) => access(resolve(root, path))));
 if (/localStorage|sessionStorage|document\.cookie/.test(script)) throw new Error('The pulse must not persist visitor emotion data.');
 for (const behavior of ['pointerdown', 'setPointerCapture', 'pointerup', 'pointercancel', 'directTouch', 'scrollToDownload']) {
   if (!script.includes(behavior)) throw new Error(`The responsive pulse interaction is missing ${behavior}.`);
