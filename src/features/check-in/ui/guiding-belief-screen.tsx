@@ -7,11 +7,11 @@ import {
   TextInput,
   View,
 } from 'react-native';
-import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import assert from '@/assert';
 
 import { AppBackButton } from '@/components/ui/app-back-button';
+import { PersistentKeyboardAwareScrollView } from '@/components/ui/persistent-scroll-view';
 import {
   CHECK_IN_EVENTS,
   CHECK_IN_STATES,
@@ -164,13 +164,12 @@ export function GuidingBeliefScreen() {
           activeStep={3}
           context="guiding-belief"
         />
-        <KeyboardAwareScrollView
+        <PersistentKeyboardAwareScrollView
           bottomOffset={REFLECTION_KEYBOARD_BOTTOM_OFFSET}
           contentContainerStyle={[styles.content, styles.flowContent]}
           contentInsetAdjustmentBehavior="automatic"
           keyboardDismissMode="interactive"
           keyboardShouldPersistTaps="handled"
-          showsVerticalScrollIndicator
           style={styles.scroll}
           testID="guiding-belief-scroll"
         >
@@ -262,7 +261,7 @@ export function GuidingBeliefScreen() {
               </Text>
             ) : null}
           </View>
-        </KeyboardAwareScrollView>
+        </PersistentKeyboardAwareScrollView>
         <SafeAreaView
           edges={['bottom', 'left', 'right']}
           style={styles.actions}

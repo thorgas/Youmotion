@@ -20,6 +20,7 @@ import {
   tabScreenContentStyle,
 } from '@/components/ui/tab-screen-layout';
 import { ScreenHeading } from '@/components/ui/screen-heading';
+import { PersistentScrollView } from '@/components/ui/persistent-scroll-view';
 import { AnalyticsTimeframeSelector } from '@/features/analytics/ui/analytics-timeframe-selector';
 import { entriesForAnalyticsTimeframe } from '@/features/analytics/domain/analytics-timeframe';
 import { useAppNavigationActor } from '@/navigation/app-navigation.provider';
@@ -325,7 +326,7 @@ export function HistoryScreen({ now }: { now?: Date }) {
   return (
     <View style={styles.page} testID="history-screen">
       <SafeAreaView edges={['top']} style={styles.safeArea}>
-        <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+        <PersistentScrollView contentContainerStyle={styles.content}>
           <ScreenHeading.Root>
             <ScreenHeading.EyebrowText testID="history-eyebrow"><fbt desc="Check-in history eyebrow heading">YOUR HISTORY</fbt></ScreenHeading.EyebrowText>
             <ScreenHeading.TitleText size="compact"><fbt desc="Check-in history title">Moments you noticed.</fbt></ScreenHeading.TitleText>
@@ -402,7 +403,7 @@ export function HistoryScreen({ now }: { now?: Date }) {
               </MomentRow>
             ))}
           </View>
-        </ScrollView>
+        </PersistentScrollView>
       </SafeAreaView>
     </View>
   );

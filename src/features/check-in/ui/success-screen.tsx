@@ -1,7 +1,7 @@
 import { useSelector } from '@xstate/react';
 import * as Schema from 'effect/Schema';
 import { PressableScale } from 'pressto';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import Animated, {
   FadeInDown,
   ReduceMotion,
@@ -18,6 +18,7 @@ import {
   REMINDER_TARGET_KINDS,
 } from '@/constants';
 import { CheckInSchema } from '@/features/check-in/domain/check-in';
+import { PersistentScrollView } from '@/components/ui/persistent-scroll-view';
 import { useAppNavigationActor } from '@/navigation/app-navigation.provider';
 import { savedCheckInCopy } from './emotion-copy';
 import { guidingBeliefSystemText } from '@/features/beliefs/ui/belief-system-copy';
@@ -77,7 +78,7 @@ export function SuccessScreen() {
   return (
     <View style={styles.page} testID="success-screen">
       <SafeAreaView edges={['top', 'bottom']} style={styles.safeArea}>
-        <ScrollView contentContainerStyle={styles.content}>
+        <PersistentScrollView contentContainerStyle={styles.content}>
         <Animated.View entering={haloEntering} style={styles.halo}>
           <Text style={styles.check}>✓</Text>
         </Animated.View>
@@ -138,7 +139,7 @@ export function SuccessScreen() {
             <Text style={styles.buttonText}><fbt desc="Button finishing the completed check-in flow">Done</fbt></Text>
           </PressableScale>
         </Animated.View>
-        </ScrollView>
+        </PersistentScrollView>
       </SafeAreaView>
     </View>
   );

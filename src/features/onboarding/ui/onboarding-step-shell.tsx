@@ -2,7 +2,6 @@ import { PressableScale } from 'pressto';
 import { fbs } from 'fbtee';
 import type { PropsWithChildren } from 'react';
 import {
-  ScrollView,
   StyleSheet,
   Text,
   View,
@@ -16,6 +15,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import assert from '@/assert';
 
 import { AppBackButton } from '@/components/ui/app-back-button';
+import { PersistentScrollView } from '@/components/ui/persistent-scroll-view';
 import {
   ONBOARDING_STATES,
   ONBOARDING_STEP_COUNT,
@@ -120,15 +120,14 @@ export function OnboardingStepShell({
             />
           ))}
         </View>
-        <ScrollView
+        <PersistentScrollView
           bounces={scrollEnabled}
           contentContainerStyle={styles.content}
           contentInsetAdjustmentBehavior="automatic"
           scrollEnabled={scrollEnabled}
-          showsVerticalScrollIndicator={false}
           testID="onboarding-content-scroll">
           {children}
-        </ScrollView>
+        </PersistentScrollView>
         <View style={styles.footer}>
           <PressableScale
             accessibilityRole="button"

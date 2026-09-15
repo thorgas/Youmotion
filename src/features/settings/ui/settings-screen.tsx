@@ -3,7 +3,6 @@ import { useSelector } from '@xstate/store-react';
 import { fbs } from 'fbtee';
 import { PressableScale } from 'pressto';
 import {
-  ScrollView,
   StyleSheet,
   Text,
   View,
@@ -30,6 +29,7 @@ import {
 } from '@/constants';
 import { tabScreenContentStyle } from '@/components/ui/tab-screen-layout';
 import { ScreenHeading } from '@/components/ui/screen-heading';
+import { PersistentScrollView } from '@/components/ui/persistent-scroll-view';
 import { SettingsActionRow } from '@/components/ui/settings-action-row';
 import { actionColors, palette, surfaceColors, type } from '@/theme';
 import { DataSafetyControls } from '@/features/data-safety/ui/data-safety-controls';
@@ -181,7 +181,7 @@ export function SettingsScreen({
   return (
     <View style={styles.page} testID="settings-screen">
       <SafeAreaView edges={['top']} style={styles.safeArea}>
-        <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+        <PersistentScrollView contentContainerStyle={styles.content}>
         <ScreenHeading.Root>
           <ScreenHeading.EyebrowText testID="settings-eyebrow"><fbt desc="Settings screen eyebrow heading">SETTINGS</fbt></ScreenHeading.EyebrowText>
           <ScreenHeading.TitleText style={styles.titleLayout}><fbt desc="Settings screen title">Your space.</fbt></ScreenHeading.TitleText>
@@ -320,7 +320,7 @@ export function SettingsScreen({
           updateChannel={updateChannel}
         />
         {technicalDetailsVisible ? <ReleaseFooter testID="workspace-release" /> : null}
-        </ScrollView>
+        </PersistentScrollView>
       </SafeAreaView>
     </View>
   );

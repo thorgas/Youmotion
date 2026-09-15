@@ -3,17 +3,19 @@ import { fbs } from 'fbtee';
 import { PressableScale } from 'pressto';
 import {
   ActivityIndicator,
-  ScrollView,
   StyleSheet,
   Text,
   TextInput,
   View,
 } from 'react-native';
-import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import assert from '@/assert';
 
 import { AppBackButton } from '@/components/ui/app-back-button';
+import {
+  PersistentKeyboardAwareScrollView,
+  PersistentScrollView,
+} from '@/components/ui/persistent-scroll-view';
 import {
   BELIEF_LIBRARY_EVENTS,
   BELIEF_LIBRARY_STATES,
@@ -340,9 +342,8 @@ function BeliefLibraryList() {
   return (
     <View style={styles.page} testID="belief-library-screen">
       <SafeAreaView style={styles.safeArea}>
-        <ScrollView
+        <PersistentScrollView
           contentContainerStyle={styles.content}
-          showsVerticalScrollIndicator
           testID="belief-library-scroll"
         >
           <LibraryBackButton
@@ -402,7 +403,7 @@ function BeliefLibraryList() {
             </View>
           )}
           {retiring ? <ActivityIndicator color={palette.moss} /> : null}
-        </ScrollView>
+        </PersistentScrollView>
       </SafeAreaView>
     </View>
   );
@@ -438,12 +439,11 @@ function BeliefLibraryEditor() {
   return (
     <View style={styles.page} testID="belief-library-editor">
       <SafeAreaView style={styles.safeArea}>
-        <KeyboardAwareScrollView
+        <PersistentKeyboardAwareScrollView
           bottomOffset={REFLECTION_KEYBOARD_BOTTOM_OFFSET}
           contentContainerStyle={styles.content}
           keyboardDismissMode="interactive"
           keyboardShouldPersistTaps="handled"
-          showsVerticalScrollIndicator
         >
           <AppBackButton
             disabled={saving}
@@ -548,7 +548,7 @@ function BeliefLibraryEditor() {
               </Text>
             )}
           </PressableScale>
-        </KeyboardAwareScrollView>
+        </PersistentKeyboardAwareScrollView>
       </SafeAreaView>
     </View>
   );

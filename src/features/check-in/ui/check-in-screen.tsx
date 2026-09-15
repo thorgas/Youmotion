@@ -2,7 +2,7 @@ import { useSelector as useActorSelector } from '@xstate/react';
 import { useSelector as useStoreSelector } from '@xstate/store-react';
 import { PressableScale } from 'pressto';
 import { useRef } from 'react';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import assert from '@/assert';
 
@@ -12,6 +12,7 @@ import {
   NAVIGATION_STATES,
 } from '@/constants';
 import { ScreenHeading } from '@/components/ui/screen-heading';
+import { PersistentScrollView } from '@/components/ui/persistent-scroll-view';
 import { useAppNavigationActor } from '@/navigation/app-navigation.provider';
 import type { EmotionSelection } from '../domain/check-in';
 import { selectionForCheckIn } from '../domain/emotion';
@@ -117,10 +118,9 @@ export function CheckInScreen() {
             />
           </View>
         </View>
-        <ScrollView
+        <PersistentScrollView
           contentContainerStyle={styles.detailsContent}
           contentInsetAdjustmentBehavior="automatic"
-          showsVerticalScrollIndicator={false}
           style={styles.detailsScroll}
           testID="check-in-details-scroll">
           {latest && !editing ? (
@@ -143,7 +143,7 @@ export function CheckInScreen() {
           <Text style={styles.disclaimer}>
             <fbt desc="Health disclaimer shown below the emotion check-in">Youmotion supports self-awareness and does not replace psychotherapeutic or medical treatment.</fbt>
           </Text>
-        </ScrollView>
+        </PersistentScrollView>
       </SafeAreaView>
     </View>
   );

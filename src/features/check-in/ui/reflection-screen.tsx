@@ -13,21 +13,21 @@ import {
   Keyboard,
   Platform,
   Pressable,
-  ScrollView,
   StyleSheet,
   Text,
   TextInput,
   useWindowDimensions,
   View,
 } from 'react-native';
-import {
-  KeyboardAwareScrollView,
-  useKeyboardState,
-} from 'react-native-keyboard-controller';
+import { useKeyboardState } from 'react-native-keyboard-controller';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import assert from '@/assert';
 
 import { AppBackButton } from '@/components/ui/app-back-button';
+import {
+  PersistentKeyboardAwareScrollView,
+  PersistentScrollView,
+} from '@/components/ui/persistent-scroll-view';
 import { ConfirmedPickerModal } from '@/components/ui/confirmed-picker-modal';
 import { Dialog } from '@/components/ui/dialog';
 import {
@@ -510,7 +510,7 @@ function ReflectionNoteStep() {
           compact={responsive.compact}
           context={editing ? 'editing' : 'reflection'}
         />
-        <KeyboardAwareScrollView
+        <PersistentKeyboardAwareScrollView
           bottomOffset={responsive.bottomOffset}
           contentContainerStyle={[
             styles.content,
@@ -523,7 +523,6 @@ function ReflectionNoteStep() {
           enabled={responsive.keyboardAwareScrollEnabled}
           keyboardDismissMode="interactive"
           keyboardShouldPersistTaps="handled"
-          showsVerticalScrollIndicator={false}
           style={styles.scroll}
           testID="reflection-keyboard-scroll"
         >
@@ -628,7 +627,7 @@ function ReflectionNoteStep() {
               saving={saving}
             />
           </View>
-        </KeyboardAwareScrollView>
+        </PersistentKeyboardAwareScrollView>
       </SafeAreaView>
     </View>
   );
@@ -670,10 +669,9 @@ function BeliefSystemStep() {
           activeStep={2}
           context="core-belief"
         />
-        <ScrollView
+        <PersistentScrollView
           contentContainerStyle={[styles.content, styles.flowContent]}
           contentInsetAdjustmentBehavior="automatic"
-          showsVerticalScrollIndicator={false}
           style={styles.scroll}
           testID="belief-system-step"
         >
@@ -778,7 +776,7 @@ function BeliefSystemStep() {
               </PressableScale>
             </View>
           </View>
-        </ScrollView>
+        </PersistentScrollView>
       </SafeAreaView>
     </View>
   );
@@ -806,10 +804,9 @@ function BeliefSystemCatalogStep() {
   return (
     <View style={styles.page} testID="reflection-screen">
       <SafeAreaView style={styles.safeArea}>
-        <ScrollView
+        <PersistentScrollView
           contentContainerStyle={styles.content}
           contentInsetAdjustmentBehavior="automatic"
-          showsVerticalScrollIndicator={false}
           testID="belief-system-catalog"
         >
           <View style={styles.catalogHeader}>
@@ -852,7 +849,7 @@ function BeliefSystemCatalogStep() {
               />
             ))}
           </View>
-        </ScrollView>
+        </PersistentScrollView>
       </SafeAreaView>
     </View>
   );
@@ -929,12 +926,11 @@ function BeliefSystemEditorStep() {
   return (
     <View style={styles.page} testID="belief-system-editor">
       <SafeAreaView style={styles.safeArea}>
-        <KeyboardAwareScrollView
+        <PersistentKeyboardAwareScrollView
           bottomOffset={REFLECTION_KEYBOARD_BOTTOM_OFFSET}
           contentContainerStyle={styles.content}
           keyboardDismissMode="interactive"
           keyboardShouldPersistTaps="handled"
-          showsVerticalScrollIndicator={false}
         >
           <BeliefEditorHeader />
           <View style={styles.card}>
@@ -980,7 +976,7 @@ function BeliefSystemEditorStep() {
               </PressableScale>
             </View>
           </View>
-        </KeyboardAwareScrollView>
+        </PersistentKeyboardAwareScrollView>
       </SafeAreaView>
     </View>
   );

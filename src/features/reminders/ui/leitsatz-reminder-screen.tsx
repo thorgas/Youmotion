@@ -8,7 +8,6 @@ import { PressableScale } from 'pressto';
 import {
   ActivityIndicator,
   Platform,
-  ScrollView,
   StyleSheet,
   Text,
   View,
@@ -26,6 +25,7 @@ import {
   REMINDER_TARGET_KINDS,
 } from '@/constants';
 import { AppBackButton } from '@/components/ui/app-back-button';
+import { PersistentScrollView } from '@/components/ui/persistent-scroll-view';
 import { Button } from '@/components/ui/button';
 import { ConfirmedPickerModal } from '@/components/ui/confirmed-picker-modal';
 import {
@@ -486,7 +486,7 @@ export function LeitsatzReminderScreen() {
             testID="reminder-back"
           />
         </View>
-        <ScrollView
+        <PersistentScrollView
           contentContainerStyle={styles.content}
           scrollEnabled={context.reminderTimePickerIndex === null}
         >
@@ -509,7 +509,7 @@ export function LeitsatzReminderScreen() {
           {snapshot.matches(REMINDER_STATES.GUIDING_BELIEF) ? (
             <GuidingBeliefContent actor={actor} editable={context.reminderAssignments.some((assignment) => assignment.id === context.reminderAssignmentDraftId)} statement={statement} targetHydrated={context.beliefStatementsHydrated && context.reminderDataHydrated} />
           ) : null}
-        </ScrollView>
+        </PersistentScrollView>
       </SafeAreaView>
     </View>
   );

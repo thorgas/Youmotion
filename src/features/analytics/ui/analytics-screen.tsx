@@ -5,7 +5,6 @@ import { PressableScale } from 'pressto';
 import assert from '@/assert';
 import {
   Pressable,
-  ScrollView,
   StyleSheet,
   Text,
   useWindowDimensions,
@@ -25,6 +24,7 @@ import {
   tabScreenContentStyle,
 } from '@/components/ui/tab-screen-layout';
 import { ScreenHeading } from '@/components/ui/screen-heading';
+import { PersistentScrollView } from '@/components/ui/persistent-scroll-view';
 import { checkInHistoryStore } from '@/app-stores';
 import { historyTimeframeStore } from '@/app-stores';
 import type { CheckIn } from '@/features/check-in/domain/check-in';
@@ -780,7 +780,7 @@ export function AnalyticsContent({ entries, locale, now, onEvidencePress, statem
   return (
     <View style={styles.page} testID="analytics-screen">
       <SafeAreaView edges={['top']} style={styles.safeArea}>
-        <ScrollView contentContainerStyle={styles.content}>
+        <PersistentScrollView contentContainerStyle={styles.content}>
           <ScreenHeading.Root>
             <ScreenHeading.EyebrowText testID="analytics-eyebrow"><fbt desc="Analytics screen eyebrow">YOUR INSIGHTS</fbt></ScreenHeading.EyebrowText>
             <ScreenHeading.TitleText size="compact"><fbt desc="Analytics screen title">Patterns you noticed.</fbt></ScreenHeading.TitleText>
@@ -839,7 +839,7 @@ export function AnalyticsContent({ entries, locale, now, onEvidencePress, statem
           )}
           <CalendarSection entries={scopedEntries} locale={locale} now={now} />
           <ObservationSection entries={scopedEntries} statements={statements} />
-        </ScrollView>
+        </PersistentScrollView>
       </SafeAreaView>
     </View>
   );

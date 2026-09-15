@@ -1,6 +1,6 @@
 import { useSelector } from '@xstate/react';
 import { PressableScale } from 'pressto';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import assert from '@/assert';
 
@@ -10,6 +10,7 @@ import {
   REMINDER_TARGET_KINDS,
 } from '@/constants';
 import { AppBackButton } from '@/components/ui/app-back-button';
+import { PersistentScrollView } from '@/components/ui/persistent-scroll-view';
 import { actionColors, palette, type } from '@/theme';
 import { useAppLocale } from '@/localization/app-locale-provider';
 import { formatWeekday } from '@/localization/date-copy';
@@ -103,7 +104,7 @@ export function ReminderSettingsScreen() {
             testID="reminder-settings-back"
           />
         </View>
-        <ScrollView contentContainerStyle={styles.content}>
+        <PersistentScrollView contentContainerStyle={styles.content}>
           <Text style={styles.eyebrow}><fbt desc="Emotion check-in reminder settings eyebrow">EMOTION CHECK-IN</fbt></Text>
           <Text style={styles.title}><fbt desc="Emotion check-in reminder settings title">A moment to notice how you feel.</fbt></Text>
           <Text style={styles.copy}><fbt desc="Emotion check-in reminder settings explanation">Choose when Youmotion may gently invite you to open the app and check in with your emotions. Leitsatz reminders live with each Leitsatz.</fbt></Text>
@@ -139,7 +140,7 @@ export function ReminderSettingsScreen() {
           >
             <Text style={styles.actionText}><fbt desc="New emotion check-in reminder setup button">Add check-in reminder</fbt></Text>
           </PressableScale>
-        </ScrollView>
+        </PersistentScrollView>
       </SafeAreaView>
     </View>
   );
