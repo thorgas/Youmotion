@@ -2,6 +2,7 @@ import * as WebBrowser from 'expo-web-browser';
 import * as Schema from 'effect/Schema';
 
 import { LEGAL_DOCUMENT_KINDS, LEGAL_DOCUMENT_URLS } from '@/constants';
+import type { AppLocale } from '@/localization/app-locale';
 import type { LegalDocumentKind } from '../domain/legal-document';
 
 export class LegalDocumentBrowserError extends Schema.TaggedError<LegalDocumentBrowserError>()(
@@ -9,15 +10,16 @@ export class LegalDocumentBrowserError extends Schema.TaggedError<LegalDocumentB
   { cause: Schema.Unknown },
 ) {}
 
-function documentUrl(kind: LegalDocumentKind) {
+function documentUrl({ kind, locale }: { kind: LegalDocumentKind; locale: AppLocale }) {
+  const urls = LEGAL_DOCUMENT_URLS[locale];
   return kind === LEGAL_DOCUMENT_KINDS.PRIVACY_POLICY
-    ? LEGAL_DOCUMENT_URLS.PRIVACY_POLICY
-    : LEGAL_DOCUMENT_URLS.TERMS_OF_USE;
+    ? urls.PRIVACY_POLICY
+    : urls.TERMS_OF_USE;
 }
 
-export async function openLegalDocument(kind: LegalDocumentKind) {
+export async function openLegalDocument({ kind, locale }: { kind: LegalDocumentKind; locale: AppLocale }) {
   try {
-    await WebBrowser.openBrowserAsync(documentUrl(kind), {
+    await WebBrowser.openBrowserAsync(documentUrl({ kind, locale }), {
       dismissButtonStyle: 'close',
       enableBarCollapsing: true,
       showTitle: true,

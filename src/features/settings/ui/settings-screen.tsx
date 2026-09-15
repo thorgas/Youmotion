@@ -301,7 +301,7 @@ export function SettingsScreen({
           <Text style={styles.sectionHeading}>
             <fbt desc="Heading grouping legal documents in settings">LEGAL</fbt>
           </Text>
-          <LegalSettingsActions />
+          <LegalSettingsActions locale={locale} />
         </View>
         <Text style={styles.sectionHeading}>
           <fbt desc="Heading grouping data and product information in settings">YOUR DATA</fbt>

@@ -9,6 +9,7 @@ import {
   LEGAL_DOCUMENT_KINDS,
   LEGAL_DOCUMENT_STATES,
 } from '@/constants';
+import type { AppLocale } from '@/localization/app-locale';
 import { palette, type } from '@/theme';
 import { legalDocumentsMachine } from '../application/legal-documents.machine';
 
@@ -16,7 +17,7 @@ const _selectFailure = (
   snapshot: ReturnType<ReturnType<typeof useMachine<typeof legalDocumentsMachine>>[2]['getSnapshot']>,
 ) => snapshot.matches(LEGAL_DOCUMENT_STATES.FAILURE);
 
-export function LegalSettingsActions() {
+export function LegalSettingsActions({ locale }: { locale: AppLocale }) {
   const [, , actor] = useMachine(legalDocumentsMachine);
   const failed = useSelector(actor, _selectFailure);
   const snapshot = actor.getSnapshot();
@@ -25,10 +26,12 @@ export function LegalSettingsActions() {
   const _openPrivacyPolicy = () => actor.send({
     type: LEGAL_DOCUMENT_EVENTS.OPEN_REQUESTED,
     document: LEGAL_DOCUMENT_KINDS.PRIVACY_POLICY,
+    locale,
   });
   const _openTerms = () => actor.send({
     type: LEGAL_DOCUMENT_EVENTS.OPEN_REQUESTED,
     document: LEGAL_DOCUMENT_KINDS.TERMS_OF_USE,
+    locale,
   });
   const _dismissFailure = () => actor.send({ type: LEGAL_DOCUMENT_EVENTS.DISMISSED });
 

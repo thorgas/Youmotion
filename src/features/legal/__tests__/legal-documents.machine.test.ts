@@ -1,6 +1,7 @@
 import { createActor, waitFor } from 'xstate';
 
 import {
+  APP_LOCALES,
   LEGAL_DOCUMENT_EVENTS,
   LEGAL_DOCUMENT_KINDS,
   LEGAL_DOCUMENT_STATES,
@@ -21,11 +22,16 @@ describe('legal documents machine', () => {
     actor.send({
       type: LEGAL_DOCUMENT_EVENTS.OPEN_REQUESTED,
       document: LEGAL_DOCUMENT_KINDS.PRIVACY_POLICY,
+      locale: APP_LOCALES.GERMAN,
     });
     await waitFor(actor, (snapshot) => snapshot.matches(LEGAL_DOCUMENT_STATES.IDLE));
 
-    expect(mockOpenLegalDocument).toHaveBeenCalledWith(LEGAL_DOCUMENT_KINDS.PRIVACY_POLICY);
+    expect(mockOpenLegalDocument).toHaveBeenCalledWith({
+      kind: LEGAL_DOCUMENT_KINDS.PRIVACY_POLICY,
+      locale: APP_LOCALES.GERMAN,
+    });
     expect(actor.getSnapshot().context.document).toBeNull();
+    expect(actor.getSnapshot().context.locale).toBeNull();
     actor.stop();
   });
 
@@ -36,12 +42,14 @@ describe('legal documents machine', () => {
     actor.send({
       type: LEGAL_DOCUMENT_EVENTS.OPEN_REQUESTED,
       document: LEGAL_DOCUMENT_KINDS.TERMS_OF_USE,
+      locale: APP_LOCALES.ENGLISH,
     });
     await waitFor(actor, (snapshot) => snapshot.matches(LEGAL_DOCUMENT_STATES.FAILURE));
     actor.send({ type: LEGAL_DOCUMENT_EVENTS.DISMISSED });
 
     expect(actor.getSnapshot().matches(LEGAL_DOCUMENT_STATES.IDLE)).toBe(true);
     expect(actor.getSnapshot().context.document).toBeNull();
+    expect(actor.getSnapshot().context.locale).toBeNull();
     actor.stop();
   });
 });

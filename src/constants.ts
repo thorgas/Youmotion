@@ -433,8 +433,14 @@ export const DATABASE_MIGRATION_TABLE = 'database_migration';
 export const APP_SETTINGS_RECORD_ID = 'current';
 export const FEEDBACK_EMAIL_RECIPIENT = 'youmotion@thorgas.com';
 export const LEGAL_DOCUMENT_URLS = Object.freeze({
-  PRIVACY_POLICY: literal('https://youmotion.app/privacy/app/'),
-  TERMS_OF_USE: literal('https://youmotion.app/terms/'),
+  [APP_LOCALES.ENGLISH]: Object.freeze({
+    PRIVACY_POLICY: literal('https://youmotion.app/privacy/app/'),
+    TERMS_OF_USE: literal('https://youmotion.app/terms/'),
+  }),
+  [APP_LOCALES.GERMAN]: Object.freeze({
+    PRIVACY_POLICY: literal('https://youmotion.app/de/privacy/app/'),
+    TERMS_OF_USE: literal('https://youmotion.app/de/terms/'),
+  }),
 });
 export const LEGAL_DOCUMENT_KINDS = Object.freeze({
   PRIVACY_POLICY: literal('privacyPolicy'),
