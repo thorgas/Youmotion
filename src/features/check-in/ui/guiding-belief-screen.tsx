@@ -170,6 +170,7 @@ export function GuidingBeliefScreen() {
           contentInsetAdjustmentBehavior="automatic"
           keyboardDismissMode="interactive"
           keyboardShouldPersistTaps="handled"
+          mode="layout"
           style={styles.scroll}
           testID="guiding-belief-scroll"
         >

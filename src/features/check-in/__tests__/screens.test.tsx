@@ -1181,6 +1181,7 @@ describe('check-in screens', () => {
     expect(screen.queryByText(/Spüre nach/)).toBeNull();
     expect(screen.queryByText(/Du kannst ihr eine neue Richtung geben/)).toBeNull();
     expect(screen.getByTestId('guiding-belief-scroll').props).toMatchObject({
+      mode: 'layout',
       showsVerticalScrollIndicator: false,
     });
     expect(screen.getByText('Dein neuer Leitsatz')).toBeTruthy();
