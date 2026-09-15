@@ -261,25 +261,25 @@ export function GuidingBeliefScreen() {
               </Text>
             ) : null}
           </View>
-        </PersistentKeyboardAwareScrollView>
-        <SafeAreaView
-          edges={['bottom', 'left', 'right']}
-          style={styles.actions}
-          testID="guiding-belief-footer"
-        >
-          <PressableScale
-            accessibilityRole="button"
-            accessibilityState={{ disabled: saving }}
-            disabled={saving}
-            onPress={_finish}
-            style={styles.primaryButton}
-            testID="guiding-belief-finish"
+          <SafeAreaView
+            edges={['bottom']}
+            style={styles.actions}
+            testID="guiding-belief-footer"
           >
-            {saving
-              ? <ActivityIndicator color={actionColors.primaryForeground} />
-              : <GuidingBeliefFinishLabel canSave={canSave} failed={failed} />}
-          </PressableScale>
-        </SafeAreaView>
+            <PressableScale
+              accessibilityRole="button"
+              accessibilityState={{ disabled: saving }}
+              disabled={saving}
+              onPress={_finish}
+              style={styles.primaryButton}
+              testID="guiding-belief-finish"
+            >
+              {saving
+                ? <ActivityIndicator color={actionColors.primaryForeground} />
+                : <GuidingBeliefFinishLabel canSave={canSave} failed={failed} />}
+            </PressableScale>
+          </SafeAreaView>
+        </PersistentKeyboardAwareScrollView>
       </SafeAreaView>
     </View>
   );
@@ -387,11 +387,7 @@ const styles = StyleSheet.create({
   },
   actions: {
     width: '100%',
-    maxWidth: 520,
-    alignSelf: 'center',
     flexDirection: 'row',
-    paddingHorizontal: 22,
-    paddingTop: 10,
     paddingBottom: 8,
   },
   primaryButton: {

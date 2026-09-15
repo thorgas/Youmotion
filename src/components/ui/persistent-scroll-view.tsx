@@ -6,12 +6,14 @@ import type {
 } from 'react-native';
 import { ScrollView, StyleSheet, View } from 'react-native';
 import Animated, {
+  type SharedValue,
   useAnimatedStyle,
   useSharedValue,
 } from 'react-native-reanimated';
 import {
   KeyboardAwareScrollView,
   type KeyboardAwareScrollViewProps,
+  useReanimatedKeyboardAnimation,
 } from 'react-native-keyboard-controller';
 
 import assert from '@/assert';
@@ -32,7 +34,45 @@ type ManagedScrollProps =
 type PersistentScrollViewProps = Omit<ScrollViewProps, ManagedScrollProps> & IndicatorProps;
 type PersistentKeyboardAwareScrollViewProps = Omit<KeyboardAwareScrollViewProps, ManagedScrollProps> & IndicatorProps;
 
-function usePersistentScrollIndicator() {
+type IndicatorMetricsInput = {
+  contentHeight: number;
+  keyboardHeight: number;
+  scrollOffset: number;
+  viewportHeight: number;
+};
+
+export function persistentScrollIndicatorMetrics({
+  contentHeight,
+  keyboardHeight,
+  scrollOffset,
+  viewportHeight,
+}: IndicatorMetricsInput) {
+  'worklet';
+  assert(contentHeight > 0, 'Scroll indicator content height must be positive.');
+  assert(viewportHeight > 0, 'Scroll indicator viewport height must be positive.');
+  const keyboardInset = Math.max(-keyboardHeight, 0);
+  const visibleViewportHeight = Math.max(viewportHeight - keyboardInset, 1);
+  const trackHeight = Math.max(visibleViewportHeight - 12, 1);
+  const overflow = Math.max(contentHeight - visibleViewportHeight, 0);
+  const minimumThumbHeight = Math.min(36, trackHeight);
+  const thumbHeight = Math.min(
+    Math.max(trackHeight * visibleViewportHeight / contentHeight, minimumThumbHeight),
+    trackHeight,
+  );
+  const travel = Math.max(trackHeight - thumbHeight, 0);
+  const progress = overflow === 0
+    ? 0
+    : Math.min(Math.max(scrollOffset / overflow, 0), 1);
+
+  return {
+    keyboardInset,
+    opacity: overflow > 1 ? 1 : 0,
+    thumbHeight,
+    translateY: progress * travel,
+  };
+}
+
+function usePersistentScrollIndicator(keyboardHeight?: SharedValue<number>) {
   const initialViewportHeight = 1;
   const initialContentHeight = 1;
   assert(initialViewportHeight > 0, 'Scroll indicator viewport height must start positive.');
@@ -53,27 +93,24 @@ function usePersistentScrollIndicator() {
     scrollOffset.value = event.nativeEvent.contentOffset.y;
   };
   const thumbStyle = useAnimatedStyle(() => {
-    const trackHeight = Math.max(viewportHeight.value - 12, 1);
-    const overflow = Math.max(contentHeight.value - viewportHeight.value, 0);
-    const thumbHeight = Math.max(
-      Math.min(trackHeight * viewportHeight.value / contentHeight.value, trackHeight),
-      36,
-    );
-    const travel = Math.max(trackHeight - thumbHeight, 0);
-    const progress = overflow === 0
-      ? 0
-      : Math.min(Math.max(scrollOffset.value / overflow, 0), 1);
-    assert(thumbHeight >= 36, 'Scroll indicator thumb must remain touch-visible.');
-    assert(progress >= 0 && progress <= 1, 'Scroll indicator progress must remain normalized.');
+    const metrics = persistentScrollIndicatorMetrics({
+      contentHeight: contentHeight.value,
+      keyboardHeight: keyboardHeight?.value ?? 0,
+      scrollOffset: scrollOffset.value,
+      viewportHeight: viewportHeight.value,
+    });
 
     return {
-      height: thumbHeight,
-      opacity: overflow > 1 ? 1 : 0,
-      transform: [{ translateY: progress * travel }],
+      height: metrics.thumbHeight,
+      opacity: metrics.opacity,
+      transform: [{ translateY: metrics.translateY }],
     };
   });
+  const trackStyle = useAnimatedStyle(() => ({
+    bottom: 6 + Math.max(-(keyboardHeight?.value ?? 0), 0),
+  }));
 
-  return { _contentSizeChanged, _layout, _scrolled, thumbStyle };
+  return { _contentSizeChanged, _layout, _scrolled, thumbStyle, trackStyle };
 }
 
 export function PersistentScrollView({
@@ -81,7 +118,13 @@ export function PersistentScrollView({
   style,
   ...props
 }: PersistentScrollViewProps) {
-  const { _contentSizeChanged, _layout, _scrolled, thumbStyle } = usePersistentScrollIndicator();
+  const {
+    _contentSizeChanged,
+    _layout,
+    _scrolled,
+    thumbStyle,
+    trackStyle,
+  } = usePersistentScrollIndicator();
 
   return (
     <View style={[styles.frame, style]}>
@@ -94,9 +137,9 @@ export function PersistentScrollView({
         showsVerticalScrollIndicator={false}
         style={styles.scroll}
       />
-      <View pointerEvents="none" style={styles.track} testID={indicatorTestID}>
+      <Animated.View pointerEvents="none" style={[styles.track, trackStyle]} testID={indicatorTestID}>
         <Animated.View style={[styles.thumb, thumbStyle]} />
-      </View>
+      </Animated.View>
     </View>
   );
 }
@@ -106,7 +149,16 @@ export function PersistentKeyboardAwareScrollView({
   style,
   ...props
 }: PersistentKeyboardAwareScrollViewProps) {
-  const { _contentSizeChanged, _layout, _scrolled, thumbStyle } = usePersistentScrollIndicator();
+  const keyboard = useReanimatedKeyboardAnimation();
+  assert(keyboard.height !== undefined, 'Keyboard animation height must be available.');
+  assert(keyboard.progress !== undefined, 'Keyboard animation progress must be available.');
+  const {
+    _contentSizeChanged,
+    _layout,
+    _scrolled,
+    thumbStyle,
+    trackStyle,
+  } = usePersistentScrollIndicator(keyboard.height);
 
   return (
     <View style={[styles.frame, style]}>
@@ -119,9 +171,9 @@ export function PersistentKeyboardAwareScrollView({
         showsVerticalScrollIndicator={false}
         style={styles.scroll}
       />
-      <View pointerEvents="none" style={styles.track} testID={indicatorTestID}>
+      <Animated.View pointerEvents="none" style={[styles.track, trackStyle]} testID={indicatorTestID}>
         <Animated.View style={[styles.thumb, thumbStyle]} />
-      </View>
+      </Animated.View>
     </View>
   );
 }

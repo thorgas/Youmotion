@@ -2,11 +2,32 @@ import { render, screen, within } from '@testing-library/react-native';
 import { Text } from 'react-native';
 
 import {
+  persistentScrollIndicatorMetrics,
   PersistentKeyboardAwareScrollView,
   PersistentScrollView,
 } from '@/components/ui/persistent-scroll-view';
 
 describe('persistent scroll views', () => {
+  it('shows and constrains the indicator to the viewport left above the keyboard', () => {
+    const closed = persistentScrollIndicatorMetrics({
+      contentHeight: 700,
+      keyboardHeight: 0,
+      scrollOffset: 0,
+      viewportHeight: 700,
+    });
+    const open = persistentScrollIndicatorMetrics({
+      contentHeight: 700,
+      keyboardHeight: -320,
+      scrollOffset: 0,
+      viewportHeight: 700,
+    });
+
+    expect(closed.opacity).toBe(0);
+    expect(open.keyboardInset).toBe(320);
+    expect(open.opacity).toBe(1);
+    expect(open.thumbHeight).toBeLessThan(700 - 320 - 12);
+  });
+
   it('keeps the indicator outside regular scroll content without intercepting touches', async () => {
     await render(
       <PersistentScrollView indicatorTestID="scroll-indicator" testID="scroll-content">

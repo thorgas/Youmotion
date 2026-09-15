@@ -128,6 +128,10 @@ jest.mock('react-native-keyboard-controller', () => {
   return {
     KeyboardAwareScrollView: ScrollView,
     KeyboardProvider: ({ children }) => React.createElement(React.Fragment, null, children),
+    useReanimatedKeyboardAnimation: () => ({
+      height: { value: 0 },
+      progress: { value: 0 },
+    }),
     useKeyboardState: (selector) => selector({ height: 0, isVisible: false }),
   };
 });

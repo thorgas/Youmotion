@@ -753,14 +753,14 @@ describe('check-in screens', () => {
     expect(within(screen.getByTestId('guiding-belief-scroll')).queryByTestId(
       'check-in-progress-header',
     )).toBeNull();
-    expect(within(screen.getByTestId('guiding-belief-scroll')).queryByTestId(
+    expect(within(screen.getByTestId('guiding-belief-scroll')).getByTestId(
       'guiding-belief-finish',
-    )).toBeNull();
+    )).toBeTruthy();
     const guidingBeliefFooter = screen.getByTestId('guiding-belief-footer');
     expect(guidingBeliefFooter.props['edges']).toEqual({
       bottom: 'additive',
-      left: 'additive',
-      right: 'additive',
+      left: 'off',
+      right: 'off',
       top: 'off',
     });
     expect(within(guidingBeliefFooter).getByTestId('guiding-belief-finish')).toBeTruthy();
