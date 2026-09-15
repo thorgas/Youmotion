@@ -753,6 +753,17 @@ describe('check-in screens', () => {
     expect(within(screen.getByTestId('guiding-belief-scroll')).queryByTestId(
       'check-in-progress-header',
     )).toBeNull();
+    expect(within(screen.getByTestId('guiding-belief-scroll')).queryByTestId(
+      'guiding-belief-finish',
+    )).toBeNull();
+    const guidingBeliefFooter = screen.getByTestId('guiding-belief-footer');
+    expect(guidingBeliefFooter.props['edges']).toEqual({
+      bottom: 'additive',
+      left: 'additive',
+      right: 'additive',
+      top: 'off',
+    });
+    expect(within(guidingBeliefFooter).getByTestId('guiding-belief-finish')).toBeTruthy();
     expect(screen.getByTestId('check-in-progress').props['accessibilityValue']).toMatchObject({
       now: 3,
     });

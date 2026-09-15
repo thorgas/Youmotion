@@ -159,7 +159,7 @@ export function GuidingBeliefScreen() {
 
   return (
     <View style={styles.page} testID="guiding-belief-screen">
-      <SafeAreaView style={styles.safeArea}>
+      <SafeAreaView edges={['top', 'left', 'right']} style={styles.safeArea}>
         <CheckInProgressHeader
           activeStep={3}
           context="guiding-belief"
@@ -262,21 +262,25 @@ export function GuidingBeliefScreen() {
               </Text>
             ) : null}
           </View>
-          <View style={styles.actions}>
-            <PressableScale
-              accessibilityRole="button"
-              accessibilityState={{ disabled: saving }}
-              disabled={saving}
-              onPress={_finish}
-              style={styles.primaryButton}
-              testID="guiding-belief-finish"
-            >
-              {saving
-                ? <ActivityIndicator color={actionColors.primaryForeground} />
-                : <GuidingBeliefFinishLabel canSave={canSave} failed={failed} />}
-            </PressableScale>
-          </View>
         </KeyboardAwareScrollView>
+        <SafeAreaView
+          edges={['bottom', 'left', 'right']}
+          style={styles.actions}
+          testID="guiding-belief-footer"
+        >
+          <PressableScale
+            accessibilityRole="button"
+            accessibilityState={{ disabled: saving }}
+            disabled={saving}
+            onPress={_finish}
+            style={styles.primaryButton}
+            testID="guiding-belief-finish"
+          >
+            {saving
+              ? <ActivityIndicator color={actionColors.primaryForeground} />
+              : <GuidingBeliefFinishLabel canSave={canSave} failed={failed} />}
+          </PressableScale>
+        </SafeAreaView>
       </SafeAreaView>
     </View>
   );
@@ -382,7 +386,15 @@ const styles = StyleSheet.create({
     fontSize: 12,
     lineHeight: 18,
   },
-  actions: { flexDirection: 'row' },
+  actions: {
+    width: '100%',
+    maxWidth: 520,
+    alignSelf: 'center',
+    flexDirection: 'row',
+    paddingHorizontal: 22,
+    paddingTop: 10,
+    paddingBottom: 8,
+  },
   primaryButton: {
     minHeight: 54,
     flex: 1,
