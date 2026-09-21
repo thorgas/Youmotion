@@ -4,8 +4,9 @@ Static, dependency-free launch site for `youmotion.app`. It contains the English
 and German marketing pages, app privacy policy, separate website privacy policy,
 terms, support, and imprint.
 
-Store buttons intentionally say **Coming soon / Bald verfügbar** until the public
-store URLs exist.
+Store buttons link to the live public store URLs. Keep `data-store-state="live"`
+on the English and German pages; the store URLs also live in
+`assets/pulse.js` (`storeLinks`).
 
 ## Cloudflare Pages
 
