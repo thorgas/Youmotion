@@ -1,7 +1,7 @@
 {
   "configVersion": 0,
   "apple": {
-    "version": "1.0.3",
+    "version": "1.0.4",
     "categories": ["HEALTH_AND_FITNESS"],
     "release": {
       "automaticRelease": false,
@@ -23,7 +23,7 @@
           "mindfulness",
           "journal"
         ],
-        "releaseNotes": "Welcome to Youmotion. Capture emotional moments with Pulse, reflect in your own words, revisit your history, and notice patterns over time—privately on your device.",
+        "releaseNotes": "Refinements to the guiding-belief screen: actions stay visible and reachable even with the on-screen keyboard on smaller devices, and the app's legal documents now open in your language.",
         "promoText": "Pause, name what you feel, and capture the moment. Youmotion keeps your reflections and personal patterns private on your device—no account required.",
         "marketingUrl": "https://youmotion.app/",
         "supportUrl": "https://youmotion.app/support/",
@@ -41,7 +41,7 @@
           "wohlbefinden",
           "selbstwahrnehmung"
         ],
-        "releaseNotes": "Willkommen bei Youmotion. Halte emotionale Momente mit dem Pulse fest, reflektiere in deinen eigenen Worten und erkenne mit der Zeit persönliche Muster – privat auf deinem Gerät.",
+        "releaseNotes": "Verbesserungen am Leitsatz-Bildschirm: Aktionen bleiben auch mit Bildschirmtastatur auf kleineren Geräten sichtbar und erreichbar, und die rechtlichen Dokumente der App öffnen sich in deiner Sprache.",
         "promoText": "Halte kurz inne, erkenne dein Gefühl und bewahre den Moment. Youmotion speichert Reflexionen und Muster privat auf deinem Gerät – ohne Konto.",
         "marketingUrl": "https://youmotion.app/de/",
         "supportUrl": "https://youmotion.app/de/support/",
