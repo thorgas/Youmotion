@@ -11,6 +11,12 @@ const websiteFonts = [
   'website/assets/instrument-sans-medium.ttf',
   'website/assets/instrument-sans-semibold.ttf',
 ];
+const websiteBadges = [
+  'website/assets/app-store-badge-en.svg',
+  'website/assets/app-store-badge-de.svg',
+  'website/assets/google-play-badge-en.svg',
+  'website/assets/google-play-badge-de.svg',
+];
 
 const storeApple = 'https://apps.apple.com/app/id6807357236';
 const storeGoogle = 'https://play.google.com/store/apps/details?id=com.youmotion.mobile';
@@ -30,7 +36,7 @@ for (const page of pages) {
 if (!headers.includes("script-src 'self'")) throw new Error('The website CSP must restrict scripts to the same origin.');
 const websiteStyles = await read('website/assets/site.css');
 if (!websiteStyles.includes('font-family: "Instrument Sans"')) throw new Error('The website must use the app’s Instrument Sans family.');
-await Promise.all(websiteFonts.map((path) => access(resolve(root, path))));
+await Promise.all([...websiteFonts, ...websiteBadges].map((path) => access(resolve(root, path))));
 if (/localStorage|sessionStorage|document\.cookie/.test(script)) throw new Error('The pulse must not persist visitor emotion data.');
 for (const behavior of ['pointerdown', 'setPointerCapture', 'pointerup', 'pointercancel', 'directTouch', 'scrollToDownload']) {
   if (!script.includes(behavior)) throw new Error(`The responsive pulse interaction is missing ${behavior}.`);

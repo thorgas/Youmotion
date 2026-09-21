@@ -7,6 +7,9 @@
 /assets/*.png
   Cache-Control: public, max-age=31536000, immutable
 
+/assets/*.svg
+  Cache-Control: public, max-age=31536000, immutable
+
 /assets/*.css
   Cache-Control: public, max-age=0, must-revalidate
 
