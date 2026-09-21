@@ -12,8 +12,13 @@ const websiteFonts = [
   'website/assets/instrument-sans-semibold.ttf',
 ];
 
+const storeApple = 'https://apps.apple.com/app/id6807357236';
+const storeGoogle = 'https://play.google.com/store/apps/details?id=com.youmotion.mobile';
+
 for (const page of pages) {
-  if (!page.includes('data-store-state="coming-soon"')) throw new Error('Store links must remain in coming-soon mode before launch.');
+  if (!page.includes('data-store-state="live"')) throw new Error('Store links must be live (data-store-state="live") after launch.');
+  if (!page.includes(`data-store="apple" href="${storeApple}"`) || !page.includes(`data-store="google" href="${storeGoogle}"`)) throw new Error('Each homepage must link store badges to the public store URLs.');
+  if (/aria-disabled="true"/.test(page) || /Coming soon|Bald verfügbar/.test(page)) throw new Error('Store badges must not be disabled or claim the app is coming soon.');
   if (!page.includes('src="/assets/pulse.js"')) throw new Error('Each localized homepage must load the pulse interaction.');
   if (!page.includes('class="section product-story"')) throw new Error('Each homepage must keep the screenshot story below the pulse.');
   const emotions = [...page.matchAll(/data-emotion="([^"]+)"/g)].map((match) => match[1]);
@@ -32,6 +37,6 @@ for (const behavior of ['pointerdown', 'setPointerCapture', 'pointerup', 'pointe
 }
 if (!script.includes('distance > hitRadius')) throw new Error('The pulse must reject interaction outside its circular hit area.');
 if (!script.includes('distance * progress')) throw new Error('Mobile scrolling must use constant-speed progress.');
-if (!script.includes('apps.apple.com/app/id6807357236') || !script.includes('play.google.com/store/apps/details?id=com.youmotion.mobile')) throw new Error('Canonical future store destinations are missing.');
+if (!script.includes('apps.apple.com/app/id6807357236') || !script.includes('play.google.com/store/apps/details?id=com.youmotion.mobile')) throw new Error('Canonical store destinations are missing.');
 
 console.log('Website structure, launch state, privacy boundary, and store destinations verified.');
