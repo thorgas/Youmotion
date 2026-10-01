@@ -1,0 +1,7 @@
+{
+  "tool_use_id": "01a0f691-d470-7b30-a35d-caa7e0568b5c",
+  "agent_id": "01a0f691-d470-7b30-a35d-caa7e0568b5c",
+  "subagent_type": "spark_worker",
+  "started_at": "2026-10-01T10:25:50.675234+02:00",
+  "transcript_unavailable_reason": "transcript path unresolvable"
+}
