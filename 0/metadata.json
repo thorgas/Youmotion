@@ -1,0 +1,36 @@
+{
+  "cli_version": "0.11.3",
+  "checkpoint_id": "01M3W2DWGVX3SM05F9YM5MQQGG",
+  "session_id": "01a0f6c3-b2fc-7400-9657-fec7f4b34685",
+  "strategy": "manual-commit",
+  "created_at": "2026-10-01T15:48:20.12525Z",
+  "branch": "codex/einblick-notifications",
+  "checkpoints_count": 1,
+  "save_step_count": 1,
+  "files_touched": [
+    "docs/handoffs/insight-notifications.md"
+  ],
+  "agent": "Codex",
+  "model": "gpt-6.1-sol",
+  "turn_id": "a3d657490f71",
+  "compact_transcript_start": 0,
+  "token_usage": {
+    "input_tokens": 702611,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 24656128,
+    "output_tokens": 59450,
+    "api_call_count": 198
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-10-01T15:48:19.773761Z",
+    "agent_lines": 0,
+    "agent_removed": 0,
+    "human_added": 13,
+    "human_modified": 1,
+    "human_removed": 0,
+    "total_committed": 13,
+    "total_lines_changed": 14,
+    "agent_percentage": 0,
+    "metric_version": 2
+  }
+}
