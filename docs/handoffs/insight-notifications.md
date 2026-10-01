@@ -32,12 +32,18 @@ Skills: visual-plan, implementation-delivery, Apple Design, React coding style, 
 
 Feature commit `1dd44a9` is pushed to `origin/codex/einblick-notifications`. The clean detached checkout at `/private/tmp/youmotion-insight-qa` passed both runtime checks against `/tmp/insight-confirmed-qa-runtimes.json`; log: `/tmp/insight-clean-runtime.log`. Its dependency directory is a filesystem clone of the installed repository dependencies. Use `--config.verify-deps-before-run=false` with pnpm in this checkout to prevent automatic dependency reinstallation. Source and lockfile are unchanged.
 
-QA upload was rejected by automatic approval review before execution. No update was created. The reviewer requires explicit authorization to upload the private application bundle to Expo/EAS project `@youmotion/youmotion`, channel `qa`, environment `preview`, iOS and Android. User approval is pending.
+Published on 2026-10-01 at 17:06:22 UTC to Expo/EAS project `@youmotion/youmotion` (`7f37690f-c632-408c-a4ab-1b240610bd12`), channel/branch `qa`, environment `preview`, after the user's explicit destination approval. Both groups point to feature commit `1dd44a9a165e71508e26e9b352c7223c0912df00` and the verified 1.0.4 runtimes. The active QA channel maps to the QA branch; its update list shows these as the newest platform groups. Production was not published.
 
-After approval, run in that clean checkout:
+- [iOS group `97bc704d-1df2-49a4-9832-8893248dea6a`](https://expo.dev/accounts/youmotion/projects/youmotion/updates/97bc704d-1df2-49a4-9832-8893248dea6a), update `01a0f86e-6ed0-77f4-9a58-4b5a6ad87184`.
+- [Android group `71d40c3f-ba69-4761-887f-23a56e4a8967`](https://expo.dev/accounts/youmotion/projects/youmotion/updates/71d40c3f-ba69-4761-887f-23a56e4a8967), update `01a0f86e-6ed0-7edc-b262-8ccd26b839da`.
+- Bundle stamp: `release-1dd44a9`; manifest release tag: `release-1dd44a9a165e71508e26e9b352c7223c0912df00`.
+- Receipt logs: `/tmp/insight-qa-publish.log`, `/tmp/insight-qa-{ios,android}-readback.json`, `/tmp/insight-qa-channel-readback.json`, `/tmp/insight-qa-list-readback.json`.
+
+The first approved export stopped before publication because generated translations were absent in the clean checkout. Generate them before publishing:
 
 ```sh
+pnpm_config_verify_deps_before_run=false pnpm i18n:all
 EXPO_PUBLIC_RELEASE=release-1dd44a9 pnpm --config.verify-deps-before-run=false exec eas update --channel qa --environment preview --platform all --message 'Einblick notifications (1dd44a9)' --non-interactive --json
 ```
 
-Read back the resulting update groups and QA channel, verify both runtime versions and source commit, then add publication IDs here. Next device step: check `src/features/insight-notifications/ui/insight-notification-controls.tsx` in a compatible QA-control build. Android background delivery remains an acceptance follow-up. The only user-only blocker is the destination-specific QA upload approval.
+Next device step: check `src/features/insight-notifications/ui/insight-notification-controls.tsx` in a compatible 1.0.4 QA-control build. Android background delivery remains an acceptance follow-up. No user-only blocker remains for the completed implementation and QA publication.
