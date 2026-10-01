@@ -1,0 +1,34 @@
+{
+  "cli_version": "0.11.3",
+  "checkpoint_id": "01M3WADEWHM0YNYB7PF98C657Y",
+  "strategy": "manual-commit",
+  "branch": "codex/einblick-notifications",
+  "checkpoints_count": 2,
+  "files_touched": [
+    ".oxlintrc.json",
+    "AGENTS.md",
+    "docs/handoffs/insight-notifications.md",
+    "oxlint-rules/__tests__/architecture.test.js",
+    "oxlint-rules/architecture.cjs",
+    "src/features/history/__tests__/history-filter.harness.ts",
+    "src/features/history/__tests__/history-filter.test.ts",
+    "src/features/history/application/history-filter.ts"
+  ],
+  "sessions": [
+    {
+      "metadata": "/0/metadata.json",
+      "transcript": "/0/full.jsonl",
+      "compact_transcript": "/0/transcript.jsonl",
+      "content_hash": "/0/content_hash.txt",
+      "prompt": "/0/prompt.txt"
+    }
+  ],
+  "token_usage": {
+    "input_tokens": 995879,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 40829696,
+    "output_tokens": 94736,
+    "api_call_count": 339,
+    "subagent_tokens_complete": false
+  }
+}

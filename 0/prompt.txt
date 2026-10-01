@@ -1,0 +1,50 @@
+Ok proceed and implement in a new branch. Create qa update when done
+
+---
+
+Yes upload the update
+
+---
+
+# Files mentioned by the user:
+
+## Photo 1.jpg: /tmp/codex-remote-attachments/01a0f6c3-b2fc-7400-9657-fec7f4b34685/4E6491FA-8C42-453F-87FA-8812B58B460B/1-Photo-1.jpg
+
+## My request:
+Going into analytics tab fully crashed the app. You can use the appstore connect cli to see the error i hope
+
+---
+
+# Files mentioned by the user:
+
+## Photo 1.jpg: /tmp/codex-remote-attachments/01a0f6c3-b2fc-7400-9657-fec7f4b34685/9C4DEAAD-47B2-4D4D-BECE-6DDB082CFE9F/1-Photo-1.jpg
+## Photo 2.jpg: /tmp/codex-remote-attachments/01a0f6c3-b2fc-7400-9657-fec7f4b34685/9C4DEAAD-47B2-4D4D-BECE-6DDB082CFE9F/2-Photo-2.jpg
+
+## My request:
+Putting this like this in the settings is a total design fail and does not match the look. It should be onin another subpage as the other reminders
+
+---
+
+Add above to repo agent infos so models do not do this mistake again
+
+---
+
+<send_user_message_question_reply>
+[{"questionItemId":"[\"request_user_input_async\",\"call_FdQFPYbzHR7cSCTSMJzR3WFx\",0]","question":"May I upload the fixed bundle from commit 6e47432—with the Analytics crash fix and dedicated Settings subpage—to Expo/EAS @youmotion/youmotion, channel qa, environment preview, for iOS and Android? Automatic approval review requires fresh approval for this payload.","answer":"Approve fixed QA update upload"}]
+</send_user_message_question_reply>
+
+---
+
+Dis you test above on android? I somehow remember that localcompare function is deadly slow on android (maybe it was another function though and my memory is wrong). Please search the hauswirtschaftsapp docs and agent info if my assumption is correct, I remember i had these issues in this repo in list item components
+
+---
+
+If we were smart we added it as custom lint rule also
+
+---
+
+Wait only create a lint rule for above case no idea if the other methods perform bad too. We should only create rules if they are measured
+
+---
+
+Ok if we use toLocaleLowerCase in you motion repo please fix it there
