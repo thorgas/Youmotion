@@ -9,7 +9,7 @@ import type { ReminderLocalTime } from '@/features/reminders/domain/reminder-tim
 import { getReminderPermission, requestReminderPermission } from '@/features/reminders/infrastructure/local-reminder.scheduler';
 import { loadInsightNotificationState, persistInsightNotificationState } from '../infrastructure/insight-notification.repository';
 import { reconcileInsightBatch, cancelInsightNotifications } from '../infrastructure/insight-notification.scheduler';
-import { insightCandidates, reconciledInsightDelivery, nextInsightDelivery, pendingInsightCandidates, InsightNotificationStateSchema, type InsightNotificationState } from '../domain/insight-notification';
+import { completedInsightDelivery, insightCandidates, reconciledInsightDelivery, nextInsightDelivery, pendingInsightCandidates, InsightNotificationStateSchema, type InsightNotificationState } from '../domain/insight-notification';
 import { createInsightNotificationStore } from './insight-notification.store';
 
 export type InsightNotificationCommand =
@@ -108,7 +108,7 @@ export class InsightNotificationCoordinator {
   }
   private async evaluate() {
     if (!this.data?.ready || !this.active) return;
-    let state = reconciledInsightDelivery({ state: this.store.getSnapshot().context.settings, now: this.deps.now() });
+    const state = completedInsightDelivery({ state: reconciledInsightDelivery({ state: this.store.getSnapshot().context.settings, now: this.deps.now() }), now: this.deps.now() });
     assert(this.loaded, 'Evaluation requires loaded notification preferences');
     assert(Schema.is(InsightNotificationStateSchema)(state), 'Evaluation starts from valid settings');
     const candidates = this.candidates();
@@ -123,9 +123,6 @@ export class InsightNotificationCoordinator {
     if (!state.enabled || permission !== REMINDER_PERMISSION_STATES.GRANTED) {
       await this.deps.cancel();
       return;
-    }
-    if (state.pending && new Date(state.pending.fireAt) <= this.deps.now()) {
-      state = { ...state, seen: [...new Set([...state.seen, ...state.pending.candidates.map(({ id }) => id)])], pending: null };
     }
     await this.scheduleCandidates({ state, candidates });
   }
@@ -157,7 +154,7 @@ export class InsightNotificationCoordinator {
       ? { ...state.pending, fireAt: nextInsightDelivery({ now: this.deps.now(), time }).toISOString() } : null });
   }
   private async applyCommand(event: InsightNotificationCommand) {
-    const state = this.store.getSnapshot().context.settings;
+    const state = completedInsightDelivery({ state: this.store.getSnapshot().context.settings, now: this.deps.now() });
     assert(this.loaded, 'Commands require loaded notification preferences');
     assert(Schema.is(InsightNotificationStateSchema)(state), 'Commands start from valid settings');
     if (event.type === INSIGHT_NOTIFICATION_EVENTS.SYSTEM_SETTINGS_REQUESTED) { await this.deps.openSettings(); return; }
@@ -177,7 +174,7 @@ export class InsightNotificationCoordinator {
     const permission = await this.deps.requestPermission();
     this.store.trigger.permissionChanged({ permission });
     if (permission !== REMINDER_PERMISSION_STATES.GRANTED) return;
-    await this.save({ ...state, enabled: true, dismissed: true, seen: this.candidates().map(({ id }) => id), pending: null });
+    await this.save({ ...state, enabled: true, dismissed: true, pending: null });
     await this.evaluate();
   }
 }

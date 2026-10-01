@@ -8,7 +8,7 @@ import * as Notifications from 'expo-notifications';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Effect from 'effect/Effect';
 import * as Schema from 'effect/Schema';
-import { APP_LOCALES, INSIGHT_NOTIFICATION_EVENTS, INSIGHT_NOTIFICATION_OWNER, INSIGHT_NOTIFICATION_STORAGE_KEY } from '@/constants';
+import { ANALYTICS_TIMEFRAMES, APP_LOCALES, INSIGHT_NOTIFICATION_EVENTS, INSIGHT_NOTIFICATION_OWNER, INSIGHT_NOTIFICATION_STORAGE_KEY } from '@/constants';
 import { PersistedDataArchiveSchema, currentDataArchive } from '@/features/data-safety/domain/data-archive';
 import legacyArchive from '@/features/data-safety/__tests__/fixtures/legacy-archive.fixture.json';
 import { initialInsightNotificationState, insightCandidates } from '../domain/insight-notification';
@@ -57,6 +57,14 @@ describe('native insight notification preferences and delivery registration', ()
       expect(insightCandidates({ entries: archive.checkIns, statements: archive.beliefStatements, now: new Date() })).not.toHaveLength(0);
       expect(archive.checkIns.length).toBe(133);
       expect(archive.beliefStatements.length).toBe(15);
+      const periodInput = { entries: archive.checkIns, statements: archive.beliefStatements };
+      const previousPeriod = insightCandidates({ ...periodInput, now: new Date(2026, 8, 8, 10) });
+      expect(insightCandidates({ ...periodInput, now: new Date(2026, 8, 13, 23, 59) })).toEqual(previousPeriod);
+      const nextPeriod = insightCandidates({ ...periodInput, now: new Date(2026, 8, 14, 0) });
+      expect(nextPeriod.filter(({ timeframe }) => timeframe === ANALYTICS_TIMEFRAMES.ALL_TIME))
+        .toEqual(previousPeriod.filter(({ timeframe }) => timeframe === ANALYTICS_TIMEFRAMES.ALL_TIME));
+      expect(nextPeriod.filter(({ timeframe }) => timeframe !== ANALYTICS_TIMEFRAMES.ALL_TIME)
+        .every(({ id }) => !previousPeriod.some((candidate) => candidate.id === id))).toBe(true);
       const repository: typeof import('../infrastructure/insight-notification.repository') = require('../infrastructure/insight-notification.repository');
       const scheduler: typeof import('../infrastructure/insight-notification.scheduler') = require('../infrastructure/insight-notification.scheduler');
       const permission: typeof import('@/features/reminders/infrastructure/local-reminder.scheduler') = require('@/features/reminders/infrastructure/local-reminder.scheduler');
@@ -67,7 +75,7 @@ describe('native insight notification preferences and delivery registration', ()
       insightNotificationStore.trigger.updated({ settings: initialInsightNotificationState() });
       insightNotificationStore.trigger.pickerChanged({ open: false });
       const { InsightNotificationCoordinator }: typeof import('../application/insight-notification-coordinator') = require('../application/insight-notification-coordinator');
-      const now = new Date();
+      let now = new Date();
       const coordinator = new InsightNotificationCoordinator({
         store: insightNotificationStore,
         deps: {
@@ -129,16 +137,28 @@ describe('native insight notification preferences and delivery registration', ()
       await waitUntil(() => insightNotificationStore.getSnapshot().context.settings.enabled && !insightNotificationStore.getSnapshot().context.busy, { timeout: 10_000 }).catch((cause: unknown) => { throw new Error(`Enable failed ${insightNotificationStore.getSnapshot().context.error}`, { cause }); });
       expect((await repository.loadInsightNotificationState()).enabled).toBe(true);
       expect((await repository.loadInsightNotificationState()).pending).toBeNull();
-      await captureEvidence(`fix-${locale}-settings-enabled`);
+      await screen.findByTestId('insight-notification-none');
+      expect(await screen.findByTestId('insight-notification-none')).toHaveTextContent(locale === APP_LOCALES.GERMAN ? /Noch keine Benachrichtigung geplant/ : /No notification is scheduled yet/);
+      await captureEvidence(`activation-${locale}-settings-empty`);
+      await press('insight-notification-toggle');
+      await waitUntil(() => !insightNotificationStore.getSnapshot().context.settings.enabled && !insightNotificationStore.getSnapshot().context.busy);
       sentinelIdentifier = await Notifications.scheduleNotificationAsync({
         identifier: `insight-harness-sentinel-${locale}`,
         content: { title: 'Synthetic unrelated notification', data: { owner: 'insight-harness-unrelated' } },
         trigger: { type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL, seconds: 3600 },
       });
       await coordinator.update({ entries: archive.checkIns, statements: archive.beliefStatements, locale, ready: true });
+      expect((await repository.loadInsightNotificationState()).pending).toBeNull();
+      await press('insight-notification-toggle');
+      await waitUntil(() => insightNotificationStore.getSnapshot().context.settings.enabled && !insightNotificationStore.getSnapshot().context.busy);
       const state = await repository.loadInsightNotificationState();
       expect(insightCandidates({ entries: archive.checkIns, statements: archive.beliefStatements, now }).length).toBeGreaterThan(0);
       if (!state.pending) throw new Error('Synthetic insights must register a pending batch.');
+      expect(state.pending.candidates).toEqual(insightCandidates({ ...periodInput, now }));
+      const nextLabel = await screen.findByTestId('insight-notification-next');
+      expect(nextLabel).toHaveTextContent(locale === APP_LOCALES.GERMAN ? /Nächste Benachrichtigung:/ : /Next notification:/);
+      expect(nextLabel).toHaveTextContent(/2026/);
+      await captureEvidence(`activation-${locale}-settings-scheduled`);
       const futureBatch = { ...state.pending, id: `insight-harness-batch-${locale}`, fireAt: new Date(Date.now() + 3_600_000).toISOString() };
       await repository.persistInsightNotificationState({ ...state, pending: futureBatch });
       await scheduler.reconcileInsightBatch({ batch: futureBatch, locale });
@@ -146,6 +166,11 @@ describe('native insight notification preferences and delivery registration', ()
       const registered = await Notifications.getAllScheduledNotificationsAsync();
       expect(registered.filter((request) => request.content.data?.['owner'] === INSIGHT_NOTIFICATION_OWNER)).toHaveLength(1);
       expect(registered.find((request) => request.identifier === futureBatch.id)?.content.data?.['target']).toEqual(futureBatch.candidates[0]);
+      now = new Date(new Date(state.pending.fireAt).getTime() + 1);
+      await coordinator.update({ ...periodInput, locale, ready: true });
+      expect((await repository.loadInsightNotificationState()).pending).toBeNull();
+      await screen.findByTestId('insight-notification-none');
+      await captureEvidence(`activation-${locale}-settings-handled`);
       await press('insight-notification-toggle');
       await waitUntil(() => !insightNotificationStore.getSnapshot().context.settings.enabled && !insightNotificationStore.getSnapshot().context.busy);
       expect((await repository.loadInsightNotificationState()).enabled).toBe(false);
@@ -153,6 +178,12 @@ describe('native insight notification preferences and delivery registration', ()
       const after = await Notifications.getAllScheduledNotificationsAsync();
       expect(after.some((request) => request.content.data?.['owner'] === INSIGHT_NOTIFICATION_OWNER)).toBe(false);
       expect(after.some((request) => request.identifier === sentinelIdentifier)).toBe(true);
+      await press('insight-notification-toggle');
+      await waitUntil(() => insightNotificationStore.getSnapshot().context.settings.enabled && !insightNotificationStore.getSnapshot().context.busy);
+      expect((await repository.loadInsightNotificationState()).pending).toBeNull();
+      expect((await Notifications.getAllScheduledNotificationsAsync()).some((request) => request.content.data?.['owner'] === INSIGHT_NOTIFICATION_OWNER)).toBe(false);
+      await press('insight-notification-toggle');
+      await waitUntil(() => !insightNotificationStore.getSnapshot().context.settings.enabled && !insightNotificationStore.getSnapshot().context.busy);
       await captureEvidence(`fix-${locale}-settings-disabled-after`);
     });
   }

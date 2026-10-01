@@ -93,9 +93,34 @@ describe('insight notification domain', () => {
       tab === ANALYTICS_INSIGHT_TABS.GUIDING_BELIEF
       && id.endsWith(`:guiding-belief:${belief?.beliefSystemId}`)
     ))).toBe(true);
-    expect(thisWeek.map(({ id }) => id.replace(`${ANALYTICS_TIMEFRAMES.LAST_WEEK}:`, '')))
-      .toEqual(allTime.map(({ id }) => id.replace(`${ANALYTICS_TIMEFRAMES.ALL_TIME}:`, '')));
+    expect(thisWeek.map(({ tab, patternId }) => ({ tab, patternId })))
+      .toEqual(allTime.map(({ tab, patternId }) => ({ tab, patternId })));
     expect(new Set(candidates.map(({ id }) => id)).size).toBe(candidates.length);
+  });
+
+  it('renews weekly and four-week identities at the local Monday boundary but keeps all-time identities', () => {
+    const entries = [1, 2, 3, 8, 9, 10].map((day) => makeCheckIn({
+      id: `period-${day}`, at: new Date(2026, 8, day, 12).toISOString(),
+      emotionId: EMOTION_IDS.JOY,
+      ...(builtInStatement ? { beliefSystemId: builtInStatement.beliefSystemId } : {}),
+    }));
+    const input = { entries, statements: archiveData.statements };
+    const monday = insightCandidates({ ...input, now: new Date(2026, 8, 7, 0) });
+    const sunday = insightCandidates({ ...input, now: new Date(2026, 8, 13, 23, 59) });
+    const nextMonday = insightCandidates({ ...input, now: new Date(2026, 8, 14, 0) });
+    expect(sunday).toEqual(monday);
+    for (const timeframe of [ANALYTICS_TIMEFRAMES.LAST_WEEK, ANALYTICS_TIMEFRAMES.LAST_FOUR_WEEKS]) {
+      const before = monday.filter((candidate) => candidate.timeframe === timeframe);
+      const after = nextMonday.filter((candidate) => candidate.timeframe === timeframe);
+      expect(before.length).toBeGreaterThan(0);
+      expect(after.length).toBeGreaterThan(0);
+      expect(after.every(({ id }) => !before.some((candidate) => candidate.id === id))).toBe(true);
+      expect(after.map(({ tab, patternId }) => ({ tab, patternId }))).toEqual(before.map(({ tab, patternId }) => ({ tab, patternId })));
+    }
+    expect(nextMonday.filter(({ timeframe }) => timeframe === ANALYTICS_TIMEFRAMES.ALL_TIME))
+      .toEqual(monday.filter(({ timeframe }) => timeframe === ANALYTICS_TIMEFRAMES.ALL_TIME));
+    expect(monday.filter(({ timeframe }) => timeframe === ANALYTICS_TIMEFRAMES.LAST_WEEK)
+      .every(({ id }) => id.startsWith(`${ANALYTICS_TIMEFRAMES.LAST_WEEK}:2026-08-31:2026-09-07:`))).toBe(true);
   });
 
   it('schedules at the next local occurrence, including the same-day boundary', () => {

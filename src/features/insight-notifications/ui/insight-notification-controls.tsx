@@ -12,6 +12,8 @@ import { ConfirmedPickerModal } from '@/components/ui/confirmed-picker-modal';
 import { useAppNavigationActor } from '@/navigation/app-navigation.provider';
 import { palette, type } from '@/theme';
 import { insightNotificationStore } from '@/app-stores';
+import { useAppLocale } from '@/localization/app-locale-provider';
+import { formatHistoryDate } from '@/localization/date-copy';
 
 const _selectNotifications = (snapshot: ReturnType<typeof insightNotificationStore.getSnapshot>) => snapshot.context;
 function InsightNotificationTime() {
@@ -48,6 +50,24 @@ function NotificationButton({ label, onPress, testID, disabled = false, variant 
 }) {
   return <Button.Root disabled={disabled} label={label} onPress={onPress} testID={testID} variant={variant}><Button.Text>{label}</Button.Text></Button.Root>;
 }
+const deliveryReady = ({ settings, hydrated, busy, error, permission }: ReturnType<typeof _selectNotifications>) => (
+  hydrated && settings.enabled && !busy && !error && permission === REMINDER_PERMISSION_STATES.GRANTED
+);
+
+function InsightNotificationDelivery() {
+  const context = useSelector(insightNotificationStore, _selectNotifications);
+  const { settings, busy } = context;
+  const locale = useAppLocale();
+  assert(Schema.is(InsightNotificationStateSchema)(settings), 'Insight delivery feedback requires valid persisted preferences');
+  assert(Object.values(REMINDER_PERMISSION_STATES).includes(context.permission), 'Insight delivery feedback requires a supported permission state');
+  if (!settings.enabled) return null;
+  if (busy) return <Text style={styles.copy} testID="insight-notification-checking"><fbt desc="Insight notification scheduling in progress">Checking your next notification…</fbt></Text>;
+  if (!deliveryReady(context)) return null;
+  if (!settings.pending) return <Text style={styles.copy} testID="insight-notification-none"><fbt desc="No insight notification scheduled">No notification is scheduled yet. We will check for new insights when you open Youmotion.</fbt></Text>;
+  const delivery = formatHistoryDate({ date: new Date(settings.pending.fireAt), locale });
+  return <Text style={styles.copy} testID="insight-notification-next">{fbs('Next notification: ' + fbs.param('delivery', delivery), 'Next scheduled insight notification')}</Text>;
+}
+
 function InsightNotificationStatus() {
   const { settings, error, permission } = useSelector(insightNotificationStore, _selectNotifications);
   assert(Schema.is(InsightNotificationStateSchema)(settings), 'Insight controls require valid notification preferences');
@@ -55,6 +75,7 @@ function InsightNotificationStatus() {
   const blocked = permission === REMINDER_PERMISSION_STATES.DENIED;
   return <>
     {settings.enabled ? <Text style={styles.copy}><fbt desc="Insight notifications enabled status">Insight notifications are enabled.</fbt></Text> : null}
+    <InsightNotificationDelivery />
     {blocked ? <Text style={styles.copy}><fbt desc="Insight notifications denied status">Notifications are turned off in system settings.</fbt></Text> : null}
     {error ? <Text accessibilityRole="alert" style={styles.copy}><fbt desc="Insight notification operation failed">Insight notifications could not be updated. Try again.</fbt></Text> : null}
   </>;
@@ -98,7 +119,7 @@ export function InsightNotificationControls({ offer = false, available = true }:
     <View style={styles.card} testID={offer ? 'insight-notification-offer' : 'insight-notification-settings'}>
       <Text style={styles.title}><fbt desc="Insight notification preference title">New insights</fbt></Text>
       <Text style={styles.copy}><fbt desc="Insight notification types explanation">Receive a notification for a new guiding belief or pattern, across all three timeframes.</fbt></Text>
-      <Text style={styles.copy}><fbt desc="Insight notification scheduling explanation">Insights are calculated when you open Youmotion. New insights can reach you at your chosen time, even when the app is closed.</fbt></Text>
+      <Text style={styles.copy}><fbt desc="Insight notification activation and periods explanation">When you activate notifications, existing insights will reach you once at your chosen time. After that, we check for new insights when you open Youmotion. Weekly and four-week insights can notify you again for a new reporting period, even when the app is closed.</fbt></Text>
       <InsightNotificationPreferenceTime />
       <InsightNotificationStatus />
       <NotificationButton disabled={!hydrated || busy} label={settings.enabled ? String(fbs('Deactivate notifications', 'Disable insight notifications')) : String(fbs('Activate notifications', 'Enable insight notifications'))} onPress={settings.enabled ? _disable : _enable} testID="insight-notification-toggle" />

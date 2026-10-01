@@ -65,6 +65,7 @@ function rig({
   reconcileError?: Error;
 } = {}) {
   let saved = settings;
+  let clock = new Date(instant);
   const reconciliations: Array<{
     batch: Parameters<InsightDependencies['reconcile']>[0]['batch'];
     locale: Parameters<InsightDependencies['reconcile']>[0]['locale'];
@@ -85,13 +86,13 @@ function rig({
       if (reconcileError) throw reconcileError;
     }),
     cancel: jest.fn(async () => undefined),
-    now: jest.fn(() => new Date(instant)),
+    now: jest.fn(() => new Date(clock)),
     nonce: jest.fn(() => 'test-nonce'),
     openSettings: jest.fn(async () => undefined),
   };
   const store = createInsightNotificationStore();
   const coordinator = new InsightNotificationCoordinator({ store, deps });
-  return { coordinator, deps, store, getSaved: () => saved, reconciliations };
+  return { coordinator, deps, store, getSaved: () => saved, reconciliations, setNow: (value: Date) => { clock = value; } };
 }
 
 const enable = (): InsightNotificationCommand => ({ type: INSIGHT_NOTIFICATION_EVENTS.ENABLED });
@@ -121,18 +122,110 @@ describe('insight notification coordinator', () => {
     expect(deps.reconcile).not.toHaveBeenCalled();
   });
 
-  it('uses enabling as a baseline so earlier insights never trigger retroactive delivery', async () => {
-    const { coordinator, deps, getSaved } = rig();
+  it('queues existing insights once when enabled and retains their IDs on reactivation after the deadline', async () => {
+    const { coordinator, deps, getSaved, setNow } = rig();
     await coordinator.update(baselineData);
     await coordinator.command(enable());
     const candidates = insightCandidates({ entries: baselineData.entries, statements: baselineData.statements, now: instant });
     expect(getSaved()).toMatchObject({
       enabled: true,
       dismissed: true,
-      seen: candidates.map(({ id }) => id),
-      pending: null,
+      seen: [],
+      pending: { candidates },
     });
+    expect(deps.reconcile).toHaveBeenLastCalledWith({ batch: getSaved().pending, locale: APP_LOCALES.ENGLISH });
+    const batch = getSaved().pending;
+    if (!batch) throw new Error('Activation must introduce available insights.');
+    setNow(new Date(new Date(batch.fireAt).getTime() + 1));
+    await coordinator.command({ type: INSIGHT_NOTIFICATION_EVENTS.DISABLED });
+    expect(getSaved().seen).toEqual(candidates.map(({ id }) => id));
+    await coordinator.command(enable());
+    expect(getSaved().pending).toBeNull();
     expect(deps.reconcile).toHaveBeenLastCalledWith({ batch: null, locale: APP_LOCALES.ENGLISH });
+  });
+
+  it('enables without a batch when no insights exist and introduces them when data later arrives', async () => {
+    const { coordinator, getSaved } = rig();
+    await coordinator.update({ ...baselineData, entries: [] });
+    await coordinator.command(enable());
+    expect(getSaved()).toMatchObject({ enabled: true, pending: null, seen: [] });
+    await coordinator.update(baselineData);
+    expect(getSaved().pending?.candidates.length).toBeGreaterThan(0);
+  });
+
+  it.each([
+    [new Date(2026, 9, 1, 20, 59), new Date(2026, 9, 1, 21)],
+    [new Date(2026, 9, 1, 21), new Date(2026, 9, 2, 21)],
+    [new Date(2026, 9, 1, 22), new Date(2026, 9, 2, 21)],
+  ])('registers the introduction at the next chosen local time when activated at %s', async (now, delivery) => {
+    const { coordinator, deps, getSaved, setNow } = rig();
+    setNow(now);
+    await coordinator.update(baselineData);
+    await coordinator.command({ type: INSIGHT_NOTIFICATION_EVENTS.TIME_CHANGED, time: { hour: 21, minute: 0 } });
+    await coordinator.command(enable());
+    expect(getSaved().pending?.fireAt).toBe(delivery.toISOString());
+    expect(deps.reconcile).toHaveBeenLastCalledWith({ batch: expect.objectContaining({ fireAt: delivery.toISOString() }), locale: APP_LOCALES.ENGLISH });
+  });
+
+  it('does not claim activation or register an introduction when preference persistence fails', async () => {
+    const { coordinator, deps, store, getSaved } = rig({ persistError: new Error('storage unavailable') });
+    await coordinator.update(baselineData);
+    await coordinator.command(enable());
+    expect(getSaved().enabled).toBe(false);
+    expect(store.getSnapshot().context.error).not.toBeNull();
+    expect(deps.reconcile).not.toHaveBeenCalled();
+  });
+
+  it('renews reporting-period candidates on foreground reentry without resending all-time insights', async () => {
+    const { coordinator, getSaved, setNow } = rig();
+    await coordinator.update(baselineData);
+    await coordinator.command(enable());
+    const batch = getSaved().pending;
+    if (!batch) throw new Error('Activation must register a batch.');
+    setNow(new Date(new Date(batch.fireAt).getTime() + 1));
+    await coordinator.update(baselineData);
+    expect(getSaved().pending).toBeNull();
+    await coordinator.setActive(false);
+    setNow(new Date(2026, 9, 5, 10));
+    await coordinator.setActive(true);
+    const renewed = getSaved().pending;
+    expect(renewed?.candidates.length).toBeGreaterThan(0);
+    expect(renewed?.candidates.some(({ timeframe }) => timeframe === 'allTime')).toBe(false);
+    await coordinator.update(baselineData);
+    expect(getSaved().pending).toEqual(renewed);
+  });
+
+  it('reconciles legacy period IDs while preserving the pending deadline and all-time ledger', async () => {
+    const now = new Date(2026, 8, 8, 10);
+    const deadline = new Date(2026, 8, 8, 19).toISOString();
+    const candidates = insightCandidates({ ...archiveData, now });
+    const legacyCandidates = candidates.map((candidate) => ({ ...candidate,
+      id: candidate.id.replace(/:\d{4}-\d{2}-\d{2}:\d{4}-\d{2}-\d{2}/, ''),
+    }));
+    const first = legacyCandidates.find(({ timeframe }) => timeframe !== 'allTime');
+    if (!first) throw new Error('Fixture must contain a bounded reporting period.');
+    const { coordinator, getSaved, setNow } = rig({ settings: {
+      ...initialInsightNotificationState(), enabled: true,
+      seen: legacyCandidates.map(({ id }) => id),
+      pending: { id: 'legacy-pending', fireAt: deadline, candidates: [first] },
+    } });
+    setNow(now);
+    await coordinator.update(archiveData);
+    expect(getSaved().pending).toMatchObject({ id: 'legacy-pending', fireAt: deadline });
+    expect(getSaved().pending?.candidates.some(({ timeframe }) => timeframe === 'allTime')).toBe(false);
+    expect(getSaved().pending?.candidates.every(({ id }) => candidates.some((candidate) => candidate.id === id))).toBe(true);
+  });
+
+  it('does not resurrect a completed introduction when its selected time changes', async () => {
+    const { coordinator, getSaved, setNow } = rig();
+    await coordinator.update(baselineData);
+    await coordinator.command(enable());
+    const batch = getSaved().pending;
+    if (!batch) throw new Error('Activation must register a batch.');
+    setNow(new Date(new Date(batch.fireAt).getTime() + 1));
+    await coordinator.command({ type: INSIGHT_NOTIFICATION_EVENTS.TIME_CHANGED, time: { hour: 22, minute: 0 } });
+    expect(getSaved().pending).toBeNull();
+    expect(getSaved().seen).toEqual(batch.candidates.map(({ id }) => id));
   });
 
   it('schedules novel insights, coalesces candidates, and reuses the same pending request on repeat updates', async () => {

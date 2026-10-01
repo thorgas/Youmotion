@@ -6399,6 +6399,54 @@
         }
       ],
       "types": []
+    },
+    "WZLB3BF8SAQoYenojjcUKw==": {
+      "description": "Insight notification scheduling in progress",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Deine nächste Benachrichtigung wird geprüft…",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "8KxgTx07xrfFFNElwe4rYA==": {
+      "description": "Next scheduled insight notification",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Nächste Benachrichtigung: {delivery}",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "XljIrNbjQ4NdpnFKLxNnbQ==": {
+      "description": "No insight notification scheduled",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Noch keine Benachrichtigung geplant. Wir prüfen neue Einblicke, wenn du Youmotion öffnest.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "TQWVKwt3Sn3n9WSpT/2r+g==": {
+      "description": "Insight notification activation and periods explanation",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Beim Aktivieren erhältst du einmal einen Hinweis auf vorhandene Einblicke zur gewählten Uhrzeit. Danach prüfen wir neue Einblicke, wenn du Youmotion öffnest. Für eine neue Woche oder einen neuen 4-Wochen-Zeitraum kannst du erneut einen Hinweis erhalten, auch wenn die App geschlossen ist.",
+          "variations": {}
+        }
+      ],
+      "types": []
     }
   }
 }
