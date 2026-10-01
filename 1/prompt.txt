@@ -1,0 +1,9 @@
+We should offer to activate notifications when a new Einblick is generated (for last week, last 4 weeks or whole time frame). In a similar way that users can in the settings choose to activate or deactivate them. And we should offer when there is a new Einblick that they receive a notification for it. Use [$visual-plan](/Users/timhorgas/git/Youmotion/.agents/skills/visual-plan/SKILL.md) first
+
+---
+
+It can be a leitsatz or a pattern
+
+---
+
+Yes approve
