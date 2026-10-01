@@ -1,5 +1,1 @@
-ok create a new branch for it and implement it. make sure you test it on android and ios
-
----
-
 send me screenshots when done
