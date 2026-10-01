@@ -20,7 +20,7 @@ export function ReminderTimingSummary({ timing }: { timing: ReminderTiming }) {
   return (
     <Text style={styles.summary} testID="reminder-timing-summary">
       {daily ? <fbt desc="Every day reminder schedule summary">Daily</fbt> : days}
-      {' · '}{times}
+      {': '}{times}
     </Text>
   );
 }

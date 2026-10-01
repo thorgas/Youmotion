@@ -194,7 +194,7 @@ describe('Leitsatz reminder screen', () => {
     const actor = await actorAtExistingEditor({ enabled: false });
     actor.send({ type: NAVIGATION_EVENTS.BACK_REQUESTED });
     await render(<AppNavigationActorProvider actor={actor}><BeliefLibraryScreen /></AppNavigationActorProvider>);
-    expect(screen.getByTestId('reminder-timing-summary')).toHaveTextContent('Mon, Wed, Fri · 09:03');
+    expect(screen.getByTestId('reminder-timing-summary')).toHaveTextContent('Mon, Wed, Fri: 09:03');
     expect(screen.getByText('Off')).toBeOnTheScreen();
     actor.stop();
   });

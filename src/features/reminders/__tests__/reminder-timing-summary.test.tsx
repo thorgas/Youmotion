@@ -17,12 +17,12 @@ describe('reminder schedule summary', () => {
         <ReminderTimingSummary timing={{ weekdays: [1, 2, 3, 4, 5, 6, 7], times: [{ hour: 9, minute: 3 }, { hour: 18, minute: 30 }] }} />
       </AppLocaleProvider>,
     );
-    expect(screen.getByTestId('reminder-timing-summary')).toHaveTextContent(`${daily} · 09:03, 18:30`);
+    expect(screen.getByTestId('reminder-timing-summary')).toHaveTextContent(`${daily}: 09:03, 18:30`);
     await view.rerender(
       <AppLocaleProvider>
         <ReminderTimingSummary timing={{ weekdays: [2, 4, 6], times: [{ hour: 0, minute: 0 }, { hour: 23, minute: 59 }] }} />
       </AppLocaleProvider>,
     );
-    expect(screen.getByTestId('reminder-timing-summary')).toHaveTextContent(`${selected} · 00:00, 23:59`);
+    expect(screen.getByTestId('reminder-timing-summary')).toHaveTextContent(`${selected}: 00:00, 23:59`);
   });
 });
