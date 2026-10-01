@@ -4,6 +4,7 @@ import { createActor, waitFor, type Actor } from 'xstate';
 import {
   APP_LOCALES,
   BELIEF_LIBRARY_EVENTS,
+  BELIEF_LIBRARY_STATES,
   CHECK_IN_EVENTS,
   EMOTION_LABEL_MODES,
   NAVIGATION_EVENTS,
@@ -19,13 +20,43 @@ import { appNavigationMachine } from '@/navigation/app-navigation.composition';
 import { AppNavigationActorProvider } from '@/navigation/app-navigation.provider';
 import {
   mockSurrealDatabase,
+  failNextSurrealUpsert,
   resetSurrealDatabaseMock,
 } from '@/test-utils/surrealdb.repository.mock';
 import * as reminderScheduler from '../infrastructure/local-reminder.scheduler';
 import { LeitsatzReminderScreen } from '../ui/leitsatz-reminder-screen';
 import { borderColors, palette } from '@/theme';
 import { CustomBeliefSystemId } from '@/features/beliefs/domain/belief-statement';
-import { ReminderAssignmentId } from '../domain/reminder-assignment';
+import { BeliefLibraryScreen } from '@/features/beliefs/ui/belief-library-screen';
+import { ReminderAssignmentId, ReminderTimestamp, type ReminderAssignment } from '../domain/reminder-assignment';
+
+const editableAssignment = {
+  id: ReminderAssignmentId.make('editor-deactivation'),
+  schemaVersion: 2,
+  targetKind: REMINDER_TARGET_KINDS.GUIDING_BELIEF,
+  beliefSystemId: CustomBeliefSystemId.make('custom-editor-deactivation'),
+  notificationContent: REMINDER_NOTIFICATION_CONTENT.GENERAL,
+  enabled: true,
+  weekdays: [2, 4, 6],
+  times: [{ hour: 9, minute: 3 }],
+  createdAt: ReminderTimestamp.make('2026-10-01T08:00:00.000Z'),
+  updatedAt: ReminderTimestamp.make('2026-10-01T08:00:00.000Z'),
+} satisfies ReminderAssignment;
+
+async function actorAtExistingEditor({ enabled = true } = {}) {
+  const actor = createActor(appNavigationMachine).start();
+  await waitFor(actor, (snapshot) => snapshot.context.reminderDataHydrated);
+  actor.send({ type: NAVIGATION_EVENTS.SETTINGS_OPENED });
+  actor.send({ type: BELIEF_LIBRARY_EVENTS.OPENED });
+  actor.send({ type: REMINDER_EVENTS.HYDRATED, assignments: [{ ...editableAssignment, enabled }] });
+  actor.send({ type: CHECK_IN_EVENTS.BELIEF_STATEMENTS_HYDRATED, statements: [{
+    kind: 'custom', beliefSystemId: editableAssignment.beliefSystemId,
+    harmfulStatement: 'I must never pause.', guidingStatement: 'I may take my time.',
+  }] });
+  actor.send({ type: REMINDER_EVENTS.ASSIGNMENT_EDIT_REQUESTED, assignmentId: editableAssignment.id });
+  await waitFor(actor, (snapshot) => snapshot.matches(REMINDER_STATES.EDITOR));
+  return actor;
+}
 
 jest.mock('expo-router', () => ({
   router: { dismissTo: jest.fn(), push: jest.fn(), replace: jest.fn() },
@@ -113,6 +144,76 @@ describe('Leitsatz reminder screen', () => {
       borderColor: borderColors.moss20,
     });
     expect(actor.getSnapshot().context.reminderAssignments).toEqual([]);
+  });
+
+  it('turns off the edited reminder, preserves saved timing, and exits to the library', async () => {
+    const actor = await actorAtExistingEditor();
+    await renderReminder(actor);
+    await fireEvent.press(screen.getByTestId('reminder-time-add'));
+    expect(actor.getSnapshot().context.reminderTimesDraft).toHaveLength(2);
+    await fireEvent.press(screen.getByTestId('reminder-deactivate'));
+    await waitFor(actor, (snapshot) => snapshot.matches(BELIEF_LIBRARY_STATES.LIBRARY));
+    expect(actor.getSnapshot().context.reminderAssignments).toEqual([
+      expect.objectContaining({ ...editableAssignment, enabled: false, updatedAt: expect.any(String) }),
+    ]);
+    expect(mockRequestReminderPermission).not.toHaveBeenCalled();
+    actor.stop();
+  });
+
+  it.each(['storage', 'scheduler'])('keeps the editor retryable after a %s failure', async (failure) => {
+    const actor = await actorAtExistingEditor();
+    await renderReminder(actor);
+    if (failure === 'storage') failNextSurrealUpsert(new Error('disk unavailable'));
+    if (failure === 'scheduler') jest.mocked(reminderScheduler.reconcileReminderNotifications)
+      .mockRejectedValueOnce(new Error('native cancellation failed'));
+    await fireEvent.press(screen.getByTestId('reminder-deactivate'));
+    expect(await screen.findByTestId('reminder-editor-error')).toHaveTextContent(
+      'Your reminder could not be turned off. Please try again.',
+    );
+    expect(actor.getSnapshot().matches(REMINDER_STATES.EDITOR)).toBe(true);
+    expect(actor.getSnapshot().context.reminderAssignments[0]?.enabled).toBe(true);
+    await fireEvent.press(screen.getByTestId('reminder-deactivate'));
+    await waitFor(actor, (snapshot) => snapshot.matches(BELIEF_LIBRARY_STATES.LIBRARY));
+    expect(actor.getSnapshot().context.reminderAssignments[0]?.enabled).toBe(false);
+    actor.stop();
+  });
+
+  it('keeps an off reminder off when saving timing edits', async () => {
+    const actor = await actorAtExistingEditor({ enabled: false });
+    await renderReminder(actor);
+    expect(screen.queryByTestId('reminder-deactivate')).not.toBeOnTheScreen();
+    await fireEvent.press(screen.getByTestId('reminder-time-add'));
+    await fireEvent.press(screen.getByTestId('reminder-save'));
+    await waitFor(actor, (snapshot) => snapshot.matches(BELIEF_LIBRARY_STATES.LIBRARY));
+    expect(actor.getSnapshot().context.reminderAssignments[0]).toMatchObject({ enabled: false });
+    expect(actor.getSnapshot().context.reminderAssignments[0]?.times).toHaveLength(2);
+    actor.stop();
+  });
+
+  it('shows saved timing in the overview even while the reminder is off', async () => {
+    const actor = await actorAtExistingEditor({ enabled: false });
+    actor.send({ type: NAVIGATION_EVENTS.BACK_REQUESTED });
+    await render(<AppNavigationActorProvider actor={actor}><BeliefLibraryScreen /></AppNavigationActorProvider>);
+    expect(screen.getByTestId('reminder-timing-summary')).toHaveTextContent('Mon, Wed, Fri · 09:03');
+    expect(screen.getByText('Off')).toBeOnTheScreen();
+    actor.stop();
+  });
+
+  it('ignores repeated deactivation while saving', async () => {
+    const actor = await actorAtExistingEditor();
+    let finishCancellation: (() => void) | undefined;
+    jest.mocked(reminderScheduler.reconcileReminderNotifications).mockImplementationOnce(() => new Promise<void>((resolve) => {
+      finishCancellation = resolve;
+    }));
+    actor.send({ type: REMINDER_EVENTS.DEACTIVATE_REQUESTED });
+    await waitFor(actor, (snapshot) => snapshot.matches(REMINDER_STATES.SAVING));
+    actor.send({ type: REMINDER_EVENTS.DEACTIVATE_REQUESTED });
+    await new Promise<void>((resolve) => setTimeout(resolve, 0));
+    if (!finishCancellation) throw new Error('Deactivation must reach notification cancellation');
+    finishCancellation();
+    await waitFor(actor, (snapshot) => snapshot.matches(BELIEF_LIBRARY_STATES.LIBRARY));
+    expect(actor.getSnapshot().context.reminderAssignments[0]?.enabled).toBe(false);
+    actor.stop();
   });
 
   it('shows the focused notification Leitsatz on its positive surface', async () => {

@@ -885,6 +885,35 @@ describe('app navigation model', () => {
     expect(mockRequestReminderPermission).not.toHaveBeenCalled();
   });
 
+  it('models editor deactivation through failure, retry, saving, and the originating library', async () => {
+    const actor = createActor(appNavigationMachine).start();
+    await waitFor(actor, (snapshot) => snapshot.context.reminderDataHydrated);
+    const id = ReminderAssignmentId.make('model-deactivation');
+    const timestamp = ReminderTimestamp.make('2026-10-01T08:00:00.000Z');
+    actor.send({ type: REMINDER_EVENTS.HYDRATED, assignments: [{
+      id, schemaVersion: 2, targetKind: REMINDER_TARGET_KINDS.GUIDING_BELIEF,
+      beliefSystemId: BELIEF_SYSTEM_IDS.ALWAYS_FUNCTIONING,
+      notificationContent: REMINDER_NOTIFICATION_CONTENT.GENERAL,
+      enabled: true, weekdays: [2], times: [{ hour: 9, minute: 3 }],
+      createdAt: timestamp, updatedAt: timestamp,
+    }] });
+    actor.send({ type: NAVIGATION_EVENTS.SETTINGS_OPENED });
+    actor.send({ type: BELIEF_LIBRARY_EVENTS.OPENED });
+    actor.send({ type: REMINDER_EVENTS.ASSIGNMENT_EDIT_REQUESTED, assignmentId: id });
+    expect(actor.getSnapshot().matches(REMINDER_STATES.EDITOR)).toBe(true);
+    failNextSurrealUpsert(new Error('model storage failure'));
+    actor.send({ type: REMINDER_EVENTS.DEACTIVATE_REQUESTED });
+    expect(actor.getSnapshot().matches(REMINDER_STATES.SAVING)).toBe(true);
+    expect(actor.getSnapshot().can({ type: REMINDER_EVENTS.DEACTIVATE_REQUESTED })).toBe(false);
+    await waitFor(actor, (snapshot) => snapshot.matches(REMINDER_STATES.EDITOR));
+    expect(actor.getSnapshot().context.reminderError).toBe('Your reminder could not be turned off.');
+    actor.send({ type: REMINDER_EVENTS.DEACTIVATE_REQUESTED });
+    await waitFor(actor, (snapshot) => snapshot.matches(BELIEF_LIBRARY_STATES.LIBRARY));
+    expect(actor.getSnapshot().context.reminderAssignments[0]?.enabled).toBe(false);
+    expect(actor.getSnapshot().context.reminderAssignmentDraftId).toBeNull();
+    actor.stop();
+  });
+
   it('models all emotion-label setting choices', () => {
     const actor = createActor(appNavigationMachine).start();
 

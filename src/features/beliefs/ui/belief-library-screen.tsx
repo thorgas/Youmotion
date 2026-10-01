@@ -45,6 +45,7 @@ import type {
   ReminderAssignment,
 } from '@/features/reminders/domain/reminder-assignment';
 import { confirmReminderDeletion } from '@/features/reminders/ui/reminder-deletion';
+import { ReminderTimingSummary } from '@/features/reminders/ui/reminder-timing-summary';
 import { useAppNavigationActor } from '@/navigation/app-navigation.provider';
 import { confirmBeliefRemoval } from './belief-library-removal';
 import { guidingBeliefLibraryStatements } from '../application/guiding-belief-library';
@@ -200,6 +201,7 @@ function BeliefLibraryReminderSection({
         </Text>
         <Text style={styles.reminderStatus}>{reminderStatusLabel(reminder)}</Text>
       </View>
+      {reminder ? <ReminderTimingSummary timing={reminder} /> : null}
       <Text style={styles.reminderCopy}>
         {reminder
           ? reminderContentLabel(reminder)

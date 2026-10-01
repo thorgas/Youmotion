@@ -766,6 +766,7 @@ export const createAppNavigationMachine = (runtime: AppNavigationRuntime) => set
         index: Schema.NonNegativeInt,
       })),
       [REMINDER_EVENTS.SAVE_REQUESTED]: EmptyEventSchema,
+      [REMINDER_EVENTS.DEACTIVATE_REQUESTED]: EmptyEventSchema,
       [REMINDER_EVENTS.SAVED]: Schema.standardSchemaV1(Schema.Struct({
         assignment: ReminderAssignmentSchema,
         assignments: ReminderAssignmentListSchema,
@@ -2265,6 +2266,35 @@ export const createAppNavigationMachine = (runtime: AppNavigationRuntime) => set
               ? context.reminderTimesDraft
               : context.reminderTimesDraft.filter((_time, index) => index !== event.index),
           }),
+        },
+        [REMINDER_EVENTS.DEACTIVATE_REQUESTED]: ({ context, self }, enq) => {
+          assert(Schema.is(ReminderAssignmentListSchema)(context.reminderAssignments), 'Deactivation requires valid reminder assignments.');
+          assert(context.reminderDataHydrated, 'Deactivation requires hydrated reminder data.');
+          const assignment = context.reminderAssignments.find(
+            (candidate) => candidate.id === context.reminderAssignmentDraftId,
+          );
+          if (!assignment?.enabled) return undefined;
+          enq(() => {
+            void setReminderAssignmentEnabled({
+              assignment,
+              assignments: context.reminderAssignments,
+              enabled: false,
+              locale: runtime.appSettingsStore.getSnapshot().context.locale,
+              now: runtime.now(),
+              statements: context.beliefStatements,
+            }).then(
+              (assignments) => self.send({
+                type: REMINDER_EVENTS.SAVED,
+                assignment,
+                assignments,
+              }),
+              () => self.send({
+                type: REMINDER_EVENTS.OPERATION_FAILED,
+                message: 'Your reminder could not be turned off.',
+              }),
+            );
+          });
+          return { target: REMINDER_STATES.SAVING, context: { reminderError: null } };
         },
         [REMINDER_EVENTS.SAVE_REQUESTED]: ({ context, self }, enq) => {
           const timing = reminderTimingFromDraft(context);

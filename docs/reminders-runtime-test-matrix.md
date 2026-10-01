@@ -8,6 +8,11 @@ This matrix defines the device-local emotion check-in (internally Pulse) and pos
 | Module initialization | Foreign, malformed, or repeated response | Cold or warm notification open | No navigation occurs for foreign or malformed data; a repeated fingerprint is ignored |
 | Focused notification | A Leitsatz notification is tapped before hydration finishes | Cold launch | A loading focused-Leitsatz destination resolves that assignment and never falls back to the full library |
 | Focused reminder edit | The assignment has hydrated | User taps Edit reminder | Its own days, times, and notification-content choice open directly without another permission prompt |
+| Overview timing | Saved active or disabled Leitsatz reminder | Open guiding-belief overview | Localized weekdays and every saved time appear beneath the reminder heading; daily schedules use Daily / Täglich |
+| Editor deactivation | Active saved reminder, possibly with unsaved edits | Tap Turn off reminder | Saved timing and content remain, draft edits are discarded, native requests are canceled, and the originating overview shows Off |
+| Editor deactivation failure | Storage or native cancellation fails | Tap Turn off reminder | Editor shows a retryable error and does not navigate to success |
+| Disabled editing | Saved disabled reminder | Edit timing and save | Updated timing is saved and the reminder stays Off |
+| Concurrent input | Deactivation is already saving | Repeated deactivation event | No second operation starts |
 | Permission | Undetermined | User accepts the explanation | Native permission is requested before a reminder can be persisted |
 | Permission | Denied or permanently denied | Permission check finishes | The Leitsatz remains intact, no assignment is created, and repair actions expose system settings and a recheck |
 | Permission | Granted | Setup starts | The reminder editor opens directly |

@@ -1,6 +1,61 @@
 {
   "fb-locale": "de-DE",
   "translations": {
+    "CxrbQD3s8cveNuZfMKKmyQ==": {
+      "description": "Deactivate reminder from its editor button",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Erinnerung ausschalten",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "0vDYyI6kKvz7iJQEzBMRsA==": {
+      "description": "Reminder deactivation preserves saved timing and discards draft edits",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Deine gespeicherten Tage und Uhrzeiten bleiben erhalten. Ungespeicherte Änderungen werden verworfen.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "O5E+Wj1j10YLW6bGQzcSKA==": {
+      "description": "Reminder editor deactivation failure",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Deine Erinnerung konnte nicht ausgeschaltet werden. Bitte versuche es erneut.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "li4pssKywfWQdLcxuBT9gg==": {
+      "description": "Reminder editor save failure",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Deine Änderung konnte nicht gespeichert werden. Bitte versuche es erneut.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "5QuzRn+LcdSgI+OU7l/gUQ==": {
+      "description": "Every day reminder schedule summary",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Täglich",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
     "140QAhauBUZz/anKZbwF8Q==": {
       "description": "Release menu action fetching an over-the-air update",
       "tokens": [],

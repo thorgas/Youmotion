@@ -310,6 +310,8 @@ function NotificationContentChoice({ actor, notificationContent }: {
 function ReminderEditorContent({
   actor,
   editing,
+  enabled,
+  error,
   notificationContent,
   pickerIndex,
   pulseTarget,
@@ -318,6 +320,8 @@ function ReminderEditorContent({
 }: {
   actor: ReminderActor;
   editing: boolean;
+  enabled: boolean;
+  error: string | null;
   notificationContent: ReminderNotificationContent;
   pickerIndex: number | null;
   pulseTarget: boolean;
@@ -328,6 +332,7 @@ function ReminderEditorContent({
   assert(times.length > 0 && times.length <= MAX_REMINDER_TIMES, 'Reminder editor requires a supported number of times');
   const _addTime = () => actor.send({ type: REMINDER_EVENTS.TIME_ADDED });
   const _saveReminder = () => actor.send({ type: REMINDER_EVENTS.SAVE_REQUESTED });
+  const _deactivateReminder = () => actor.send({ type: REMINDER_EVENTS.DEACTIVATE_REQUESTED });
   const selectedWeekdays = new Set(weekdays);
   return (
     <>
@@ -389,6 +394,20 @@ function ReminderEditorContent({
         onPress={_saveReminder}
         testID="reminder-save"
       />
+      {editing && enabled ? (
+        <View style={styles.deactivationSection}>
+          <ActionButton
+            label={String(fbs('Turn off reminder', 'Deactivate reminder from its editor button'))}
+            onPress={_deactivateReminder}
+            secondary
+            testID="reminder-deactivate"
+          />
+          <Text style={styles.deactivationHint}>
+            <fbt desc="Reminder deactivation preserves saved timing and discards draft edits">Your saved days and times stay. Unsaved changes are discarded.</fbt>
+          </Text>
+        </View>
+      ) : null}
+      <ReminderEditorError error={error} />
     </>
   );
 }
@@ -450,6 +469,17 @@ function reminderScreenLoading(
     || snapshot.matches(REMINDER_STATES.SAVING);
 }
 
+function ReminderEditorError({ error }: { error: string | null }) {
+  if (!error) return null;
+  return (
+    <Text accessibilityRole="alert" style={styles.error} testID="reminder-editor-error">
+      {error === 'Your reminder could not be turned off.'
+        ? <fbt desc="Reminder editor deactivation failure">Your reminder could not be turned off. Please try again.</fbt>
+        : <fbt desc="Reminder editor save failure">Your reminder change could not be saved. Please try again.</fbt>}
+    </Text>
+  );
+}
+
 export function LeitsatzReminderScreen() {
   const actor = useAppNavigationActor();
   const snapshot = useSelector(actor, _selectSnapshot);
@@ -501,7 +531,7 @@ export function LeitsatzReminderScreen() {
             />
           ) : null}
           {snapshot.matches(REMINDER_STATES.EDITOR) ? (
-            <ReminderEditorContent actor={actor} editing={context.reminderAssignmentDraftId !== null} notificationContent={context.reminderNotificationContentDraft} pickerIndex={context.reminderTimePickerIndex} pulseTarget={pulseTarget} times={context.reminderTimesDraft} weekdays={context.reminderWeekdaysDraft} />
+            <ReminderEditorContent actor={actor} editing={context.reminderAssignmentDraftId !== null} enabled={context.reminderAssignments.some((assignment) => assignment.id === context.reminderAssignmentDraftId && assignment.enabled)} error={context.reminderError} notificationContent={context.reminderNotificationContentDraft} pickerIndex={context.reminderTimePickerIndex} pulseTarget={pulseTarget} times={context.reminderTimesDraft} weekdays={context.reminderWeekdaysDraft} />
           ) : null}
           {snapshot.matches(REMINDER_STATES.ACTIVE) ? (
             <ActiveContent actor={actor} statement={statement} />
@@ -524,6 +554,8 @@ const styles = StyleSheet.create({
   title: { fontFamily: type.semibold, color: palette.ink, fontSize: 34, lineHeight: 40 },
   copy: { fontFamily: type.regular, color: palette.inkMuted, fontSize: 15, lineHeight: 23 },
   error: { fontFamily: type.medium, color: palette.danger, fontSize: 14, lineHeight: 20 },
+  deactivationSection: { gap: 10, marginTop: 8 },
+  deactivationHint: { fontFamily: type.regular, color: palette.inkMuted, fontSize: 13, lineHeight: 19, textAlign: 'center' },
   statementCard: { minHeight: 150, justifyContent: 'center', backgroundColor: palette.selectionWash, borderColor: borderColors.moss20, borderWidth: 1, borderRadius: 24, borderCurve: 'continuous', padding: 22 },
   cardEyebrow: { fontFamily: type.semibold, color: palette.moss, fontSize: 10, letterSpacing: 1.2, marginBottom: 14 },
   statement: { fontFamily: type.medium, color: palette.ink, fontSize: 23, lineHeight: 32, textAlign: 'center' },
