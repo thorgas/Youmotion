@@ -6171,6 +6171,198 @@
       "tokens": [],
       "translations": [{ "translation": "Check-in-Erinnerung hinzufügen", "variations": {} }],
       "types": []
+    },
+    "8HXYudI7umTrKkAD0Rgz4w==": {
+      "description": "Insight notification time picker label",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Benachrichtigungszeit",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "RFO6sqP5iBAXqiQLfYiNSw==": {
+      "description": "Insight delivery time label",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Benachrichtigungszeit",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "jyeISc4UStZHp1f4Y99uOg==": {
+      "description": "Confirm insight notification time",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Fertig",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "aklWJ+nKJFeZH0H7gLAjHg==": {
+      "description": "Choose insight notification time",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Uhrzeit wählen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "fJAXnh1IsEI1sH9TBregsg==": {
+      "description": "Insight notifications enabled status",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Benachrichtigungen für neue Einblicke sind aktiviert.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "smPEXyTVmj1ZwVpjNmX/Ng==": {
+      "description": "Insight notifications denied status",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Benachrichtigungen sind in den Systemeinstellungen ausgeschaltet.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "f2+eW6hzWmAUwdaOgCnHgg==": {
+      "description": "Insight notification operation failed",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Die Benachrichtigungen konnten nicht aktualisiert werden. Bitte versuche es erneut.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "j7LUpY4SPt+00lbT9YsnWA==": {
+      "description": "Open insight notification system settings",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Systemeinstellungen öffnen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "MwJhwdE+OnGkJXJ1skvAFg==": {
+      "description": "Recheck insight notification permission",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Erneut prüfen",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "PDtcLFM8pozat7LQSuYgew==": {
+      "description": "Insight notification loading preference",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Benachrichtigungseinstellungen werden geladen…",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "jpcRckVXXpIfpKXPA7tQMw==": {
+      "description": "Insight notification preference title",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Neue Einblicke",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "212Kcd7I1mgDxquQaKLWXg==": {
+      "description": "Insight notification types explanation",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Erhalte eine Benachrichtigung für einen neuen Leitsatz oder ein neues Muster – für alle drei Zeiträume.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "4oktJkh/Sr0Lf4LuprozIg==": {
+      "description": "Insight notification scheduling explanation",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Einblicke werden berechnet, wenn du Youmotion öffnest. Neue Einblicke können dich zur gewählten Uhrzeit erreichen, auch wenn die App geschlossen ist.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "qJodctUCUGb2Yyw7Uz3p0Q==": {
+      "description": "Disable insight notifications",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Benachrichtigungen ausschalten",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "QajSJ4k3B+E6YrbXC8Qdlw==": {
+      "description": "Enable insight notifications",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Benachrichtigungen aktivieren",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "of2zpGjNsIoY16rmVCVu2g==": {
+      "description": "Dismiss insight notification offer",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Später",
+          "variations": {}
+        }
+      ],
+      "types": []
     }
   }
 }

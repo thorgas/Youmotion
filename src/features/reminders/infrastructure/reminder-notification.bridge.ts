@@ -5,11 +5,15 @@ import assert from '@/assert';
 
 import {
   REMINDER_EVENTS,
+  INSIGHT_NOTIFICATION_EVENTS,
   REMINDER_NOTIFICATION_OWNER,
   REMINDER_TARGET_KINDS,
 } from '@/constants';
 import { BeliefSystemId } from '@/features/beliefs/domain/belief-statement';
 import { ReminderAssignmentId } from '../domain/reminder-assignment';
+
+import { InsightNotificationPayloadSchema } from '@/features/insight-notifications/infrastructure/insight-notification.scheduler';
+import type { InsightOpenedEvent } from '@/features/insight-notifications/application/insight-notification-runtime';
 
 const PulsePayloadSchema = Schema.Struct({
   owner: Schema.Literal(REMINDER_NOTIFICATION_OWNER),
@@ -25,11 +29,13 @@ const GuidingBeliefPayloadSchema = Schema.Struct({
   beliefSystemId: BeliefSystemId,
 });
 const ReminderNotificationPayloadSchema = Schema.Union(
+  InsightNotificationPayloadSchema,
   PulsePayloadSchema,
   GuidingBeliefPayloadSchema,
 );
 type ReminderNotificationPayload = typeof ReminderNotificationPayloadSchema.Type;
 type ReminderNotificationEvent =
+  | InsightOpenedEvent
   | { type: typeof REMINDER_EVENTS.RECONCILE_REQUESTED }
   | {
       type: typeof REMINDER_EVENTS.NOTIFICATION_OPENED;
@@ -50,6 +56,7 @@ let installed = false;
 let lastFingerprint: string | undefined;
 
 function eventForPayload(payload: ReminderNotificationPayload): ReminderNotificationEvent {
+  if ('target' in payload) return { type: INSIGHT_NOTIFICATION_EVENTS.OPENED, target: payload.target };
   return payload.targetKind === REMINDER_TARGET_KINDS.PULSE
     ? {
         type: REMINDER_EVENTS.NOTIFICATION_OPENED,
@@ -68,6 +75,13 @@ function handlePayload(data: unknown) {
   const result = Schema.decodeUnknownEither(ReminderNotificationPayloadSchema)(data);
   if (result._tag === 'Left') return;
   const payload = result.right;
+  if ('target' in payload) {
+    if (lastFingerprint === payload.batchId) return;
+    lastFingerprint = payload.batchId;
+    if (!actor) { pending = payload; return; }
+    actor.send(eventForPayload(payload));
+    return;
+  }
   assert(payload.assignmentId.length > 0, 'Decoded reminder payload must identify an assignment');
   assert(payload.fingerprint.length > 0, 'Decoded reminder payload must have a fingerprint');
   if (lastFingerprint === payload.fingerprint) return;
@@ -90,7 +104,7 @@ export function installReminderNotificationBridge() {
   if (installed) return;
   installed = true;
   assert(installed, 'Reminder notification bridge must mark itself installed');
-  assert(pending === undefined || pending.fingerprint.length > 0, 'Pending reminder payload must have a fingerprint');
+  assert(pending === undefined || ('target' in pending ? pending.batchId : pending.fingerprint).length > 0, 'Pending reminder payload must have a fingerprint');
   Notifications.setNotificationHandler({
     handleNotification: async () => ({
       shouldPlaySound: false,
@@ -110,7 +124,7 @@ export function installReminderNotificationBridge() {
 export function bindReminderNotificationActor(nextActor: ReminderActor) {
   actor = nextActor;
   assert(actor === nextActor, 'Reminder bridge must retain the bound actor');
-  assert(pending === undefined || pending.assignmentId.length > 0, 'Pending reminder payload must identify an assignment');
+  assert(pending === undefined || ('target' in pending ? pending.batchId : pending.assignmentId).length > 0, 'Pending reminder payload must identify an assignment');
   if (!pending) return;
   const payload = pending;
   pending = undefined;

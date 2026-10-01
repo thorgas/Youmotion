@@ -35,6 +35,7 @@ import { actionColors, palette, surfaceColors, type } from '@/theme';
 import { DataSafetyControls } from '@/features/data-safety/ui/data-safety-controls';
 import { FeedbackSettingsAction } from '@/features/feedback/ui/feedback-screen';
 import { LegalSettingsActions } from '@/features/legal/ui/legal-settings-actions';
+import { InsightNotificationControls } from '@/features/insight-notifications/ui/insight-notification-controls';
 import { ReleaseFooter } from '@/features/updates/ui/release-footer';
 import { shouldShowUpdateControls } from '@/features/updates/domain/update-controls';
 import { useAppNavigationActor } from '@/navigation/app-navigation.provider';
@@ -297,6 +298,7 @@ export function SettingsScreen({
             ))}
           />
         </View>
+        <InsightNotificationControls />
         <View testID="settings-legal-section">
           <Text style={styles.sectionHeading}>
             <fbt desc="Heading grouping legal documents in settings">LEGAL</fbt>

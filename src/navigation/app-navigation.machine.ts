@@ -11,6 +11,7 @@ import {
 
 import {
   APP_ROUTES,
+  INSIGHT_NOTIFICATION_EVENTS,
   APP_LOCALES,
   BELIEF_LIBRARY_EVENTS,
   BELIEF_LIBRARY_STATES,
@@ -134,7 +135,15 @@ import {
 } from '@/features/reminders/infrastructure/local-reminder.scheduler';
 import { loadReminderData } from '@/features/reminders/infrastructure/reminder.repository';
 
+import type { InsightNotificationRuntime } from '@/features/insight-notifications/application/insight-notification-runtime';
+import { InsightCandidateSchema } from '@/features/insight-notifications/domain/insight-notification';
+import type { createAnalyticsStore } from '@/features/analytics/application/analytics.store';
+import { primaryAnalyticsInsights } from '@/features/analytics/domain/check-in-analytics';
+import { entriesForAnalyticsTimeframe } from '@/features/analytics/domain/analytics-timeframe';
+
 export interface AppNavigationRuntime {
+  readonly analyticsStore?: ReturnType<typeof createAnalyticsStore>;
+  readonly insightNotifications?: InsightNotificationRuntime;
   readonly appSettingsStore: ReturnType<typeof createAppSettingsStore>;
   readonly checkInHistoryStore: ReturnType<typeof createCheckInHistoryStore>;
   readonly nonce: () => string;
@@ -142,6 +151,7 @@ export interface AppNavigationRuntime {
 }
 
 const AppContextSchema = Schema.Struct({
+  insightNotificationTarget: Schema.NullOr(InsightCandidateSchema),
   selection: Schema.NullOr(EmotionSelectionSchema),
   onboardingSelection: OnboardingSelectionSchema,
   onboardingEntryPoint: Schema.NullOr(OnboardingEntryPointSchema),
@@ -559,6 +569,14 @@ export const createAppNavigationMachine = (runtime: AppNavigationRuntime) => set
   schemas: {
     context: Schema.standardSchemaV1(AppContextSchema),
     events: {
+      [INSIGHT_NOTIFICATION_EVENTS.ENABLED]: EmptyEventSchema,
+      [INSIGHT_NOTIFICATION_EVENTS.DISABLED]: EmptyEventSchema,
+      [INSIGHT_NOTIFICATION_EVENTS.DISMISSED]: EmptyEventSchema,
+      [INSIGHT_NOTIFICATION_EVENTS.RECHECK_REQUESTED]: EmptyEventSchema,
+      [INSIGHT_NOTIFICATION_EVENTS.SYSTEM_SETTINGS_REQUESTED]: EmptyEventSchema,
+      [INSIGHT_NOTIFICATION_EVENTS.TIME_CHANGED]: Schema.standardSchemaV1(Schema.Struct({ time: ReminderLocalTime })),
+      [INSIGHT_NOTIFICATION_EVENTS.PICKER_CHANGED]: Schema.standardSchemaV1(Schema.Struct({ open: Schema.Boolean })),
+      [INSIGHT_NOTIFICATION_EVENTS.OPENED]: Schema.standardSchemaV1(Schema.Struct({ target: InsightCandidateSchema })),
       [NAVIGATION_EVENTS.BACK_REQUESTED]: EmptyEventSchema,
       [NAVIGATION_EVENTS.TODAY_OPENED]: EmptyEventSchema,
       [NAVIGATION_EVENTS.HISTORY_OPENED]: EmptyEventSchema,
@@ -802,7 +820,7 @@ export const createAppNavigationMachine = (runtime: AppNavigationRuntime) => set
   id: 'appNavigation',
   initial: NAVIGATION_STATES.STARTING,
   context: {
-    selection: null,
+    insightNotificationTarget: null,    selection: null,
     onboardingSelection: null,
     onboardingEntryPoint: null,
     note: '',
@@ -845,6 +863,25 @@ export const createAppNavigationMachine = (runtime: AppNavigationRuntime) => set
   entry: ({ self }, enq) => {
     enq(() => {
       assert(self.getSnapshot().status !== 'stopped', 'Startup hydration requires an active actor.');
+      runtime.insightNotifications?.start({
+        data: () => {
+          const context = self.getSnapshot().context;
+          assert(Schema.is(AppContextSchema)(context), 'Insight evaluation requires valid root state.');
+          const history = runtime.checkInHistoryStore.getSnapshot().context;
+          const settings = runtime.appSettingsStore.getSnapshot().context;
+          assert(Array.isArray(history.entries), 'Insight evaluation requires hydrated entry data.');
+          return { entries: history.entries, statements: context.beliefStatements, locale: settings.locale,
+            ready: history.hydrated && history.error === null && settings.hydrated && settings.error === null
+              && context.beliefStatementsHydrated && context.error === null
+              && !self.getSnapshot().matches({ tabs: { settings: 'restoring' } })
+              && !self.getSnapshot().matches({ tabs: { settings: 'deleting' } }) };
+        },
+        subscribe: (notify) => {
+          const subscriptions = [self.subscribe(notify), runtime.checkInHistoryStore.subscribe(notify), runtime.appSettingsStore.subscribe(notify)];
+          return { unsubscribe: () => subscriptions.forEach((subscription) => subscription.unsubscribe()) };
+        },
+        onStop: (stop) => { self.subscribe({ complete: stop }); },
+      });
       assert(Schema.is(AppContextSchema)(self.getSnapshot().context), 'Startup context must satisfy the app schema.');
       void Effect.runPromise(loadCheckIns).then(
         (entries) => self.send({ type: CHECK_IN_EVENTS.HISTORY_HYDRATED, entries }),
@@ -883,8 +920,34 @@ export const createAppNavigationMachine = (runtime: AppNavigationRuntime) => set
     });
   },
   on: {
-    [CHECK_IN_EVENTS.HISTORY_HYDRATED]: ({ event }, enq) => {
+    [INSIGHT_NOTIFICATION_EVENTS.ENABLED]: ({ event }, enq) => { enq(() => runtime.insightNotifications?.command(event)); },
+    [INSIGHT_NOTIFICATION_EVENTS.DISABLED]: ({ event }, enq) => { enq(() => runtime.insightNotifications?.command(event)); },
+    [INSIGHT_NOTIFICATION_EVENTS.DISMISSED]: ({ event }, enq) => { enq(() => runtime.insightNotifications?.command(event)); },
+    [INSIGHT_NOTIFICATION_EVENTS.TIME_CHANGED]: ({ event }, enq) => { enq(() => runtime.insightNotifications?.command(event)); },
+    [INSIGHT_NOTIFICATION_EVENTS.PICKER_CHANGED]: ({ event }, enq) => { enq(() => runtime.insightNotifications?.command(event)); },
+    [INSIGHT_NOTIFICATION_EVENTS.RECHECK_REQUESTED]: ({ event }, enq) => { enq(() => runtime.insightNotifications?.command(event)); },
+    [INSIGHT_NOTIFICATION_EVENTS.SYSTEM_SETTINGS_REQUESTED]: ({ event }, enq) => { enq(() => runtime.insightNotifications?.command(event)); },
+    [INSIGHT_NOTIFICATION_EVENTS.OPENED]: ({ event }, enq) => {
+      enq(() => {
+        const entries = entriesForAnalyticsTimeframe({ entries: runtime.checkInHistoryStore.getSnapshot().context.entries,
+          now: runtime.now(), timeframe: event.target.timeframe });
+        assert(Schema.is(InsightCandidateSchema)(event.target), 'Insight notification target must be valid.');
+        const patterns = primaryAnalyticsInsights(entries);
+        const index = patterns.findIndex((pattern) => {
+          const id = pattern.kind === 'belief' ? `${pattern.kind}:${pattern.emotionId}:${pattern.beliefSystemId}` : `${pattern.kind}:${pattern.emotionId}`;
+          return id === event.target.patternId;
+        });
+        assert(index >= -1, 'Missing notification patterns fall back to the first pattern.');
+        runtime.analyticsStore?.trigger.insightNotificationOpened({ timeframe: event.target.timeframe, tab: event.target.tab, patternIndex: Math.max(0, index) });
+      });
+      return { context: { insightNotificationTarget: runtime.checkInHistoryStore.getSnapshot().context.hydrated ? null : event.target }, target: `#appNavigation.${NAVIGATION_STATES.TABS}.${NAVIGATION_STATES.ANALYTICS}` };
+    },
+    [CHECK_IN_EVENTS.HISTORY_HYDRATED]: ({ context, event, self }, enq) => {
       enq(() => runtime.checkInHistoryStore.trigger.hydrated({ entries: event.entries }));
+      if (context.insightNotificationTarget) {
+        const target = context.insightNotificationTarget;
+        enq(() => self.send({ type: INSIGHT_NOTIFICATION_EVENTS.OPENED, target }));
+      }
     },
     [CHECK_IN_EVENTS.HISTORY_HYDRATION_FAILED]: ({ event }, enq) => {
       enq(() => runtime.checkInHistoryStore.trigger.hydrationFailed({ message: event.message }));
@@ -1497,6 +1560,7 @@ export const createAppNavigationMachine = (runtime: AppNavigationRuntime) => set
             },
             [DATA_SAFETY_STATES.RESTORING]: {
               entry: ({ context, self }, enq) => {
+                enq(() => runtime.insightNotifications?.reset());
                 enq(() => {
                   const archive = context.dataArchive;
                   if (!archive) {
@@ -1561,6 +1625,7 @@ export const createAppNavigationMachine = (runtime: AppNavigationRuntime) => set
             },
             [DATA_SAFETY_STATES.DELETING]: {
               entry: ({ self }, enq) => {
+                enq(() => runtime.insightNotifications?.reset());
                 enq(() => {
                   void Effect.runPromise(deleteAllJournalData()).then(
                     () => self.send({ type: DATA_SAFETY_EVENTS.DELETE_SUCCEEDED }),

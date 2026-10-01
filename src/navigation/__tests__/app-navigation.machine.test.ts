@@ -2,6 +2,9 @@ import { createActor, waitFor, type Actor } from 'xstate';
 import * as Effect from 'effect/Effect';
 
 import {
+  ANALYTICS_EVENTS,
+  ANALYTICS_INSIGHT_TABS,
+  ANALYTICS_TIMEFRAMES,
   APP_ROUTES,
   APP_LOCALES,
   BELIEF_LIBRARY_EVENTS,
@@ -12,6 +15,7 @@ import {
   DATA_SAFETY_STATES,
   EMOTION_LABEL_MODES,
   EMOTION_IDS,
+  INSIGHT_NOTIFICATION_EVENTS,
   BELIEF_SYSTEM_IDS,
   MAX_NOTE_LENGTH,
   NAVIGATION_EVENTS,
@@ -32,6 +36,7 @@ import {
   type BeliefStatement,
 } from '@/features/beliefs/domain/belief-statement';
 import {
+  CheckInSchema,
   CheckInId,
   CheckInTimestamp,
   type CheckIn,
@@ -40,6 +45,9 @@ import {
 import { emotions } from '@/features/check-in/domain/emotion';
 import { checkInHistoryStore } from '@/app-stores';
 import { appSettingsStore } from '@/app-stores';
+import { createAnalyticsStore } from '@/features/analytics/application/analytics.store';
+import { createCheckInHistoryStore } from '@/features/history/application/check-in-history.store';
+import type { InsightCandidate } from '@/features/insight-notifications/domain/insight-notification';
 import {
   DataArchiveSchema,
   DataArchiveTimestamp,
@@ -234,6 +242,85 @@ describe('app navigation model', () => {
     mockRequestReminderPermission.mockResolvedValue(REMINDER_PERMISSION_STATES.GRANTED);
     mockGetReminderPermission.mockClear();
     mockGetReminderPermission.mockResolvedValue(REMINDER_PERMISSION_STATES.UNDETERMINED);
+  });
+
+  it('opens a warm insight notification into its analytics timeframe and pattern', async () => {
+    const history = createCheckInHistoryStore();
+    history.trigger.hydrated({ entries: [hydrationSentinel, {
+      ...hydrationSentinel,
+      id: CheckInId.make('warm-insight-moment-2'),
+    }, {
+      ...hydrationSentinel,
+      id: CheckInId.make('warm-insight-moment-3'),
+    }] });
+    const analytics = createAnalyticsStore();
+    analytics.trigger[ANALYTICS_EVENTS.PREVIOUS_MONTH_REQUESTED]({});
+    const target: InsightCandidate = {
+      id: `${ANALYTICS_TIMEFRAMES.ALL_TIME}:emotion:${EMOTION_IDS.JOY}`,
+      timeframe: ANALYTICS_TIMEFRAMES.ALL_TIME,
+      tab: ANALYTICS_INSIGHT_TABS.PATTERN,
+      patternId: `emotion:${EMOTION_IDS.JOY}`,
+    };
+    const actor = createActor(createAppNavigationMachine({
+      appSettingsStore,
+      checkInHistoryStore: history,
+      analyticsStore: analytics,
+      nonce: () => 'insight-open-test',
+      now: () => new Date('2026-09-08T10:00:00.000Z'),
+    })).start();
+    actor.send({ type: INSIGHT_NOTIFICATION_EVENTS.OPENED, target });
+    await waitFor(actor, (snapshot) => routeForStateValue(snapshot.value) === APP_ROUTES.ANALYTICS);
+    expect(analytics.getSnapshot().context).toMatchObject({
+      timeframe: ANALYTICS_TIMEFRAMES.ALL_TIME,
+      insightTab: ANALYTICS_INSIGHT_TABS.PATTERN,
+      patternIndex: 0,
+      monthOffset: 0,
+    });
+    actor.stop();
+  });
+
+  it('retains a cold insight target until history hydrates, then resolves its pattern index', async () => {
+    const history = createCheckInHistoryStore();
+    const analytics = createAnalyticsStore();
+    const target: InsightCandidate = {
+      id: `${ANALYTICS_TIMEFRAMES.ALL_TIME}:emotion:${EMOTION_IDS.JOY}`,
+      timeframe: ANALYTICS_TIMEFRAMES.ALL_TIME,
+      tab: ANALYTICS_INSIGHT_TABS.PATTERN,
+      patternId: `emotion:${EMOTION_IDS.JOY}`,
+    };
+    const actor = createActor(createAppNavigationMachine({
+      appSettingsStore,
+      checkInHistoryStore: history,
+      analyticsStore: analytics,
+      nonce: () => 'cold-insight-open-test',
+      now: () => new Date('2026-09-08T10:00:00.000Z'),
+    })).start();
+    actor.send({ type: INSIGHT_NOTIFICATION_EVENTS.OPENED, target });
+    await waitFor(actor, (snapshot) => routeForStateValue(snapshot.value) === APP_ROUTES.ANALYTICS);
+    expect(actor.getSnapshot().context.insightNotificationTarget).toEqual(target);
+
+    const occurrence = CheckInTimestamp.make('2026-09-05T08:15:00.000Z');
+    const entries = [0, 1, 2, 3, 4, 5, 6].map((index) => CheckInSchema.make({
+      id: CheckInId.make(`cold-insight-moment-${String(index)}`),
+      createdAt: occurrence,
+      occurredAt: occurrence,
+      emotionId: index < 4 ? EMOTION_IDS.JOY : EMOTION_IDS.SADNESS,
+      intensity: 0.5,
+      note: '',
+      ...(index < 3 ? {
+        beliefSystemId: BELIEF_SYSTEM_IDS.ALWAYS_FUNCTIONING,
+        guidingStatementSnapshot: 'I may pause.',
+      } : {}),
+    }));
+    actor.send({ type: CHECK_IN_EVENTS.HISTORY_HYDRATED, entries });
+    await waitFor(actor, () => analytics.getSnapshot().context.patternIndex === 1);
+    expect(actor.getSnapshot().context.insightNotificationTarget).toBeNull();
+    expect(analytics.getSnapshot().context).toMatchObject({
+      timeframe: ANALYTICS_TIMEFRAMES.ALL_TIME,
+      insightTab: ANALYTICS_INSIGHT_TABS.PATTERN,
+      patternIndex: 1,
+    });
+    actor.stop();
   });
 
   it('replays time and nonce-dependent transitions deterministically', () => {

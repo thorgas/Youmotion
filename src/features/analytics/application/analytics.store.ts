@@ -32,6 +32,8 @@ export const createAnalyticsStore = () => createStore({
       timeframe: AnalyticsTimeframeSchema,
     })),
     events: {
+      insightNotificationOpened: Schema.standardSchemaV1(Schema.Struct({ timeframe: AnalyticsTimeframeSchema,
+        tab: Schema.Literal(ANALYTICS_INSIGHT_TABS.GUIDING_BELIEF, ANALYTICS_INSIGHT_TABS.PATTERN), patternIndex: Schema.NonNegativeInt })),
       [ANALYTICS_EVENTS.PREVIOUS_MONTH_REQUESTED]: Schema.standardSchemaV1(Schema.Struct({})),
       [ANALYTICS_EVENTS.NEXT_MONTH_REQUESTED]: Schema.standardSchemaV1(Schema.Struct({})),
       [ANALYTICS_EVENTS.CURRENT_MONTH_REQUESTED]: Schema.standardSchemaV1(Schema.Struct({})),
@@ -51,6 +53,7 @@ export const createAnalyticsStore = () => createStore({
   },
   context: initialContext,
   on: {
+    insightNotificationOpened: (context, event) => ({ ...context, timeframe: event.timeframe, insightTab: event.tab, patternIndex: event.patternIndex, monthOffset: 0 }),
     [ANALYTICS_EVENTS.PREVIOUS_MONTH_REQUESTED]: (context) => ({
       ...context,
       monthOffset: context.monthOffset - 1,

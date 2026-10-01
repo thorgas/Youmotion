@@ -498,3 +498,17 @@ export const SPLASH_OVERLAY_FADE_DURATION = 180;
 export const ONBOARDING_STEP_COUNT = 3;
 
 export const UPDATE_CHANNELS: ReadonlyArray<string> = ['production', 'testing', 'qa'];
+
+export const INSIGHT_NOTIFICATION_DEFAULT_TIME = { hour: 19, minute: 0 };
+export const INSIGHT_NOTIFICATION_OWNER = 'youmotion-insights';
+export const INSIGHT_NOTIFICATION_STORAGE_KEY = 'youmotion.insight-notifications.v1';
+export const INSIGHT_NOTIFICATION_EVENTS = Object.freeze({
+  ENABLED: literal('insightNotificationEnabled'),
+  DISABLED: literal('insightNotificationDisabled'),
+  DISMISSED: literal('insightNotificationDismissed'),
+  TIME_CHANGED: literal('insightNotificationTimeChanged'),
+  PICKER_CHANGED: literal('insightNotificationPickerChanged'),
+  RECHECK_REQUESTED: literal('insightNotificationRecheckRequested'),
+  SYSTEM_SETTINGS_REQUESTED: literal('insightNotificationSystemSettingsRequested'),
+  OPENED: literal('insightNotificationOpened'),
+});

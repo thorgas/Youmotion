@@ -1,3 +1,6 @@
+import type { ReactNode } from 'react';
+import { InsightNotificationControls } from '@/features/insight-notifications/ui/insight-notification-controls';
+import { insightCandidates } from '@/features/insight-notifications/domain/insight-notification';
 import { useSelector as useActorSelector } from '@xstate/react';
 import { useSelector } from '@xstate/store-react';
 import { fbs } from 'fbtee';
@@ -752,10 +755,11 @@ function CalendarSection({ entries, locale, now }: {
   );
 }
 
-export function AnalyticsContent({ entries, locale, now, onEvidencePress, statements }: {
+export function AnalyticsContent({ entries, locale, now, onEvidencePress, statements, notificationOffer }: {
   entries: readonly CheckIn[];
   locale: AppLocale;
   now: Date;
+  notificationOffer?: ReactNode;
   onEvidencePress?: (selection: InsightEvidenceSelection) => void;
   statements: readonly BeliefStatement[];
 }) {
@@ -806,6 +810,7 @@ export function AnalyticsContent({ entries, locale, now, onEvidencePress, statem
             statements={statements}
             timeframe={analytics.timeframe}
           />
+          {notificationOffer}
           {scopedEntries.length === 0 ? (
             <View style={styles.empty}>
               <Text style={styles.emptyTitle}>
@@ -874,6 +879,7 @@ export function AnalyticsScreen({ now }: { now?: Date }) {
   };
   return (
     <AnalyticsContent
+      notificationOffer={<InsightNotificationControls offer available={insightCandidates({ entries: history.entries, statements, now: currentDate }).length > 0} />}
       entries={history.entries}
       locale={locale}
       now={currentDate}
