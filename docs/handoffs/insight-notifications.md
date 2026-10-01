@@ -8,6 +8,7 @@ The new vertical feature under `src/features/insight-notifications/` persists an
 
 ## Verification and evidence
 
+- Feature commit: `1dd44a9`. Final Jest run: 58 suites / 411 tests pass; coverage is 88.26% statements, 78.85% branches, 83.80% functions and 91.17% lines. Native Harness passes two locale paths on each platform. Screenshot evidence under `artifacts/screenshots/insight-notifications/` corresponds to this feature commit.
 - `pnpm verify` was run and stops at pre-existing, untracked `.opencode/plugins/entire.ts` Oxlint errors. Those files and other unrelated working-tree edits were preserved.
 - Full applicable checks pass independently: `pnpm exec oxlint --type-aware --deny-warnings --ignore-pattern '.opencode/**' .`, `pnpm lint:architecture`, `pnpm typecheck`, `pnpm verify:website`, and `pnpm test:coverage`. Coverage thresholds are unchanged.
 - Native Harness passes both German and English paths on iOS and Android. It verifies actual AsyncStorage persistence, permission/activation, owner-scoped native registration, duplicate reconciliation, deactivation and unrelated-notification preservation.
@@ -27,4 +28,16 @@ The committed `expected-ota-runtimes.json` still names older 1.0.3 testing binar
 
 Skills: visual-plan, implementation-delivery, Apple Design, React coding style, React Native Harness, Argent device interaction and Expo EAS Update. Spark was unavailable; bounded mechanical checks used the available substitute agent.
 
-Next step: review the feature and QA update, then check `src/features/insight-notifications/ui/insight-notification-controls.tsx` in a compatible QA-control build. Android background delivery remains a device acceptance follow-up. No user-only blocker prevents implementation or QA publication.
+## Publication status
+
+Feature commit `1dd44a9` is pushed to `origin/codex/einblick-notifications`. The clean detached checkout at `/private/tmp/youmotion-insight-qa` passed both runtime checks against `/tmp/insight-confirmed-qa-runtimes.json`; log: `/tmp/insight-clean-runtime.log`. Its dependency directory is a filesystem clone of the installed repository dependencies. Use `--config.verify-deps-before-run=false` with pnpm in this checkout to prevent automatic dependency reinstallation. Source and lockfile are unchanged.
+
+QA upload was rejected by automatic approval review before execution. No update was created. The reviewer requires explicit authorization to upload the private application bundle to Expo/EAS project `@youmotion/youmotion`, channel `qa`, environment `preview`, iOS and Android. User approval is pending.
+
+After approval, run in that clean checkout:
+
+```sh
+EXPO_PUBLIC_RELEASE=release-1dd44a9 pnpm --config.verify-deps-before-run=false exec eas update --channel qa --environment preview --platform all --message 'Einblick notifications (1dd44a9)' --non-interactive --json
+```
+
+Read back the resulting update groups and QA channel, verify both runtime versions and source commit, then add publication IDs here. Next device step: check `src/features/insight-notifications/ui/insight-notification-controls.tsx` in a compatible QA-control build. Android background delivery remains an acceptance follow-up. The only user-only blocker is the destination-specific QA upload approval.
