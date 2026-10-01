@@ -1,0 +1,58 @@
+{
+  "cli_version": "0.11.3",
+  "checkpoint_id": "01M3W252W5G3XRTB3PKHHK251Y",
+  "session_id": "01a0f6c3-b2fc-7400-9657-fec7f4b34685",
+  "strategy": "manual-commit",
+  "created_at": "2026-10-01T15:43:30.545897Z",
+  "branch": "codex/einblick-notifications",
+  "checkpoints_count": 1,
+  "files_touched": [
+    "src/features/insight-notifications/__tests__/insight-notification-coordinator.test.ts",
+    "src/features/insight-notifications/__tests__/insight-notification.infrastructure.test.ts",
+    "src/features/insight-notifications/__tests__/insight-notification.test.ts",
+    "src/features/reminders/__tests__/reminder-notification.bridge.test.ts",
+    "src/navigation/__tests__/app-navigation.machine.test.ts"
+  ],
+  "agent": "Codex",
+  "model": "gpt-6.1-sol",
+  "turn_id": "a3d657490f71",
+  "compact_transcript_start": 0,
+  "token_usage": {
+    "input_tokens": 676637,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 23063552,
+    "output_tokens": 55638,
+    "api_call_count": 174,
+    "subagent_tokens_complete": false
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-10-01T15:43:30.191043Z",
+    "agent_lines": 748,
+    "agent_removed": 10,
+    "human_added": 1194,
+    "human_modified": 0,
+    "human_removed": 0,
+    "total_committed": 1942,
+    "total_lines_changed": 1958,
+    "agent_percentage": 38.71297242083759,
+    "metric_version": 2
+  },
+  "prompt_attributions": [
+    {
+      "checkpoint_number": 1,
+      "user_lines_added": 627,
+      "user_lines_removed": 0,
+      "agent_lines_added": 0,
+      "agent_lines_removed": 0,
+      "user_added_per_file": {
+        ".claude/settings.json": 80,
+        ".claude/settings.local.json": 10,
+        ".codex/hooks.json": 88,
+        ".cursor/hooks.json": 40,
+        ".gemini/settings.json": 139,
+        ".opencode/plugins/entire.ts": 269,
+        "opencode.json": 1
+      }
+    }
+  ]
+}

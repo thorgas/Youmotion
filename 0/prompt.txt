@@ -1,0 +1,11 @@
+Use these question answers to revise the plan:
+Question block: questions
+- Should notifications arrive while Youmotion is closed?: First cut: when the app evaluates new insights, Other: The consultation should only happen when the app is open for now, but the user should be able to set it to a time that also sends a notification even when the app is closed
+
+---
+
+Remove the option to set it now. Let the user set a time is totally fine
+
+---
+
+Ok proceed and implement in a new branch. Create qa update when done
