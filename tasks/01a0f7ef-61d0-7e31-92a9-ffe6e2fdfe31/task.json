@@ -1,0 +1,22 @@
+{
+  "tool_use_id": "01a0f7ef-61d0-7e31-92a9-ffe6e2fdfe31",
+  "agent_id": "01a0f7ef-61d0-7e31-92a9-ffe6e2fdfe31",
+  "subagent_type": "default",
+  "files": [
+    "src/features/insight-notifications/__tests__/fixtures.ts",
+    "src/features/insight-notifications/__tests__/insight-notification.test.ts",
+    "src/features/insight-notifications/__tests__/insight-notification-coordinator.test.ts",
+    "src/features/insight-notifications/__tests__/insight-notification.infrastructure.test.ts",
+    "src/features/reminders/__tests__/reminder-notification.bridge.test.ts",
+    "src/navigation/__tests__/app-navigation.machine.test.ts"
+  ],
+  "token_usage": {
+    "input_tokens": 255264,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 10723584,
+    "output_tokens": 49093,
+    "api_call_count": 85
+  },
+  "started_at": "2026-10-01T16:47:37.522045+02:00",
+  "completed_at": "2026-10-01T17:48:45.375911+02:00"
+}

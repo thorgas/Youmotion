@@ -1,0 +1,58 @@
+{
+  "cli_version": "0.11.3",
+  "checkpoint_id": "01M3W71KMJMSXE2TJDVFVQ0FKW",
+  "session_id": "01a0f6c3-b2fc-7400-9657-fec7f4b34685",
+  "strategy": "manual-commit",
+  "created_at": "2026-10-01T17:09:00.840591Z",
+  "branch": "codex/einblick-notifications",
+  "checkpoints_count": 1,
+  "files_touched": [
+    "docs/handoffs/insight-notifications.md"
+  ],
+  "agent": "Codex",
+  "model": "gpt-6.1-sol",
+  "turn_id": "6902864b93d6",
+  "checkpoint_transcript_start": 1474,
+  "transcript_lines_at_start": 1474,
+  "compact_transcript_start": 179,
+  "token_usage": {
+    "input_tokens": 91475,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 1998592,
+    "output_tokens": 5185,
+    "api_call_count": 27
+  },
+  "session_metrics": {
+    "turn_count": 1
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-10-01T17:09:00.488411Z",
+    "agent_lines": 9,
+    "agent_removed": 3,
+    "human_added": 0,
+    "human_modified": 0,
+    "human_removed": 0,
+    "total_committed": 9,
+    "total_lines_changed": 12,
+    "agent_percentage": 100,
+    "metric_version": 2
+  },
+  "prompt_attributions": [
+    {
+      "checkpoint_number": 1,
+      "user_lines_added": 627,
+      "user_lines_removed": 0,
+      "agent_lines_added": 0,
+      "agent_lines_removed": 0,
+      "user_added_per_file": {
+        ".claude/settings.json": 80,
+        ".claude/settings.local.json": 10,
+        ".codex/hooks.json": 88,
+        ".cursor/hooks.json": 40,
+        ".gemini/settings.json": 139,
+        ".opencode/plugins/entire.ts": 269,
+        "opencode.json": 1
+      }
+    }
+  ]
+}
