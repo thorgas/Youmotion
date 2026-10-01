@@ -1,0 +1,38 @@
+{
+  "cli_version": "0.11.3",
+  "checkpoint_id": "01M3VBJK1EPAMZTPY0CJD17VEG",
+  "strategy": "manual-commit",
+  "branch": "codex/gentle-reminder-timing-and-deactivation",
+  "checkpoints_count": 1,
+  "files_touched": [
+    "README.md",
+    "docs/handoffs/gentle-reminder-timing-and-deactivation.md",
+    "docs/reminders-runtime-test-matrix.md",
+    "src/constants.ts",
+    "src/features/beliefs/ui/belief-library-screen.tsx",
+    "src/features/reminders/__tests__/gentle-reminder.harness.tsx",
+    "src/features/reminders/__tests__/leitsatz-reminder-screen.test.tsx",
+    "src/features/reminders/__tests__/reminder-timing-summary.test.tsx",
+    "src/features/reminders/ui/leitsatz-reminder-screen.tsx",
+    "src/features/reminders/ui/reminder-timing-summary.tsx",
+    "src/navigation/__tests__/app-navigation.machine.test.ts",
+    "src/navigation/app-navigation.machine.ts"
+  ],
+  "sessions": [
+    {
+      "metadata": "/0/metadata.json",
+      "transcript": "/0/full.jsonl",
+      "compact_transcript": "/0/transcript.jsonl",
+      "content_hash": "/0/content_hash.txt",
+      "prompt": "/0/prompt.txt"
+    }
+  ],
+  "token_usage": {
+    "input_tokens": 451018,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 19658496,
+    "output_tokens": 42908,
+    "api_call_count": 153,
+    "subagent_tokens_complete": false
+  }
+}
