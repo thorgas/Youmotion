@@ -59,3 +59,11 @@ Main Settings now uses an existing `SettingsActionRow` to open `/insight-notific
 `AGENTS.md` now documents matching Settings subpages, Hermes compatibility and rerunning native consumer checks after late changes. `architecture/no-unsupported-hermes-apis` rejects direct, computed and optional `toSorted` access in application source; permanent rule tests cover it.
 
 Final checks: 58 suites / 417 tests and coverage thresholds pass; statements 87.28%, branches 77.77%, functions 83.14%, lines 90.08%. TS7, architecture lint, website and Oxlint excluding pre-existing `.opencode/**` pass. Full `pnpm verify` still fails only at those unrelated untracked plugin errors. Final native Harness: iOS 2/2, Android 2/2. Logs: `/tmp/insight-fix-final-*.log`, `/tmp/insight-fix-{ios,android}-harness.log`, `/tmp/insight-crash-harness-diagnostic.log`. The direct native runner used a main-checkout `NODE_PATH` to avoid publication-copy pnpm CLI shims resolving to the temporary checkout. No native dependency or runtime change.
+
+Fix commit: `6e47432cb213d52f9d8b94cec618eb4b157d4e3f`, pushed on the feature branch. Native `insight-notification-fix-*` screenshots correspond to this commit. The clean QA checkout was advanced to this commit, translations regenerated, and both runtime checks passed again (`/tmp/insight-fix-clean-runtime.log`). Automatic approval review rejected the replacement upload before execution, requiring fresh authorization for this later payload. No fixed QA update has been published; the earlier groups above still contain the unsupported API. Await explicit approval of the fixed bundle for the same Expo/EAS project/channel/environment/platforms, then run:
+
+```sh
+EXPO_PUBLIC_RELEASE=release-6e47432 pnpm --config.verify-deps-before-run=false exec eas update --channel qa --environment preview --platform all --message 'Fix Analytics Hermes crash and notification settings (6e47432)' --non-interactive --json
+```
+
+After upload, read back both groups and the active QA channel and replace this pending status with the verified receipt.
