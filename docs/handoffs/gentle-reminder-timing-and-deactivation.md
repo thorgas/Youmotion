@@ -26,7 +26,7 @@ Base: `adf58e41f08c11b8858840eb66a084a82c9ca9b7` on `main`. Implementation adds 
 - Android native Harness has passed both English/German paths against real SurrealDB transactions and native notification queues. The final test revision passed 2/2 locale paths in 22.51 seconds; iOS passed 2/2 in 12.889 seconds.
 - iOS Debug simulator build and native Harness passed both English/German paths. `pnpm preios` supplies required Tracy headers; follow it with `pnpm prepare:harness:ios` to restore Harness UI in local pods. Grant the test app notification permission on first run so the test can establish scheduled requests before deactivation. The production deactivation action itself does not request permission.
 - The native tests reload the disabled assignment from native SurrealDB, verify its original timing remains, verify owned requests are canceled, and verify a foreign notification remains. Screenshot fixtures contain all 133 moments and 15 guiding beliefs from the committed synthetic archive.
-- Design guidance: Apple Design and Emil Design Engineering; implementation delivery and React Native Harness skills guide delivery and device verification. No user-only blocker remains for this feature. Remote publication and releases were not requested.
+- Design guidance: Apple Design and Emil Design Engineering; implementation delivery and React Native Harness skills guide delivery and device verification. No user-only blocker remains for this feature. The user subsequently requested a QA update; see the publication record below.
 
 ## Native prerequisites and exact runs
 
@@ -56,4 +56,21 @@ Harness writes `gentle-reminder-{de-DE,en-US}-{overview,editor,off}.png` in the 
 
 Screenshot folder: `artifacts/screenshots/gentle-reminder/{android,ios}/`, with German and English overview, editor, and disabled-state captures. Android final filenames use the `gentle-reminder-` prefix; iOS filenames begin with the locale. Images are intentionally ignored by Git. iOS result log: `/private/tmp/gentle-reminder-ios-harness-scroll.log`; Android final log: `/private/tmp/gentle-reminder-android-harness-final.log`.
 
-Next step: review the feature commit and the linked screenshots. The branch can be integrated when requested; no release or remote branch has been published.
+Next step: review the feature commit and the linked screenshots. The branch can be integrated when requested; the QA update has been published; the Git branch has not been pushed.
+
+## QA publication - 2026-10-01
+
+Published from a clean detached checkout of feature commit `fe2409622e93120f41ac517d04d936e4ca7d064e` to project `@youmotion/youmotion` (`7f37690f-c632-408c-a4ab-1b240610bd12`), channel/branch `qa`, EAS environment `preview`. Bundle release stamp: `release-fe24096`.
+
+- iOS group: `3d460dbc-7dc7-4efe-a3ba-7dfa2b998591`; runtime `47bf1cadbb1b18b824919fc123c77ec60d92b553`.
+- Android group: `f986aac3-422e-495c-ad19-5009d001b9b8`; runtime `db6a01a3a019dbc3c78b53dc4294555d1d1580c8`.
+- These match the finished 1.0.4 production builds (`20f3b655-a913-4164-aa55-765cc69eb227` iOS, `5ce24210-1169-42c2-b2c5-864faf454731` Android). Existing 1.0.3 testing builds carry different runtimes and cannot receive this update. A compatible QA-control 1.0.4 binary is required to test through the channel menu; a normal production binary has no manual QA controls.
+- The committed expected-runtime file still describes the 1.0.3 testing binaries. It was preserved. Verification used a task-local expected JSON populated from the confirmed finished 1.0.4 build metadata, and both clean-checkout fingerprint resolutions matched without any runtime override.
+
+Publication command (after runtime verification):
+
+```sh
+EXPO_PUBLIC_RELEASE=release-fe24096 pnpm exec eas update --channel qa --environment preview --platform all --message 'Gentle reminder timing and editor deactivation (fe24096)' --non-interactive --json
+```
+
+Logs: `/private/tmp/gentle-reminder-qa-publish-runtime.log`, `/private/tmp/gentle-reminder-qa-publish.log`, `/private/tmp/gentle-reminder-qa-publish.json`. Remote group/channel readbacks are saved alongside them. No production channel update was published.
