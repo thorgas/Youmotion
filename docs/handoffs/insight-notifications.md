@@ -102,3 +102,15 @@ Native regression coverage was updated for empty-data feedback, existing-data ac
 Next executable action: restore responsive test devices and run `src/features/insight-notifications/__tests__/insight-notifications.harness.tsx` on iOS and Android with the documented main-checkout NODE_PATH/direct CLI setup; capture the scheduled and empty states, then perform exact-source QA publication only after the release gates pass. The previously published QA payload remains `6e47432`. No dependency, database migration or native runtime change is introduced. No user-only blocker remains; device launch/transport availability is the outstanding verification blocker.
 
 Skills used for this follow-up: implementation-delivery, Apple Design, React Native Testing, React Native Harness, Argent device interaction/RN workflow and Metro debugger. Exact Expo SDK 57 documentation was read before editing React Native code.
+
+
+## Activation follow-up QA release (2026-10-02, Europe/Berlin)
+
+Published the user-requested device-testing release from clean commit `f3a58d882c8d6ff5c801b18f33f4b372249edf66` at 00:18:23 CEST (2026-10-01T22:18:23.134Z), project `@youmotion/youmotion`, channel/branch `qa`, environment `preview`, both platforms. Native simulator gaps remain explicitly unconfirmed; the user requested this QA release for device testing.
+
+- iOS group `c0a758d2-5da8-4ef9-b8d5-1db293814607`, update `01a0f98c-181e-78ff-9b00-e8fe44567702`, runtime `47bf1cadbb1b18b824919fc123c77ec60d92b553`.
+- Android group `4f9ea8b6-91eb-4980-92fc-bb29e74394a0`, update `01a0f98c-181e-7484-8a04-4a5e0c8a85cd`, runtime `db6a01a3a019dbc3c78b53dc4294555d1d1580c8`.
+
+Fresh finished-build readbacks, clean-checkout runtime preflight and generated translations passed before upload. Both remote update readbacks match the source commit and runtimes; the active QA channel maps to QA and its list shows the new groups as the newest compatible updates. Publication checkout: `/private/tmp/youmotion-insight-activation-qa`; unchanged installed dependencies were filesystem-cloned, with automatic pnpm reinstallation disabled. Receipt files: `/tmp/insight-activation-qa-{publish.log,receipt.json,runtime.log,ios-build.json,android-build.json,ios-readback.json,android-readback.json,channel-readback.json,list-readback.json}`.
+
+On a compatible 1.0.4 release build, select QA in the existing update menu and check for an update. Confirm Settings shows Git `f3a58d8`. Test existing-data activation at a time a few minutes ahead, the scheduled/empty statuses, and notification arrival while the app is closed. A daily notification is not expected when no new report or insight is waiting. The EAS Update skill was used for publication. No user-only blocker remains for this QA release; native device acceptance remains outstanding.
