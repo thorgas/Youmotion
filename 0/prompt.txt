@@ -1,10 +1,14 @@
-Create a qa update so i can test
-
----
-
 # Files mentioned by the user:
 
 ## Photo 1.jpg: /tmp/codex-remote-attachments/01a0f67d-5f9c-7ed3-9561-4985eecc4aff/95CA6C05-4C22-4730-9849-34EF11E2A8B5/1-Photo-1.jpg
 
 ## My request:
 I dont like the dot, rather do colon: and space, then create a pr and another update
+
+---
+
+<image name=[Image #1] path="/tmp/codex-remote-attachments/01a0f67d-5f9c-7ed3-9561-4985eecc4aff/95CA6C05-4C22-4730-9849-34EF11E2A8B5/1-Photo-1.jpg">
+
+---
+
+</image>
