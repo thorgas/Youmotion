@@ -1,0 +1,58 @@
+{
+  "cli_version": "0.11.3",
+  "checkpoint_id": "01M3VCFARD337NH3H18J4BJ5Q0",
+  "session_id": "01a0f67d-5f9c-7ed3-9561-4985eecc4aff",
+  "strategy": "manual-commit",
+  "created_at": "2026-10-01T09:24:39.269206Z",
+  "branch": "codex/gentle-reminder-timing-and-deactivation",
+  "checkpoints_count": 1,
+  "files_touched": [
+    "docs/handoffs/gentle-reminder-timing-and-deactivation.md"
+  ],
+  "agent": "Codex",
+  "model": "gpt-6.1-sol",
+  "turn_id": "2ea44059f914",
+  "checkpoint_transcript_start": 1165,
+  "transcript_lines_at_start": 1165,
+  "compact_transcript_start": 145,
+  "token_usage": {
+    "input_tokens": 42147,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 2396672,
+    "output_tokens": 5336,
+    "api_call_count": 24
+  },
+  "session_metrics": {
+    "turn_count": 1
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-10-01T09:24:39.006508Z",
+    "agent_lines": 19,
+    "agent_removed": 2,
+    "human_added": 0,
+    "human_modified": 0,
+    "human_removed": 0,
+    "total_committed": 19,
+    "total_lines_changed": 21,
+    "agent_percentage": 100,
+    "metric_version": 2
+  },
+  "prompt_attributions": [
+    {
+      "checkpoint_number": 1,
+      "user_lines_added": 627,
+      "user_lines_removed": 0,
+      "agent_lines_added": 0,
+      "agent_lines_removed": 0,
+      "user_added_per_file": {
+        ".claude/settings.json": 80,
+        ".claude/settings.local.json": 10,
+        ".codex/hooks.json": 88,
+        ".cursor/hooks.json": 40,
+        ".gemini/settings.json": 139,
+        ".opencode/plugins/entire.ts": 269,
+        "opencode.json": 1
+      }
+    }
+  ]
+}
