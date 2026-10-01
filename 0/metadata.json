@@ -1,0 +1,66 @@
+{
+  "cli_version": "0.11.3",
+  "checkpoint_id": "01M3WKYFSKT9328R77APFJDQW4",
+  "session_id": "01a0f6c3-b2fc-7400-9657-fec7f4b34685",
+  "strategy": "manual-commit",
+  "created_at": "2026-10-01T20:54:34.948592Z",
+  "branch": "codex/einblick-notifications",
+  "checkpoints_count": 2,
+  "save_step_count": 1,
+  "files_touched": [
+    "docs/qa/insight-notifications.md",
+    "src/features/insight-notifications/__tests__/insight-notification-controls.test.tsx",
+    "src/features/insight-notifications/__tests__/insight-notification-coordinator.test.ts",
+    "src/features/insight-notifications/__tests__/insight-notification.test.ts",
+    "src/features/insight-notifications/__tests__/insight-notifications.harness.tsx",
+    "src/features/insight-notifications/application/insight-notification-coordinator.ts",
+    "src/features/insight-notifications/domain/insight-notification.ts",
+    "src/features/insight-notifications/ui/insight-notification-controls.tsx",
+    "translations/de-DE.json"
+  ],
+  "agent": "Codex",
+  "model": "gpt-6.1-sol",
+  "turn_id": "eef476c69044",
+  "compact_transcript_start": 0,
+  "token_usage": {
+    "input_tokens": 1375924,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 48527104,
+    "output_tokens": 121264,
+    "api_call_count": 404,
+    "subagent_tokens_complete": false
+  },
+  "session_metrics": {
+    "turn_count": 6
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-10-01T20:54:32.475101Z",
+    "agent_lines": 0,
+    "agent_removed": 0,
+    "human_added": 346,
+    "human_modified": 25,
+    "human_removed": 0,
+    "total_committed": 346,
+    "total_lines_changed": 372,
+    "agent_percentage": 0,
+    "metric_version": 2
+  },
+  "prompt_attributions": [
+    {
+      "checkpoint_number": 2,
+      "user_lines_added": 627,
+      "user_lines_removed": 0,
+      "agent_lines_added": 0,
+      "agent_lines_removed": 0,
+      "user_added_per_file": {
+        ".claude/settings.json": 80,
+        ".claude/settings.local.json": 10,
+        ".codex/hooks.json": 88,
+        ".cursor/hooks.json": 40,
+        ".gemini/settings.json": 139,
+        ".opencode/plugins/entire.ts": 269,
+        "opencode.json": 1
+      }
+    }
+  ]
+}
