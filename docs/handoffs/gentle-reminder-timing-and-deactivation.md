@@ -56,7 +56,7 @@ Harness writes `gentle-reminder-{de-DE,en-US}-{overview,editor,off}.png` in the 
 
 Screenshot folder: `artifacts/screenshots/gentle-reminder/{android,ios}/`, with German and English overview, editor, and disabled-state captures. Android final filenames use the `gentle-reminder-` prefix; iOS filenames begin with the locale. Images are intentionally ignored by Git. iOS result log: `/private/tmp/gentle-reminder-ios-harness-scroll.log`; Android final log: `/private/tmp/gentle-reminder-android-harness-final.log`.
 
-Next step: review the feature commit and the linked screenshots. The branch can be integrated when requested; the QA update has been published; the Git branch has not been pushed.
+Next step: review the feature commit and the linked screenshots. The branch can be integrated when requested; the QA update has been published; the Git branch has been pushed and PR #33 is open.
 
 ## QA publication - 2026-10-01
 
@@ -74,3 +74,15 @@ EXPO_PUBLIC_RELEASE=release-fe24096 pnpm exec eas update --channel qa --environm
 ```
 
 Logs: `/private/tmp/gentle-reminder-qa-publish-runtime.log`, `/private/tmp/gentle-reminder-qa-publish.log`, `/private/tmp/gentle-reminder-qa-publish.json`. Remote group/channel readbacks are saved alongside them. No production channel update was published.
+
+## Colon formatting follow-up - 2026-10-01
+
+User requested colon and space instead of the centered dot: `Täglich: 09:03`. Commit `1684a226678b642e7c2fb75ab434f95005e05b7e` updates the UI and both localized consumer tests. PR: https://github.com/thorgas/Youmotion/pull/33 (base `main`).
+
+Repeated verification: 54 suites / 379 tests with coverage pass; native Harness passes German and English on Android (2/2, 27.289s) and iOS (2/2, 24.151s). Application lint, architecture lint, and TypeScript pass. Fresh screenshot evidence is associated with the new feature commit in `artifacts/screenshots/gentle-reminder/evidence.txt`. The PR currently reports no configured CI checks. The earlier unrelated plugin lint blocker remains.
+
+Published another clean-source QA update with release stamp `release-1684a22`, same project/channel/environment and verified 1.0.4 runtimes:
+- iOS group `b5b1920f-510f-478d-839b-6e9327954b00`.
+- Android group `46237f06-a6c9-4999-b592-28af4ddf0c58`.
+
+Logs: `/private/tmp/gentle-reminder-colon-{coverage,android,ios,runtime}.log` and `/private/tmp/gentle-reminder-colon-qa-{publish,ios-readback,android-readback,channel-readback}.json` (publication progress is in `gentle-reminder-colon-qa-publish.log`). Publication checkout: `/private/tmp/youmotion-gentle-reminder-qa`. No production update or merge was performed. Next step: review PR #33 and check the QA update in the compatible test app.
