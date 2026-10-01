@@ -76,3 +76,11 @@ EXPO_PUBLIC_RELEASE=release-6e47432 pnpm --config.verify-deps-before-run=false e
 ```
 
 Next acceptance step: reopen Analytics and the Settings subpage in a compatible 1.0.4 QA-control build; Android background delivery remains the prior documented follow-up. No user-only blocker remains for the crash fix, Settings correction, repo guidance or replacement QA publication.
+
+## Measured locale-casing lint rule
+
+At the user's request, `architecture/no-slow-english-locale-lowercase` flags only explicit `toLocaleLowerCase("en")` calls in application source. Rule tests cover direct, computed and optional calls, and verify that `localeCompare`, uppercasing, unspecified/other locales and tooling remain outside the restriction. There is no autofix because casing semantics must be checked. The evidence is Hauswirtschaft's `../recipe-manager/docs/ANDROID_PERFORMANCE.md`: its physical Pixel 6a profile attributed about 8.7 seconds to repeated English locale lowercasing in Android ICU; 500 conversions took about 663 ms versus 27 ms for `toLowerCase`. No measurement was found establishing that `localeCompare` is slow, so no rule or runtime change was made for it.
+
+The user also requested fixing existing Youmotion `toLocaleLowerCase` use. Both calls were in history search and now use `toLowerCase`. Permanent Jest and native Harness tests validate mixed-case English and German umlaut matching against entries derived from the committed 133-moment archive. No other application code or native dependency changed. AGENTS guidance requires measurement before extending performance rules.
+
+Verification: 59 suites / 432 tests and coverage thresholds pass; scoped full Oxlint, architecture, TS7 and website checks pass. Full `pnpm verify` retains only the existing untracked `.opencode/plugins/entire.ts` failure. Native iOS history casing test passes (1/1, English and German). Android test did not execute: Pixel 9 adb transport timed out and one controlled restart failed before boot. The owned runner was stopped and scoped services cleaned up; no data wipe or other-device change was made. This is a runner gap, not an assertion failure. Logs: `/tmp/locale-rule-final-*.log`, `/tmp/locale-rule-{ios,android}-harness.log`. This lint/search change is separate from the published crash-fix QA payload `6e47432`; no further OTA upload has been requested or performed.

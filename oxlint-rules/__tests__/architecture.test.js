@@ -3,6 +3,26 @@ const architecture = require('../architecture.cjs');
 
 const tester = new RuleTester({ languageOptions: { ecmaVersion: 2022, sourceType: 'module' } });
 
+tester.run('no-slow-english-locale-lowercase', architecture.rules['no-slow-english-locale-lowercase'], {
+  valid: [
+    { code: 'value.toLowerCase();', filename: '/repo/src/search.ts' },
+    { code: 'value.toLocaleLowerCase();', filename: '/repo/src/search.ts' },
+    { code: "value.toLocaleLowerCase('de');", filename: '/repo/src/search.ts' },
+    { code: "value.toLocaleLowerCase('en-US');", filename: '/repo/src/search.ts' },
+    { code: "value.toLocaleUpperCase('en'); left.localeCompare(right, 'en');", filename: '/repo/src/search.ts' },
+    { code: "value.toLocaleLowerCase('en');", filename: '/repo/src/__tests__/search.test.ts' },
+    { code: "value.toLocaleLowerCase('en');", filename: '/repo/scripts/tool.js' },
+    { code: "value[method]('en');", filename: '/repo/src/search.ts' },
+    { code: "const lower = value.toLocaleLowerCase;", filename: '/repo/src/search.ts' },
+  ],
+  invalid: [
+    { code: "value.toLocaleLowerCase('en');", filename: '/repo/src/search.ts', errors: [{ messageId: 'slow' }] },
+    { code: "value['toLocaleLowerCase']('en');", filename: '/repo/src/search.ts', errors: [{ messageId: 'slow' }] },
+    { code: "value?.toLocaleLowerCase('en');", filename: '/repo/src/search.ts', errors: [{ messageId: 'slow' }] },
+    { code: "value.toLocaleLowerCase?.('en');", filename: '/repo/src/search.ts', errors: [{ messageId: 'slow' }] },
+  ],
+});
+
 tester.run('no-unsupported-hermes-apis', require('../architecture.cjs').rules['no-unsupported-hermes-apis'], {
   valid: [
     { code: 'const sorted = values.slice().sort();', filename: '/repo/src/domain/candidates.ts' },

@@ -19,7 +19,7 @@ export function filterHistoryEntries({
   filters: HistoryFilters;
   searchableText: (entry: CheckIn) => string;
 }) {
-  const query = filters.query.trim().toLocaleLowerCase();
+  const query = filters.query.trim().toLowerCase();
   const filtered = entries.filter((entry) => {
     assert(entry.id.length > 0, 'Filtered history entry must have an identifier.');
     assert(entry.intensity >= 0 && entry.intensity <= 1, 'Filtered history entry intensity must be normalized.');
@@ -32,7 +32,7 @@ export function filterHistoryEntries({
     if (filters.content === HISTORY_CONTENT_FILTERS.BELIEFS && entry.beliefSystemId === undefined) {
       return false;
     }
-    const text = searchableText(entry).toLocaleLowerCase();
+    const text = searchableText(entry).toLowerCase();
     // eslint-disable-next-line code-architecture/no-unasserted-return -- String.includes is a built-in boolean predicate; combined filter behavior is covered by screen tests.
     return query === '' || text.includes(query);
   });

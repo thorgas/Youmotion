@@ -215,6 +215,31 @@ const noComments = {
   },
 };
 
+const noSlowEnglishLocaleLowercase = {
+  meta: {
+    type: 'problem',
+    docs: { description: 'Avoid the measured Android ICU slowdown from English locale lowercasing.' },
+    messages: { slow: 'Repeated toLocaleLowerCase("en") caused a measured Android ICU slowdown. Use toLowerCase when its semantics fit; an exception requires correctness tests and Android profiling.' },
+    schema: [],
+  },
+  create(context) {
+    const filename = normalizedFilename(context);
+    if (!filename.includes('/src/') || filename.includes('/__tests__/')) return {};
+    return {
+      CallExpression(node) {
+        const callee = node.callee;
+        if (callee.type !== 'MemberExpression') return;
+        const method = callee.computed ? callee.property.value : callee.property.name;
+        if (method !== 'toLocaleLowerCase') return;
+        const locale = node.arguments[0];
+        if (locale?.type === 'Literal' && locale.value === 'en') {
+          context.report({ node, messageId: 'slow' });
+        }
+      },
+    };
+  },
+};
+
 const noUnsupportedHermesApis = {
   meta: {
     type: 'problem',
@@ -251,5 +276,6 @@ module.exports = {
     'no-barrel-files': noBarrelFiles,
     'no-comments': noComments,
     'no-unsupported-hermes-apis': noUnsupportedHermesApis,
+    'no-slow-english-locale-lowercase': noSlowEnglishLocaleLowercase,
   },
 };

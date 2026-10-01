@@ -36,6 +36,8 @@ Read the exact Expo SDK 57 documentation at https://docs.expo.dev/versions/v57.0
 
 ## Verification
 
+- Add performance lint restrictions only for measured cases. `architecture/no-slow-english-locale-lowercase` rejects explicit `toLocaleLowerCase("en")` calls, the case measured in Hauswirtschaft's Android ICU profile (`../recipe-manager/docs/ANDROID_PERFORMANCE.md`). Use `toLowerCase` only when its semantics fit; an exception requires correctness tests and Android profiling. Do not extend this restriction to `localeCompare`, other casing methods or other locales without measurements.
+
 - Use pnpm exclusively for dependency management and project scripts.
 - Run `pnpm verify` for lint, TypeScript 7, and Jest.
 - Run `pnpm test:coverage`; never lower the configured coverage thresholds.

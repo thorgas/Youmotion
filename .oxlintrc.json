@@ -37,6 +37,7 @@
   ],
   "rules": {
     "architecture/no-unsupported-hermes-apis": "error",
+    "architecture/no-slow-english-locale-lowercase": "error",
     "architecture/no-framework-in-domain": "error",
     "architecture/ui-cannot-reach-infrastructure": "error",
     "architecture/feature-public-api": "error",
