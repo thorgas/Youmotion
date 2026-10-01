@@ -366,6 +366,7 @@ export const NAVIGATION_STATES = Object.freeze({
   HISTORY: literal('history'),
   ANALYTICS: literal('analytics'),
   SETTINGS: literal('settings'),
+  INSIGHT_NOTIFICATIONS: literal('insightNotificationSettings'),
   REFLECTION: literal('reflection'),
 });
 
@@ -397,6 +398,7 @@ export const APP_ROUTES = Object.freeze({
   BELIEF_LIBRARY_EDITOR: literal('/belief-library-editor'),
   LEITSATZ_REMINDER: literal('/leitsatz-reminder'),
   REMINDERS: literal('/reminders'),
+  INSIGHT_NOTIFICATIONS: literal('/insight-notifications'),
   REFLECTION: literal('/reflection'),
   BELIEF_SYSTEM: literal('/belief-system'),
   BELIEF_SYSTEM_CATALOG: literal('/belief-system-catalog'),
@@ -503,6 +505,7 @@ export const INSIGHT_NOTIFICATION_DEFAULT_TIME = { hour: 19, minute: 0 };
 export const INSIGHT_NOTIFICATION_OWNER = 'youmotion-insights';
 export const INSIGHT_NOTIFICATION_STORAGE_KEY = 'youmotion.insight-notifications.v1';
 export const INSIGHT_NOTIFICATION_EVENTS = Object.freeze({
+  SETTINGS_OPENED: literal('insightNotificationSettingsOpened'),
   ENABLED: literal('insightNotificationEnabled'),
   DISABLED: literal('insightNotificationDisabled'),
   DISMISSED: literal('insightNotificationDismissed'),

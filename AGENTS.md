@@ -19,6 +19,11 @@ Read the exact Expo SDK 57 documentation at https://docs.expo.dev/versions/v57.0
 - Keep one XState actor hook per component and derive all related state from its snapshot.
 - Do not create barrel files. Use direct imports, including Effect subpath imports.
 
+## Settings design
+
+- Keep the main Settings screen a list of the existing `SettingsActionRow` links. Notification and reminder configuration belongs on a dedicated subpage, like `ReminderSettingsScreen`; never embed a large configuration card directly between Settings sections.
+- Reuse the existing reminder page's back button, safe-area, typography and spacing. Open the subpage through the root navigation machine and cover its open/back paths.
+
 ## Type and data safety
 
 - TypeScript 7 strict checks are the source of truth. Never add a type assertion or non-null assertion.
@@ -27,6 +32,7 @@ Read the exact Expo SDK 57 documentation at https://docs.expo.dev/versions/v57.0
 - Put domain vocabulary and repeated configuration in `src/constants.ts`.
 - Model expected failures as `Schema.TaggedError`; reserve defects for impossible states.
 - Prefer guard clauses and shallow control flow. Do not add `switch` statements.
+- Target the installed native Hermes runtime, not Node's JavaScript capabilities. Hermes in this project does not support `Array.prototype.toSorted`; use a fresh copy followed by `.sort()` with the existing documented lint exception. The local `architecture/no-unsupported-hermes-apis` rule rejects `toSorted` in application code. Do not accept an autofix to an unsupported API.
 
 ## Verification
 
@@ -39,5 +45,6 @@ Read the exact Expo SDK 57 documentation at https://docs.expo.dev/versions/v57.0
 - Add model-path coverage when changing navigation states or events.
 - Add or update a custom Oxlint rule test when changing an architectural invariant.
 - Use React Native Harness for device-level component interactions.
+- Rerun native consumer checks after every late change to code executed on device, including seemingly small ordering or formatting changes. A prior native pass does not cover later edits. Jest/TypeScript passing does not prove Hermes API support; exercise the actual screen calculation directly in Harness so coordinator error handling cannot hide a runtime exception.
 
 The local Oxlint plugin enforces these rules. A suppression requires an explicit architectural reason and a corresponding test.

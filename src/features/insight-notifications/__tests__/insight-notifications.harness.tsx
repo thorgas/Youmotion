@@ -1,6 +1,7 @@
 import { afterEach, describe, expect, mock, requireActual, render, resetModules, test, waitUntil } from 'react-native-harness';
 import { screen, userEvent } from '@react-native-harness/ui';
 import { Platform, ScrollView, StyleSheet } from 'react-native';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { File, Paths } from 'expo-file-system';
 import * as Notifications from 'expo-notifications';
@@ -53,6 +54,7 @@ describe('native insight notification preferences and delivery registration', ()
     test(`persists, schedules once, and disables without cancelling unrelated alerts in ${locale}`, async () => {
       savedPreferences = await AsyncStorage.getItem(INSIGHT_NOTIFICATION_STORAGE_KEY);
       const archive = currentDataArchive(await Effect.runPromise(Schema.decodeUnknown(PersistedDataArchiveSchema)(legacyArchive)));
+      expect(insightCandidates({ entries: archive.checkIns, statements: archive.beliefStatements, now: new Date() })).not.toHaveLength(0);
       expect(archive.checkIns.length).toBe(133);
       expect(archive.beliefStatements.length).toBe(15);
       const repository: typeof import('../infrastructure/insight-notification.repository') = require('../infrastructure/insight-notification.repository');
@@ -89,7 +91,7 @@ describe('native insight notification preferences and delivery registration', ()
       mock('@/navigation/app-navigation.provider', () => ({
         useAppNavigationActor: () => ({
           send: (event: InsightNotificationCommand) => { void currentCoordinator().command(event); },
-          getSnapshot: () => ({ status: 'active' }),
+          getSnapshot: () => ({ status: 'active', can: () => true }),
         }),
       }));
       const { AppLocaleProvider }: typeof import('@/localization/app-locale-provider') = require('@/localization/app-locale-provider');
@@ -117,11 +119,17 @@ describe('native insight notification preferences and delivery registration', ()
       await waitUntil(() => !insightNotificationStore.getSnapshot().context.pickerOpen, { timeout: 10_000 }).catch((cause: unknown) => { throw new Error('Picker close failed', { cause }); });
       await coordinator.command({ type: INSIGHT_NOTIFICATION_EVENTS.TIME_CHANGED, time: { hour: 19, minute: 15 } });
       expect((await repository.loadInsightNotificationState()).time).toEqual({ hour: 19, minute: 15 });
+      const { InsightNotificationSettingsScreen }: typeof import('../ui/insight-notification-settings-screen') = require('../ui/insight-notification-settings-screen');
+      await rendered.rerender(<GestureHandlerRootView style={styles.root}><SafeAreaProvider><AppLocaleProvider><InsightNotificationSettingsScreen /></AppLocaleProvider></SafeAreaProvider></GestureHandlerRootView>);
+      await screen.findByTestId('insight-notification-settings-screen');
+      await screen.findByTestId('insight-notification-settings-back');
+      await captureEvidence(`fix-${locale}-settings-disabled`);
+      await captureEvidence(`fix-${locale}-settings-time-selected`);
       await press('insight-notification-toggle');
       await waitUntil(() => insightNotificationStore.getSnapshot().context.settings.enabled && !insightNotificationStore.getSnapshot().context.busy, { timeout: 10_000 }).catch((cause: unknown) => { throw new Error(`Enable failed ${insightNotificationStore.getSnapshot().context.error}`, { cause }); });
       expect((await repository.loadInsightNotificationState()).enabled).toBe(true);
       expect((await repository.loadInsightNotificationState()).pending).toBeNull();
-      await captureEvidence(`${locale}-enabled`);
+      await captureEvidence(`fix-${locale}-settings-enabled`);
       sentinelIdentifier = await Notifications.scheduleNotificationAsync({
         identifier: `insight-harness-sentinel-${locale}`,
         content: { title: 'Synthetic unrelated notification', data: { owner: 'insight-harness-unrelated' } },
@@ -145,7 +153,7 @@ describe('native insight notification preferences and delivery registration', ()
       const after = await Notifications.getAllScheduledNotificationsAsync();
       expect(after.some((request) => request.content.data?.['owner'] === INSIGHT_NOTIFICATION_OWNER)).toBe(false);
       expect(after.some((request) => request.identifier === sentinelIdentifier)).toBe(true);
-      await captureEvidence(`${locale}-disabled`);
+      await captureEvidence(`fix-${locale}-settings-disabled-after`);
     });
   }
 });

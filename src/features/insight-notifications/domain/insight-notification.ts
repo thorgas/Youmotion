@@ -50,7 +50,11 @@ export function insightCandidates({ entries, statements, now }: {
         : `${pattern.kind}:${pattern.emotionId}`;
       return { id: `${timeframe}:${patternId}`, timeframe, tab: ANALYTICS_INSIGHT_TABS.PATTERN, patternId };
     });
-    return beliefs.toSorted((first, second) => first.id.localeCompare(second.id, 'en')).concat(patterns.toSorted((first, second) => first.id.localeCompare(second.id, 'en')));
+    // oxlint-disable-next-line unicorn/no-array-sort -- Hermes lacks toSorted; this receiver is a fresh copy, exercised by the native candidate regression.
+    const sortedBeliefs = beliefs.slice().sort((first, second) => first.id.localeCompare(second.id, 'en'));
+    // oxlint-disable-next-line unicorn/no-array-sort -- Hermes lacks toSorted; this receiver is a fresh copy, exercised by the native candidate regression.
+    const sortedPatterns = patterns.slice().sort((first, second) => first.id.localeCompare(second.id, 'en'));
+    return sortedBeliefs.concat(sortedPatterns);
   });
 }
 

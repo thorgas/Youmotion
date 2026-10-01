@@ -215,6 +215,26 @@ const noComments = {
   },
 };
 
+const noUnsupportedHermesApis = {
+  meta: {
+    type: 'problem',
+    docs: { description: 'Keep application JavaScript compatible with the installed Hermes runtime.' },
+    messages: { unsupported: 'Hermes does not support toSorted. Sort a fresh copy and verify it in native Harness.' },
+    schema: [],
+  },
+  create(context) {
+    const filename = normalizedFilename(context);
+    if (!filename.includes('/src/') || filename.includes('/__tests__/')) return {};
+    return {
+      MemberExpression(node) {
+        const property = node.property;
+        const name = node.computed ? property.value : property.name;
+        if (name === 'toSorted') context.report({ node, messageId: 'unsupported' });
+      },
+    };
+  },
+};
+
 module.exports = {
   meta: { name: 'architecture' },
   rules: {
@@ -230,5 +250,6 @@ module.exports = {
     'no-sync-schema-apis': noSyncSchemaApis,
     'no-barrel-files': noBarrelFiles,
     'no-comments': noComments,
+    'no-unsupported-hermes-apis': noUnsupportedHermesApis,
   },
 };

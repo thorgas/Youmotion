@@ -3,6 +3,18 @@ const architecture = require('../architecture.cjs');
 
 const tester = new RuleTester({ languageOptions: { ecmaVersion: 2022, sourceType: 'module' } });
 
+tester.run('no-unsupported-hermes-apis', require('../architecture.cjs').rules['no-unsupported-hermes-apis'], {
+  valid: [
+    { code: 'const sorted = values.slice().sort();', filename: '/repo/src/domain/candidates.ts' },
+    { code: 'values.toSorted();', filename: '/repo/src/__tests__/candidates.test.ts' },
+  ],
+  invalid: [
+    { code: 'values.toSorted();', filename: '/repo/src/domain/candidates.ts', errors: [{ messageId: 'unsupported' }] },
+    { code: "values['toSorted']();", filename: '/repo/src/ui/screen.ts', errors: [{ messageId: 'unsupported' }] },
+    { code: 'values?.toSorted();', filename: '/repo/src/domain/candidates.ts', errors: [{ messageId: 'unsupported' }] },
+  ],
+});
+
 tester.run('no-framework-in-domain', architecture.rules['no-framework-in-domain'], {
   valid: [{ code: "import { clamp } from './math';", filename: '/app/src/features/check-in/domain/value.ts' }],
   invalid: [{

@@ -47,3 +47,15 @@ EXPO_PUBLIC_RELEASE=release-1dd44a9 pnpm --config.verify-deps-before-run=false e
 ```
 
 Next device step: check `src/features/insight-notifications/ui/insight-notification-controls.tsx` in a compatible 1.0.4 QA-control build. Android background delivery remains an acceptance follow-up. No user-only blocker remains for the completed implementation and QA publication.
+
+## Analytics crash and Settings correction
+
+The user reported that opening Analytics crashed the TestFlight app and that the inline Settings card did not match the existing reminder layout. App Store Connect authentication was configured, but read-only app/crash queries stalled for several minutes without returning data and were stopped. No Apple crash report was retrieved.
+
+Native iOS Harness reproduced the calculation failure directly: the installed Hermes runtime reports `Array.prototype.toSorted` as undefined. This sorting change had been made after the previous native checks. Analytics evaluated it during rendering; the coordinator caught the same exception and displayed the notification error in Settings. Candidate ordering now uses supported `slice().sort()`. A permanent native assertion computes candidates from the committed synthetic archive before coordinator exception handling.
+
+Main Settings now uses an existing `SettingsActionRow` to open `/insight-notifications`, a dedicated page following `ReminderSettingsScreen` back button, safe-area, heading and spacing. Root-machine open/back paths are covered. German translations are included. Native tests render the dedicated page and exercise preferences in both locales.
+
+`AGENTS.md` now documents matching Settings subpages, Hermes compatibility and rerunning native consumer checks after late changes. `architecture/no-unsupported-hermes-apis` rejects direct, computed and optional `toSorted` access in application source; permanent rule tests cover it.
+
+Final checks: 58 suites / 417 tests and coverage thresholds pass; statements 87.28%, branches 77.77%, functions 83.14%, lines 90.08%. TS7, architecture lint, website and Oxlint excluding pre-existing `.opencode/**` pass. Full `pnpm verify` still fails only at those unrelated untracked plugin errors. Final native Harness: iOS 2/2, Android 2/2. Logs: `/tmp/insight-fix-final-*.log`, `/tmp/insight-fix-{ios,android}-harness.log`, `/tmp/insight-crash-harness-diagnostic.log`. The direct native runner used a main-checkout `NODE_PATH` to avoid publication-copy pnpm CLI shims resolving to the temporary checkout. No native dependency or runtime change.

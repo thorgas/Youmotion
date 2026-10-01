@@ -6363,6 +6363,42 @@
         }
       ],
       "types": []
+    },
+    "ukqSNYK/Mr/zayStVBebIg==": {
+      "description": "Insight notification settings entry explanation",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Wähle eine Uhrzeit für Benachrichtigungen zu neuen Leitsätzen und Mustern.",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "JUlnA8f94hAv7NAgCiWrsA==": {
+      "description": "Insight notification settings eyebrow",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "NEUE EINBLICKE",
+          "variations": {}
+        }
+      ],
+      "types": []
+    },
+    "2YOAnrrnMv5HeZK+7j0xxQ==": {
+      "description": "Insight notification settings heading",
+      "status": "new",
+      "tokens": [],
+      "translations": [
+        {
+          "translation": "Nimm wahr, was sich zeigt.",
+          "variations": {}
+        }
+      ],
+      "types": []
     }
   }
 }

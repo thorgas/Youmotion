@@ -539,6 +539,7 @@ export const createAppNavigationMachine = (runtime: AppNavigationRuntime) => set
       },
     },
     [NAVIGATION_STATES.REFLECTION]: {},
+    [NAVIGATION_STATES.INSIGHT_NOTIFICATIONS]: {},
     [CHECK_IN_STATES.SAVING]: {},
     [CHECK_IN_STATES.BELIEF_SYSTEM]: {},
     [CHECK_IN_STATES.BELIEF_SYSTEM_CATALOG]: {},
@@ -570,6 +571,7 @@ export const createAppNavigationMachine = (runtime: AppNavigationRuntime) => set
     context: Schema.standardSchemaV1(AppContextSchema),
     events: {
       [INSIGHT_NOTIFICATION_EVENTS.ENABLED]: EmptyEventSchema,
+      [INSIGHT_NOTIFICATION_EVENTS.SETTINGS_OPENED]: EmptyEventSchema,
       [INSIGHT_NOTIFICATION_EVENTS.DISABLED]: EmptyEventSchema,
       [INSIGHT_NOTIFICATION_EVENTS.DISMISSED]: EmptyEventSchema,
       [INSIGHT_NOTIFICATION_EVENTS.RECHECK_REQUESTED]: EmptyEventSchema,
@@ -1415,6 +1417,9 @@ export const createAppNavigationMachine = (runtime: AppNavigationRuntime) => set
         [NAVIGATION_STATES.SETTINGS]: {
           initial: DATA_SAFETY_STATES.IDLE,
           on: {
+            [INSIGHT_NOTIFICATION_EVENTS.SETTINGS_OPENED]: {
+              target: `#appNavigation.${NAVIGATION_STATES.INSIGHT_NOTIFICATIONS}`,
+            },
             [ONBOARDING_EVENTS.OPENED]: {
               target: `#appNavigation.${NAVIGATION_STATES.ONBOARDING}.${ONBOARDING_STATES.WELCOME}`,
               context: {
@@ -3217,6 +3222,13 @@ export const createAppNavigationMachine = (runtime: AppNavigationRuntime) => set
         },
       },
     },
+    [NAVIGATION_STATES.INSIGHT_NOTIFICATIONS]: {
+      on: {
+        [NAVIGATION_EVENTS.BACK_REQUESTED]: {
+          target: `#appNavigation.${NAVIGATION_STATES.TABS}.${NAVIGATION_STATES.SETTINGS}`,
+        },
+      },
+    },
     [CHECK_IN_STATES.FAILURE]: {
       on: {
         [NAVIGATION_EVENTS.BACK_REQUESTED]: { target: NAVIGATION_STATES.REFLECTION },
@@ -3234,6 +3246,7 @@ const primaryRouteForStateValue =(value: StateValue) => {
     'Primary routing requires a supported XState value shape.',
   );
   const route = [
+    { matches: matchesState(NAVIGATION_STATES.INSIGHT_NOTIFICATIONS, value), route: APP_ROUTES.INSIGHT_NOTIFICATIONS },
     {
       matches: matchesState(
         { [NAVIGATION_STATES.ONBOARDING]: ONBOARDING_STATES.EXAMPLE },
@@ -3257,6 +3270,7 @@ const primaryRouteForStateValue =(value: StateValue) => {
       APP_ROUTES.ONBOARDING_PULSE,
       APP_ROUTES.ONBOARDING,
       APP_ROUTES.SUCCESS,
+      APP_ROUTES.INSIGHT_NOTIFICATIONS,
     ]).has(route),
     'Primary routing returned an unsupported route.',
   );

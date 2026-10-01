@@ -25,6 +25,7 @@ import {
   MOTION_DURATION,
   ONBOARDING_EVENTS,
   REMINDER_EVENTS,
+  INSIGHT_NOTIFICATION_EVENTS,
   SETTINGS_EVENTS,
 } from '@/constants';
 import { tabScreenContentStyle } from '@/components/ui/tab-screen-layout';
@@ -35,7 +36,6 @@ import { actionColors, palette, surfaceColors, type } from '@/theme';
 import { DataSafetyControls } from '@/features/data-safety/ui/data-safety-controls';
 import { FeedbackSettingsAction } from '@/features/feedback/ui/feedback-screen';
 import { LegalSettingsActions } from '@/features/legal/ui/legal-settings-actions';
-import { InsightNotificationControls } from '@/features/insight-notifications/ui/insight-notification-controls';
 import { ReleaseFooter } from '@/features/updates/ui/release-footer';
 import { shouldShowUpdateControls } from '@/features/updates/domain/update-controls';
 import { useAppNavigationActor } from '@/navigation/app-navigation.provider';
@@ -178,6 +178,7 @@ export function SettingsScreen({
   const _openOnboarding = () => actor.send({ type: ONBOARDING_EVENTS.OPENED });
   const _openBeliefLibrary = () => actor.send({ type: BELIEF_LIBRARY_EVENTS.OPENED });
   const _openReminders = () => actor.send({ type: REMINDER_EVENTS.OPENED });
+  const _openInsightNotifications = () => actor.send({ type: INSIGHT_NOTIFICATION_EVENTS.SETTINGS_OPENED });
 
   return (
     <View style={styles.page} testID="settings-screen">
@@ -297,8 +298,13 @@ export function SettingsScreen({
               'Button opening personal core-belief management',
             ))}
           />
+          <SettingsActionRow
+            description={String(fbs('Choose a time for notifications about new guiding beliefs and patterns.', 'Insight notification settings entry explanation'))}
+            onPress={_openInsightNotifications}
+            testID="open-insight-notifications"
+            title={String(fbs('New insights', 'Insight notification preference title'))}
+          />
         </View>
-        <InsightNotificationControls />
         <View testID="settings-legal-section">
           <Text style={styles.sectionHeading}>
             <fbt desc="Heading grouping legal documents in settings">LEGAL</fbt>

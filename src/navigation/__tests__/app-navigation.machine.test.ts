@@ -244,6 +244,18 @@ describe('app navigation model', () => {
     mockGetReminderPermission.mockResolvedValue(REMINDER_PERMISSION_STATES.UNDETERMINED);
   });
 
+  it('opens insight notification settings as a subpage and returns to Settings', async () => {
+    const actor = createActor(appNavigationMachine).start();
+    actor.send({ type: NAVIGATION_EVENTS.SETTINGS_OPENED });
+    actor.send({ type: INSIGHT_NOTIFICATION_EVENTS.SETTINGS_OPENED });
+    await waitFor(actor, (snapshot) => snapshot.matches(NAVIGATION_STATES.INSIGHT_NOTIFICATIONS));
+    expect(routeForStateValue(actor.getSnapshot().value)).toBe(APP_ROUTES.INSIGHT_NOTIFICATIONS);
+    actor.send({ type: NAVIGATION_EVENTS.BACK_REQUESTED });
+    await waitFor(actor, (snapshot) => snapshot.matches({ [NAVIGATION_STATES.TABS]: NAVIGATION_STATES.SETTINGS }));
+    expect(routeForStateValue(actor.getSnapshot().value)).toBe(APP_ROUTES.SETTINGS);
+    actor.stop();
+  });
+
   it('opens a warm insight notification into its analytics timeframe and pattern', async () => {
     const history = createCheckInHistoryStore();
     history.trigger.hydrated({ entries: [hydrationSentinel, {
