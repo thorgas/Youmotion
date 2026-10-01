@@ -60,10 +60,19 @@ Main Settings now uses an existing `SettingsActionRow` to open `/insight-notific
 
 Final checks: 58 suites / 417 tests and coverage thresholds pass; statements 87.28%, branches 77.77%, functions 83.14%, lines 90.08%. TS7, architecture lint, website and Oxlint excluding pre-existing `.opencode/**` pass. Full `pnpm verify` still fails only at those unrelated untracked plugin errors. Final native Harness: iOS 2/2, Android 2/2. Logs: `/tmp/insight-fix-final-*.log`, `/tmp/insight-fix-{ios,android}-harness.log`, `/tmp/insight-crash-harness-diagnostic.log`. The direct native runner used a main-checkout `NODE_PATH` to avoid publication-copy pnpm CLI shims resolving to the temporary checkout. No native dependency or runtime change.
 
-Fix commit: `6e47432cb213d52f9d8b94cec618eb4b157d4e3f`, pushed on the feature branch. Native `insight-notification-fix-*` screenshots correspond to this commit. The clean QA checkout was advanced to this commit, translations regenerated, and both runtime checks passed again (`/tmp/insight-fix-clean-runtime.log`). Automatic approval review rejected the replacement upload before execution, requiring fresh authorization for this later payload. No fixed QA update has been published; the earlier groups above still contain the unsupported API. Await explicit approval of the fixed bundle for the same Expo/EAS project/channel/environment/platforms, then run:
+Fix commit: `6e47432cb213d52f9d8b94cec618eb4b157d4e3f`, pushed on the feature branch. Native `insight-notification-fix-*` screenshots correspond to this commit: eight iOS images and five validated Android images under the ignored artifact directories. Remaining Android image export stopped when its emulator went offline; both locale tests had already passed. Task-owned partial exports were removed and scoped Argent services cleaned up. The clean QA checkout was advanced to this commit, translations regenerated, and both runtime checks passed again (`/tmp/insight-fix-clean-runtime.log`).
+
+The user explicitly approved the replacement payload after automatic approval review required fresh authorization. Published to the same Expo/EAS project, QA channel/branch and preview environment at 2026-10-01 17:41:16 UTC:
+
+- [Fixed iOS group `8d856c8f-d18a-4bbf-9950-ab7626c98536`](https://expo.dev/accounts/youmotion/projects/youmotion/updates/8d856c8f-d18a-4bbf-9950-ab7626c98536), update `01a0f88e-651c-7c06-a76c-5a1e45ad44b3`.
+- [Fixed Android group `af68982e-4363-4ae5-ae81-2fd133e7ace2`](https://expo.dev/accounts/youmotion/projects/youmotion/updates/af68982e-4363-4ae5-ae81-2fd133e7ace2), update `01a0f88e-651c-79fd-8dc4-3acc02963cb4`.
+
+Both remote group readbacks confirm the fix commit and verified runtimes. The active QA channel maps to the QA branch and its update list shows these as the newest updates for each platform/runtime. The earlier groups remain historical; compatible QA clients receive these replacements. Receipt: `/tmp/insight-fix-qa-{publish.log,ios-readback.json,android-readback.json,channel-readback.json,list-readback.json}`.
+
+Publication command:
 
 ```sh
 EXPO_PUBLIC_RELEASE=release-6e47432 pnpm --config.verify-deps-before-run=false exec eas update --channel qa --environment preview --platform all --message 'Fix Analytics Hermes crash and notification settings (6e47432)' --non-interactive --json
 ```
 
-After upload, read back both groups and the active QA channel and replace this pending status with the verified receipt.
+Next acceptance step: reopen Analytics and the Settings subpage in a compatible 1.0.4 QA-control build; Android background delivery remains the prior documented follow-up. No user-only blocker remains for the crash fix, Settings correction, repo guidance or replacement QA publication.
