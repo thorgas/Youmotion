@@ -9,6 +9,11 @@ or release submission. Expo/EAS continues to own builds, binary distribution and
 Apple metadata. ASC and gplay are complementary. Commands were checked against
 installed CLI help on 9 September 2026; recheck leaf `--help` after upgrades.
 
+For new store binaries, use the verified
+[store release workflow](../../docs/release/store-release-workflow.md):
+EAS-managed uploads first, then Play Console **Save as draft** for localized
+release notes. The local gplay credential cannot commit production edits.
+
 ## 1. Freeze inputs and scope
 
 - Confirm app IDs, editable version, locales, intended screenshot types and owner

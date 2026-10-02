@@ -50,3 +50,9 @@ Read the exact Expo SDK 57 documentation at https://docs.expo.dev/versions/v57.0
 - Rerun native consumer checks after every late change to code executed on device, including seemingly small ordering or formatting changes. A prior native pass does not cover later edits. Jest/TypeScript passing does not prove Hermes API support; exercise the actual screen calculation directly in Harness so coordinator error handling cannot hide a runtime exception.
 
 The local Oxlint plugin enforces these rules. A suppression requires an explicit architectural reason and a corresponding test.
+
+## Store releases
+
+- Follow `docs/release/store-release-workflow.md`. Use EAS-managed credentials and explicit build IDs for binary uploads. The local gplay credential currently cannot validate or commit production edits; do not retry it as the first release path.
+- After the EAS Android submission finishes, save English/German release notes in Play Console with **Save as draft**, then read back the exact version code, notes and draft status. Preserve the current live release. Do not edit Console during an active EAS upload.
+- Distinguish upload, draft creation, review submission and public rollout. Verify actual native-store state; an EAS job finishing alone is insufficient. Permission expansion requires explicit user authorization.
