@@ -1,8 +1,10 @@
 {
   "configVersion": 0,
   "apple": {
-    "version": "1.0.4",
-    "categories": ["HEALTH_AND_FITNESS"],
+    "version": "1.0.5",
+    "categories": [
+      "HEALTH_AND_FITNESS"
+    ],
     "release": {
       "automaticRelease": false,
       "phasedRelease": false
@@ -23,7 +25,7 @@
           "mindfulness",
           "journal"
         ],
-        "releaseNotes": "Stability improvements and bug fixes",
+        "releaseNotes": "New: optional notifications for guiding beliefs and patterns in your Insights. Enable them in Settings and choose a time. Existing insights are included once when you activate notifications. Also: clearer reminder times and a fix for an Insights crash.",
         "promoText": "Pause, name what you feel, and capture the moment. Youmotion keeps your reflections and personal patterns private on your device—no account required.",
         "marketingUrl": "https://youmotion.app/",
         "supportUrl": "https://youmotion.app/support/",
@@ -41,7 +43,7 @@
           "wohlbefinden",
           "selbstwahrnehmung"
         ],
-        "releaseNotes": "App-Stabilitäts Verbesserungen und Bug Fixes",
+        "releaseNotes": "Neu: freiwillige Benachrichtigungen für Leitsätze und Muster in deinen Einblicken. Aktiviere sie in den Einstellungen und wähle eine Uhrzeit. Bereits vorhandene Einblicke werden beim Aktivieren einmal berücksichtigt. Außerdem: klarere Erinnerungszeiten und ein behobener Absturz in den Einblicken.",
         "promoText": "Halte kurz inne, erkenne dein Gefühl und bewahre den Moment. Youmotion speichert Reflexionen und Muster privat auf deinem Gerät – ohne Konto.",
         "marketingUrl": "https://youmotion.app/de/",
         "supportUrl": "https://youmotion.app/de/support/",
