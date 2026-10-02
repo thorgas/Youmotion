@@ -69,7 +69,7 @@ verification. Live readback: 1.0.5 is PREPARE_FOR_SUBMISSION, not under review;
 no active or READY_FOR_REVIEW submission exists. Replace its attached build 21
 with verified build 23 (completed), review submitted after physical XR verification. Preserve MANUAL release behavior.
 Version ID: `2d487ef1-db95-4f40-95a9-c236f1826244`.
-App ID: `6807357236`. No Google Play submission was requested.
+App ID: `6807357236`. Google Play submission was subsequently authorized below.
 
 ## Current validation
 
@@ -108,7 +108,9 @@ checkout `/private/tmp/youmotion-local-network-candidate`.
   first attempt found Today instead of welcome; only this newly added QA install
   was removed/reinstalled. The same replay then passed all onboarding steps to
   Today in 17.9 seconds, without a Local Network dialog. No journal entries were
-  created. No pre-existing phone app/data was replaced.
+  created. Apple TN3179 documents app deletion as the iOS reset to undecided
+  Local Network permission state, so the final delete/reinstall is the supported
+  reset procedure; an earlier approval should not suppress this test prompt. No pre-existing phone app/data was replaced.
 - Device automation initially failed signing. Two explicit QA runner App IDs and
   per-target profiles were provisioned with the existing developer certificate
   and registered XR. Automatic signing worked after the user's Xcode login.
@@ -195,4 +197,44 @@ asc versions view --version-id 2d487ef1-db95-4f40-95a9-c236f1826244 \
   --include-build --include-submission
 ```
 
-- Preserve manual release and live 1.0.4 (20). No Google Play release is authorized.
+- Preserve manual release and live iOS 1.0.4 (20). Google Play authority is recorded below.
+
+## Android review submission
+
+The user subsequently requested Android submission too. Existing runtime source
+`2cafff48504c89abab05d56bdfbdccdb9f0f1eb5` remains unchanged and fully verified.
+The Android Release first-launch E2E already passed; no new tests or app changes
+are needed. EAS production build `9d347662-7791-47c3-887d-d0d1fe8d3071` FINISHED
+from the clean candidate checkout, version 1.0.5, version code 18, with managed
+credentials and Tracy false. Previous draft 1.0.5 (17) predates this fix.
+
+Current Play production readback has draft 17 and completed live 16 (1.0.4).
+The task-owned inspection edit was discarded. Managed publishing was turned on
+through the signed-in Play Console so approval will not publish the update.
+Next: require FINISHED with exact source/version, inspect the resulting AAB for
+native Tracy exclusion, submit the explicit EAS build ID using production/draft,
+wait for FINISHED upload, save exact committed EN/DE notes as draft, read back
+version 18 and both notes, then send for Google review and verify In review.
+Do not edit Console during the EAS upload or release publicly after approval.
+
+Android build 18 archive check passed: no Tracy native filenames or wrapper
+references across 125 native/Dex entries; four CPU architectures included.
+AAB SHA256: `d2b3b45240c7eee974328a038c5d5ad543f27bb43cb82cd7c1da066866708017`.
+Runtime fingerprint: `e8806237b6e791bfcd098e7ace49672c8e6557da`.
+Managed EAS upload `0d643109-d272-42d9-bc03-ae57af0ec1d5` FINISHED.
+Fresh read-only Play edit confirmed draft version code 18 and completed live
+version 16. EAS retained the previous notes, so the committed local-network notes
+still need to be saved in Console before review. The inspection edit was discarded.
+
+The Mac locked during the final Console steps. Native CUA reports the Mac is
+locked and automatic unlock failed; Chrome extension connections disappeared
+and the replacement reported its debugger unattached. The user was asked to
+unlock the Mac. No review action has happened yet. Do not report uploaded/draft
+as reviewed. Resume the existing Production draft, save the exact two locale
+notes from `store/releases/1.0.5-notes.json` as draft, read them back, then send
+for Google review through Publishing overview. Managed publishing is on and
+must remain on to preserve separate review and public-release steps.
+
+Console: https://play.google.com/console/u/0/developers/7928512905996440350/app/4975326910658743231/tracks/production?tab=releases
+Evidence: `/private/tmp/youmotion-local-network-play-build18-tracks.json` and
+`/private/tmp/youmotion-local-network-android-eas-submit-status.json`.
