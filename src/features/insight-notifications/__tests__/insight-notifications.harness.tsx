@@ -9,6 +9,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Effect from 'effect/Effect';
 import * as Schema from 'effect/Schema';
 import { ANALYTICS_TIMEFRAMES, APP_LOCALES, INSIGHT_NOTIFICATION_EVENTS, INSIGHT_NOTIFICATION_OWNER, INSIGHT_NOTIFICATION_STORAGE_KEY } from '@/constants';
+import { formatHistoryDate } from '@/localization/date-copy';
 import { PersistedDataArchiveSchema, currentDataArchive } from '@/features/data-safety/domain/data-archive';
 import legacyArchive from '@/features/data-safety/__tests__/fixtures/legacy-archive.fixture.json';
 import { initialInsightNotificationState, insightCandidates } from '../domain/insight-notification';
@@ -138,7 +139,9 @@ describe('native insight notification preferences and delivery registration', ()
       expect((await repository.loadInsightNotificationState()).enabled).toBe(true);
       expect((await repository.loadInsightNotificationState()).pending).toBeNull();
       await screen.findByTestId('insight-notification-none');
-      expect(await screen.findByTestId('insight-notification-none')).toHaveTextContent(locale === APP_LOCALES.GERMAN ? /Noch keine Benachrichtigung geplant/ : /No notification is scheduled yet/);
+      await screen.findByAccessibilityLabel(locale === APP_LOCALES.GERMAN
+        ? 'Noch keine Benachrichtigung geplant. Wir prüfen neue Einblicke, wenn du Youmotion öffnest.'
+        : 'No notification is scheduled yet. We will check for new insights when you open Youmotion.');
       await captureEvidence(`activation-${locale}-settings-empty`);
       await press('insight-notification-toggle');
       await waitUntil(() => !insightNotificationStore.getSnapshot().context.settings.enabled && !insightNotificationStore.getSnapshot().context.busy);
@@ -155,9 +158,10 @@ describe('native insight notification preferences and delivery registration', ()
       expect(insightCandidates({ entries: archive.checkIns, statements: archive.beliefStatements, now }).length).toBeGreaterThan(0);
       if (!state.pending) throw new Error('Synthetic insights must register a pending batch.');
       expect(state.pending.candidates).toEqual(insightCandidates({ ...periodInput, now }));
-      const nextLabel = await screen.findByTestId('insight-notification-next');
-      expect(nextLabel).toHaveTextContent(locale === APP_LOCALES.GERMAN ? /Nächste Benachrichtigung:/ : /Next notification:/);
-      expect(nextLabel).toHaveTextContent(/2026/);
+      await screen.findByTestId('insight-notification-next');
+      const delivery = formatHistoryDate({ date: new Date(state.pending.fireAt), locale });
+      expect(delivery).toMatch(/2026/);
+      await screen.findByAccessibilityLabel(`${locale === APP_LOCALES.GERMAN ? 'Nächste Benachrichtigung:' : 'Next notification:'} ${delivery}`);
       await captureEvidence(`activation-${locale}-settings-scheduled`);
       const futureBatch = { ...state.pending, id: `insight-harness-batch-${locale}`, fireAt: new Date(Date.now() + 3_600_000).toISOString() };
       await repository.persistInsightNotificationState({ ...state, pending: futureBatch });
