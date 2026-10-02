@@ -1,0 +1,30 @@
+{
+  "cli_version": "0.11.3",
+  "checkpoint_id": "01M3Y3Y7GPJ2SR551DAJAYSKPH",
+  "strategy": "manual-commit",
+  "branch": "main",
+  "checkpoints_count": 1,
+  "files_touched": [
+    "docs/handoffs/local-network-startup.md",
+    "src/components/ui/__tests__/persistent-scroll-view.harness.tsx",
+    "src/components/ui/__tests__/persistent-scroll-view.test.tsx",
+    "src/components/ui/persistent-scroll-view.tsx"
+  ],
+  "sessions": [
+    {
+      "metadata": "/0/metadata.json",
+      "transcript": "/0/full.jsonl",
+      "compact_transcript": "/0/transcript.jsonl",
+      "content_hash": "/0/content_hash.txt",
+      "prompt": "/0/prompt.txt"
+    }
+  ],
+  "token_usage": {
+    "input_tokens": 369302,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 24007552,
+    "output_tokens": 60929,
+    "api_call_count": 217,
+    "subagent_tokens_complete": false
+  }
+}
