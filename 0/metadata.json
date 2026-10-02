@@ -1,0 +1,75 @@
+{
+  "cli_version": "0.11.3",
+  "checkpoint_id": "01M3Y21EDHSHMDXV4X3AP4SKKB",
+  "session_id": "01a0fbfd-5a4a-7750-979e-bcd5345745b7",
+  "strategy": "manual-commit",
+  "created_at": "2026-10-02T10:20:05.488957Z",
+  "branch": "main",
+  "checkpoints_count": 1,
+  "files_touched": [
+    "README.md",
+    "docs/handoffs/local-network-startup.md",
+    "eas.json",
+    "react-native.config.js",
+    "scripts/verify-ios-store-archive.sh",
+    "src/__tests__/development-tracing.test.ts",
+    "src/development/install-tracing.ts",
+    "store/releases/1.0.5-notes.json"
+  ],
+  "agent": "Codex",
+  "model": "gpt-6.1-sol",
+  "turn_id": "bdb8dfd7081d",
+  "compact_transcript_start": 0,
+  "token_usage": {
+    "input_tokens": 206615,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 13325568,
+    "output_tokens": 36205,
+    "api_call_count": 117,
+    "subagent_tokens_complete": false
+  },
+  "session_metrics": {
+    "turn_count": 1
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-10-02T10:20:05.32317Z",
+    "agent_lines": 0,
+    "agent_removed": 0,
+    "human_added": 169,
+    "human_modified": 12,
+    "human_removed": 0,
+    "total_committed": 169,
+    "total_lines_changed": 181,
+    "agent_percentage": 0,
+    "metric_version": 2
+  },
+  "prompt_attributions": [
+    {
+      "checkpoint_number": 1,
+      "user_lines_added": 759,
+      "user_lines_removed": 5,
+      "agent_lines_added": 0,
+      "agent_lines_removed": 0,
+      "user_added_per_file": {
+        ".claude/settings.json": 80,
+        ".claude/settings.local.json": 10,
+        ".codex/hooks.json": 88,
+        ".cursor/hooks.json": 40,
+        ".gemini/settings.json": 139,
+        ".opencode/plugins/entire.ts": 269,
+        "README.md": 1,
+        "docs/handoffs/local-network-startup.md": 67,
+        "opencode.json": 1,
+        "react-native.config.js": 9,
+        "scripts/verify-ios-store-archive.sh": 13,
+        "src/__tests__/development-tracing.test.ts": 33,
+        "src/development/install-tracing.ts": 9
+      },
+      "user_removed_per_file": {
+        "README.md": 1,
+        "scripts/verify-ios-store-archive.sh": 1,
+        "src/development/install-tracing.ts": 3
+      }
+    }
+  ]
+}
