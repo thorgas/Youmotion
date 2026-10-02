@@ -1,0 +1,47 @@
+{
+  "cli_version": "0.11.3",
+  "checkpoint_id": "01M3Y8R4CPW4WJ3VXM0CA9PSQN",
+  "session_id": "01a0fbfd-5a4a-7750-979e-bcd5345745b7",
+  "strategy": "manual-commit",
+  "created_at": "2026-10-02T12:17:14.79086Z",
+  "branch": "main",
+  "checkpoints_count": 2,
+  "save_step_count": 1,
+  "files_touched": [],
+  "agent": "Codex",
+  "model": "gpt-6.1-sol",
+  "turn_id": "c05c07a3f730",
+  "compact_transcript_start": 0,
+  "token_usage": {
+    "input_tokens": 888210,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 62412160,
+    "output_tokens": 120619,
+    "api_call_count": 486
+  },
+  "session_metrics": {
+    "turn_count": 4
+  },
+  "prompt_attributions": [
+    {
+      "checkpoint_number": 2,
+      "user_lines_added": 647,
+      "user_lines_removed": 2,
+      "agent_lines_added": 0,
+      "agent_lines_removed": 0,
+      "user_added_per_file": {
+        ".claude/settings.json": 80,
+        ".claude/settings.local.json": 10,
+        ".codex/hooks.json": 88,
+        ".cursor/hooks.json": 40,
+        ".gemini/settings.json": 139,
+        ".opencode/plugins/entire.ts": 269,
+        "docs/handoffs/local-network-startup.md": 20,
+        "opencode.json": 1
+      },
+      "user_removed_per_file": {
+        "docs/handoffs/local-network-startup.md": 2
+      }
+    }
+  ]
+}
