@@ -38,6 +38,19 @@ onboarding screen is added because the shipped app has no feature requiring this
 access. A new iOS binary is required; OTA JavaScript cannot remove native threads.
 Do not uninstall or replace an existing personal journal to validate this fix.
 
+## Additional native acceptance failure
+
+The fresh Android Release onboarding run exposed an existing worklet assertion:
+`Scroll indicator viewport height must be positive`. Android emits zero height
+when the onboarding scroll view detaches. The layout boundary already accepts
+zero, but the animated indicator rejected it and destroyed the React instance.
+Runtime evidence: `/private/tmp/youmotion-local-network-android-startup.log`.
+Cover zero viewport, zero content, both zero, and normal/keyboard geometry;
+hide the indicator while native measurements are zero, then recover on positive
+measurements. Exercise native worklet rendering and repeat full Release onboarding
+on both platforms after this late fix. Build 22 must not be submitted because it
+predates this additional repair.
+
 ## Commands
 
 ```sh

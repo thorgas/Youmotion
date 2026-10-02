@@ -8,6 +8,18 @@ import {
 } from '@/components/ui/persistent-scroll-view';
 
 describe('persistent scroll views', () => {
+  it.each([
+    { contentHeight: 700, viewportHeight: 0 },
+    { contentHeight: 0, viewportHeight: 700 },
+    { contentHeight: 0, viewportHeight: 0 },
+  ])('hides the indicator for native zero measurements: %o', (measurements) => {
+    expect(persistentScrollIndicatorMetrics({
+      ...measurements,
+      keyboardHeight: -320,
+      scrollOffset: 100,
+    })).toEqual({ keyboardInset: 320, opacity: 0, thumbHeight: 0, translateY: 0 });
+  });
+
   it('shows and constrains the indicator to the viewport left above the keyboard', () => {
     const closed = persistentScrollIndicatorMetrics({
       contentHeight: 700,

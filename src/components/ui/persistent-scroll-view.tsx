@@ -48,9 +48,12 @@ export function persistentScrollIndicatorMetrics({
   viewportHeight,
 }: IndicatorMetricsInput) {
   'worklet';
-  assert(contentHeight > 0, 'Scroll indicator content height must be positive.');
-  assert(viewportHeight > 0, 'Scroll indicator viewport height must be positive.');
+  assert(contentHeight >= 0, 'Scroll indicator content height must be non-negative.');
+  assert(viewportHeight >= 0, 'Scroll indicator viewport height must be non-negative.');
   const keyboardInset = Math.max(-keyboardHeight, 0);
+  if (contentHeight === 0 || viewportHeight === 0) {
+    return { keyboardInset, opacity: 0, thumbHeight: 0, translateY: 0 };
+  }
   const visibleViewportHeight = Math.max(viewportHeight - keyboardInset, 1);
   const trackHeight = Math.max(visibleViewportHeight - 12, 1);
   const overflow = Math.max(contentHeight - visibleViewportHeight, 0);
