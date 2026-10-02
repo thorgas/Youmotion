@@ -30,7 +30,7 @@ only `Ottrelite.install` in JavaScript does not prevent that startup.
 | Explicit profiling Debug build, native wrapper available | Load and install Tracy once | `development-tracing.test.ts` |
 | Native dependency resolution, both platforms | No Tracy by default or in release EAS profiles, even if flag is true | Expo autolinking JSON and native Release binaries |
 | Store archive containing Tracy | Reject before upload | Existing local 1.0.5 build 21 archive rejected |
-| Store archive without Tracy and forbidden selectors | Pass archive gate | New archive required |
+| Store archive without Tracy and forbidden selectors | Pass archive gate | Build 23 IPA passed |
 | Android Release, fresh startup | No Tracy native library or discovery | Release APK and fresh synthetic device check |
 
 There is no new persistence or hydration behavior. No permission rationale or
@@ -67,30 +67,112 @@ uncommitted `.opencode/plugins/entire.ts` lint failures. Preserve those files.
 The user authorized a new App Store binary and submission for review after
 verification. Live readback: 1.0.5 is PREPARE_FOR_SUBMISSION, not under review;
 no active or READY_FOR_REVIEW submission exists. Replace its attached build 21
-with the verified candidate, then submit. Preserve MANUAL release behavior.
+with verified build 23 (completed), then submit after physical-test disposition. Preserve MANUAL release behavior.
 Version ID: `2d487ef1-db95-4f40-95a9-c236f1826244`.
 App ID: `6807357236`. No Google Play submission was requested.
 
 ## Current validation
 
-Source checkout: `main`, starting HEAD `435fc9c580d2cf49ae1ae7c69cb7dcf2c5fe0511`.
-Unrelated hook changes remain untouched.
+Runtime candidate: `2cafff48504c89abab05d56bdfbdccdb9f0f1eb5`, pushed to `main`.
+Source starting HEAD: `435fc9c580d2cf49ae1ae7c69cb7dcf2c5fe0511`.
+Unrelated hook changes remain untouched. The final checks ran from the clean
+checkout `/private/tmp/youmotion-local-network-candidate`.
 
-- Type checking and website verification passed.
-- Initial Jest and coverage passed: 61 suites, 452 tests. Coverage: statements 88.52%,
-  branches 79.64%, functions 83.8%, lines 91.41%.
-- Changed-file Oxlint and whitespace checks passed.
-- Full `pnpm verify` stops at unrelated `.opencode/plugins/entire.ts` lint errors.
-- Initial native dependency resolution and CocoaPods regeneration passed for
-  Debug-only iOS linking. Rerun for the final opt-in behavior on both platforms.
-- The existing local build 21 IPA contains Tracy and is rejected by the new gate.
-- Synthetic archive checks passed for clean executables and JS-only references;
-  correctly rejected native Tracy, private selectors, and missing executables.
-- Native build log: `/private/tmp/youmotion-local-network-release-build.log`.
-- The first local native build stalled at Expo fingerprint resource generation
-  and spawned a runaway config-loader chain. Its task-owned processes were
-  stopped. Local scripts now pin child Node commands to Node 22 and have a
-  temporary recursive-loader guard for diagnosis. These are ignored local
-  environment changes, not release source. A retry failed compiling an Apple
-  Foundation module after the process-resource failure; native confirmation is
-  pending. Preserve logs and do not treat earlier source checks as device proof.
+- Full `pnpm verify` passed: Oxlint, ESLint, TypeScript 7, website checks,
+  61 Jest suites and 456 tests. `pnpm test:coverage` passed all unchanged thresholds:
+  statements 88.52%, branches 79.64%, functions 83.8%, lines 91.41%.
+- The installed dependency layout was made by pnpm 12.6.0. Verification used
+  `/opt/homebrew/bin/pnpm` with `PNPM_PACKAGE_MANAGER_MANAGE=false` to avoid a
+  package-manager self-switch, plus the locked transitive Jest resolution path
+  above. No dependency or lockfile change was made.
+- Android and iOS Harness each passed both zero-measurement regression tests.
+  Harness's existing Reanimated substitution is used; the actual native animation
+  worklet was verified separately by the final Release onboarding flows.
+- Final iOS simulator Release build succeeded and its executable has no native
+  Tracy wrapper. Android arm64 Release APK succeeded and has no Tracy libraries,
+  classes or DEX references.
+- Fresh final Release installs completed all onboarding steps into a usable
+  Today screen on iOS 26.5 and Android API 36. No permission dialog appeared.
+  Both are dedicated, empty QA targets; no journal data was used.
+- The existing local build 21 IPA contains Tracy and the new archive gate rejects it.
+  Synthetic archives verify acceptance of clean executables/JS-only references
+  and rejection of native Tracy, private Harness selectors and missing executables.
+- Physical iPhone permission validation remains pending: both connected iPhones
+  are locked. Neither existing install was inspected, replaced or erased. The
+  user was asked to unlock and identify a safe/disposable QA device, or explicitly
+  skip the physical test. A simulator launch alone is not physical permission proof.
+
+Evidence:
+
+- `/private/tmp/youmotion-final-verify.log`
+- `/private/tmp/youmotion-final-coverage.log`
+- `/private/tmp/youmotion-local-network-scroll-harness-final.log`
+- `/private/tmp/youmotion-local-network-scroll-harness-ios.log`
+- `/private/tmp/youmotion-local-network-release-build-scroll-fix.log`
+- `/private/tmp/youmotion-local-network-android-build-scroll-fix.log`
+- `/private/tmp/youmotion-local-network-ios-welcome.png`
+- `/private/tmp/youmotion-local-network-android-welcome.png`
+- `/private/tmp/youmotion-local-network-ios-final-main.png`
+- `/private/tmp/youmotion-local-network-android-final-main.png`
+
+The first local iOS build spawned a runaway Expo config-loader chain; only this
+build's processes were stopped. Child tooling was pinned to Node 22. The final
+rebuild passed without the temporary recursive-loader guard. The ignored local
+`ios/.xcode.env.local` keeps its original Node path and the matching child PATH.
+
+## Reproducible release onboarding
+
+`e2e/agent-device/first-launch-ios.ad` and `first-launch-android.ad` record the
+verified journey from welcome to Today. They require agent-device 0.20.0 and a
+fresh Release install on a **disposable** QA target named Youmotion Local Network
+QA. Never clear an existing user's journal to meet this prerequisite. Change the
+context device name only to another confirmed disposable target. Both committed
+replays passed on the final Release artifacts: iOS 10.3 seconds, Android 7.68
+seconds. The scripts stop at the working Today screen and write a synthetic-data
+screenshot. The iOS replay is simulator evidence, not a physical permission check.
+
+```sh
+mkdir -p artifacts
+pnpm exec agent-device test e2e/agent-device/first-launch-ios.ad --platform ios
+pnpm exec agent-device test e2e/agent-device/first-launch-android.ad --platform android
+```
+
+## App Store replacement
+
+- Version: 1.0.5, manual release, existing draft ID above. No active review existed.
+- Superseded build 22: `bbdcf018-d2db-40ed-86f3-b8b7bf525658`, source `680a039`,
+  finished before cancellation could run. It was not uploaded or submitted.
+- Final build 23: `fd3128fd-b8c2-4e8c-8aee-6f0b88d0deb0`, source `2cafff4`.
+  Managed credentials were frozen; production profile, no auto-submit.
+- English and German What's New were updated and read back exactly from
+  `store/releases/1.0.5-notes.json` (329/379 characters).
+- App Privacy publication could not be read via the public API; no cached web
+  session is available and the browser is signed out. Existing declarations were
+  not changed. Current readiness reports no blocking errors; this remains an
+  advisory, not a proven published-state readback.
+- Build 23 FINISHED and its downloaded IPA passed the native archive gate.
+  Bundle/version/build and production channel were verified. Runtime fingerprint:
+  `edb767a52c8607524dce180629b617ccd39ddac6`.
+  IPA SHA256: `89882a50f50d1a6cb5c84020784714564f762ecbdd3360a3f045e3a4edc97e0a`.
+- Explicit-ID EAS upload `606d4cef-19c2-4e20-bc91-d01950f06343` FINISHED.
+  Apple build `cca46c28-ec25-4cc0-9155-13239e68acc9` is VALID and App Store eligible.
+- Draft 1.0.5 now references Apple build 23. Readback remains
+  PREPARE_FOR_SUBMISSION. Readiness has zero errors/blockers, three inherited
+  non-blocking metadata warnings. Manual release is preserved. Review dry run
+  reports `wouldSubmit: true` and `alreadyAttached: true`.
+- Pending: physical iPhone permission validation or an explicit user decision
+  to skip it. Both connected phones were locked. Do not infer consent to erase
+  journal data or overwrite either install. This is a validation decision, not
+  a new request for App Review authorization; review was already authorized.
+  After disposition, submit with the exact IDs below and read back actual review
+  state. No review submission or public rollout has happened yet.
+
+```sh
+asc review submit --app 6807357236 \
+  --version-id 2d487ef1-db95-4f40-95a9-c236f1826244 \
+  --build-id cca46c28-ec25-4cc0-9155-13239e68acc9 --confirm
+asc versions view --version-id 2d487ef1-db95-4f40-95a9-c236f1826244 \
+  --include-build --include-submission
+```
+
+- Preserve manual release and live 1.0.4 (20). No Google Play release is authorized.

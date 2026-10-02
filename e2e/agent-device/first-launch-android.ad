@@ -1,0 +1,12 @@
+context platform=android device="Youmotion Local Network QA" kind=emulator
+open "com.youmotion.mobile" --relaunch
+wait "id=\"onboarding-primary-action\" label=\"See how it works\""
+press "id=\"onboarding-primary-action\" label=\"See how it works\""
+wait "id=\"onboarding-primary-action\" label=\"Show the example\""
+press "id=\"onboarding-primary-action\" label=\"Show the example\""
+wait "id=\"onboarding-primary-action\" label=\"Continue\""
+press "id=\"onboarding-primary-action\" label=\"Continue\""
+wait "id=\"onboarding-primary-action\" label=\"Try your first check-in\""
+press "id=\"onboarding-primary-action\" label=\"Try your first check-in\""
+wait "id=\"tab-today\""
+screenshot "artifacts/first-launch-android.png"
