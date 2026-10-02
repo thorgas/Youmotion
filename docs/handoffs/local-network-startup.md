@@ -24,7 +24,7 @@ only `Ottrelite.install` in JavaScript does not prevent that startup.
 
 | Build / startup | Expected result | Verification |
 | --- | --- | --- |
-| iOS Release, fresh install, before welcome/onboarding | No Tracy module or broadcast; no Local Network dialog | New Release binary and fresh physical-device launch required |
+| iOS Release, fresh install, before welcome/onboarding | No Tracy module or broadcast; no Local Network dialog | Fresh physical XR Release E2E passed; build 23 IPA gate passed |
 | iOS Release, JS startup, native wrapper unavailable | No import or install of the native wrapper | `development-tracing.test.ts` |
 | Normal development, native wrapper absent | No import or install | `development-tracing.test.ts` |
 | Explicit profiling Debug build, native wrapper available | Load and install Tracy once | `development-tracing.test.ts` |
@@ -67,7 +67,7 @@ uncommitted `.opencode/plugins/entire.ts` lint failures. Preserve those files.
 The user authorized a new App Store binary and submission for review after
 verification. Live readback: 1.0.5 is PREPARE_FOR_SUBMISSION, not under review;
 no active or READY_FOR_REVIEW submission exists. Replace its attached build 21
-with verified build 23 (completed), then submit after physical-test disposition. Preserve MANUAL release behavior.
+with verified build 23 (completed), review submitted after physical XR verification. Preserve MANUAL release behavior.
 Version ID: `2d487ef1-db95-4f40-95a9-c236f1826244`.
 App ID: `6807357236`. No Google Play submission was requested.
 
@@ -97,10 +97,24 @@ checkout `/private/tmp/youmotion-local-network-candidate`.
 - The existing local build 21 IPA contains Tracy and the new archive gate rejects it.
   Synthetic archives verify acceptance of clean executables/JS-only references
   and rejection of native Tracy, private Harness selectors and missing executables.
-- Physical iPhone permission validation remains pending: both connected iPhones
-  are locked. Neither existing install was inspected, replaced or erased. The
-  user was asked to unlock and identify a safe/disposable QA device, or explicitly
-  skip the physical test. A simulator launch alone is not physical permission proof.
+- Physical iPhone XR validation passed on iOS 17.7.1 after the user unlocked
+  the phone and restored the correct thorgascloud Xcode account. Inventory before
+  installation contained no Youmotion app. A local device-signed Release from the
+  unchanged runtime candidate (HEAD 38cdcdb only adds docs/E2E) was installed;
+  its executable contains no native Tracy. Local native version metadata is
+  1.0.3 (1), so this is candidate-code proof, not an exact build-23 device install.
+- The existing first-launch iOS replay was copied to /private/tmp with only its
+  target changed to the physical XR and screenshot destination changed. The
+  first attempt found Today instead of welcome; only this newly added QA install
+  was removed/reinstalled. The same replay then passed all onboarding steps to
+  Today in 17.9 seconds, without a Local Network dialog. No journal entries were
+  created. No pre-existing phone app/data was replaced.
+- Device automation initially failed signing. Two explicit QA runner App IDs and
+  per-target profiles were provisioned with the existing developer certificate
+  and registered XR. Automatic signing worked after the user's Xcode login.
+  A wildcard signing-ID request was rejected by automatic approval review as
+  broader than narrow QA authority; it was not created or bypassed.
+
 
 Evidence:
 
@@ -160,12 +174,18 @@ pnpm exec agent-device test e2e/agent-device/first-launch-android.ad --platform 
   PREPARE_FOR_SUBMISSION. Readiness has zero errors/blockers, three inherited
   non-blocking metadata warnings. Manual release is preserved. Review dry run
   reports `wouldSubmit: true` and `alreadyAttached: true`.
-- Pending: physical iPhone permission validation or an explicit user decision
-  to skip it. Both connected phones were locked. Do not infer consent to erase
-  journal data or overwrite either install. This is a validation decision, not
-  a new request for App Review authorization; review was already authorized.
-  After disposition, submit with the exact IDs below and read back actual review
-  state. No review submission or public rollout has happened yet.
+- Physical verification is complete. Review submission
+  `31d6bb2f-d7ce-4404-8037-78e3ea9e0d93` succeeded at
+  2026-10-02T11:44:01Z. Apple's version readback confirms WAITING_FOR_REVIEW and
+  attached build 23. No user-only blocker remains. Manual release is preserved;
+  approval will not automatically publish the update.
+- Evidence: `/private/tmp/youmotion-first-launch-physical-xr-final.log`,
+  `/private/tmp/youmotion-first-launch-physical-xr.png`,
+  `/private/tmp/youmotion-1.0.5-build23-review-submitted.json`, and
+  `/private/tmp/youmotion-1.0.5-build23-review-readback.json`.
+- Next: read review state; do not submit again or release publicly without
+  authorization. The command below is the already-completed submission, retained
+  as an audit reference.
 
 ```sh
 asc review submit --app 6807357236 \
