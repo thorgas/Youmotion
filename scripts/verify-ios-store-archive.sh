@@ -18,6 +18,18 @@ trap 'rm -rf "$verification_dir"' EXIT
 
 unzip -q "$archive_path" -d "$verification_dir"
 
+for app_path in "$verification_dir"/Payload/*.app; do
+  executable_name="$(/usr/libexec/PlistBuddy -c 'Print :CFBundleExecutable' "$app_path/Info.plist")"
+  if [[ ! -f "$app_path/$executable_name" ]]; then
+    echo "Store archive is missing its declared app executable." >&2
+    exit 1
+  fi
+  if rg -a -F -q 'ReactNativeOttreliteBackendTracy' "$app_path/$executable_name"; then
+    echo "Store archive contains the Tracy native profiler, which can trigger Local Network permission at startup." >&2
+    exit 1
+  fi
+done
+
 forbidden_selectors=(
   '_addTouch:forDelayedDelivery:'
   '_clearTouches'
@@ -41,4 +53,4 @@ if (( ${#found_selectors[@]} > 0 )); then
   exit 1
 fi
 
-echo "iOS archive is free of the known HarnessUI private selectors."
+echo "iOS archive is free of the Tracy native profiler and known HarnessUI private selectors."

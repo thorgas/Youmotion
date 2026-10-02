@@ -28,7 +28,8 @@
       "environment": "preview",
       "channel": "preview",
       "env": {
-        "EAS_USE_CACHE": "1"
+        "EAS_USE_CACHE": "1",
+        "EXPO_PUBLIC_ENABLE_TRACY": "false"
       },
       "android": {
         "buildType": "apk"
@@ -47,7 +48,8 @@
       "channel": "production",
       "autoIncrement": true,
       "env": {
-        "EAS_USE_CACHE": "1"
+        "EAS_USE_CACHE": "1",
+        "EXPO_PUBLIC_ENABLE_TRACY": "false"
       },
       "android": {
         "buildType": "app-bundle"
