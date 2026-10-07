@@ -98,7 +98,7 @@ checkout `/private/tmp/youmotion-local-network-candidate`.
   Synthetic archives verify acceptance of clean executables/JS-only references
   and rejection of native Tracy, private Harness selectors and missing executables.
 - Physical iPhone XR validation passed on iOS 17.7.1 after the user unlocked
-  the phone and restored the correct thorgascloud Xcode account. Inventory before
+  the phone and restored the correct authorized Xcode account. Inventory before
   installation contained no Youmotion app. A local device-signed Release from the
   unchanged runtime candidate (HEAD 38cdcdb only adds docs/E2E) was installed;
   its executable contains no native Tracy. Local native version metadata is
@@ -208,7 +208,7 @@ are needed. EAS production build `9d347662-7791-47c3-887d-d0d1fe8d3071` FINISHED
 from the clean candidate checkout, version 1.0.5, version code 18, with managed
 credentials and Tracy false. Previous draft 1.0.5 (17) predates this fix.
 
-Current Play production readback has draft 17 and completed live 16 (1.0.4).
+Historical Play production readback before the build 18 upload had draft 17 and completed live 16 (1.0.4).
 The task-owned inspection edit was discarded. Managed publishing was turned on
 through the signed-in Play Console so approval will not publish the update.
 Next: require FINISHED with exact source/version, inspect the resulting AAB for
@@ -226,10 +226,11 @@ Fresh read-only Play edit confirmed draft version code 18 and completed live
 version 16. EAS retained the previous notes, so the committed local-network notes
 still need to be saved in Console before review. The inspection edit was discarded.
 
-The Mac locked during the final Console steps. Native CUA reports the Mac is
+Historical blocker before the successful CLI submission below: the Mac locked
+during the final Console steps. Native CUA reported the Mac was
 locked and automatic unlock failed; Chrome extension connections disappeared
 and the replacement reported its debugger unattached. The user was asked to
-unlock the Mac. No review action has happened yet. Do not report uploaded/draft
+unlock the Mac. At that point no review action had happened. Do not report uploaded/draft
 as reviewed. Resume the existing Production draft, save the exact two locale
 notes from `store/releases/1.0.5-notes.json` as draft, read them back, then send
 for Google review through Publishing overview. Managed publishing is on and
@@ -238,3 +239,29 @@ must remain on to preserve separate review and public-release steps.
 Console: https://play.google.com/console/u/0/developers/7928512905996440350/app/4975326910658743231/tracks/production?tab=releases
 Evidence: `/private/tmp/youmotion-local-network-play-build18-tracks.json` and
 `/private/tmp/youmotion-local-network-android-eas-submit-status.json`.
+
+### Current CLI recheck and submission
+
+The user explicitly requested a fresh credential check. The local profile still
+uses the previously configured service account; its identity is kept outside
+this public handoff. Empty-edit
+validation and validation with the exact release notes both succeeded. Users
+permission inspection still returns 403; it is not required for this release.
+No credentials or permissions were changed.
+
+Saving the notes with `--changes-not-sent-for-review` returned HTTP 400:
+Google requires automatic review for these changes. Under the user's existing
+Android review authorization, build 18 was staged as completed with exact EN/DE
+notes, validated, then committed successfully without that flag. Managed
+publishing was previously verified on and remains the publication hold.
+
+Fresh API readback confirms 1.0.5, version code 18, completed, with exact notes
+(329 English and 379 German characters). This is API release status, not proof
+of public availability or the Console's In review label. Browser reconnection
+returned a stale draft view, then disconnected and reported debugger unattached;
+the final Console review-state check remains outstanding. Do not resubmit or
+publish. Read Publishing overview when browser access returns.
+
+Evidence: `/private/tmp/youmotion-build18-review-commit.json` and
+`/private/tmp/youmotion-build18-review-readback.json`. Both task-owned inspection
+edits were discarded. The committed submission edit is 04391557664495591324.
