@@ -1,0 +1,40 @@
+{
+  "cli_version": "0.11.3",
+  "checkpoint_id": "01M4AVXVRETJX8KV9M5H96NZNF",
+  "session_id": "01a1159b-9487-7142-b3a1-aa48a2f17fc1",
+  "strategy": "manual-commit",
+  "created_at": "2026-10-07T09:43:20.055484Z",
+  "branch": "codex/appduct-e2e",
+  "checkpoints_count": 1,
+  "save_step_count": 1,
+  "files_touched": [
+    ".gitignore",
+    "entry.tsx",
+    "metro.config.cjs",
+    "rn-harness.config.mjs",
+    "src/development/development-root.tsx"
+  ],
+  "agent": "Codex",
+  "model": "gpt-6.1-sol",
+  "turn_id": "3808d57f62f0",
+  "compact_transcript_start": 0,
+  "token_usage": {
+    "input_tokens": 328141,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 21602048,
+    "output_tokens": 50244,
+    "api_call_count": 167
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-10-07T09:43:19.955532Z",
+    "agent_lines": 20,
+    "agent_removed": 3,
+    "human_added": 1481,
+    "human_modified": 0,
+    "human_removed": 0,
+    "total_committed": 1501,
+    "total_lines_changed": 1505,
+    "agent_percentage": 1.5282392026578073,
+    "metric_version": 2
+  }
+}

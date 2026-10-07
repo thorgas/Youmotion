@@ -3,9 +3,13 @@
   "checkpoint_id": "01M4AVXVRETJX8KV9M5H96NZNF",
   "strategy": "manual-commit",
   "branch": "codex/appduct-e2e",
-  "checkpoints_count": 4,
+  "checkpoints_count": 5,
   "files_touched": [
-    "entry.tsx"
+    ".gitignore",
+    "entry.tsx",
+    "metro.config.cjs",
+    "rn-harness.config.mjs",
+    "src/development/development-root.tsx"
   ],
   "sessions": [
     {
@@ -14,14 +18,21 @@
       "compact_transcript": "/0/transcript.jsonl",
       "content_hash": "/0/content_hash.txt",
       "prompt": "/0/prompt.txt"
+    },
+    {
+      "metadata": "/1/metadata.json",
+      "transcript": "/1/full.jsonl",
+      "compact_transcript": "/1/transcript.jsonl",
+      "content_hash": "/1/content_hash.txt",
+      "prompt": "/1/prompt.txt"
     }
   ],
   "token_usage": {
-    "input_tokens": 980536,
+    "input_tokens": 1308677,
     "cache_creation_tokens": 0,
-    "cache_read_tokens": 67092608,
-    "output_tokens": 130244,
-    "api_call_count": 529,
+    "cache_read_tokens": 88694656,
+    "output_tokens": 180488,
+    "api_call_count": 696,
     "subagent_tokens_complete": false
   }
 }
