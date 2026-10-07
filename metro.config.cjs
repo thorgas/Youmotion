@@ -3,6 +3,7 @@ const { withInspector } = require('@callstack/inspector/metro');
 const { withRozenite } = require('@rozenite/metro');
 const { withRozeniteRequireProfiler } = require('@rozenite/require-profiler-plugin/metro');
 const { withReactNativeGrab } = require('react-native-grab/metro');
+const { withAppduct } = require('@appduct/react-native/metro');
 
 const defaultConfig = getDefaultConfig(__dirname);
 const harnessPresstoPath = require.resolve('./src/testing/pressto.harness.tsx');
@@ -31,4 +32,10 @@ const rozeniteConfig = withRozenite(grabConfig, {
 });
 const inspectorEnabled = process.env.WITH_INSPECTOR === 'true';
 
-module.exports = inspectorEnabled ? withInspector(rozeniteConfig, true)() : rozeniteConfig;
+module.exports = async () => {
+  const config = await rozeniteConfig();
+  const inspectedConfig = inspectorEnabled ? await withInspector(config, true)() : config;
+  return withAppduct(inspectedConfig, {
+    include: process.env.EXPO_PUBLIC_E2E === 'true' && process.env.APPDUCT_ENABLED !== '0',
+  });
+};

@@ -61,3 +61,5 @@ example
 
 # Local App Store Connect reports and authentication workspace
 /.asc/
+/.appduct/
+/artifacts/e2e-appduct/

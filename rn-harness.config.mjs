@@ -18,7 +18,10 @@ export default {
     webPlatform({ name: 'web', browser: chrome(`http://localhost:${webPort}/index.html`) }),
     applePlatform({
       name: 'ios',
-      device: appleSimulator('iPhone 17 Pro', '26.1'),
+      device: appleSimulator(
+        process.env.RN_HARNESS_IOS_DEVICE ?? 'iPhone 17 Pro',
+        process.env.RN_HARNESS_IOS_VERSION ?? '26.1',
+      ),
       bundleId: 'com.youmotion.mobile',
       appLaunchOptions: {
         arguments: [
