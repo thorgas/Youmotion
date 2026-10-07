@@ -1,0 +1,84 @@
+{
+  "cli_version": "0.11.3",
+  "checkpoint_id": "01M4AVXVRETJX8KV9M5H96NZNF",
+  "session_id": "01a0fbfd-5a4a-7750-979e-bcd5345745b7",
+  "strategy": "manual-commit",
+  "created_at": "2026-10-07T09:43:19.268365Z",
+  "branch": "codex/appduct-e2e",
+  "checkpoints_count": 4,
+  "save_step_count": 3,
+  "files_touched": [
+    "entry.tsx"
+  ],
+  "agent": "Codex",
+  "model": "gpt-6.1-sol",
+  "turn_id": "0262251462c9",
+  "compact_transcript_start": 0,
+  "token_usage": {
+    "input_tokens": 980536,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 67092608,
+    "output_tokens": 130244,
+    "api_call_count": 529,
+    "subagent_tokens_complete": false
+  },
+  "session_metrics": {
+    "turn_count": 8
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-10-07T09:43:19.004296Z",
+    "agent_lines": 2,
+    "agent_removed": 0,
+    "human_added": 1497,
+    "human_modified": 0,
+    "human_removed": 0,
+    "total_committed": 1499,
+    "total_lines_changed": 1503,
+    "agent_percentage": 0.1330671989354624,
+    "metric_version": 2
+  },
+  "prompt_attributions": [
+    {
+      "checkpoint_number": 2,
+      "user_lines_added": 627,
+      "user_lines_removed": 0,
+      "agent_lines_added": 0,
+      "agent_lines_removed": 0,
+      "user_added_per_file": {
+        ".claude/settings.json": 80,
+        ".claude/settings.local.json": 10,
+        ".codex/hooks.json": 88,
+        ".cursor/hooks.json": 40,
+        ".gemini/settings.json": 139,
+        ".opencode/plugins/entire.ts": 269,
+        "opencode.json": 1
+      }
+    },
+    {
+      "checkpoint_number": 3,
+      "user_lines_added": 706,
+      "user_lines_removed": 10,
+      "agent_lines_added": 31,
+      "agent_lines_removed": 3,
+      "user_added_per_file": {
+        ".claude/settings.json": 80,
+        ".claude/settings.local.json": 10,
+        ".codex/hooks.json": 88,
+        ".cursor/hooks.json": 40,
+        ".gemini/settings.json": 139,
+        ".opencode/plugins/entire.ts": 269,
+        "AGENTS.md": 3,
+        "docs/handoffs/local-network-startup.md": 4,
+        "docs/release/store-release-workflow.md": 62,
+        "opencode.json": 1,
+        "store/automation/UPLOAD-RUNBOOK.md": 10
+      },
+      "user_removed_per_file": {
+        "AGENTS.md": 2,
+        "docs/handoffs/local-network-startup.md": 3,
+        "docs/release/store-release-workflow.md": 2,
+        "store/automation/UPLOAD-RUNBOOK.md": 3
+      }
+    }
+  ]
+}

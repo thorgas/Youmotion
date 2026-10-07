@@ -1,0 +1,27 @@
+{
+  "cli_version": "0.11.3",
+  "checkpoint_id": "01M4AVXVRETJX8KV9M5H96NZNF",
+  "strategy": "manual-commit",
+  "branch": "codex/appduct-e2e",
+  "checkpoints_count": 4,
+  "files_touched": [
+    "entry.tsx"
+  ],
+  "sessions": [
+    {
+      "metadata": "/0/metadata.json",
+      "transcript": "/0/full.jsonl",
+      "compact_transcript": "/0/transcript.jsonl",
+      "content_hash": "/0/content_hash.txt",
+      "prompt": "/0/prompt.txt"
+    }
+  ],
+  "token_usage": {
+    "input_tokens": 980536,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 67092608,
+    "output_tokens": 130244,
+    "api_call_count": 529,
+    "subagent_tokens_complete": false
+  }
+}
