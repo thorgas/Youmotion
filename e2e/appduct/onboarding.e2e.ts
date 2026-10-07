@@ -16,12 +16,27 @@ test.beforeEach(async ({ app, device, screen }) => {
   await device.openLink(developmentUrl);
   const openConfirmation = screen.getByRole('button', 'Open');
   if (await openConfirmation.isVisible()) await openConfirmation.tap();
-  await expect(screen.getByTestId('onboarding-welcome-step')).toBeVisible();
+  const welcome = screen.getByTestId('onboarding-welcome-step');
+  const developerMenuContinue = screen.getByText('Continue');
+  await expect.poll(async () => (
+    await welcome.isVisible() || await developerMenuContinue.isVisible()
+  ), { timeout: 30_000 }).toBe(true);
+  if (await developerMenuContinue.isVisible()) {
+    await screen.getByRole('button').tap();
+    await device.back();
+  }
+  await expect(welcome).toBeVisible();
   const session = await link({ scheme: 'youmotion' });
   await device.openLink(session.deepLink);
   if (await openConfirmation.isVisible()) await openConfirmation.tap();
   const client = await waitForSession<OnboardingTools>(session.sessionId, { timeoutMs: 30_000 });
   try {
+    await expect.poll(async () => {
+      const tools = await client.tools();
+      return ['get_onboarding_state', 'skip_onboarding', 'seed_archive_fixture'].every((name) => (
+        tools.some((tool) => tool.name === name)
+      ));
+    }, { timeout: 30_000, interval: 200 }).toBe(true);
     expect(await client.call('get_onboarding_state', {})).toEqual({ completed: false });
     expect(await client.call('skip_onboarding', {})).toEqual({ completed: true });
     expect(await client.call('skip_onboarding', {})).toEqual({ completed: true });

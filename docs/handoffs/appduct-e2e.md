@@ -35,7 +35,19 @@ Implementation and reproducible setup: [Appduct E2E guide](../testing/appduct-e2
   88.58% statements, 79.64% branches, 84% functions, 91.49% lines.
   Logs: `/private/tmp/youmotion-appduct-verify-r5.log` and
   `/private/tmp/youmotion-appduct-coverage-r5.log`.
-- Android test discovery succeeds; Android execution has not been verified.
+- Android E2E passes 3/3 on the dedicated `Youmotion_Appduct_E2E` emulator
+  (API 36, arm64, `emulator-5558`). Run:
+  `01a115e0-4e8e-73d9-b707-f4a06258446e`. Log:
+  `/private/tmp/youmotion-appduct-e2e-android-r7.log`; preserved report:
+  `artifacts/e2e-appduct/android-report.json`.
+- Shared setup now waits for the Appduct tool registry, and completes/closes
+  Expo's Android developer menu after each app-data reset. The final iOS
+  follow-up passes 3/3 (`01a115e2-8bfe-7b28-84f7-8bc6de969b96`).
+- The separate direct Android Harness check did not reach assertions: native
+  startup stalled both with and without APK installation. Its owned processes
+  were stopped. Logs: `/private/tmp/youmotion-appduct-harness-android.log` and
+  `/private/tmp/youmotion-appduct-harness-android-r2.log`. The passing Android
+  E2E did execute the native archive transaction and persisted settings.
 
 ## Local setup findings
 
@@ -56,5 +68,25 @@ build workaround is documented in the guide. All task-owned build processes
 were stopped; unrelated processes and dirty repository files were preserved.
 
 No remote push or publication was requested. No user-only blocker remains for
-the delivered iOS test setup. To verify Android, build the E2E development app
-and run the documented command on a dedicated disposable emulator.
+the delivered test setup. Both platforms use dedicated disposable devices.
+
+## Android execution follow-up
+
+The Android Debug APK compiled with Appduct (`751` Gradle tasks, successful).
+Argent's streaming install aborted and left pending installs scoped to the new
+emulator. After stopping those exact ADB children, a non-streaming install
+succeeded. The first launch then stalled; a scoped cold boot recovered after
+removing only this task's emulator snapshot. No existing emulator or physical
+phone was reset. All E2E assertions passed after correcting the developer-menu
+setup and waiting for tool publication. These failures were setup evidence,
+not passing app tests.
+
+Final logs: `/private/tmp/android-verify-final.log`,
+`/private/tmp/android-coverage-final.log`,
+`/private/tmp/youmotion-appduct-e2e-ios-android-followup.log`, and
+`/private/tmp/youmotion-appduct-harness-android.log`.
+
+Both full checks pass on the final tree: 63 suites / 468 tests. No application
+source changed in this follow-up. The newly created Android emulator was shut
+down cleanly; task-owned services were stopped. Unrelated dirty work and other
+devices were preserved. No remote push or publication occurred.
