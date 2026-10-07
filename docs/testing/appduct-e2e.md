@@ -3,7 +3,8 @@
 The `e2e` mobile engine runs deterministic Pulse, Settings and restart tests on
 iOS simulators and Android emulators. It calls Appduct's `skip_onboarding`
 instead of tapping onboarding pages. No model provider or AI credentials are
-needed. CLI telemetry is disabled by the package scripts.
+needed. CLI telemetry is disabled by the package scripts. Setup waits for the
+Appduct session to publish all three required tools before invoking them.
 
 Use Node 22.22.3+ on the Node 22 branch, or Node 24.8+. Install with `pnpm install`.
 Rebuild the development app after adding Appduct; Expo Go and existing binaries
@@ -34,7 +35,9 @@ For Android, build with `EXPO_PUBLIC_E2E=true pnpm android --device
 reverse tcp:8091 tcp:8091`, and set `E2E_PLATFORM=android` and `E2E_DEVICE` to
 that serial. The Appduct bootstrap reaches its host daemon through the
 private-network address in the generated link. Host and device must be able to
-reach each other.
+reach each other. Each cleared Android install shows Expo's developer-menu
+onboarding; setup taps its Continue button and closes the menu with Back
+before asserting Youmotion's welcome screen.
 
 If Appduct's default port 8443 is occupied, use a task-owned state directory
 with an OS-assigned port. This does not alter the user's Appduct configuration
@@ -70,6 +73,12 @@ existing Harness configuration and a freshly rebuilt test binary.
 
 ```sh
 RN_HARNESS_IOS_DEVICE='<dedicated simulator name>' RN_HARNESS_IOS_VERSION='<iOS runtime version>' RN_HARNESS_METRO_PORT=8083 pnpm test:harness:ios appduct-onboarding
+```
+
+The same native helper can be checked on Android using a dedicated emulator:
+
+```sh
+ANDROID_SERIAL='<emulator-serial>' RN_HARNESS_ANDROID_AVD='<dedicated AVD>' pnpm test:harness:android appduct-onboarding
 ```
 
 Reports and evidence are written under `artifacts/e2e-appduct/` (gitignored).
