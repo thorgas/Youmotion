@@ -1,0 +1,22 @@
+Please add tests via https://www.npmjs.com/package/e2e and write tests that skip the onboarding via https://github.com/callstackincubator/appduct
+
+---
+
+<send_user_message_question_reply>
+[{"answer":"Continue with e2e's device engine","questionItemId":"[\"request_user_input_async\",\"call_71de46c028864acfb407466a348323fb\",0]","question":"Argent isn't installed in this environment. To enable the mobile/Chromium tooling this repo is configured for, run `npx @swmansion/argent@latest init -y` (or `npm i -g @swmansion/argent@latest && argent init -y`). Should I run the requested e2e framework's device checks without Argent?"}]
+</send_user_message_question_reply>
+
+---
+
+If npm sucks herenis the github repo https://github.com/tester-army/e2e
+
+---
+
+# Response annotations:
+Each item contains text selected from an earlier Codex response and may include a user comment. Treat items as Annotation 1, Annotation 2, and so on in array order. Use every selection as context and address every comment. For every annotation you address, include its inline directive `:codex-annotation{index="N"}`, where N is its one-based array position (for example, `:codex-annotation{index="1"}`). Do not use unstructured annotation labels.
+<response-annotations>
+[{"text":"full pnpm verify still stops on the pre-existing .opencode lint errors."}]
+</response-annotations>
+
+## My request:
+Fix these

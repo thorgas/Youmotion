@@ -1,0 +1,85 @@
+{
+  "cli_version": "0.11.3",
+  "checkpoint_id": "01M4AVXAA30MZTPGK8HYHJB2YE",
+  "session_id": "01a1159b-9487-7142-b3a1-aa48a2f17fc1",
+  "strategy": "manual-commit",
+  "created_at": "2026-10-07T09:43:00.314855Z",
+  "branch": "codex/appduct-e2e",
+  "checkpoints_count": 1,
+  "files_touched": [
+    ".oxlintrc.json"
+  ],
+  "agent": "Codex",
+  "model": "gpt-6.1-sol",
+  "turn_id": "3808d57f62f0",
+  "compact_transcript_start": 0,
+  "token_usage": {
+    "input_tokens": 326182,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 21313664,
+    "output_tokens": 49377,
+    "api_call_count": 164,
+    "subagent_tokens_complete": false
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-10-07T09:43:00.207045Z",
+    "agent_lines": 0,
+    "agent_removed": 0,
+    "human_added": 1,
+    "human_modified": 0,
+    "human_removed": 0,
+    "total_committed": 1,
+    "total_lines_changed": 1,
+    "agent_percentage": 0,
+    "metric_version": 2
+  },
+  "prompt_attributions": [
+    {
+      "checkpoint_number": 1,
+      "user_lines_added": 2104,
+      "user_lines_removed": 21,
+      "agent_lines_added": 0,
+      "agent_lines_removed": 0,
+      "user_added_per_file": {
+        ".claude/settings.json": 80,
+        ".claude/settings.local.json": 10,
+        ".codex/hooks.json": 88,
+        ".cursor/hooks.json": 40,
+        ".gemini/settings.json": 139,
+        ".gitignore": 2,
+        ".opencode/plugins/entire.ts": 269,
+        "AGENTS.md": 3,
+        "docs/handoffs/local-network-startup.md": 31,
+        "docs/release/store-release-workflow.md": 76,
+        "docs/testing/appduct-e2e.md": 64,
+        "e2e.config.ts": 21,
+        "e2e/appduct/onboarding.e2e.ts": 50,
+        "entry.tsx": 2,
+        "metro.config.cjs": 4,
+        "opencode.json": 1,
+        "package.json": 7,
+        "pnpm-lock.yaml": 908,
+        "pnpm-workspace.yaml": 1,
+        "rn-harness.config.mjs": 4,
+        "src/__tests__/appduct-onboarding.harness.ts": 40,
+        "src/__tests__/appduct-onboarding.test.tsx": 133,
+        "src/development/appduct-fixture.ts": 16,
+        "src/development/appduct-onboarding.ts": 39,
+        "src/development/appduct-tools.tsx": 53,
+        "src/development/development-root.tsx": 4,
+        "src/development/install-appduct.ts": 9,
+        "store/automation/UPLOAD-RUNBOOK.md": 10
+      },
+      "user_removed_per_file": {
+        "AGENTS.md": 2,
+        "docs/handoffs/local-network-startup.md": 4,
+        "docs/release/store-release-workflow.md": 8,
+        "metro.config.cjs": 1,
+        "package.json": 1,
+        "rn-harness.config.mjs": 1,
+        "src/development/development-root.tsx": 1,
+        "store/automation/UPLOAD-RUNBOOK.md": 3
+      }
+    }
+  ]
+}
