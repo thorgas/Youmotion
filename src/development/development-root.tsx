@@ -11,7 +11,10 @@ export function DevelopmentRoot({ children }: PropsWithChildren) {
   useRequireProfilerDevTools();
 
   if (process.env.EXPO_PUBLIC_E2E === 'true') {
-    return children;
+    if (!__DEV__) return children;
+    // oxlint-disable-next-line typescript/no-unsafe-assignment -- Guarded development-only loading keeps the fixture and Appduct tools out of the Release module graph; bootstrap gate tests cover Release.
+    const { AppductTools }: typeof import('./appduct-tools') = require('./appduct-tools');
+    return <><AppductTools />{children}</>;
   }
 
   return <ReactNativeGrabRoot style={{ flex: 1 }}>{children}</ReactNativeGrabRoot>;
