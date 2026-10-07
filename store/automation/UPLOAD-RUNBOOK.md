@@ -11,8 +11,11 @@ installed CLI help on 9 September 2026; recheck leaf `--help` after upgrades.
 
 For new store binaries, use the verified
 [store release workflow](../../docs/release/store-release-workflow.md):
-EAS-managed uploads first, then Play Console **Save as draft** for localized
-release notes. The local gplay credential cannot commit production edits.
+EAS-managed binary uploads first, then CLI or Console completion according to
+the user's draft/review authority. On 2 October 2026 the local gplay account
+successfully validated and committed production build 18 with localized notes.
+Recheck access rather than treating the historical 403 as a permanent blocker.
+CLI service-account requests do not need an unlocked Mac.
 
 ## 1. Freeze inputs and scope
 
@@ -212,7 +215,11 @@ gplay edits commit --package com.youmotion.mobile --edit "$PLAY_EDIT_ID" \
 Stop on validation failure. Observed on 9 September: validation returned 403;
 the separately attempted safe commit returned 400 saying changes are sent for
 review automatically and the parameter must not be set. **Do not remove the
-flag as an automatic retry.** Use the Console draft route above. Do not commit
+flag as an automatic retry.** For draft-only authority, use the Console draft
+route above. With explicit review authority, follow the current store release
+workflow, verify managed publishing and pending changes, then commit without
+the rejected flag. The successful build 18 submission on 2 October confirms
+that this 400 does not establish a credential failure. Do not commit
 an old API edit after saving through the UI.
 
 The owner permits a private testing-track review only as a fallback if draft
