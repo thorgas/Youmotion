@@ -100,10 +100,10 @@ menu, and automatically submits the finished build to TestFlight.
 Use the production-only release for the ordinary App Store candidate:
 
 ```bash
-pnpm release:testflight:production
+pnpm build:production:ios
 ```
 
-The compatibility alias `pnpm release:testflight` runs the production-only
+The checked `pnpm build:production:ios` command creates the production-only
 command. Production-only binaries subscribe to `production` and receive
 compatible production updates automatically on launch, but they do not expose
 the manual channel selector. Build without automatic submission with

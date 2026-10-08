@@ -62,3 +62,5 @@ session names; no separate retrospective skill was needed.
 ## README and package-command follow-up
 
 All 101 Youmotion scripts are inventoried in `docs/testing/package-command-audit.md`. QA/production OTA commands now name the required EAS environment, and Reassure inherits Jest's no-Watchman policy. README uses pinned EAS commands and documents Appduct prerequisites. `verify:commands` prevents missing script files, aliases, profiles, documentation entries and OTA environments. Full verify (479 tests), coverage, website suite, 77 rule tests, fingerprints and all performance commands pass. Store screenshot provenance still reports 82 release-asset findings; React Doctor reports 11 errors/65 warnings. Native/cloud/release command execution is explicitly distinguished from CLI/config validation. No publication or native build occurred in this follow-up. Update-kit audit and docs commit: `9f7abdf`.
+
+Release follow-up8October: Youmotion repository is PUBLIC, verified through GitHub API. Its source-link visibility gate is cleared; update-kit visibility remains separate. See store-release-1.0.6.md for release evidence.

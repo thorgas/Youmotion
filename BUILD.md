@@ -86,16 +86,25 @@ pnpm build:preview:ios
 
 ## Production builds
 
-Production Android builds are AAB files for Google Play. Production iOS builds are signed App Store archives.
+Use the checked wrapper for production AAB/IPA builds. Commit and push the intended source first, with matching versions in app.json and store.config.json.
 
 ```bash
+pnpm release:check
 pnpm build:production
 # Or one platform:
 pnpm build:production:android
 pnpm build:production:ios
 ```
 
-Monitor cloud builds with `pnpm eas:builds`. Open the EAS dashboard with `pnpm eas:open` to inspect builds, submissions, updates, and credentials.
+The wrapper verifies clean source and production-only environment settings, discovers existing jobs for the exact version/commit, runs verification and coverage before creating missing jobs, and prints build URLs only after authenticated readback. It writes a redacted record to `artifacts/releases/VERSION/SHA.json`. A failed or uncertain API request is an error, never a queued build. Retry the same command to rediscover existing jobs; do not start another raw build. An uncertain launch with a missing job requires inspection before creation.
+
+```bash
+pnpm release:status
+# To inspect the candidate after documentation commits:
+pnpm release:status --source EXACT_RELEASE_SHA
+```
+
+Queued/in-progress jobs are reported as such. Store upload requires FINISHED plus exact source/version/build and archive checks. See [the complete release workflow](docs/release/store-release-workflow.md). The wrapper does not upload, submit for review, or publish.
 
 ## TestFlight + Play testing release
 
@@ -140,11 +149,11 @@ Wait for both builds to finish, then run the submit commands above. When builds 
 For an ordinary production-only TestFlight/App Store candidate, use:
 
 ```bash
-pnpm release:testflight:production
+pnpm build:production:ios
 ```
 
-`pnpm release:testflight` remains an alias for this production-only path. The
-binary has no manual channel selector, but it automatically checks the
+The former build-and-auto-submit production shortcuts were removed so the
+archive can be checked before upload. The binary has no manual channel selector, but it automatically checks the
 `production` channel on launch. Because launch waiting is zero, a compatible
 update downloaded during one cold launch is applied on the next; allow up to
 two cold launches when verifying a new production OTA.
@@ -203,11 +212,13 @@ pnpm_config_verify_deps_before_run=false pnpm --config.verify-deps-before-run=fa
 Always test a release in TestFlight first:
 
 ```bash
-# Build and upload in one command:
-pnpm release:testflight
+# Build first, then verify the exact finished IPA:
+pnpm build:production:ios
+pnpm verify:ios:archive -- /absolute/path/to/Youmotion.ipa
+pnpm exec appduct doctor /absolute/path/to/Youmotion.ipa --assert-absent
 
-# Or upload the latest existing production build:
-pnpm submit:testflight
+# Upload that exact verified build:
+pnpm submit:testflight --id EXACT_IOS_BUILD_ID
 ```
 
 EAS uploads the binary to App Store Connect, where it appears in TestFlight after Apple processes it. Add internal testers first, then external testers if needed.
@@ -230,8 +241,8 @@ For later uploads:
 # Safest default: internal testing track
 pnpm submit:play:internal
 
-# Upload the latest build as a draft production release
-pnpm submit:play:production
+# Upload the exact finished build as a draft production release
+pnpm submit:play:production --id EXACT_ANDROID_BUILD_ID
 ```
 
 The production submission profile deliberately creates a draft. Review the release in Play Console, use a staged rollout when appropriate, and publish it there.
