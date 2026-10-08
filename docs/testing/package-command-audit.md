@@ -130,3 +130,9 @@ Appduct discovery needs explicit `E2E_PLATFORM` and `E2E_DEVICE`, even when only
 | `test:release-runner` | Injected EAS failures, reuse, identity and readback regression tests |
 
 Production aliases now use the checked coordinator; production uploads require explicit --id and do not select --latest. Production build+auto-submit aliases removed. Wrapper proof:22 regression tests and real FINISHED build readbacks.
+
+| `release:review:ios` | Explicit version/build, dry-run/confirm App Review entrypoint |
+| `release:status:ios` | Apple review-state readback |
+| `release:status:play` | Google releaseLifecycleState readback; requires --track, no edit |
+| `release:testing:ios` | Exact-build external group/beta review distribution |
+| `release:testing:ios:status` | Exact-build TestFlight group readback |

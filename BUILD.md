@@ -241,11 +241,11 @@ For later uploads:
 # Safest default: internal testing track
 pnpm submit:play:internal
 
-# Upload the exact finished build as a draft production release
+# Upload the exact finished build for review (review authority required)
 pnpm submit:play:production --id EXACT_ANDROID_BUILD_ID
 ```
 
-The production submission profile deliberately creates a draft. Review the release in Play Console, use a staged rollout when appropriate, and publish it there.
+The production submission profile uses completed with changesNotSentForReview=false to send changes for review. Keep managed publishing on when public rollout is not authorized. Set/read back committed EN/DE notes with gplay after upload; use the release-lifecycle CLI to verify review and publication.
 
 ## Optional EAS Update setup
 
@@ -288,3 +288,7 @@ pnpm eas:credentials:android
 - [App version management](https://docs.expo.dev/build-reference/app-versions/)
 - [EAS environment variables](https://docs.expo.dev/eas/environment-variables/)
 - [EAS Update deployment](https://docs.expo.dev/eas-update/deployment/)
+
+## Review and tester completion
+
+Uploading is not review submission. Follow [Finish review and testing through CLIs](docs/release/store-release-workflow.md#finish-review-and-testing-through-clis) after both uploads finish. `release:review:ios` previews/submits the exact Apple build; `release:status:ios` and `release:status:play --track TRACK` verify review state. Tester updates reuse the same binaries and existing groups/tracks. Managed publishing and Apple manual release keep public rollout separate.

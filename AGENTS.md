@@ -57,3 +57,9 @@ The local Oxlint plugin enforces these rules. A suppression requires an explicit
 - After the EAS Android submission finishes, set the exact committed English/German release notes through gplay or Play Console, then read back the exact version code, notes and intended release status. For a Console draft, use **Save as draft**. Do not edit Console during an active EAS upload.
 - Send changes for review only with user authorization. If Google rejects `--changes-not-sent-for-review` because review is automatic, omit it only when that authorization already exists. Keep managed publishing enabled when approval must be separate from public rollout. For future Expo review submissions, use production `releaseStatus: "completed"` and `changesNotSentForReview: false`; localized notes still require a separate step. Changing this configuration does not submit an existing draft.
 - Distinguish upload, draft creation, review submission and public rollout. Verify actual native-store state; an EAS job finishing alone is insufficient. Permission expansion requires explicit user authorization.
+
+## Release completion
+
+- Follow docs/release/store-release-workflow.md through the requested endpoint. Upload/staging is not review submission. Once review or tester distribution is authorized, finish those steps and read back exact version/build, submission IDs and tester availability gates.
+- Prefer asc/gplay mutations and status commands. gplay tracks releases list exposes releaseLifecycleState without an edit; do not infer review or publication from edit completed. Verify managed publishing separately when public rollout is not authorized.
+- For TestFlight, fill Beta App Descriptions and beta-review contact/notes through asc before external beta submission. Internal all-build-access groups must not be explicitly attached. No new binary is needed to assign an existing eligible build to testers.

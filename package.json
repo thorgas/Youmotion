@@ -221,7 +221,12 @@
     "test:e2e:website": "E2E_TELEMETRY_DISABLED=1 e2e run --config e2e.website.config.ts",
     "release:check": "node scripts/release-production-builds.mjs --check",
     "release:status": "node scripts/release-production-builds.mjs --status",
-    "test:release-runner": "node --test scripts/release-production-builds.test.mjs"
+    "test:release-runner": "node --test scripts/release-production-builds.test.mjs",
+    "release:review:ios": "asc review submit --app 6807357236 --platform IOS",
+    "release:status:ios": "asc review status --app 6807357236 --platform IOS",
+    "release:status:play": "gplay tracks releases list --package com.youmotion.mobile",
+    "release:testing:ios": "asc builds add-groups",
+    "release:testing:ios:status": "asc testflight groups list"
   },
   "expo": {
     "autolinking": {
