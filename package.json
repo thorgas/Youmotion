@@ -1,8 +1,13 @@
 {
   "name": "youmotion",
   "homepage": "https://youmotion.app/",
-  "repository": { "type": "git", "url": "git+https://github.com/thorgas/Youmotion.git" },
-  "bugs": { "url": "https://github.com/thorgas/Youmotion/issues" },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/thorgas/Youmotion.git"
+  },
+  "bugs": {
+    "url": "https://github.com/thorgas/Youmotion/issues"
+  },
   "main": "./entry.tsx",
   "version": "1.0.1",
   "packageManager": "pnpm@11.18.0",
@@ -156,20 +161,18 @@
     "build:testing:android": "eas build --platform android --profile testing",
     "build:testing:ios": "eas build --platform ios --profile testing",
     "build:testflight:qa-controls": "eas build --platform ios --profile testing",
-    "build:testflight:production": "eas build --platform ios --profile production",
-    "build:production": "eas build --platform all --profile production",
-    "build:production:android": "eas build --platform android --profile production",
-    "build:production:ios": "eas build --platform ios --profile production",
-    "submit:testflight": "eas submit --platform ios --profile production --latest",
+    "build:testflight:production": "node scripts/release-production-builds.mjs --platform ios",
+    "build:production": "node scripts/release-production-builds.mjs",
+    "build:production:android": "node scripts/release-production-builds.mjs --platform android",
+    "build:production:ios": "node scripts/release-production-builds.mjs --platform ios",
+    "submit:testflight": "eas submit --platform ios --profile production --non-interactive",
     "submit:testflight:testing": "node scripts/submit-testing.mjs ios",
     "submit:testflight:qa-controls": "node scripts/submit-testing.mjs ios",
     "submit:play:internal": "eas submit --platform android --profile internal --latest",
     "submit:play:testing": "node scripts/submit-testing.mjs android",
-    "submit:play:production": "eas submit --platform android --profile production --latest",
+    "submit:play:production": "eas submit --platform android --profile production --non-interactive",
     "release:testing": "eas build --platform all --profile testing --no-wait",
-    "release:testflight": "pnpm release:testflight:production",
     "release:testflight:qa-controls": "eas build --platform ios --profile testing --auto-submit",
-    "release:testflight:production": "eas build --platform ios --profile production --auto-submit",
     "version:ios": "eas build:version:get --platform ios",
     "version:android": "eas build:version:get --platform android",
     "version:android:set": "eas build:version:set --platform android",
@@ -212,10 +215,13 @@
     "test:harness:ios": "RN_HARNESS_METRO_PORT=8083 harness --config jest.harness.config.mjs --no-watchman --harnessRunner ios",
     "prepare:harness:ios": "node scripts/prepare-ios-harness.mjs",
     "verify:commands": "node scripts/verify-commands.mjs",
-    "verify": "pnpm verify:commands && pnpm lint && pnpm typecheck && pnpm verify:website && pnpm test",
+    "verify": "pnpm verify:commands && pnpm test:release-runner && pnpm lint && pnpm typecheck && pnpm verify:website && pnpm test",
     "test:e2e:appduct": "E2E_TELEMETRY_DISABLED=1 e2e run",
     "test:e2e:appduct:list": "E2E_TELEMETRY_DISABLED=1 e2e list",
-    "test:e2e:website": "E2E_TELEMETRY_DISABLED=1 e2e run --config e2e.website.config.ts"
+    "test:e2e:website": "E2E_TELEMETRY_DISABLED=1 e2e run --config e2e.website.config.ts",
+    "release:check": "node scripts/release-production-builds.mjs --check",
+    "release:status": "node scripts/release-production-builds.mjs --status",
+    "test:release-runner": "node --test scripts/release-production-builds.test.mjs"
   },
   "expo": {
     "autolinking": {

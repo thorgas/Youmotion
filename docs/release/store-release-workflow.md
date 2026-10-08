@@ -24,10 +24,17 @@ EAS credentials and the local CLI profile are different service accounts.
 4. Commit/push the exact candidate and build it:
 
    ```sh
-   pnpm exec eas build --platform all --profile production --non-interactive --no-wait --json
+   pnpm release:check
+   pnpm build:production
+   pnpm release:status
    pnpm exec eas build:view ANDROID_BUILD_ID --json
    pnpm exec eas build:view IOS_BUILD_ID --json
    ```
+
+   The checked wrapper stops on preflight/API errors, reuses exact-source jobs,
+   and records only authenticated build readbacks. No IDs means no confirmed
+   build; inspect the failure before any other release work. An unknown launch
+   must be rediscovered, never blindly repeated.
 
    Require FINISHED, the intended version, and the exact source SHA. Use explicit
    build IDs for submission, never `--latest`. Keep runtime fingerprints and

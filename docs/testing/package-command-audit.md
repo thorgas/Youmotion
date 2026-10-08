@@ -77,9 +77,7 @@ Appduct discovery needs explicit `E2E_PLATFORM` and `E2E_DEVICE`, even when only
 | `submit:play:testing` | Installed EAS help/profile validated; account/external operation not executed |
 | `submit:play:production` | Installed EAS help/profile validated; account/external operation not executed |
 | `release:testing` | Installed EAS help/profile validated; account/external operation not executed |
-| `release:testflight` | Installed EAS help/profile validated; account/external operation not executed |
 | `release:testflight:qa-controls` | Installed EAS help/profile validated; account/external operation not executed |
-| `release:testflight:production` | Installed EAS help/profile validated; account/external operation not executed |
 | `version:ios` | Installed EAS help/profile validated; account/external operation not executed |
 | `version:android` | Installed EAS help/profile validated; account/external operation not executed |
 | `version:android:set` | Installed EAS help/profile validated; account/external operation not executed |
@@ -126,3 +124,9 @@ Appduct discovery needs explicit `E2E_PLATFORM` and `E2E_DEVICE`, even when only
 | `test:e2e:appduct` | CLI/path validated; execution requires scoped native device/build/artifact |
 | `test:e2e:appduct:list` | Executed successfully during this audit |
 | `test:e2e:website` | Executed successfully during this audit |
+
+| `release:check` | Read-only production source/config preflight; no cloud mutation |
+| `release:status` | Readback of exact-source build jobs; never creates builds |
+| `test:release-runner` | Injected EAS failures, reuse, identity and readback regression tests |
+
+Production aliases now use the checked coordinator; production uploads require explicit --id and do not select --latest. Production build+auto-submit aliases removed. Wrapper proof:22 regression tests and real FINISHED build readbacks.
