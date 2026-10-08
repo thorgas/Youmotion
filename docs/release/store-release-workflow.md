@@ -1,7 +1,7 @@
 # Store release workflow
 
 Use this workflow for Youmotion store binaries. Listing-only changes remain in
-`store/automation/UPLOAD-RUNBOOK.md`. Verified on 2 October 2026 for 1.0.5.
+`store/automation/UPLOAD-RUNBOOK.md`. Review and testing CLI steps verified on 8 October 2026 for 1.0.6.
 
 ## Default route
 
@@ -48,7 +48,9 @@ EAS credentials and the local CLI profile are different service accounts.
    pnpm exec eas submit --platform android --profile production --id ANDROID_BUILD_ID --non-interactive --no-wait
    ```
 
-   Android production is configured as `draft`. EAS iOS upload alone does not
+   Android production is configured as `completed` with automatic review; use this
+   lane only with review authority and managed publishing verified. Localized
+   notes still need the separate CLI step below. EAS iOS upload alone does not
    create an App Review submission. Read the installed CLI help; EAS CLI 21 has
    no submission-view command. The verified read-only fallback is
    `pnpm dlx eas-cli@23.2.0 submit:view SUBMISSION_ID --json`, without changing
@@ -93,9 +95,11 @@ validation before falling back to Console; an old 403 is historical evidence.
    only when the user's existing authority covers sending those changes for review.
 5. Read back the exact version code and both notes in a fresh edit, then discard
    only the task-owned inspection edit. Never commit an inspection edit.
-6. Verify the Console review label separately. API `completed` is release intent;
-   it does not prove In review or public availability. If browser access fails,
-   report the successful API commit and the outstanding Console check separately.
+6. Read review/publication state with `gplay tracks releases list --package
+   com.youmotion.mobile --track production --output json`. The edit API
+   `completed` value is release intent; use `releaseLifecycleState` from this
+   no-edit lifecycle API to distinguish IN_REVIEW, APPROVED_NOT_PUBLISHED and
+   PUBLISHED. Use Console only when this endpoint is unavailable.
 
 For draft-only authority, or a currently verified API-access failure, use Console:
 
@@ -149,8 +153,8 @@ contents or tokens into release logs, handoffs, issues, or pull requests.
 
 ## Expo review configuration
 
-The current production submit profile uploads Android as draft. For a future
-review-authorized submission, configure `submit.production.android` as:
+The production submit profile now sends Android for review with the following
+settings. Do not invoke it for draft-only authority:
 
 ```json
 {
@@ -178,3 +182,56 @@ Record source SHA, version/build numbers, EAS job IDs, native store IDs, exact
 localized notes and readbacks in `docs/handoffs/`. A draft, review submission,
 approval and public availability are separate states. Send for review or roll
 out only under the requested release scope and applicable release gates.
+
+## Finish review and testing through CLIs
+
+EAS upload and `asc release stage` are intermediate steps. When the user requests review, continue to the commands below and read back each result. When tester distribution is requested, also update every existing selected testing track/group using the same uploaded binary. Do not rebuild/reupload to promote an already uploaded build. Record endpoint authority (draft, review, testing distribution or public rollout) before starting.
+
+### Apple App Review
+
+Require zero blocking readiness errors, the intended VALID build, exact notes and an attached build. Current asc5 uses `--build-id`; `--build` is removed. Do not create a second submission if one already exists.
+
+```sh
+asc validate --app 6807357236 --version VERSION --platform IOS --output json
+pnpm release:review:ios --version-id VERSION_ID --build-id APPLE_BUILD_ID --dry-run --output json
+pnpm release:review:ios --version-id VERSION_ID --build-id APPLE_BUILD_ID --confirm --output json
+pnpm release:status:ios --version VERSION --output json
+```
+
+Require the actual submission ID and WAITING_FOR_REVIEW/IN_REVIEW readback. MANUAL release timing remains separate from review; do not release publicly merely because Apple approves. A DNS/network failure before a response requires checking current submission state before retrying.
+
+### Google Play review and testing
+
+`gplay` can send the existing draft for review and promote it to internal/alpha/beta via an edit. No browser interaction is needed for these mutations. Managed publishing must already be on when public rollout is not authorized; its toggle still requires Console verification with the current CLI. Read the complete pending change set before commit.
+
+1. `gplay edits create --package com.youmotion.mobile --output json`; retain the returned task-owned edit ID.
+2. `gplay tracks list --package com.youmotion.mobile --edit EDIT_ID --output json`; confirm the exact uploaded code and existing tracks.
+3. Create a task-local releases JSON array with the exact versionCode, name, committed EN/DE notes and `status: "completed"`. Include any older codes deliberately retained; do not substitute --latest or upload another bundle.
+4. For each authorized track, run `gplay tracks update --package com.youmotion.mobile --edit EDIT_ID --track TRACK --releases @RELEASES_JSON`. For testers, reuse existing internal/alpha/beta tracks and keep their memberships. Do not create new tracks/testers implicitly.
+5. `gplay edits validate --package com.youmotion.mobile --edit EDIT_ID`.
+6. Under explicit review authority, `gplay edits commit --package com.youmotion.mobile --edit EDIT_ID`. Google currently requires automatic review for this app; do not add `--changes-not-sent-for-review` for this lane.
+7. Check each track with `pnpm release:status:play --track TRACK --output json`. Require the exact code and `releaseLifecycleState`, not edit.status alone. A fresh inspection edit can verify exact notes; discard only that edit with `gplay edits delete --package com.youmotion.mobile --edit INSPECTION_EDIT_ID --confirm`.
+
+The lifecycle endpoint exposes review state independently of edits: [official API](https://developers.google.com/android-publisher/api-ref/rest/v3/applications.tracks.releases). IN_REVIEW means submitted, APPROVED_NOT_PUBLISHED means approval is held, PUBLISHED means available on that track. A browser screenshot is optional corroboration, not the primary status route. The managed-publishing toggle/public release controls remain in [Publishing overview](https://support.google.com/googleplay/android-developer/answer/9859654?hl=en).
+
+### TestFlight updates
+
+```sh
+asc testflight groups list --app 6807357236 --paginate --output json
+asc builds test-notes create --build-id APPLE_BUILD_ID --locale en-US --whats-new 'COMMITTED_TEST_NOTES'
+asc builds test-notes create --build-id APPLE_BUILD_ID --locale de-DE --whats-new 'COMMITTED_TEST_NOTES'
+pnpm release:testing:ios --build-id APPLE_BUILD_ID --group EXTERNAL_GROUP_ID --dry-run --output json
+pnpm release:testing:ios --build-id APPLE_BUILD_ID --group EXTERNAL_GROUP_ID --submit --confirm --output json
+pnpm release:testing:ios:status --build-id APPLE_BUILD_ID --output json
+asc builds beta-app-review-submission view --build-id APPLE_BUILD_ID --output json
+```
+
+Inspect configured locales first; update existing notes rather than creating duplicates. External testers need Beta App Review, independently of App Review. Before submitting, require localized Beta App Descriptions, the public feedback email, reviewer contact details, review notes, privacy/marketing URLs, encryption readiness and an eligible build. Missing beta descriptions/feedback/contact metadata caused actual submission failures on 8 October and were repaired through these CLI commands. Use `asc testflight app-localizations list/update` and `asc testflight review view/edit`; reuse the app's existing approved contact information without printing/committing it.
+
+Team (Expo) is internal and hasAccessToAllBuilds=true; it receives eligible builds automatically. Do not explicitly add this internal group: Apple returns 422. Assign external groups only (or use --skip-internal), then verify internal all-build access and external beta-review state separately. An external group relationship alone does not prove testers can install before beta approval.
+
+## Skills and source of truth
+
+Use implementation-delivery for release code changes, asc-release-flow and asc-testflight-orchestration for Apple, and gplay-release-flow/testers-orchestration for Google. Existing skills provide the platform behavior; this project guide supplies exact commands and completion gates. A second duplicated release skill is unnecessary. Prefer installed CLI help and schemas over stale skill examples.
+
+Managed publishing holds alpha/beta updates as well as production. Internal testing is exempt. Use lifecycle PUBLISHED to prove tester availability; completed intent or approved-but-held is insufficient. Do not turn managed publishing off or publish the entire approved batch when only review/test distribution was authorized and that batch includes production. Report this publication boundary explicitly.
