@@ -1,7 +1,7 @@
 {
   "configVersion": 0,
   "apple": {
-    "version": "1.0.5",
+    "version": "1.0.6",
     "categories": [
       "HEALTH_AND_FITNESS"
     ],
@@ -25,7 +25,7 @@
           "mindfulness",
           "journal"
         ],
-        "releaseNotes": "New: optional notifications for guiding beliefs and patterns in your Insights. Enable them in Settings and choose a time. Existing insights are included once when you activate notifications. Also: clearer reminder times and a fix for an Insights crash.",
+        "releaseNotes": "New: discover Youmotion’s source code directly from Settings. Explore how Pulse helps you notice emotional intensity and nuance, and find the project on GitHub. This update also improves app reliability.",
         "promoText": "Pause, name what you feel, and capture the moment. Youmotion keeps your reflections and personal patterns private on your device—no account required.",
         "marketingUrl": "https://youmotion.app/",
         "supportUrl": "https://youmotion.app/support/",
@@ -43,7 +43,7 @@
           "wohlbefinden",
           "selbstwahrnehmung"
         ],
-        "releaseNotes": "Neu: freiwillige Benachrichtigungen für Leitsätze und Muster in deinen Einblicken. Aktiviere sie in den Einstellungen und wähle eine Uhrzeit. Bereits vorhandene Einblicke werden beim Aktivieren einmal berücksichtigt. Außerdem: klarere Erinnerungszeiten und ein behobener Absturz in den Einblicken.",
+        "releaseNotes": "Neu: Entdecke den Quellcode von Youmotion direkt in den Einstellungen. Sieh dir an, wie Pulse dir hilft, die Intensität und Nuancen deiner Gefühle wahrzunehmen, und finde das Projekt auf GitHub. Außerdem verbessert dieses Update die Zuverlässigkeit der App.",
         "promoText": "Halte kurz inne, erkenne dein Gefühl und bewahre den Moment. Youmotion speichert Reflexionen und Muster privat auf deinem Gerät – ohne Konto.",
         "marketingUrl": "https://youmotion.app/de/",
         "supportUrl": "https://youmotion.app/de/support/",
