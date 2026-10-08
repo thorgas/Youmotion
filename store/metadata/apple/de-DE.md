@@ -47,6 +47,10 @@ Youmotion beschreibt, was du festgehalten hast, ohne ein Gefühl als besser oder
 
 Youmotion unterstützt die Selbstwahrnehmung. Die App ist kein Medizinprodukt und dient nicht der Diagnose, Behandlung, Heilung oder Vorbeugung von Erkrankungen. Sie ersetzt keine psychotherapeutische oder medizinische Behandlung.
 
+QUELLCODE
+
+Projektquellcode und Beiträge: https://github.com/thorgas/Youmotion
+
 ## Neu in Version 1.0.3
 
 Willkommen bei Youmotion. Halte emotionale Momente mit dem Pulse fest, reflektiere in deinen eigenen Worten und erkenne mit der Zeit persönliche Muster – privat auf deinem Gerät.

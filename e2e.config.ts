@@ -9,7 +9,7 @@ if (!device) throw new Error('Set E2E_DEVICE to a dedicated disposable simulator
 export default {
   targets: [{
     name: platform,
-    engine: mobile({ platform, device, session: 'youmotion-appduct' }),
+    engine: mobile({ platform, device, session: `youmotion-appduct-${platform}` }),
     app: {
       bundleId: 'com.youmotion.mobile',
       ...(platform === 'ios' ? { launchArguments: ['-EXDevMenuIsOnboardingFinished', 'YES', '-EXDevMenuShowsAtLaunch', 'NO'] } : {}),

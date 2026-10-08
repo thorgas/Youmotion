@@ -6,6 +6,8 @@ import { useAppNavigationActor } from '@/navigation/app-navigation.provider';
 import { OnboardingToolResultSchema, readOnboardingState, skipOnboarding } from './appduct-onboarding';
 import { FixtureToolInputSchema, FixtureToolResultSchema, seedArchiveFixture } from './appduct-fixture';
 
+import { configureSourceCodeBrowser, readSourceCodeBrowser, SourceCodeBrowserInputSchema, SourceCodeBrowserResultSchema } from './appduct-source-code';
+
 const inputSchema = {
   schema: Schema.standardSchemaV1(Schema.Struct({})),
   jsonSchema: { type: 'object', properties: {}, additionalProperties: false },
@@ -51,6 +53,31 @@ export function AppductTools() {
     annotations: { destructiveHint: true, idempotentHint: true },
     timeoutMs: 30_000,
     handler: seedArchiveFixture,
+  }, undefined, { enabled });
+  useAppductTool({
+    name: 'configure_source_code_browser',
+    description: 'Configure a memory-only browser outcome in an explicit E2E development build. Accepts no destination or journal data. Native restores the normal browser.',
+    inputSchema: {
+      schema: Schema.standardSchemaV1(SourceCodeBrowserInputSchema),
+      jsonSchema: JSONSchema.make(SourceCodeBrowserInputSchema),
+    },
+    outputSchema: {
+      schema: Schema.standardSchemaV1(SourceCodeBrowserResultSchema),
+      jsonSchema: JSONSchema.make(SourceCodeBrowserResultSchema),
+    },
+    annotations: { idempotentHint: true },
+    handler: configureSourceCodeBrowser,
+  }, undefined, { enabled });
+  useAppductTool({
+    name: 'read_source_code_browser',
+    description: 'Read only the public repository URLs requested through the E2E browser adapter. Contains no journal data.',
+    inputSchema,
+    outputSchema: {
+      schema: Schema.standardSchemaV1(SourceCodeBrowserResultSchema),
+      jsonSchema: JSONSchema.make(SourceCodeBrowserResultSchema),
+    },
+    annotations: { readOnlyHint: true },
+    handler: readSourceCodeBrowser,
   }, undefined, { enabled });
   return null;
 }

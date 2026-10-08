@@ -1,5 +1,6 @@
 module.exports = {
   preset: 'jest-expo',
+  watchman: false,
   setupFiles: ['<rootDir>/jest.setup.js'],
   testPathIgnorePatterns: ['/node_modules/', '/vendor/', '\\.harness\\.[jt]sx?$'],
   moduleNameMapper: {

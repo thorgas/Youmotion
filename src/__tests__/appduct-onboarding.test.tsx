@@ -125,7 +125,7 @@ describe('Appduct onboarding consumer boundary', () => {
     Object.assign(process.env, { EXPO_PUBLIC_E2E: e2e });
     installAppduct();
     await render(<AppNavigationActorProvider actor={actor}><AppductTools /></AppNavigationActorProvider>);
-    expect(mockTool).toHaveBeenCalledTimes(3);
+    expect(mockTool.mock.calls.map((call) => call[0].name)).toEqual(['skip_onboarding', 'get_onboarding_state', 'seed_archive_fixture', 'configure_source_code_browser', 'read_source_code_browser']);
     expect(mockTool.mock.calls.every((call) => call[2].enabled === enabled)).toBe(true);
     expect(screen.toJSON()).toBeNull();
     expect(mockAuto).toHaveBeenCalledTimes(enabled ? 1 : 0);

@@ -1,4 +1,4 @@
-import { access, readFile } from 'node:fs/promises';
+import { access, readFile, readdir } from 'node:fs/promises';
 import { resolve } from 'node:path';
 
 const root = resolve(import.meta.dirname, '..');
@@ -45,4 +45,44 @@ if (!script.includes('distance > hitRadius')) throw new Error('The pulse must re
 if (!script.includes('distance * progress')) throw new Error('Mobile scrolling must use constant-speed progress.');
 if (!script.includes('apps.apple.com/app/id6807357236') || !script.includes('play.google.com/store/apps/details?id=com.youmotion.mobile')) throw new Error('Canonical store destinations are missing.');
 
-console.log('Website structure, launch state, privacy boundary, and store destinations verified.');
+const sourceUrl = 'https://github.com/thorgas/Youmotion';
+const files = await readdir(resolve(root, 'website'), { recursive: true });
+const htmlPaths = files.filter((path) => path.endsWith('index.html'));
+if (htmlPaths.length !== 12) throw new Error('Source-link coverage must include all 12 website pages.');
+function verifySupportSource({ page, path, german, anchor }) {
+    const main = page.match(/<main\b[\s\S]*?<\/main>/)?.[0];
+    const heading = german ? 'Quellcode und Beiträge' : 'Source and contributions';
+    if (!main?.includes(anchor) || !main.includes(`<h2>${heading}</h2>`)) throw new Error(`${path}: support contribution section is missing.`);
+    if (!main.includes('mailto:youmotion@thorgas.com')) throw new Error(`${path}: source link must preserve personal email support.`);
+}
+await Promise.all(htmlPaths.map(async (path) => {
+  const page = await read(`website/${path}`);
+  const german = path.startsWith('de/');
+  const label = german ? 'Quellcode auf GitHub' : 'Source code on GitHub';
+  const anchor = `<a href="${sourceUrl}">${label}</a>`;
+  const footer = page.match(/<footer\b[\s\S]*?<\/footer>/)?.[0];
+  if (!footer?.includes(anchor)) throw new Error(`${path}: footer source link is missing or incorrectly localized.`);
+  if (path === 'index.html' || path === 'de/index.html') {
+    const section = page.match(/<section[^>]*id="source"[\s\S]*?<\/section>/)?.[0];
+    if (!section?.includes(anchor)) throw new Error(`${path}: landing source section is missing.`);
+  }
+  if (path.includes('support/')) verifySupportSource({ page, path, german, anchor });
+}));
+const config = JSON.parse(await read('store.config.json'));
+await Promise.all([
+  ['en-US', 'SOURCE CODE', 'Project source and contributions:'],
+  ['de-DE', 'QUELLCODE', 'Projektquellcode und Beiträge:'],
+].map(async ([locale, heading, copy]) => {
+  const section = `${heading}\n\n${copy} ${sourceUrl}`;
+  const apple = config.apple.info[locale].description;
+  const google = (await read(`store/automation/google-play/metadata/${locale}/full_description.txt`)).trim();
+  if (!apple.includes(section) || !google.includes(section)) throw new Error(`${locale}: localized store source section is missing.`);
+  if (apple.length > 4000 || google.length > 4000) throw new Error(`${locale}: full description exceeds the store limit.`);
+  await Promise.all([['apple', apple], ['google-play', google]].map(async ([platform, description]) => {
+    const doc = await read(`store/metadata/${platform}/${locale}.md`);
+    const title = platform === 'apple' ? (locale === 'en-US' ? 'Description' : 'Beschreibung') : (locale === 'en-US' ? 'Full description' : 'Vollständige Beschreibung');
+    const body = doc.split(`## ${title}\n\n`)[1]?.split('\n## ')[0]?.trim();
+    if (body !== description) throw new Error(`${platform}/${locale}: documented description differs from upload source.`);
+  }));
+}));
+console.log('Website structure, launch state, privacy boundary, store destinations, and localized source links verified.');

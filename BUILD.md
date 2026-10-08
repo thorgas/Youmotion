@@ -149,7 +149,7 @@ binary has no manual channel selector, but it automatically checks the
 update downloaded during one cold launch is applied on the next; allow up to
 two cold launches when verifying a new production OTA.
 
-The archive guard must print `iOS archive is free of the known HarnessUI private selectors.` It can also be run manually with `pnpm verify:ios:archive -- /absolute/path/to/Youmotion.ipa`.
+The archive guard must print `iOS archive is free of the Tracy native profiler and known HarnessUI private selectors.` It can also be run manually with `pnpm verify:ios:archive -- /absolute/path/to/Youmotion.ipa`.
 
 If Play reports that a versionCode was already submitted, its counter is ahead of EAS (usually after a manual or differently sourced upload). Resynchronize once, entering a value at least as high as Play's current maximum, then rebuild; `autoIncrement` will use the next value:
 
