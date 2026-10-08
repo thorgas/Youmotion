@@ -35,6 +35,7 @@ import { SettingsActionRow } from '@/components/ui/settings-action-row';
 import { actionColors, palette, surfaceColors, type } from '@/theme';
 import { DataSafetyControls } from '@/features/data-safety/ui/data-safety-controls';
 import { FeedbackSettingsAction } from '@/features/feedback/ui/feedback-screen';
+import { SourceCodeSettingsAction } from '@/features/source-code/ui/source-code-settings-action';
 import { LegalSettingsActions } from '@/features/legal/ui/legal-settings-actions';
 import { ReleaseFooter } from '@/features/updates/ui/release-footer';
 import { shouldShowUpdateControls } from '@/features/updates/domain/update-controls';
@@ -251,6 +252,7 @@ export function SettingsScreen({
         </Text>
         <View style={styles.actionGroup}>
           <FeedbackSettingsAction />
+          <SourceCodeSettingsAction />
         </View>
         <Text style={styles.sectionHeading}>
           <fbt desc="Heading for the Settings onboarding replay action">UNDERSTAND YOUMOTION</fbt>

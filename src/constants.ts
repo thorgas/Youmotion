@@ -515,3 +515,16 @@ export const INSIGHT_NOTIFICATION_EVENTS = Object.freeze({
   SYSTEM_SETTINGS_REQUESTED: literal('insightNotificationSystemSettingsRequested'),
   OPENED: literal('insightNotificationOpened'),
 });
+
+export const SOURCE_CODE_URL = 'https://github.com/thorgas/Youmotion';
+export const SOURCE_CODE_EVENTS = Object.freeze({
+  OPEN_REQUESTED: literal('sourceCode.openRequested'),
+  OPENED: literal('sourceCode.opened'),
+  OPEN_FAILED: literal('sourceCode.openFailed'),
+  DISMISSED: literal('sourceCode.dismissed'),
+});
+export const SOURCE_CODE_STATES = Object.freeze({
+  IDLE: literal('idle'),
+  OPENING: literal('opening'),
+  FAILURE: literal('failure'),
+});

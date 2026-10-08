@@ -47,6 +47,10 @@ Youmotion describes what you recorded without rating one feeling as better or wo
 
 Youmotion supports self-awareness. It is not a medical device and does not diagnose, treat, cure, or prevent any medical condition. It does not replace psychotherapeutic or medical treatment.
 
+SOURCE CODE
+
+Project source and contributions: https://github.com/thorgas/Youmotion
+
 ## What’s new — version 1.0.3
 
 Welcome to Youmotion. Capture emotional moments with Pulse, reflect in your own words, revisit your history, and notice patterns over time—privately on your device.

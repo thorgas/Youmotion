@@ -88,3 +88,9 @@ Use store-provided metrics first:
 - Ratings, review themes, and support topics
 
 Any future in-app analytics or crash SDK is a separate privacy and product decision.
+
+## Source-link publication gate
+
+Project source and contributions: https://github.com/thorgas/Youmotion
+
+This URL is staged for the source launch. Confirm anonymous repository access and resolve the open-source readiness findings before publishing website, app, store, or announcement updates. Retain the existing website, support email, and privacy destinations.

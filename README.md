@@ -1,5 +1,9 @@
 # Youmotion
 
+[Website](https://youmotion.app/) · [App Store](https://apps.apple.com/app/id6807357236) · [Google Play](https://play.google.com/store/apps/details?id=com.youmotion.mobile) · [Source code](https://github.com/thorgas/Youmotion)
+
+Settings → Support includes **Source code** (German: **Quellcode**), which opens this repository. Public source links are staged for the repository launch; do not publish them to live surfaces until the repository is accessible signed out.
+
 Build, internal distribution, TestFlight, Google Play, and App Store release instructions are in [BUILD.md](./BUILD.md). Database setup, persisted schema, migration behavior, and native SurrealDB packaging are documented in [DB.md](./DB.md).
 
 Youmotion is a private, local-first Expo app for noticing and recording emotions with a seven-direction feeling pulse. Dragging from the center chooses an emotion; distance chooses nuance and intensity. Releasing opens a short reflection that is saved before a separate, optional Leidsatz step. Individual history entries can be edited or permanently deleted after confirmation from the edit screen, the visible History action, or a long press on the History row.
@@ -106,10 +110,10 @@ The project pin is pnpm 11.18.0. Run `pnpm --version`; a compatible pnpm 11 inst
 Install a development client once on each physical device before scanning Metro QR codes. Android internal builds produce an installable APK. iOS device builds require an Apple Developer account and a registered device:
 
 ```bash
-pnpm dlx eas-cli@latest login
-pnpm dlx eas-cli@latest init
-pnpm dlx eas-cli@latest build --platform android --profile development
-pnpm dlx eas-cli@latest build --platform ios --profile development
+pnpm eas:login
+pnpm eas:init
+pnpm build:dev:android
+pnpm build:dev:ios
 ```
 
 After installing the resulting build, open Youmotion and scan the QR code printed by `pnpm start`. Rebuild the client only when native dependencies or native configuration change; ordinary TypeScript, styling, and translation changes load through Metro.
@@ -124,8 +128,8 @@ pnpm fingerprint:ios
 For simulators and emulators, EAS CLI can find and install an existing development build with the same fingerprint, or create one when no match exists:
 
 ```bash
-pnpm dlx eas-cli@latest build:dev --platform android
-pnpm dlx eas-cli@latest build:dev --platform ios
+pnpm exec eas build:dev --platform android
+pnpm exec eas build:dev --platform ios
 ```
 
 EAS dependency caches remain enabled by default, and the development profile enables the EAS compiler cache. Local iOS builds compile React Native from source because the SDK 57 precompiled React framework does not contain a development symbol required by `expo-dev-launcher`; the native project is ccache-ready, and `brew install ccache` enables that cache on this Mac. Do not cache `node_modules` separately because pnpm and EAS already restore dependencies from the lockfile and package caches.
@@ -142,11 +146,9 @@ pnpm typecheck
 pnpm typecheck:compat
 pnpm test
 pnpm test:coverage
-pnpm test:e2e
-pnpm test:e2e:smoke
+pnpm test:e2e:website
+pnpm verify:commands
 pnpm verify
-pnpm test:harness
-pnpm doctor:react
 ```
 
 ### Install a Release build on a connected phone
@@ -240,6 +242,12 @@ function-bound, assertion-density, and compound-component checks. Its complete
 applicability table and intentional test/runtime-fixture exclusions are documented in
 [`docs/code-architecture-eslint.md`](docs/code-architecture-eslint.md).
 
+### Appduct end-to-end tests
+
+The deterministic Appduct suite covers onboarding, Pulse, Settings, restart, and source-link recovery on disposable iOS/Android devices. Follow [the setup and scoped-device commands](docs/testing/appduct-e2e.md). `E2E_PLATFORM=ios E2E_DEVICE='<dedicated simulator>' pnpm test:e2e:appduct:list` lists cases without driving a device; `pnpm test:e2e:website` runs the local website link suite without a native app. The legacy Argent command names below remain supported for existing recorded flows.
+
+See [the package-command audit](docs/testing/package-command-audit.md) for every script, its prerequisites, and which checks require devices, credentials, or release assets.
+
 ## Testing strategy
 
 - Pure tests cover vector-to-emotion selection and intensity thresholds.
@@ -268,7 +276,7 @@ Run the focused Android regression on an emulator with `pnpm test:harness:androi
 
 ### Argent end-to-end tests
 
-Install Argent with `npx @swmansion/argent@latest init -y`, boot a dedicated iOS simulator or Android emulator, and install the Youmotion development client once with `pnpm ios` or `pnpm android`. Confirm the target and copy its UDID or emulator serial:
+Install Argent with `pnpm dlx @swmansion/argent@latest init -y`, boot a dedicated iOS simulator or Android emulator, and install the Youmotion development client once with `pnpm ios` or `pnpm android`. Confirm the target and copy its UDID or emulator serial:
 
 ```bash
 pnpm --version

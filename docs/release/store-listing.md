@@ -49,6 +49,10 @@ Settings include local backup controls you control: export your full data as JSO
 
 Youmotion has no account and keeps your journal on this device. It supports self-awareness and does not replace psychotherapeutic or medical treatment.
 
+SOURCE CODE
+
+Project source and contributions: https://github.com/thorgas/Youmotion
+
 #### What's New for version 1.0.3 (defensible from shipped behavior)
 
 - Added the full local self-check flow: seven-direction Feeling Pulse, optional reflection, and optional Leidsatz/Leitsatz steps.
@@ -90,6 +94,10 @@ In den Datensicherungseinstellungen kannst du ein Backup als JSON exportieren, e
 
 Du benötigst kein Konto. Dein Journal bleibt auf deinem Gerät. Die App unterstützt Selbstreflexion und ersetzt keine psychotherapeutische oder medizinische Behandlung.
 
+QUELLCODE
+
+Projektquellcode und Beiträge: https://github.com/thorgas/Youmotion
+
 #### What’s New / Neu in Version 1.0.3 (aus dem nachweisbaren Funktionsumfang)
 
 - Vollständiger lokaler Check-in-Fluss mit Gefühlspuls, optionaler Reflexion und optionalen Leidsatz/Leitsatz-Schritten.
@@ -115,6 +123,10 @@ Du benötigst kein Konto. Dein Journal bleibt auf deinem Gerät. Die App unterst
   Optional local reminders can invite check-ins at chosen times. Settings let you export your data as JSON, preview and restore a backup, and delete local journal data.
 
   Youmotion requires no account and keeps your journal on this device. It supports self-awareness and does not replace psychotherapeutic or medical treatment.
+
+  SOURCE CODE
+
+  Project source and contributions: https://github.com/thorgas/Youmotion
 - Category: Health & Fitness
 - Keywords/metadata guidance:
   - Prioritize: `feeling pulse`, `emotion check-in`, `local diary`, `reminders`, `insights`, `beliefs`, `offline`, `privacy`.
@@ -152,6 +164,10 @@ Du benötigst kein Konto. Dein Journal bleibt auf deinem Gerät. Die App unterst
   Optionale lokale Erinnerungen laden zu Check-ins ein. In den Einstellungen kannst du deine Daten als JSON exportieren, ein Backup vor der Wiederherstellung prüfen und lokale Journaldaten löschen.
 
   Du benötigst kein Konto. Dein Journal bleibt auf diesem Gerät. Die App unterstützt Selbstreflexion und ersetzt keine psychotherapeutische oder medizinische Behandlung.
+
+  QUELLCODE
+
+  Projektquellcode und Beiträge: https://github.com/thorgas/Youmotion
 - Kategorie: Health & Fitness
 - Keywords/Keyword-Hinweise:
   - Priorisiere: `Gefühlspuls`, `Gefühle`, `Reflexion`, `Leidsatz`, `Leitsatz`, `Verlauf`, `Einblicke`, `Erinnerung`, `lokal`.
@@ -177,3 +193,9 @@ Du benötigst kein Konto. Dein Journal bleibt auf deinem Gerät. Die App unterst
 
 Use clean production captures with synthetic data only. Do not show developer
 overlays, personal journal text, device notifications, or unsupported claims.
+
+## Source-link publication gate
+
+Project source and contributions: https://github.com/thorgas/Youmotion
+
+This URL is staged for the source launch. Confirm anonymous repository access and resolve the open-source readiness findings before publishing website, app, store, or announcement updates. Retain the existing website, support email, and privacy destinations.

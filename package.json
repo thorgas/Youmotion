@@ -1,5 +1,8 @@
 {
   "name": "youmotion",
+  "homepage": "https://youmotion.app/",
+  "repository": { "type": "git", "url": "git+https://github.com/thorgas/Youmotion.git" },
+  "bugs": { "url": "https://github.com/thorgas/Youmotion/issues" },
   "main": "./entry.tsx",
   "version": "1.0.1",
   "packageManager": "pnpm@11.18.0",
@@ -136,8 +139,8 @@
     "eas:builds": "eas build:list",
     "eas:update:configure": "eas update:configure",
     "eas:update:development": "eas update --channel development --environment development",
-    "eas:update:qa": "expo-update-kit verify-runtime --app-dir . && eas update --channel qa",
-    "eas:update:production": "expo-update-kit verify-runtime --app-dir . && eas update --channel production",
+    "eas:update:qa": "expo-update-kit verify-runtime --app-dir . && eas update --channel qa --environment preview",
+    "eas:update:production": "expo-update-kit verify-runtime --app-dir . && eas update --channel production --environment production",
     "eas:update:runtimes": "expo-update-kit verify-runtime --app-dir . --write",
     "build:dev": "eas build --platform all --profile development",
     "build:dev:android": "eas build --platform android --profile development",
@@ -208,9 +211,11 @@
     "test:harness:android:pixel": "node scripts/run-android-harness.mjs android-pixel-6a 8084",
     "test:harness:ios": "RN_HARNESS_METRO_PORT=8083 harness --config jest.harness.config.mjs --no-watchman --harnessRunner ios",
     "prepare:harness:ios": "node scripts/prepare-ios-harness.mjs",
-    "verify": "pnpm lint && pnpm typecheck && pnpm verify:website && pnpm test",
+    "verify:commands": "node scripts/verify-commands.mjs",
+    "verify": "pnpm verify:commands && pnpm lint && pnpm typecheck && pnpm verify:website && pnpm test",
     "test:e2e:appduct": "E2E_TELEMETRY_DISABLED=1 e2e run",
-    "test:e2e:appduct:list": "E2E_TELEMETRY_DISABLED=1 e2e list"
+    "test:e2e:appduct:list": "E2E_TELEMETRY_DISABLED=1 e2e list",
+    "test:e2e:website": "E2E_TELEMETRY_DISABLED=1 e2e run --config e2e.website.config.ts"
   },
   "expo": {
     "autolinking": {

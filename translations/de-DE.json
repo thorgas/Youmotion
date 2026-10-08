@@ -6447,6 +6447,66 @@
         }
       ],
       "types": []
-    }
+    },
+      "Qd0ne8UMhVZ3yH/oZiDMnw==": {
+        "description": "Settings source code link explanation",
+        "status": "new",
+        "tokens": [],
+        "translations": [
+          {
+            "translation": "Entdecke das Youmotion-Repository auf GitHub.",
+            "variations": {}
+          }
+        ],
+        "types": []
+      },
+      "dgRYSUVfGlG1d9qzo4kQUg==": {
+        "description": "Settings source code link title",
+        "status": "new",
+        "tokens": [],
+        "translations": [
+          {
+            "translation": "Quellcode",
+            "variations": {}
+          }
+        ],
+        "types": []
+      },
+      "RURrzP4dy/WEwtT5XZ4WiQ==": {
+        "description": "Source code browser failure message",
+        "status": "new",
+        "tokens": [],
+        "translations": [
+          {
+            "translation": "Das Repository konnte nicht geöffnet werden. Bitte versuche es erneut.",
+            "variations": {}
+          }
+        ],
+        "types": []
+      },
+      "YaS8uv/B61mW6SHmCgySaQ==": {
+        "description": "Dismiss source code browser failure",
+        "status": "new",
+        "tokens": [],
+        "translations": [
+          {
+            "translation": "Schließen",
+            "variations": {}
+          }
+        ],
+        "types": []
+      },
+      "MZsHz1N2BqGaY98C6fLTnA==": {
+        "description": "Retry source code browser failure",
+        "status": "new",
+        "tokens": [],
+        "translations": [
+          {
+            "translation": "Erneut versuchen",
+            "variations": {}
+          }
+        ],
+        "types": []
+      }
   }
 }

@@ -126,3 +126,9 @@ Recommended declarations:
   rating, target audience, Data safety answers, and any testing-track requirement.
 - Install and test the exact processed TestFlight and Play artifacts on physical
   devices before pressing Submit for Review.
+
+## Source-link publication gate
+
+Project source and contributions: https://github.com/thorgas/Youmotion
+
+This URL is staged for the source launch. Confirm anonymous repository access and resolve the open-source readiness findings before publishing website, app, store, or announcement updates. Retain the existing website, support email, and privacy destinations.

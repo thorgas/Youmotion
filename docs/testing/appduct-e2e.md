@@ -89,3 +89,61 @@ recursively spawned child processes. The disposable development build can use
 `EXPO_UPDATES_FINGERPRINT_OVERRIDE=0000000000000000000000000000000000000000`
 with `MOBILE_UPDATE_CHANNEL=none` to skip that calculation. This override is
 only for local test builds; never use it for OTA publication or store builds.
+
+## Source code links
+
+`e2e/appduct/source-code.e2e.ts` uses the same disposable-device setup and
+synthetic archive. It covers the production Settings source row, the exact
+HTTPS repository destination, English and German browser recovery, dismissal,
+retry, and returning to Settings/Pulse. A separate native-browser test opens
+the real browser and closes it with iOS Close or Android Back. Repository
+network availability is not an assertion: private GitHub repositories can
+show a 404 until publication.
+
+```sh
+E2E_PLATFORM=ios E2E_DEVICE='<dedicated simulator>' pnpm test:e2e:appduct e2e/appduct/source-code.e2e.ts --repeat-each 2
+E2E_PLATFORM=android E2E_DEVICE='<dedicated emulator>' pnpm test:e2e:appduct e2e/appduct/source-code.e2e.ts --repeat-each 2
+pnpm test:e2e:website
+```
+
+The `configure_source_code_browser` and `read_source_code_browser` tools use a
+memory-only adapter enabled exclusively by `__DEV__` and `EXPO_PUBLIC_E2E=true`.
+They accept no URL, credentials or journal content. Native is the default;
+production builds cannot enable the test adapter. Tests restore native mode
+and close their Appduct client in teardown. Each run clears only the selected
+disposable app's state; never select a personal device. Bootstrap links after
+restart retain their Appduct query but target Today, avoiding the empty root
+route. iOS and Android runner sessions have distinct names.
+
+The native iOS return assertion retries only the automation runner's known
+“still finishing” accessibility-watchdog response while it settles; other
+errors propagate. No AI/model calls or automatic test retries are configured.
+
+
+When other tooling uses a different agent-device version, isolate the E2E
+mobile engine's daemon as well as Appduct. This avoids replacing another
+session's daemon or losing its device binding:
+
+```sh
+AGENT_DEVICE_STATE_DIR=/tmp/youmotion-source-device-android AGENT_DEVICE_PLATFORM=android AGENT_DEVICE_ANDROID_DEVICE_ALLOWLIST='<dedicated emulator>' APPDUCT_STATE_DIR=/tmp/youmotion-appduct-e2e E2E_PLATFORM=android E2E_DEVICE='<dedicated emulator>' pnpm test:e2e:appduct e2e/appduct/source-code.e2e.ts
+```
+
+Use a different task-owned directory per platform. Do not stop or replace the
+user's shared daemon or ADB server to recover a scoped run.
+
+The Android allowlist is process-scoped and accepts only the named disposable
+emulator. It prevents unrelated connected devices from entering discovery or
+being selected if a timed-out session loses its binding. Use a fresh task-owned
+daemon directory when changing these discovery environment values.
+
+
+Android bootstrap restores only the selected emulator's `tcp:8091` reverse
+forwarding after both app-state reset and restart, because the device runner
+can remove a prior session's mapping. `e2e/appduct/metro.mjs` invokes ADB with
+an argument array, validates the disposable emulator serial, and bounds the
+command to 15 seconds. It never restarts the shared ADB server.
+
+The recovery flow uses measured control/tab frames to scroll only when an
+error action would overlap the tab bar; it then asserts the complete action
+is above that bar. This avoids a full-screen Android overscroll while proving
+both recovery actions remain physically reachable on iOS.

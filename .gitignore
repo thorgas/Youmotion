@@ -63,3 +63,5 @@ example
 /.asc/
 /.appduct/
 /artifacts/e2e-appduct/
+
+/artifacts/e2e-website/

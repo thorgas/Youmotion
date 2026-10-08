@@ -54,3 +54,9 @@ This audit applies the useful launch-stage parts of `Eronred/aso-skills` to Youm
 4. Upload to TestFlight and Play internal testing; run the production preflight.
 5. Submit both listings with manual release enabled.
 6. Review early conversion and qualitative feedback, then revise one variable at a time.
+
+## Source-link publication gate
+
+Project source and contributions: https://github.com/thorgas/Youmotion
+
+This URL is staged for the source launch. Confirm anonymous repository access and resolve the open-source readiness findings before publishing website, app, store, or announcement updates. Retain the existing website, support email, and privacy destinations.
