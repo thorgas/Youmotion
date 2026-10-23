@@ -106,7 +106,10 @@ jobs:
           const emit=(data)=>process.stdout.write(JSON.stringify({_tag:'ModelProbe',...data})+'\n');
           const env={PATH:process.env.PATH,HOME:join(root,'model-home'),OLLAMA_HOST:'127.0.0.1:11435',OLLAMA_MODELS:join(root,'models')};
           await mkdir(env.HOME,{mode:0o700});
-          const server=spawn(executable,['serve'],{env,stdio:'ignore'});
+          let serverTail='';
+          const classify=text=>({memoryCapacity:/requires more system memory|not enough (?:system )?memory|out of memory/i.test(text),modelLoad:/model failed to load|unable to load model|error loading model/i.test(text),metalInitialization:/failed to initialize.*[Mm]etal|[Mm]etal.*(?:failed|error)|failed to allocate.*context/i.test(text),runnerTerminated:/runner process has terminated|runner terminated/i.test(text),libraryLoad:/Library not loaded|image not found|failed to load.*(?:library|dylib)|dyld\[/i.test(text),unsupportedArchitecture:/unknown model architecture|unsupported.*architecture/i.test(text)});
+          const server=spawn(executable,['serve'],{env,stdio:['ignore','pipe','pipe']});
+          for(const stream of [server.stdout,server.stderr])stream.on('data',chunk=>{serverTail=(serverTail+chunk.toString()).slice(-262144);});
           const joined=new Promise(r=>server.once('close',r));
           let proxy;
           const stop=async()=>{proxy?.closeAllConnections();if(proxy)await new Promise(r=>proxy.close(r));server.kill('SIGTERM');const killer=setTimeout(()=>server.kill('SIGKILL'),5000);await joined;clearTimeout(killer);};
@@ -115,11 +118,11 @@ jobs:
            let ready=false;for(let n=0;n<60;n++){try{const r=await fetch('http://127.0.0.1:11435/api/tags',{signal:AbortSignal.timeout(1000)});await r.arrayBuffer();if(r.ok){ready=true;break;}}catch{}await new Promise(r=>setTimeout(r,1000));}if(!ready)throw Error();
            emit({phase:'readiness',status:'completed'});
            if(!await childRun(['pull','gemma4:e4b'],600000))throw Error();emit({phase:'pull',status:'completed'});
-           proxy=http.createServer((req,res)=>{const started=Date.now();let bytes=0;const upstream=http.request({hostname:'127.0.0.1',port:11435,path:req.url,method:req.method,headers:req.headers},response=>{emit({phase:'http',status:'headers',statusCode:response.statusCode,elapsedMs:Date.now()-started});res.writeHead(response.statusCode,response.headers);response.on('data',c=>bytes+=c.length);response.on('end',()=>emit({phase:'http',status:'completed',statusCode:response.statusCode,bytes,elapsedMs:Date.now()-started}));response.pipe(res);});upstream.setTimeout(300000,()=>upstream.destroy());upstream.on('error',()=>{emit({phase:'http',status:'transport-failed',elapsedMs:Date.now()-started});res.destroy();});req.pipe(upstream);});
+           proxy=http.createServer((req,res)=>{const started=Date.now();let bytes=0;let errorBody='';const upstream=http.request({hostname:'127.0.0.1',port:11435,path:req.url,method:req.method,headers:req.headers},response=>{emit({phase:'http',status:'headers',statusCode:response.statusCode,elapsedMs:Date.now()-started});res.writeHead(response.statusCode,response.headers);response.on('data',c=>{bytes+=c.length;if(response.statusCode>=400&&errorBody.length<4096)errorBody=(errorBody+c.toString()).slice(0,4096);});response.on('end',()=>{emit({phase:'http',status:'completed',statusCode:response.statusCode,bytes,elapsedMs:Date.now()-started});if(response.statusCode>=400)emit({phase:'server-error-classification',...classify(errorBody)});});response.pipe(res);});upstream.setTimeout(300000,()=>upstream.destroy());upstream.on('error',()=>{emit({phase:'http',status:'transport-failed',elapsedMs:Date.now()-started});res.destroy();});req.pipe(upstream);});
            await new Promise((r,j)=>{proxy.once('error',j);proxy.listen(11434,'127.0.0.1',r);});
            const c=spawn(process.execPath,[join(root,'probe.mjs'),join(root,'runtime'),join(root,'public.git/objects'),'6f5d35a38a49a214b53a2eb232172787555ce4f6'],{env:{PATH:process.env.PATH,NODE_NO_WARNINGS:'1'},stdio:['ignore','inherit','ignore']});
            const timer=setTimeout(()=>c.kill('SIGKILL'),600000);const code=await new Promise(r=>{c.once('error',()=>{});c.once('close',r);});clearTimeout(timer);emit({phase:'coding',status:code===0?'completed':'failed'});
-          }catch{emit({phase:'setup',status:'failed'});process.exitCode=1;}finally{await stop();emit({phase:'cleanup',status:'completed'});}
+          }catch{emit({phase:'setup',status:'failed'});process.exitCode=1;}finally{await stop();emit({phase:'server-log-classification',...classify(serverTail)});emit({phase:'cleanup',status:'completed'});}
           PROBE
           mkdir -m 700 "$probe_root/ollama"
           curl --silent --show-error --max-time 120 --fail --location --proto '=https' --tlsv1.2 --output "$probe_root/ollama.tgz" https://github.com/ollama/ollama/releases/download/v0.40.3/ollama-darwin.tgz
