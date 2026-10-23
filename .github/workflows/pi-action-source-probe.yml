@@ -1,0 +1,63 @@
+name: Source Git probe
+on:
+  workflow_dispatch:
+permissions: {}
+jobs:
+  probe:
+    if: github.repository == 'thorgas/Youmotion' && github.actor == 'thorgas'
+    runs-on: macos-26
+    timeout-minutes: 10
+    steps:
+      - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444
+        with:
+          node-version: 24.21.0
+          architecture: arm64
+      - name: Probe isolated source object reads
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --input-type=module <<'PROBE'
+          import {mkdtemp,mkdir,rm,access} from 'node:fs/promises';
+          import {tmpdir} from 'node:os';
+          import {join,isAbsolute} from 'node:path';
+          import {spawn} from 'node:child_process';
+          import {createHash} from 'node:crypto';
+          const emit=(data)=>process.stdout.write(`${JSON.stringify(data)}\n`);
+          const root=await mkdtemp(join(tmpdir(),'pi-source-git-probe-'));
+          const gitDir=join(root,'repo.git');
+          const clean={PATH:'/usr/bin:/bin:/usr/sbin:/sbin',HOME:root,TMPDIR:root,GIT_CONFIG_NOSYSTEM:'1',GIT_CONFIG_GLOBAL:'/dev/null',GIT_CONFIG_SYSTEM:'/dev/null',GIT_TERMINAL_PROMPT:'0'};
+          const production={GIT_CONFIG_NOSYSTEM:'1',GIT_CONFIG_GLOBAL:'/dev/null',GIT_CONFIG_SYSTEM:'/dev/null',GIT_TERMINAL_PROMPT:'0',GIT_OBJECT_DIRECTORY:join(gitDir,'objects')};
+          const run=(exe,args,env,category,objectKind,ms)=>new Promise(resolve=>{
+           const started=Date.now();let bytes=0;const chunks=[];let timeout=false;let overflow=false;let spawnFailed=false;
+           const child=spawn(exe,args,{env,cwd:root,detached:true,stdio:['ignore','pipe','pipe']});
+           const kill=()=>{try{process.kill(-child.pid,'SIGKILL');}catch{}};
+           const timer=setTimeout(()=>{timeout=true;kill();},ms);
+           child.stdout.on('data',chunk=>{bytes+=chunk.length;if(bytes>16777216){overflow=true;kill();}else chunks.push(chunk);});
+           child.stderr.on('data',()=>{});
+           child.once('error',()=>{spawnFailed=true;});
+           child.once('close',code=>{clearTimeout(timer);const status=timeout?'timeout':overflow?'output-limit':spawnFailed?'spawn-failed':code===0?'success':'exit';emit({category,objectKind,status,elapsedMs:Date.now()-started,bytes,...(Number.isInteger(code)?{exitCode:code}:{})});resolve({ok:status==='success',output:Buffer.concat(chunks)});});
+          });
+          const must=(result)=>{if(!result.ok)throw Error('probe-failed');return result.output;};
+          const flags=['--no-lazy-fetch','--no-replace-objects','--no-optional-locks','--git-dir',gitDir];
+          try{
+           await mkdir(join(root,'home'),{mode:0o700});
+           must(await run('/usr/bin/git',['init','--bare','--quiet',gitDir],clean,'systemGit','init',120000));
+           const sha='ff280052a3e7e4f729471ede5c3cf1b06d11f25d';
+           must(await run('/usr/bin/git',[...flags,'-c','core.hooksPath=/dev/null','fetch','--no-tags','--depth=1','https://github.com/thorgas/Youmotion.git',sha],clean,'systemGit','fetch',120000));
+           const found=must(await run('/usr/bin/xcrun',['--find','git'],clean,'xcrun','resolve',60000)).toString().trim();
+           if(!isAbsolute(found)||found.includes('\n'))throw Error('invalid-output');
+           const tools=[['systemGit','/usr/bin/git'],['xcodeGit',found]];
+           try{await access('/opt/homebrew/bin/git');tools.push(['homebrewGit','/opt/homebrew/bin/git']);}catch{}
+           const commit=must(await run('/usr/bin/git',[...flags,'cat-file','commit',sha],clean,'control','commit',5000));
+           const match=/^tree ([a-f0-9]{40})\n/.exec(commit.toString());if(!match)throw Error('invalid-output');
+           const tree=must(await run('/usr/bin/git',[...flags,'cat-file','tree',match[1]],clean,'control','tree',5000));
+           let offset=0,blob;while(offset<tree.length){const nul=tree.indexOf(0,offset);if(nul<0||nul+21>tree.length)throw Error('invalid-output');const header=tree.subarray(offset,nul).toString();if(/^100(?:644|755) /.test(header)){blob=tree.subarray(nul+1,nul+21).toString('hex');break;}offset=nul+21;}if(!blob)throw Error('invalid-output');
+           const references=new Map([['commit',commit],['tree',tree],['blob',must(await run('/usr/bin/git',[...flags,'cat-file','blob',blob],clean,'control','blob',5000))]]);
+           let failed=false;
+           for(const [category,exe]of tools)for(const [variant,env]of [['minimal',production],['explicitPath',{...production,PATH:clean.PATH}]])for(const [kind,oid]of [['commit',sha],['tree',match[1]],['blob',blob]]){
+            const result=await run(exe,[...flags,'cat-file',kind,oid],env,`${category}-${variant}`,kind,5000);
+            const equal=result.ok&&createHash('sha256').update(result.output).digest('hex')===createHash('sha256').update(references.get(kind)).digest('hex');emit({category:`${category}-${variant}`,objectKind:kind,status:equal?'bytes-match':'comparison-failed'});if(!equal)failed=true;
+           }
+           if(failed)process.exitCode=1;
+          }catch{emit({category:'probe',objectKind:'setup',status:'failed'});process.exitCode=1;}finally{await rm(root,{recursive:true,force:true});}
+          PROBE
