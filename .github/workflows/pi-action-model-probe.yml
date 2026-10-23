@@ -1,0 +1,128 @@
+name: Model coding probe
+on:
+  workflow_dispatch:
+permissions: {}
+jobs:
+  probe:
+    if: github.repository == 'thorgas/Youmotion' && github.actor == 'thorgas'
+    runs-on: macos-26
+    timeout-minutes: 25
+    defaults:
+      run:
+        shell: bash
+        working-directory: pi-action-harness
+    steps:
+      - name: Checkout immutable trusted harness
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8
+        with:
+          repository: thorgas/pi-action
+          ref: 460cb6e8a716f77c9d888104aa6ee0e91552e7ff
+          token: ${{ secrets.PI_ACTION_HARNESS_READ_TOKEN }}
+          path: pi-action-harness
+          persist-credentials: false
+      - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444
+        with:
+          node-version: 24.21.0
+          architecture: arm64
+      - uses: pnpm/action-setup@a7487c7e89a18df4991f7f222e4898a00d66ddda
+        with:
+          version: 11.21.0
+          run_install: false
+      - name: Install exact trusted dependency graph
+        run: pnpm install --frozen-lockfile --ignore-scripts --no-optimistic-repeat-install
+      - name: Probe actual coding model without native bootstrap
+        env:
+          NODE_NO_WARNINGS: '1'
+        run: |
+          set -euo pipefail
+          umask 077
+          probe_root="$(mktemp -d "$RUNNER_TEMP/pi-source-materialization.XXXXXX")"
+          probe_root="$(node -e 'process.stdout.write(require("node:fs").realpathSync(process.argv[1]))' "$probe_root")"
+          trap 'rm -rf -- "$probe_root"' EXIT
+          cat > "$probe_root/fetch.mjs" <<'FETCH'
+          import {mkdir,realpath} from 'node:fs/promises';
+          import {join} from 'node:path';
+          import {spawn} from 'node:child_process';
+          const root=await realpath(process.argv[2]);
+          const gitDir=join(root,'public.git');
+          const env={PATH:'/usr/bin:/bin:/usr/sbin:/sbin',HOME:root,TMPDIR:root,GIT_CONFIG_NOSYSTEM:'1',GIT_CONFIG_GLOBAL:'/dev/null',GIT_CONFIG_SYSTEM:'/dev/null',GIT_TERMINAL_PROMPT:'0'};
+          const run=(args,kind)=>new Promise(resolve=>{
+           const started=Date.now();let timedOut=false,spawnFailed=false,bytes=0;
+           const child=spawn('/usr/bin/git',args,{env,cwd:root,detached:true,stdio:['ignore','pipe','pipe']});
+           const timer=setTimeout(()=>{timedOut=true;try{process.kill(-child.pid,'SIGKILL');}catch{}},120000);
+           child.stdout.on('data',chunk=>{bytes+=chunk.length;});child.stderr.on('data',()=>{});
+           child.once('error',()=>{spawnFailed=true;});
+           child.once('close',code=>{clearTimeout(timer);const status=timedOut?'timeout':spawnFailed?'spawn-failed':code===0?'completed':'exit';process.stdout.write(`${JSON.stringify({_tag:'SourceProbeFetch',kind,status,elapsedMs:Date.now()-started,bytes,...(Number.isInteger(code)?{exitCode:code}:{})})}\n`);resolve(status==='completed');});
+          });
+          let ok=false;
+          try{
+           await mkdir(join(root,'runtime'),{mode:0o700});
+           ok=await run(['init','--bare','--quiet',gitDir],'initialize');
+           if(ok)ok=await run(['--no-lazy-fetch','--no-replace-objects','--no-optional-locks','--git-dir',gitDir,'-c','core.hooksPath=/dev/null','fetch','--no-tags','--depth=1','https://github.com/thorgas/Youmotion.git','6f5d35a38a49a214b53a2eb232172787555ce4f6'],'fetch');
+          }catch{process.stdout.write('{"_tag":"SourceProbeFetch","kind":"setup","status":"failed"}\n');}
+          if(!ok)process.exitCode=1;
+          FETCH
+          node "$probe_root/fetch.mjs" "$probe_root"
+          cat > "$probe_root/probe.mjs" <<'PROBE'
+          import { strict as assert } from 'node:assert';
+          import { mkdir, realpath, lstat, readFile, readdir } from 'node:fs/promises';
+          import { join, resolve } from 'node:path';
+          import { pathToFileURL } from 'node:url';
+          import { createRequire } from 'node:module';
+          const require = createRequire(join(process.cwd(), 'package.json'));
+          const dependency = (specifier) => import(pathToFileURL(require.resolve(specifier)).href);
+          const load = (path) => import(pathToFileURL(join(process.cwd(), path)).href);
+          let phase = 'configuration'; let calls = 0; const started = Date.now();
+          try {
+            const root = resolve(process.argv[2]); const objects = resolve(process.argv[3]); const commit = process.argv[4];
+            assert.equal(await realpath(root), root); assert.equal(await realpath(objects), objects);
+            const info = await lstat(root); assert.ok(info.isDirectory() && !info.isSymbolicLink() && info.uid === process.getuid() && (info.mode & 0o777) === 0o700);
+            assert.match(commit, /^[a-f0-9]{40}$/);
+            const [Effect, Exit, { makeLocalCoding }, { makeLocalModels }, { sourceSnapshotVocabulary, localCodingVocabulary, preparationVocabulary }] = await Promise.all([
+              dependency('effect/Effect'), dependency('effect/Exit'), load('packages/runner/src/local-coding.ts'), load('packages/runner/src/local-model.ts'), load('packages/protocol/src/constants.ts'),
+            ]);
+            for (const name of ['sources', 'edits', 'candidates']) await mkdir(join(root, name), { mode: 0o700 });
+            const {models,model}=makeLocalModels({modelId:'gemma4:e4b',contextWindow:8192,maxTokens:4096});
+            const options = { statePath: join(root, localCodingVocabulary.files.state), harnessPath: join(root, localCodingVocabulary.files.harness), workspaceRoot: join(root, preparationVocabulary.files.root), metadataRoot: join(root, 'sources'), journalRoot: join(root, 'edits'), candidateRoot: join(root, 'candidates'), registry: [{ sourceId: 'public-source-probe', commitOid: commit, objectFormat: 'sha1', pathPolicyVersion: sourceSnapshotVocabulary.applicationProfile.version, selection: sourceSnapshotVocabulary.applicationProfile.selection, objectDirectory: objects }], gitExecutable: '/usr/bin/git', models, model, now: Date.now, maxRequests: 16, maxTokens: 4096, runMs: 600000, activity: { report(event) { phase = event.phase; process.stdout.write(`${JSON.stringify(event)}\n`); } } };
+            phase = 'source-materialization';
+            const exit = await Effect.runPromiseExit(Effect.scoped(Effect.gen(function* () { const coding = yield* makeLocalCoding(options); return yield* coding.run({ taskId: 'public-source-probe', requestId: 'public-source-probe-request', sourceId: 'public-source-probe', prompt: "Infrastructure smoke: verified one-byte draft\n\nInfrastructure smoke. Replace the empty file benchmarks/e2e-maestro-vs-argent/results/logs/01-1-argent.stderr.log with exactly the single ASCII character 1: the printable digit one (U+0031, hexadecimal 31), not a placeholder. Do not write NUL, a null character, angle-bracket text or an escape sequence. No newline, no spaces, no quotes. The file must be exactly one byte. Use taskId from your system context, expectedWriterRevision 0, expectedOldHash e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855, and contents JSON string \"1\". Read the result back. Do not edit other files." }); })));
+            if (Exit.isFailure(exit)) throw new Error('ControlledFailure');
+            assert.ok(Number.isSafeInteger(exit.value.writerRevision));
+            const receipts = [];
+            const visit = async (path) => { for (const entry of await readdir(path, { withFileTypes: true })) { const child = join(path, entry.name); if (entry.isDirectory()) await visit(child); else if (entry.name === sourceSnapshotVocabulary.files.receipt) { const value = JSON.parse(await readFile(child, 'utf8')); if (value.receipt?.commitOid === commit) receipts.push(value.receipt); } } };
+            await visit(options.metadataRoot); assert.equal(receipts.length, 1);
+            process.stdout.write(`${JSON.stringify({ _tag: 'ModelCodingProbe', status: 'completed', phase: 'source-materialization', files: receipts[0].fileCount, bytes: receipts[0].totalBytes, writerRevision: exit.value.writerRevision, elapsedMs: Date.now() - started })}\n`);
+          } catch {
+            process.stdout.write(`${JSON.stringify({ _tag: 'ModelCodingProbe', status: 'failed', phase, elapsedMs: Date.now() - started })}\n`);
+            process.exitCode = 1;
+          }
+          PROBE
+          cat > "$probe_root/services.mjs" <<'PROBE'
+          import http from 'node:http';
+          import {spawn} from 'node:child_process';
+          import {mkdir} from 'node:fs/promises';
+          import {join} from 'node:path';
+          const root=process.argv[2], executable=process.argv[3];
+          const emit=(data)=>process.stdout.write(JSON.stringify({_tag:'ModelProbe',...data})+'\n');
+          const env={PATH:process.env.PATH,HOME:join(root,'model-home'),OLLAMA_HOST:'127.0.0.1:11435',OLLAMA_MODELS:join(root,'models')};
+          await mkdir(env.HOME,{mode:0o700});
+          const server=spawn(executable,['serve'],{env,stdio:'ignore'});
+          const joined=new Promise(r=>server.once('close',r));
+          let proxy;
+          const stop=async()=>{proxy?.closeAllConnections();if(proxy)await new Promise(r=>proxy.close(r));server.kill('SIGTERM');const killer=setTimeout(()=>server.kill('SIGKILL'),5000);await joined;clearTimeout(killer);};
+          const childRun=(args,ms)=>new Promise(resolve=>{const c=spawn(executable,args,{env,stdio:'ignore'});let timed=false;const t=setTimeout(()=>{timed=true;c.kill('SIGKILL');},ms);c.once('error',()=>{});c.once('close',code=>{clearTimeout(t);resolve(!timed&&code===0);});});
+          try{
+           let ready=false;for(let n=0;n<60;n++){try{const r=await fetch('http://127.0.0.1:11435/api/tags',{signal:AbortSignal.timeout(1000)});await r.arrayBuffer();if(r.ok){ready=true;break;}}catch{}await new Promise(r=>setTimeout(r,1000));}if(!ready)throw Error();
+           emit({phase:'readiness',status:'completed'});
+           if(!await childRun(['pull','gemma4:e4b'],600000))throw Error();emit({phase:'pull',status:'completed'});
+           proxy=http.createServer((req,res)=>{const started=Date.now();let bytes=0;const upstream=http.request({hostname:'127.0.0.1',port:11435,path:req.url,method:req.method,headers:req.headers},response=>{emit({phase:'http',status:'headers',statusCode:response.statusCode,elapsedMs:Date.now()-started});res.writeHead(response.statusCode,response.headers);response.on('data',c=>bytes+=c.length);response.on('end',()=>emit({phase:'http',status:'completed',statusCode:response.statusCode,bytes,elapsedMs:Date.now()-started}));response.pipe(res);});upstream.setTimeout(300000,()=>upstream.destroy());upstream.on('error',()=>{emit({phase:'http',status:'transport-failed',elapsedMs:Date.now()-started});res.destroy();});req.pipe(upstream);});
+           await new Promise((r,j)=>{proxy.once('error',j);proxy.listen(11434,'127.0.0.1',r);});
+           const c=spawn(process.execPath,[join(root,'probe.mjs'),join(root,'runtime'),join(root,'public.git/objects'),'6f5d35a38a49a214b53a2eb232172787555ce4f6'],{env:{PATH:process.env.PATH,NODE_NO_WARNINGS:'1'},stdio:['ignore','inherit','ignore']});
+           const timer=setTimeout(()=>c.kill('SIGKILL'),600000);const code=await new Promise(r=>{c.once('error',()=>{});c.once('close',r);});clearTimeout(timer);emit({phase:'coding',status:code===0?'completed':'failed'});
+          }catch{emit({phase:'setup',status:'failed'});process.exitCode=1;}finally{await stop();emit({phase:'cleanup',status:'completed'});}
+          PROBE
+          mkdir -m 700 "$probe_root/ollama"
+          curl --silent --show-error --max-time 120 --fail --location --proto '=https' --tlsv1.2 --output "$probe_root/ollama.tgz" https://github.com/ollama/ollama/releases/download/v0.40.3/ollama-darwin.tgz
+          printf '%s  %s\n' a2d1d906a2c8febd9cb18f5c183854d0a6db5dc522940d68b0c0ed048e8dfdea "$probe_root/ollama.tgz" | shasum -a 256 --check --status
+          tar -xzf "$probe_root/ollama.tgz" -C "$probe_root/ollama"
+          node "$probe_root/services.mjs" "$probe_root" "$probe_root/ollama/ollama"
