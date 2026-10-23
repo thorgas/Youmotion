@@ -1,0 +1,198 @@
+name: pi-action session
+on:
+  issue_comment:
+    types: [created]
+  workflow_dispatch:
+    inputs:
+      pullRequest:
+        description: Open same-repository pull request number (leave empty for issue)
+        required: false
+        type: string
+      issueNumber:
+        description: Open issue number (leave pullRequest empty)
+        required: false
+        type: string
+      rerunArtifactId:
+        description: Exact encrypted checkpoint artifact ID to rerun; leave empty for a new task
+        required: false
+        default: ''
+        type: string
+      authorizeFreshAttempt:
+        description: Authorize a fresh six-hour attempt and profile request budget; previous post-checkpoint spend is unknown
+        required: false
+        default: false
+        type: boolean
+      prompt:
+        description: Optional task text; otherwise use the independently fetched issue or PR title and body
+        required: false
+        default: ''
+        type: string
+permissions: {}
+concurrency:
+  group: pi-action-${{ github.repository }}
+  cancel-in-progress: false
+jobs:
+  session:
+    if: >-
+      github.repository == 'thorgas/Youmotion' &&
+      github.actor == github.repository_owner &&
+      (github.event_name == 'workflow_dispatch' && github.ref == format('refs/heads/{0}', github.event.repository.default_branch) ||
+       github.event_name == 'issue_comment' && startsWith(github.event.comment.body, '/pi run'))
+    runs-on: macos-26
+    timeout-minutes: 360
+    permissions:
+      contents: read
+      pull-requests: read
+      issues: read
+      actions: read
+    defaults:
+      run:
+        shell: bash
+        working-directory: ${{ env.ACT && env.PI_ACTION_WORKSPACE || format('{0}/pi-action-harness', github.workspace) }}
+    steps:
+      - name: Start the absolute session deadline before bootstrap
+        working-directory: ${{ runner.temp }}
+        run: |
+          set -euo pipefail
+          started_ms=$(( $(date +%s) * 1000 ))
+          deadline_ms=$(( started_ms + 21600000 - 240000 ))
+          run_root="${PI_ACTION_RUN_ROOT:-$(mktemp -d "$RUNNER_TEMP/pi-action.XXXXXX")}"
+          test -d "$run_root"
+          printf 'PI_ACTION_NATIVE_CACHE_ROOT=%s/pi-action-native-cache\n' "$RUNNER_TEMP" >> "$GITHUB_ENV"
+          printf 'PI_ACTION_RUN_ROOT=%s\nPI_ACTION_DEADLINE=%s\n' "$run_root" "$deadline_ms" >> "$GITHUB_ENV"
+      - name: Checkout immutable private harness
+        if: ${{ !env.ACT }}
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8
+        with:
+          repository: thorgas/pi-action
+          ref: 75c1689f16663e9bc63162e51cc90ac61002806e
+          token: ${{ secrets.PI_ACTION_HARNESS_READ_TOKEN }}
+          path: pi-action-harness
+          persist-credentials: false
+      - name: Set up pinned Node
+        if: ${{ !env.ACT }}
+        uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444
+        with:
+          node-version: 24.21.0
+          architecture: arm64
+      - name: Set up pinned pnpm
+        if: ${{ !env.ACT }}
+        uses: pnpm/action-setup@a7487c7e89a18df4991f7f222e4898a00d66ddda
+        with:
+          version: 11.21.0
+          run_install: false
+      - name: Install the exact trusted harness dependency graph
+        if: ${{ !env.ACT }}
+        run: pnpm install --frozen-lockfile --ignore-scripts --no-optimistic-repeat-install
+      - name: Materialize the reviewed public profile
+        if: ${{ !env.ACT }}
+        env:
+          REVIEWED_PROFILE_JSON: ${{ vars.PI_ACTION_PROFILE_JSON }}
+        run: node tooling/github-actions/hosted-setup.mjs profile
+      - name: Restore the explicitly selected native cache
+        if: ${{ !env.ACT && vars.PI_ACTION_NATIVE_CACHE_KEY != '' }}
+        uses: actions/cache/restore@0400d5f644dc74513175e3cd8d07132dd4860809 # v4.2.4
+        with:
+          path: ${{ env.PI_ACTION_NATIVE_CACHE_ROOT }}
+          key: ${{ vars.PI_ACTION_NATIVE_CACHE_KEY }}
+          fail-on-cache-miss: true
+      - name: Download checksum-pinned vendor tools into the private run directory
+        if: ${{ !env.ACT }}
+        working-directory: ${{ runner.temp }}
+        run: |
+          set -euo pipefail
+          printf 'PI_ACTION_STAGE=tools\n' >> "$GITHUB_ENV"
+          tools="$PI_ACTION_RUN_ROOT/tools"
+          mkdir -m 700 "$tools" "$tools/ollama"
+          remaining_seconds=$(( PI_ACTION_DEADLINE / 1000 - $(date +%s) ))
+          test "$remaining_seconds" -gt 0
+          curl --max-time "$remaining_seconds" --fail --location --proto '=https' --tlsv1.2 --output "$tools/ollama.tgz" https://github.com/ollama/ollama/releases/download/v0.40.3/ollama-darwin.tgz
+          printf '%s  %s\n' a2d1d906a2c8febd9cb18f5c183854d0a6db5dc522940d68b0c0ed048e8dfdea "$tools/ollama.tgz" | shasum -a 256 --check --status
+          tar -xzf "$tools/ollama.tgz" -C "$tools/ollama"
+          remaining_seconds=$(( PI_ACTION_DEADLINE / 1000 - $(date +%s) ))
+          test "$remaining_seconds" -gt 0
+          curl --max-time "$remaining_seconds" --fail --location --proto '=https' --tlsv1.2 --output "$tools/cloudflared.tgz" https://github.com/cloudflare/cloudflared/releases/download/2026.9.3/cloudflared-darwin-arm64.tgz
+          printf '%s  %s\n' 587c2cfb1c230fe36c7fa7727da78be459dae028cabe8c001291999350f07095 "$tools/cloudflared.tgz" | shasum -a 256 --check --status
+          tar -xzf "$tools/cloudflared.tgz" -C "$tools"
+          test -x "$tools/ollama/ollama"
+          test -x "$tools/cloudflared"
+          printf 'PI_ACTION_OLLAMA_EXECUTABLE=%s\nPI_ACTION_TUNNEL_EXECUTABLE=%s\n' "$tools/ollama/ollama" "$tools/cloudflared" >> "$GITHUB_ENV"
+      - name: Write private credential files for trusted adapters
+        if: ${{ !env.ACT }}
+        working-directory: ${{ runner.temp }}
+        env:
+          READ_TOKEN: ${{ github.token }}
+          PUBLICATION_AUTH: ${{ vars.PI_ACTION_PUBLICATION_AUTH || 'app' }}
+          APP_ID: ${{ vars.PI_ACTION_APP_ID }}
+          INSTALLATION_ID: ${{ vars.PI_ACTION_INSTALLATION_ID }}
+          APP_PRIVATE_KEY: ${{ secrets.PI_ACTION_APP_PRIVATE_KEY }}
+          PUBLICATION_TOKEN: ${{ secrets.PI_ACTION_PUBLICATION_TOKEN }}
+          VIEWER_SECRET: ${{ secrets.PI_ACTION_VIEWER_SECRET }}
+          CHECKPOINT_KEY: ${{ secrets.PI_ACTION_CHECKPOINT_KEY }}
+        run: |
+          set -euo pipefail
+          printf 'PI_ACTION_STAGE=credentials\n' >> "$GITHUB_ENV"
+          test -n "$READ_TOKEN"
+          test -n "$VIEWER_SECRET"
+          [[ "$CHECKPOINT_KEY" =~ ^[a-f0-9]{64}$ ]]
+          umask 077
+          printf '%s' "$READ_TOKEN" > "$PI_ACTION_RUN_ROOT/read-token.txt"
+          case "$PUBLICATION_AUTH" in
+            app)
+              test -n "$APP_ID"
+              test -n "$INSTALLATION_ID"
+              [[ "$APP_ID" =~ ^[1-9][0-9]*$ ]]
+              [[ "$INSTALLATION_ID" =~ ^[1-9][0-9]*$ ]]
+              test -n "$APP_PRIVATE_KEY"
+              printf '%s' "$APP_PRIVATE_KEY" > "$PI_ACTION_RUN_ROOT/publication-app-key.pem"
+              ;;
+            file)
+              APP_ID=''
+              INSTALLATION_ID=''
+              test -n "$PUBLICATION_TOKEN"
+              printf '%s' "$PUBLICATION_TOKEN" > "$PI_ACTION_RUN_ROOT/publication-token.txt"
+              ;;
+            *) exit 1 ;;
+          esac
+          printf 'PI_ACTION_PUBLICATION_AUTH=%s\nPI_ACTION_APP_ID=%s\nPI_ACTION_INSTALLATION_ID=%s\n' "$PUBLICATION_AUTH" "$APP_ID" "$INSTALLATION_ID" >> "$GITHUB_ENV"
+          printf '%s' "$VIEWER_SECRET" > "$PI_ACTION_RUN_ROOT/viewer-secret.txt"
+          printf '%s' "$CHECKPOINT_KEY" > "$PI_ACTION_RUN_ROOT/checkpoint-key.txt"
+          printf 'PI_ACTION_CHECKPOINT_KEY_FILE=%s/checkpoint-key.txt\n' "$PI_ACTION_RUN_ROOT" >> "$GITHUB_ENV"
+      - name: Admit, prepare native C0, and run the shared session locally
+        if: ${{ env.ACT }}
+        run: bash tooling/github-actions/run-session.sh
+      - name: Run the shared session with scoped artifact runtime authority
+        if: ${{ !env.ACT }}
+        uses: ./pi-action-harness/tooling/github-actions/session-action
+      - name: Write sanitized outcome and job summary
+        if: ${{ always() }}
+        working-directory: ${{ runner.temp }}
+        env:
+          JOB_OUTCOME: ${{ job.status }}
+          HARNESS_ROOT: ${{ env.ACT && env.PI_ACTION_WORKSPACE || format('{0}/pi-action-harness', github.workspace) }}
+        run: |
+          set -euo pipefail
+          umask 077
+          if [ -z "${PI_ACTION_RUN_ROOT:-}" ] || [ ! -d "$PI_ACTION_RUN_ROOT" ]; then
+            PI_ACTION_RUN_ROOT=$(mktemp -d "$RUNNER_TEMP/pi-action-receipt.XXXXXX")
+            printf 'PI_ACTION_RUN_ROOT=%s\n' "$PI_ACTION_RUN_ROOT" >> "$GITHUB_ENV"
+            export PI_ACTION_RUN_ROOT
+          fi
+          helper="$HARNESS_ROOT/tooling/github-actions/hosted-setup.mjs"
+          if command -v node >/dev/null 2>&1 && [ -f "$helper" ] && node "$helper" receipt; then
+            exit 0
+          fi
+          set -o noclobber
+          printf '%s' '{"version":1,"outcome":"unknown","stage":"bootstrap","platform":"unknown","architecture":"unknown","tokenDisposal":"unknown"}' > "$PI_ACTION_RUN_ROOT/hosted-receipt.json"
+          if [ -n "${GITHUB_STEP_SUMMARY:-}" ]; then
+            printf '%s\n' 'pi-action bootstrap did not produce a trusted session receipt; outcome and cleanup remain unknown.' >> "$GITHUB_STEP_SUMMARY"
+          fi
+      - name: Upload only the sanitized hosted receipt
+        if: ${{ always() && !env.ACT }}
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: pi-action-session-result-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ env.PI_ACTION_RUN_ROOT }}/hosted-receipt.json
+          if-no-files-found: error
+          include-hidden-files: false
+          retention-days: 1
