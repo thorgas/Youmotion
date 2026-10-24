@@ -16,7 +16,7 @@ jobs:
       - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8
         with:
           repository: thorgas/pi-action
-          ref: bc7eb1f7f5aa3846197c6f6d273f588591112175
+          ref: fe420f1e2872cd16e401e168ec9ebfa73e978b1d
           token: ${{ secrets.PI_ACTION_HARNESS_READ_TOKEN }}
           persist-credentials: false
           path: pi-action-harness
@@ -49,8 +49,7 @@ jobs:
           xcrun --sdk iphonesimulator --show-sdk-version >> "$EVIDENCE_ROOT/toolchain.txt"
           node --version >> "$EVIDENCE_ROOT/toolchain.txt"
           pnpm --version >> "$EVIDENCE_ROOT/toolchain.txt"
-          node --input-type=module - <<'JS'
-          import {DefaultArtifactClient} from '@actions/artifact';
-          const root=process.env.EVIDENCE_ROOT;
-          await new DefaultArtifactClient().uploadArtifact('pi-action-verified-cache-evidence',[root+'/native-cache.tgz',root+'/toolchain.txt'],root,{retentionDays:1,compressionLevel:0});
-          JS
+      - name: Upload through scoped action authority
+        uses: ./pi-action-harness/tooling/github-actions/cache-evidence-action
+        env:
+          EVIDENCE_ROOT: ${{ runner.temp }}/cache-evidence
