@@ -6,6 +6,9 @@ jobs:
     if: github.actor == github.repository_owner && github.repository == 'thorgas/Youmotion'
     runs-on: macos-26
     timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: ${{ github.workspace }}/pi-action-harness
     permissions:
       contents: read
       actions: read
@@ -16,6 +19,7 @@ jobs:
           ref: bc7eb1f7f5aa3846197c6f6d273f588591112175
           token: ${{ secrets.PI_ACTION_HARNESS_READ_TOKEN }}
           persist-credentials: false
+          path: pi-action-harness
       - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444
         with:
           node-version: 24.21.0
