@@ -65,7 +65,7 @@ jobs:
         uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8
         with:
           repository: thorgas/pi-action
-          ref: 109b9cbb1ab980abc84c92a78d1ca7adfcad9d11
+          ref: f1c8acb2d7d809911ac5b6c5c52a064e7e8f2be3
           token: ${{ secrets.PI_ACTION_HARNESS_READ_TOKEN }}
           path: pi-action-harness
           persist-credentials: false
@@ -94,12 +94,18 @@ jobs:
           REVIEWED_PROFILE_JSON: ${{ vars.PI_ACTION_PROFILE_JSON }}
         run: node tooling/github-actions/hosted-setup.mjs profile
       - name: Restore the explicitly selected native cache
+        id: native-cache-restore
         if: ${{ !env.ACT && vars.PI_ACTION_NATIVE_CACHE_KEY != '' }}
         uses: actions/cache/restore@0400d5f644dc74513175e3cd8d07132dd4860809 # v4.2.4
         with:
           path: ${{ env.PI_ACTION_NATIVE_CACHE_ROOT }}
           key: ${{ vars.PI_ACTION_NATIVE_CACHE_KEY }}
           fail-on-cache-miss: true
+      - name: Require the exact selected native cache key
+        if: ${{ !env.ACT && vars.PI_ACTION_NATIVE_CACHE_KEY != '' }}
+        env:
+          NATIVE_CACHE_EXACT_HIT: ${{ steps.native-cache-restore.outputs.cache-hit }}
+        run: test "$NATIVE_CACHE_EXACT_HIT" = true
       - name: Download checksum-pinned vendor tools into the private run directory
         if: ${{ !env.ACT }}
         working-directory: ${{ runner.temp }}
@@ -168,6 +174,20 @@ jobs:
       - name: Run the shared session with scoped artifact runtime authority
         if: ${{ !env.ACT }}
         uses: ./pi-action-harness/tooling/github-actions/session-action
+      - name: Export verified native baseline for cache
+        id: native-cache-export
+        if: ${{ always() && !env.ACT && vars.PI_ACTION_NATIVE_CACHE_KEY == '' }}
+        working-directory: ${{ github.workspace }}/pi-action-harness
+        run: |
+          set -euo pipefail
+          umask 077
+          node tooling/github-actions/native-cache.mjs "$PI_ACTION_RUN_ROOT" "$PI_ACTION_NATIVE_CACHE_ROOT"
+      - name: Save the immutable verified native baseline
+        if: ${{ always() && !env.ACT && steps.native-cache-export.outputs.ready == 'true' }}
+        uses: actions/cache/save@0400d5f644dc74513175e3cd8d07132dd4860809 # v4.2.4
+        with:
+          path: ${{ env.PI_ACTION_NATIVE_CACHE_ROOT }}
+          key: ${{ steps.native-cache-export.outputs.key }}
       - name: Write sanitized outcome and job summary
         if: ${{ always() }}
         working-directory: ${{ runner.temp }}
