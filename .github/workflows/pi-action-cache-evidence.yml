@@ -28,22 +28,29 @@ jobs:
         with:
           version: 11.21.0
           run_install: false
-      - name: Compare exact build recipe metadata
-        env:
-          PROFILE: ${{ vars.PI_ACTION_PROFILE_JSON }}
-          EVIDENCE_ROOT: ${{ runner.temp }}/cache-evidence
+      - name: Write metadata-only bootstrap probe
         run: |
-          mkdir -m 700 "$EVIDENCE_ROOT"
-          node --input-type=module - <<'JS'
+          cat > parity-probe.mjs <<'JS'
           import {readFileSync,writeFileSync} from 'node:fs';
           import {dirname} from 'node:path';
           import {execFileSync} from 'node:child_process';
           import {createHash} from 'node:crypto';
           import {nativeProducerVocabulary,nativeCandidatePreparationVocabulary} from './packages/protocol/src/constants.ts';
-          const p=JSON.parse(process.env.PROFILE);const b=p.preparation.build; if(JSON.stringify(Object.keys(b.environment))!==JSON.stringify(['EXPO_UPDATES_FINGERPRINT_OVERRIDE']))throw Error('Unexpected environment shape');
+          const p=JSON.parse(process.env.PROFILE);const b=p.preparation.build;
           const build={executable:b.executable,arguments:b.arguments,environment:{PATH:dirname(process.execPath)+':'+process.env.PATH,...b.environment,CI:b.environment.CI??'1',EXPO_PUBLIC_E2E:b.environment.EXPO_PUBLIC_E2E??'1',MOBILE_UPDATE_CHANNEL:b.environment.MOBILE_UPDATE_CHANNEL??'none',USE_CCACHE:b.environment.USE_CCACHE??'0',...nativeCandidatePreparationVocabulary.environment}};
           const toolchain={xcode:execFileSync('/usr/bin/xcodebuild',['-version'],{encoding:'utf8'}).trim(),simulatorSdk:execFileSync('/usr/bin/xcrun',['--sdk','iphonesimulator','--show-sdk-version'],{encoding:'utf8'}).trim(),node:process.version};
           const parts={policy:nativeProducerVocabulary.policy.name,policyVersion:nativeProducerVocabulary.policy.version,inputManifestHash:'d05e8b401dbbc3e0662e69360d997109199a19a7158101195de37f1272ec3d94',toolchain,build,bundleId:p.preparation.bundleId,expoSdkMajor:p.preparation.expoSdkMajor,architecture:'arm64',simulatorOsVersion:p.native.simulatorOsVersion};
           const fingerprint=createHash('sha256').update(JSON.stringify(parts)).digest('hex');
-          console.log(JSON.stringify({_tag:'NativeRecipeParity',fingerprint,parts}));
+          console.log(JSON.stringify({_tag:'NativeRecipeParity',fingerprint,parts}));process.exit(1);
           JS
+          printf '{}' > parity-profile.json
+      - name: Probe exact session action bootstrap environment without coding
+        continue-on-error: true
+        uses: ./pi-action-harness/tooling/github-actions/session-action
+        env:
+          PROFILE: ${{ vars.PI_ACTION_PROFILE_JSON }}
+          PI_ACTION_PROFILE: parity-profile.json
+          PI_ACTION_SESSION_PREPARE_SCRIPT: parity-probe.mjs
+          PI_ACTION_RUN_ROOT: ${{ runner.temp }}
+          PI_ACTION_DEADLINE: '0'
+          PI_ACTION_TUNNEL_EXECUTABLE: /usr/bin/true
