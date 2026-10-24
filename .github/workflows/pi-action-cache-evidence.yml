@@ -40,15 +40,10 @@ jobs:
           import {execFileSync} from 'node:child_process';
           import {createHash} from 'node:crypto';
           import {nativeProducerVocabulary,nativeCandidatePreparationVocabulary} from './packages/protocol/src/constants.ts';
-          const p=JSON.parse(process.env.PROFILE);const b=p.preparation.build;
+          const p=JSON.parse(process.env.PROFILE);const b=p.preparation.build; if(JSON.stringify(Object.keys(b.environment))!==JSON.stringify(['EXPO_UPDATES_FINGERPRINT_OVERRIDE']))throw Error('Unexpected environment shape');
           const build={executable:b.executable,arguments:b.arguments,environment:{PATH:dirname(process.execPath)+':'+process.env.PATH,...b.environment,CI:b.environment.CI??'1',EXPO_PUBLIC_E2E:b.environment.EXPO_PUBLIC_E2E??'1',MOBILE_UPDATE_CHANNEL:b.environment.MOBILE_UPDATE_CHANNEL??'none',USE_CCACHE:b.environment.USE_CCACHE??'0',...nativeCandidatePreparationVocabulary.environment}};
           const toolchain={xcode:execFileSync('/usr/bin/xcodebuild',['-version'],{encoding:'utf8'}).trim(),simulatorSdk:execFileSync('/usr/bin/xcrun',['--sdk','iphonesimulator','--show-sdk-version'],{encoding:'utf8'}).trim(),node:process.version};
           const parts={policy:nativeProducerVocabulary.policy.name,policyVersion:nativeProducerVocabulary.policy.version,inputManifestHash:'d05e8b401dbbc3e0662e69360d997109199a19a7158101195de37f1272ec3d94',toolchain,build,bundleId:p.preparation.bundleId,expoSdkMajor:p.preparation.expoSdkMajor,architecture:'arm64',simulatorOsVersion:p.native.simulatorOsVersion};
           const fingerprint=createHash('sha256').update(JSON.stringify(parts)).digest('hex');
-          writeFileSync(process.env.EVIDENCE_ROOT+'/toolchain.txt',JSON.stringify({fingerprint,parts},null,2));
+          console.log(JSON.stringify({_tag:'NativeRecipeParity',fingerprint,parts}));
           JS
-      - name: Upload bounded metadata
-        uses: ./pi-action-harness/tooling/github-actions/cache-evidence-action
-        env:
-          EVIDENCE_ROOT: ${{ runner.temp }}/cache-evidence
-          EVIDENCE_METADATA_ONLY: 'true'
