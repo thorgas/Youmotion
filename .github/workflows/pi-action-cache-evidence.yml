@@ -28,6 +28,10 @@ jobs:
         with:
           version: 11.21.0
           run_install: false
+      - uses: actions/cache/restore@0400d5f644dc74513175e3cd8d07132dd4860809
+        with:
+          path: ${{ runner.temp }}/pi-action-native-cache
+          key: pi-action-native-a164efa823826e776707b894e683d5e550cdd722258b10545edde5e95402aa12-88f100199dae4f1dba8b654d1953c176e242375cf3bf8b22752ea52dbba309ac
       - name: Write metadata-only bootstrap probe
         run: |
           cat > parity-probe.mjs <<'JS'
@@ -41,7 +45,10 @@ jobs:
           const toolchain={xcode:execFileSync('/usr/bin/xcodebuild',['-version'],{encoding:'utf8'}).trim(),simulatorSdk:execFileSync('/usr/bin/xcrun',['--sdk','iphonesimulator','--show-sdk-version'],{encoding:'utf8'}).trim(),node:process.version};
           const parts={policy:nativeProducerVocabulary.policy.name,policyVersion:nativeProducerVocabulary.policy.version,inputManifestHash:'d05e8b401dbbc3e0662e69360d997109199a19a7158101195de37f1272ec3d94',toolchain,build,bundleId:p.preparation.bundleId,expoSdkMajor:p.preparation.expoSdkMajor,architecture:'arm64',simulatorOsVersion:p.native.simulatorOsVersion};
           const fingerprint=createHash('sha256').update(JSON.stringify(parts)).digest('hex');
-          console.log(JSON.stringify({_tag:'NativeRecipeParity',fingerprint,parts}));process.exit(1);
+          console.log(JSON.stringify({_tag:'NativeRecipeParity',fingerprint,parts}));
+          const fs=await import('node:fs');const path=await import('node:path');const base=process.env.PI_ACTION_RUN_ROOT+'/pi-action-native-cache/seed';const entries=JSON.parse(fs.readFileSync(process.env.PI_ACTION_RUN_ROOT+'/pi-action-native-cache/bundle/input-manifest.json','utf8'));let differences=[];
+          for(const [name,kind,mode,size,commitment] of entries){const full=path.join(base,name);const st=fs.lstatSync(full);let bad=(st.mode&511)!==mode;if(kind==='file')bad=bad||st.size!==size||createHash('sha256').update(fs.readFileSync(full)).digest('hex')!==commitment;if(kind==='link'){const target=fs.realpathSync(full);const expected=JSON.parse(commitment);bad=bad||path.relative(base,target)!==expected[0]||(fs.statSync(target).isFile()&&createHash('sha256').update(fs.readFileSync(target)).digest('hex')!==expected[1]);}if(bad)differences.push({name,kind,expectedMode:mode,actualMode:st.mode&511});}
+          console.log(JSON.stringify({_tag:'CacheInputParity',count:entries.length,mismatches:differences.length,first:differences.slice(0,10)}));process.exit(1);
           JS
           printf '{}' > parity-profile.json
       - name: Probe exact session action bootstrap environment without coding
