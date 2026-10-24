@@ -16,7 +16,7 @@ jobs:
       - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8
         with:
           repository: thorgas/pi-action
-          ref: fe420f1e2872cd16e401e168ec9ebfa73e978b1d
+          ref: 3bc1ff8434e9e168492ed21015d3a90d0b9c3aae
           token: ${{ secrets.PI_ACTION_HARNESS_READ_TOKEN }}
           persist-credentials: false
           path: pi-action-harness
@@ -28,28 +28,27 @@ jobs:
         with:
           version: 11.21.0
           run_install: false
-      - run: pnpm install --frozen-lockfile --ignore-scripts --no-optimistic-repeat-install
-      - uses: actions/cache/restore@0400d5f644dc74513175e3cd8d07132dd4860809
-        id: restore
-        with:
-          path: ${{ runner.temp }}/pi-action-native-cache
-          key: pi-action-native-a164efa823826e776707b894e683d5e550cdd722258b10545edde5e95402aa12-88f100199dae4f1dba8b654d1953c176e242375cf3bf8b22752ea52dbba309ac
-      - name: Export only verified cache for local reproduction
+      - name: Compare exact build recipe metadata
         env:
-          CACHE_HIT: ${{ steps.restore.outputs.cache-hit }}
-          CACHE_ROOT: ${{ runner.temp }}/pi-action-native-cache
+          PROFILE: ${{ vars.PI_ACTION_PROFILE_JSON }}
           EVIDENCE_ROOT: ${{ runner.temp }}/cache-evidence
         run: |
-          set -euo pipefail
-          test "$CACHE_HIT" = true
           mkdir -m 700 "$EVIDENCE_ROOT"
-          test -f "$CACHE_ROOT/bundle/producer-receipt.json"
-          tar -czf "$EVIDENCE_ROOT/native-cache.tgz" -C "$CACHE_ROOT" bundle seed
-          xcodebuild -version > "$EVIDENCE_ROOT/toolchain.txt"
-          xcrun --sdk iphonesimulator --show-sdk-version >> "$EVIDENCE_ROOT/toolchain.txt"
-          node --version >> "$EVIDENCE_ROOT/toolchain.txt"
-          pnpm --version >> "$EVIDENCE_ROOT/toolchain.txt"
-      - name: Upload through scoped action authority
+          node --input-type=module - <<'JS'
+          import {readFileSync,writeFileSync} from 'node:fs';
+          import {dirname} from 'node:path';
+          import {execFileSync} from 'node:child_process';
+          import {createHash} from 'node:crypto';
+          import {nativeProducerVocabulary,nativeCandidatePreparationVocabulary} from './packages/protocol/src/constants.ts';
+          const p=JSON.parse(process.env.PROFILE);const b=p.preparation.build;
+          const build={executable:b.executable,arguments:b.arguments,environment:{PATH:dirname(process.execPath)+':'+process.env.PATH,...b.environment,CI:b.environment.CI??'1',EXPO_PUBLIC_E2E:b.environment.EXPO_PUBLIC_E2E??'1',MOBILE_UPDATE_CHANNEL:b.environment.MOBILE_UPDATE_CHANNEL??'none',USE_CCACHE:b.environment.USE_CCACHE??'0',...nativeCandidatePreparationVocabulary.environment}};
+          const toolchain={xcode:execFileSync('/usr/bin/xcodebuild',['-version'],{encoding:'utf8'}).trim(),simulatorSdk:execFileSync('/usr/bin/xcrun',['--sdk','iphonesimulator','--show-sdk-version'],{encoding:'utf8'}).trim(),node:process.version};
+          const parts={policy:nativeProducerVocabulary.policy.name,policyVersion:nativeProducerVocabulary.policy.version,inputManifestHash:'d05e8b401dbbc3e0662e69360d997109199a19a7158101195de37f1272ec3d94',toolchain,build,bundleId:p.preparation.bundleId,expoSdkMajor:p.preparation.expoSdkMajor,architecture:'arm64',simulatorOsVersion:p.native.simulatorOsVersion};
+          const fingerprint=createHash('sha256').update(JSON.stringify(parts)).digest('hex');
+          writeFileSync(process.env.EVIDENCE_ROOT+'/toolchain.txt',JSON.stringify({fingerprint,parts},null,2));
+          JS
+      - name: Upload bounded metadata
         uses: ./pi-action-harness/tooling/github-actions/cache-evidence-action
         env:
           EVIDENCE_ROOT: ${{ runner.temp }}/cache-evidence
+          EVIDENCE_METADATA_ONLY: 'true'
