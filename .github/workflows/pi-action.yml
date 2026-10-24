@@ -65,7 +65,7 @@ jobs:
         uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8
         with:
           repository: thorgas/pi-action
-          ref: f1c8acb2d7d809911ac5b6c5c52a064e7e8f2be3
+          ref: ce5b0bf2dbde332f3ca79cec65993f293ea13148
           token: ${{ secrets.PI_ACTION_HARNESS_READ_TOKEN }}
           path: pi-action-harness
           persist-credentials: false
@@ -87,7 +87,7 @@ jobs:
       - name: Verify activity watchdog and redaction contract
         run: |
           pnpm exec vitest run tests/observability/activity.test.ts tests/pi/budgeted-models.test.ts tests/runner/native-process-timeout.test.ts
-          node --test --test-concurrency=1 tests/cli/model-pull.test.mjs tests/cli/model-create.test.mjs tests/native-preview/published-frames.test.mjs tests/cli/session-prepare.test.mjs tests/cli/session-command.test.mjs
+          node --test --test-concurrency=1 tests/cli/model-pull.test.mjs tests/cli/model-create.test.mjs tests/native-preview/published-frames.test.mjs tests/cli/session-prepare.test.mjs tests/cli/session-command.test.mjs tests/cli/session-preview.test.mjs
       - name: Materialize the reviewed public profile
         if: ${{ !env.ACT }}
         env:
