@@ -6,97 +6,21 @@ jobs:
   probe:
     if: github.repository == 'thorgas/Youmotion' && github.actor == 'thorgas'
     runs-on: macos-26
-    timeout-minutes: 25
+    timeout-minutes: 18
     defaults:
       run:
         shell: bash
-        working-directory: pi-action-harness
     steps:
-      - name: Checkout immutable trusted harness
-        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8
-        with:
-          repository: thorgas/pi-action
-          ref: 460cb6e8a716f77c9d888104aa6ee0e91552e7ff
-          token: ${{ secrets.PI_ACTION_HARNESS_READ_TOKEN }}
-          path: pi-action-harness
-          persist-credentials: false
       - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444
         with:
           node-version: 24.21.0
           architecture: arm64
-      - uses: pnpm/action-setup@a7487c7e89a18df4991f7f222e4898a00d66ddda
-        with:
-          version: 11.21.0
-          run_install: false
-      - name: Install exact trusted dependency graph
-        run: pnpm install --frozen-lockfile --ignore-scripts --no-optimistic-repeat-install
-      - name: Probe actual coding model without native bootstrap
-        env:
-          NODE_NO_WARNINGS: '1'
+      - name: Compare finite model format and loading
         run: |
           set -euo pipefail
           umask 077
-          probe_root="$(mktemp -d "$RUNNER_TEMP/pi-source-materialization.XXXXXX")"
-          probe_root="$(node -e 'process.stdout.write(require("node:fs").realpathSync(process.argv[1]))' "$probe_root")"
+          probe_root="$(mktemp -d "$RUNNER_TEMP/pi-model-structure.XXXXXX")"
           trap 'rm -rf -- "$probe_root"' EXIT
-          cat > "$probe_root/fetch.mjs" <<'FETCH'
-          import {mkdir,realpath} from 'node:fs/promises';
-          import {join} from 'node:path';
-          import {spawn} from 'node:child_process';
-          const root=await realpath(process.argv[2]);
-          const gitDir=join(root,'public.git');
-          const env={PATH:'/usr/bin:/bin:/usr/sbin:/sbin',HOME:root,TMPDIR:root,GIT_CONFIG_NOSYSTEM:'1',GIT_CONFIG_GLOBAL:'/dev/null',GIT_CONFIG_SYSTEM:'/dev/null',GIT_TERMINAL_PROMPT:'0'};
-          const run=(args,kind)=>new Promise(resolve=>{
-           const started=Date.now();let timedOut=false,spawnFailed=false,bytes=0;
-           const child=spawn('/usr/bin/git',args,{env,cwd:root,detached:true,stdio:['ignore','pipe','pipe']});
-           const timer=setTimeout(()=>{timedOut=true;try{process.kill(-child.pid,'SIGKILL');}catch{}},120000);
-           child.stdout.on('data',chunk=>{bytes+=chunk.length;});child.stderr.on('data',()=>{});
-           child.once('error',()=>{spawnFailed=true;});
-           child.once('close',code=>{clearTimeout(timer);const status=timedOut?'timeout':spawnFailed?'spawn-failed':code===0?'completed':'exit';process.stdout.write(`${JSON.stringify({_tag:'SourceProbeFetch',kind,status,elapsedMs:Date.now()-started,bytes,...(Number.isInteger(code)?{exitCode:code}:{})})}\n`);resolve(status==='completed');});
-          });
-          let ok=false;
-          try{
-           await mkdir(join(root,'runtime'),{mode:0o700});
-           ok=await run(['init','--bare','--quiet',gitDir],'initialize');
-           if(ok)ok=await run(['--no-lazy-fetch','--no-replace-objects','--no-optional-locks','--git-dir',gitDir,'-c','core.hooksPath=/dev/null','fetch','--no-tags','--depth=1','https://github.com/thorgas/Youmotion.git','6f5d35a38a49a214b53a2eb232172787555ce4f6'],'fetch');
-          }catch{process.stdout.write('{"_tag":"SourceProbeFetch","kind":"setup","status":"failed"}\n');}
-          if(!ok)process.exitCode=1;
-          FETCH
-          node "$probe_root/fetch.mjs" "$probe_root"
-          cat > "$probe_root/probe.mjs" <<'PROBE'
-          import { strict as assert } from 'node:assert';
-          import { mkdir, realpath, lstat, readFile, readdir } from 'node:fs/promises';
-          import { join, resolve } from 'node:path';
-          import { pathToFileURL } from 'node:url';
-          import { createRequire } from 'node:module';
-          const require = createRequire(join(process.cwd(), 'package.json'));
-          const dependency = (specifier) => import(pathToFileURL(require.resolve(specifier)).href);
-          const load = (path) => import(pathToFileURL(join(process.cwd(), path)).href);
-          let phase = 'configuration'; let calls = 0; const started = Date.now();
-          try {
-            const root = resolve(process.argv[2]); const objects = resolve(process.argv[3]); const commit = process.argv[4];
-            assert.equal(await realpath(root), root); assert.equal(await realpath(objects), objects);
-            const info = await lstat(root); assert.ok(info.isDirectory() && !info.isSymbolicLink() && info.uid === process.getuid() && (info.mode & 0o777) === 0o700);
-            assert.match(commit, /^[a-f0-9]{40}$/);
-            const [Effect, Exit, { makeLocalCoding }, { makeLocalModels }, { sourceSnapshotVocabulary, localCodingVocabulary, preparationVocabulary }] = await Promise.all([
-              dependency('effect/Effect'), dependency('effect/Exit'), load('packages/runner/src/local-coding.ts'), load('packages/runner/src/local-model.ts'), load('packages/protocol/src/constants.ts'),
-            ]);
-            for (const name of ['sources', 'edits', 'candidates']) await mkdir(join(root, name), { mode: 0o700 });
-            const {models,model}=makeLocalModels({modelId:'gemma4:e4b',contextWindow:8192,maxTokens:4096});
-            const options = { statePath: join(root, localCodingVocabulary.files.state), harnessPath: join(root, localCodingVocabulary.files.harness), workspaceRoot: join(root, preparationVocabulary.files.root), metadataRoot: join(root, 'sources'), journalRoot: join(root, 'edits'), candidateRoot: join(root, 'candidates'), registry: [{ sourceId: 'public-source-probe', commitOid: commit, objectFormat: 'sha1', pathPolicyVersion: sourceSnapshotVocabulary.applicationProfile.version, selection: sourceSnapshotVocabulary.applicationProfile.selection, objectDirectory: objects }], gitExecutable: '/usr/bin/git', models, model, now: Date.now, maxRequests: 16, maxTokens: 4096, runMs: 600000, activity: { report(event) { phase = event.phase; process.stdout.write(`${JSON.stringify(event)}\n`); } } };
-            phase = 'source-materialization';
-            const exit = await Effect.runPromiseExit(Effect.scoped(Effect.gen(function* () { const coding = yield* makeLocalCoding(options); return yield* coding.run({ taskId: 'public-source-probe', requestId: 'public-source-probe-request', sourceId: 'public-source-probe', prompt: "Infrastructure smoke: verified one-byte draft\n\nInfrastructure smoke. Replace the empty file benchmarks/e2e-maestro-vs-argent/results/logs/01-1-argent.stderr.log with exactly the single ASCII character 1: the printable digit one (U+0031, hexadecimal 31), not a placeholder. Do not write NUL, a null character, angle-bracket text or an escape sequence. No newline, no spaces, no quotes. The file must be exactly one byte. Use taskId from your system context, expectedWriterRevision 0, expectedOldHash e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855, and contents JSON string \"1\". Read the result back. Do not edit other files." }); })));
-            if (Exit.isFailure(exit)) throw new Error('ControlledFailure');
-            assert.ok(Number.isSafeInteger(exit.value.writerRevision));
-            const receipts = [];
-            const visit = async (path) => { for (const entry of await readdir(path, { withFileTypes: true })) { const child = join(path, entry.name); if (entry.isDirectory()) await visit(child); else if (entry.name === sourceSnapshotVocabulary.files.receipt) { const value = JSON.parse(await readFile(child, 'utf8')); if (value.receipt?.commitOid === commit) receipts.push(value.receipt); } } };
-            await visit(options.metadataRoot); assert.equal(receipts.length, 1);
-            process.stdout.write(`${JSON.stringify({ _tag: 'ModelCodingProbe', status: 'completed', phase: 'source-materialization', files: receipts[0].fileCount, bytes: receipts[0].totalBytes, writerRevision: exit.value.writerRevision, elapsedMs: Date.now() - started })}\n`);
-          } catch {
-            process.stdout.write(`${JSON.stringify({ _tag: 'ModelCodingProbe', status: 'failed', phase, elapsedMs: Date.now() - started })}\n`);
-            process.exitCode = 1;
-          }
-          PROBE
           cat > "$probe_root/services.mjs" <<'PROBE'
           import http from 'node:http';
           import {spawn} from 'node:child_process';
@@ -121,7 +45,8 @@ jobs:
            if(!await childRun(['pull','gemma4:e4b'],600000))throw Error();emit({phase:'pull',status:'completed'});
            proxy=http.createServer((req,res)=>{const started=Date.now();let bytes=0;let errorBody='';const upstream=http.request({hostname:'127.0.0.1',port:11435,path:req.url,method:req.method,headers:req.headers},response=>{emit({phase:'http',status:'headers',statusCode:response.statusCode,elapsedMs:Date.now()-started});res.writeHead(response.statusCode,response.headers);response.on('data',c=>{bytes+=c.length;if(response.statusCode>=400&&errorBody.length<4096)errorBody=(errorBody+c.toString()).slice(0,4096);});response.on('end',()=>{emit({phase:'http',status:'completed',statusCode:response.statusCode,bytes,elapsedMs:Date.now()-started});if(response.statusCode>=400)emit({phase:'server-error-classification',...classify(errorBody)});});response.pipe(res);});upstream.setTimeout(300000,()=>upstream.destroy());upstream.on('error',()=>{emit({phase:'http',status:'transport-failed',elapsedMs:Date.now()-started});res.destroy();});req.pipe(upstream);});
            await new Promise((r,j)=>{proxy.once('error',j);proxy.listen(11434,'127.0.0.1',r);});
-           for(const mode of ['native-load','native-render','native-minimal','openai-minimal']){try{const endpoint=mode!=='openai-minimal'?'/api/chat':'/v1/chat/completions';const payload=mode!=='openai-minimal'?{model:'gemma4:e4b',messages:mode==='native-load'?[]:[{role:'user',content:'Reply OK.'}],stream:false,...(mode==='native-render'?{debug_render_only:true}:{}),options:{num_predict:16,num_ctx:8192}}:{model:'gemma4:e4b',messages:[{role:'user',content:'Reply OK.'}],stream:false,max_tokens:16};const response=await fetch('http://127.0.0.1:11435'+endpoint,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(payload),signal:AbortSignal.timeout(120000)});const body=(await response.text()).slice(0,4096);let shape='other';try{const data=JSON.parse(body);shape=typeof data.error==='string'?'error-string':data.error&&typeof data.error==='object'?'error-object':data.message?'native-message':Array.isArray(data.choices)?'openai-choices':'other';}catch{}emit({phase:mode,statusCode:response.status,shape,...(response.ok?{}:classify(body))});}catch{emit({phase:mode,status:'failed'});}}
+           let format='unknown';try{const response=await fetch('http://127.0.0.1:11435/api/show',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({model:'gemma4:e4b'}),signal:AbortSignal.timeout(10000)});const data=await response.json();format=['gguf','safetensors'].includes(data.details?.format)?data.details.format:'unknown';emit({phase:'model-structure',statusCode:response.status,format,gemma4:data.model_info?.['general.architecture']==='gemma4',capabilities:['completion','tools','thinking','vision','embedding'].filter(x=>Array.isArray(data.capabilities)&&data.capabilities.includes(x))});}catch{emit({phase:'model-structure',status:'failed'});}
+           for(const mode of ['native-load',...(format==='gguf'?['cpu-load']:[])]){try{const response=await fetch('http://127.0.0.1:11435/api/chat',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({model:'gemma4:e4b',messages:[],stream:false,options:{num_ctx:mode==='cpu-load'?1024:8192,num_predict:16,...(mode==='cpu-load'?{num_gpu:0}:{})}}),signal:AbortSignal.timeout(120000)});const body=(await response.text()).slice(0,4096);emit({phase:mode,statusCode:response.status,...(response.ok?{}:classify(body))});}catch{emit({phase:mode,status:'failed'});}}
           
           }catch{emit({phase:'setup',status:'failed'});process.exitCode=1;}finally{await stop();emit({phase:'server-log-markers',chatPromptError:serverTail.includes('chat prompt error')});emit({phase:'cleanup',status:'completed'});}
           PROBE
