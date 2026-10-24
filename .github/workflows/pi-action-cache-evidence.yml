@@ -1,0 +1,52 @@
+name: pi-action cache evidence
+on: workflow_dispatch
+permissions: {}
+jobs:
+  cache:
+    if: github.actor == github.repository_owner && github.repository == 'thorgas/Youmotion'
+    runs-on: macos-26
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      actions: read
+    steps:
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8
+        with:
+          repository: thorgas/pi-action
+          ref: bc7eb1f7f5aa3846197c6f6d273f588591112175
+          token: ${{ secrets.PI_ACTION_HARNESS_READ_TOKEN }}
+          persist-credentials: false
+      - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444
+        with:
+          node-version: 24.21.0
+          architecture: arm64
+      - uses: pnpm/action-setup@a7487c7e89a18df4991f7f222e4898a00d66ddda
+        with:
+          version: 11.21.0
+          run_install: false
+      - run: pnpm install --frozen-lockfile --ignore-scripts --no-optimistic-repeat-install
+      - uses: actions/cache/restore@0400d5f644dc74513175e3cd8d07132dd4860809
+        id: restore
+        with:
+          path: ${{ runner.temp }}/pi-action-native-cache
+          key: pi-action-native-a164efa823826e776707b894e683d5e550cdd722258b10545edde5e95402aa12-88f100199dae4f1dba8b654d1953c176e242375cf3bf8b22752ea52dbba309ac
+      - name: Export only verified cache for local reproduction
+        env:
+          CACHE_HIT: ${{ steps.restore.outputs.cache-hit }}
+          CACHE_ROOT: ${{ runner.temp }}/pi-action-native-cache
+          EVIDENCE_ROOT: ${{ runner.temp }}/cache-evidence
+        run: |
+          set -euo pipefail
+          test "$CACHE_HIT" = true
+          mkdir -m 700 "$EVIDENCE_ROOT"
+          test -f "$CACHE_ROOT/bundle/producer-receipt.json"
+          tar -czf "$EVIDENCE_ROOT/native-cache.tgz" -C "$CACHE_ROOT" bundle seed
+          xcodebuild -version > "$EVIDENCE_ROOT/toolchain.txt"
+          xcrun --sdk iphonesimulator --show-sdk-version >> "$EVIDENCE_ROOT/toolchain.txt"
+          node --version >> "$EVIDENCE_ROOT/toolchain.txt"
+          pnpm --version >> "$EVIDENCE_ROOT/toolchain.txt"
+          node --input-type=module - <<'JS'
+          import {DefaultArtifactClient} from '@actions/artifact';
+          const root=process.env.EVIDENCE_ROOT;
+          await new DefaultArtifactClient().uploadArtifact('pi-action-verified-cache-evidence',[root+'/native-cache.tgz',root+'/toolchain.txt'],root,{retentionDays:1,compressionLevel:0});
+          JS
