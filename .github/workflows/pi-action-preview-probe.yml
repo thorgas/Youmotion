@@ -57,6 +57,7 @@ jobs:
           JS
       - name: Exercise real preview gateway and tunnel
         env:
+          PROBE_DIRECT_DNS: "1"
           PROBE_ROOT: ${{ runner.temp }}/preview-probe
           PROBE_TUNNEL: ${{ runner.temp }}/tools/cloudflared
           NODE_NO_WARNINGS: '1'
