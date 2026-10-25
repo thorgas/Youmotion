@@ -16,7 +16,7 @@ jobs:
       - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8
         with:
           repository: thorgas/pi-action
-          ref: 9b1578609d149378565e741ae924bdf61c7e17fc
+          ref: 8e2f823ba5b0bfc58c9fa0365bc71d2188f79e92
           token: ${{ secrets.PI_ACTION_HARNESS_READ_TOKEN }}
           persist-credentials: false
           path: pi-action-harness
@@ -73,7 +73,7 @@ jobs:
           import assert from 'node:assert/strict';
           import * as Effect from 'effect/Effect';import * as Exit from 'effect/Exit';
           import {mkdtemp,realpath,readFile,writeFile} from 'node:fs/promises';import {tmpdir} from 'node:os';import {join} from 'node:path';
-          const fixtureConfiguration=()=>({native:{qaLabel:'Settings',agentQa:false}});
+          const fixtureConfiguration=()=>({native:{qaLabel:'Settings',agentQa:false,deepLinkScheme:'exp+youmotion',metroPort:8084}});
            const {runSessionQa}=await import('../../apps/cli/src/session-runtime.ts');
            const {makeSqliteTaskStore}=await import('../../packages/task-store/src/sqlite.ts');
            const {makeTaskStorage}=await import('../../packages/core/src/tasks.ts');
