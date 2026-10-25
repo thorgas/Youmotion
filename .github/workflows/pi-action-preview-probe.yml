@@ -1,0 +1,69 @@
+name: pi-action preview probe
+on: workflow_dispatch
+permissions: {}
+jobs:
+  preview:
+    if: github.actor == github.repository_owner && github.repository == 'thorgas/Youmotion'
+    runs-on: macos-26
+    timeout-minutes: 12
+    defaults:
+      run:
+        working-directory: ${{ github.workspace }}/pi-action-harness
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8
+        with:
+          repository: thorgas/pi-action
+          ref: 6f5319a93919e8eb497aa5c71ed0b858d31c5d9b
+          token: ${{ secrets.PI_ACTION_HARNESS_READ_TOKEN }}
+          persist-credentials: false
+          path: pi-action-harness
+      - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444
+        with:
+          node-version: 24.21.0
+          architecture: arm64
+      - uses: pnpm/action-setup@a7487c7e89a18df4991f7f222e4898a00d66ddda
+        with:
+          version: 11.21.0
+          run_install: false
+      - run: pnpm install --frozen-lockfile --ignore-scripts --reporter=silent
+      - name: Prepare exact vendor and disposable simulator
+        run: |
+          mkdir -p "$RUNNER_TEMP/tools"
+          curl --fail --location --silent --show-error --output "$RUNNER_TEMP/tools/cloudflared.tgz" https://github.com/cloudflare/cloudflared/releases/download/2026.9.3/cloudflared-darwin-arm64.tgz
+          printf '%s  %s\n' 587c2cfb1c230fe36c7fa7727da78be459dae028cabe8c001291999350f07095 "$RUNNER_TEMP/tools/cloudflared.tgz" | shasum -a 256 --check --status
+          tar -xzf "$RUNNER_TEMP/tools/cloudflared.tgz" -C "$RUNNER_TEMP/tools"
+          device="$(xcrun simctl create pi-action-preview-probe com.apple.CoreSimulator.SimDeviceType.iPhone-17 com.apple.CoreSimulator.SimRuntime.iOS-26-2)"
+          printf 'PROBE_DEVICE=%s\n' "$device" >> "$GITHUB_ENV"
+      - name: Write credential-free preview probe
+        run: |
+          mkdir -p .local/cache-import-e2e-2026-10-24
+          cat > .local/cache-import-e2e-2026-10-24/preview-probe.mjs <<'JS'
+          import https from 'node:https';import {resolve4} from 'node:dns/promises';import {Readable} from 'node:stream';
+          import {spawn,execFileSync} from 'node:child_process';import {resolve} from 'node:path';import {mkdirSync,writeFileSync,appendFileSync,readFileSync} from 'node:fs';import {randomBytes} from 'node:crypto';import * as Effect from 'effect/Effect';import {startPreviewTunnel} from '../../packages/runner/src/preview-tunnel.ts';import {runNativePreparationCommand} from '../../packages/runner/src/native-command.ts';import {startPublishedPreview} from '../../tooling/native-preview/published-preview.mjs';
+          const nativeFetch=(url,options)=>new Promise((done,fail)=>{const request=https.request(url,{headers:options.headers,signal:options.signal,lookup:(host,opts,cb)=>resolve4(host).then(a=>opts.all?cb(null,a.map(address=>({address,family:4}))):cb(null,a[0],4),cb)},response=>done(new Response(Readable.toWeb(response),{status:response.statusCode,headers:response.headers})));request.on('error',fail);request.end();});const fetchProbe=process.env.PROBE_DIRECT_DNS==='1'?nativeFetch:fetch;
+          const root=resolve(process.env.PROBE_ROOT??'.local/cache-import-e2e-2026-10-24/preview-probe');mkdirSync(root,{recursive:true,mode:0o700});const device=process.env.PROBE_DEVICE??readFileSync('.local/cache-import-e2e-2026-10-24/preview-probe-device.txt','utf8').trim();const executable=resolve(process.env.PROBE_TUNNEL??'.local/cache-import-e2e-2026-10-24/vendor/cloudflared');const env={PATH:'/usr/bin:/bin'};const diagnostics=[];const emit=x=>console.log(JSON.stringify(x));
+          const inventory=JSON.parse(execFileSync('/usr/bin/xcrun',['simctl','list','devices','available','--json'],{env,encoding:'utf8'}));const booted=Object.values(inventory.devices).flat().find(x=>x.udid===device)?.state==='Booted';
+          for(const operation of (booted?['bootstatus']:['boot','bootstatus'])){await runNativePreparationCommand({executable:'/usr/bin/xcrun',arguments:['simctl',operation,device,...(operation==='bootstatus'?['-b']:[])],cwd:root,environment:env,signal:new AbortController().signal,activityPhase:operation==='bootstatus'?'simulator-readiness':'simulator-start'});}
+          const secret=randomBytes(48).toString('base64url');const secretFile=root+'/secret';writeFileSync(secretFile,secret,{mode:0o600});const raw=root+'/vendor.log';writeFileSync(raw,'',{mode:0o600});let logged=0,frames=0,localOrigin,publicOrigin,stage='setup';const context={taskId:'preview-probe',attemptId:'preview-probe',generation:1,userId:'probe',expiresAt:Date.now()+180000,device};
+          const gateway=await startPublishedPreview({context,secretFile,currentLease:()=>context,maxSessionMs:180000,onFrame:()=>frames++});localOrigin=gateway.localOrigin;
+          try{await Effect.runPromise(Effect.scoped(Effect.gen(function*(){const tunnel=yield* startPreviewTunnel({localOrigin,executable,reportDiagnostic:x=>{diagnostics.push(x);emit(x);},spawnChild:({executable,args,env})=>{const child=spawn(executable,args,{env,stdio:['ignore','pipe','pipe']});for(const stream of [child.stdout,child.stderr])stream.on('data',b=>{logged+=b.length;if(logged<=65536)appendFileSync(raw,b);});return child;}});publicOrigin=tunnel.origin;gateway.publishOrigin(publicOrigin);const headers={authorization:'Basic '+Buffer.from('probe:'+secret).toString('base64')};yield* Effect.tryPromise(async()=>{stage='health';let ready=false;const limit=Date.now()+60000;let status;let network;while(Date.now()<limit){try{const r=await fetchProbe(publicOrigin+'/healthz',{headers,signal:AbortSignal.timeout(3000)});status=r.status;await r.body?.cancel();if(r.status===200){ready=true;break;}}catch(error){if(network===undefined){emit({_tag:'ProbeNetworkShape',errorName:['Error','TypeError','AbortError','TimeoutError'].includes(error?.name)?error.name:'other',topCode:typeof error?.code==='string'&&/^[A-Z_0-9]{1,50}$/.test(error.code)?error.code:'other',previewHost:error?.cause?.hostname===new URL(publicOrigin).hostname,code:error?.cause?.code});try{const status=execFileSync('/usr/bin/curl',['--max-time','4','--silent','--output','/dev/null','--write-out','%{http_code}',publicOrigin],{env:{PATH:'/usr/bin:/bin'},encoding:'utf8'});emit({_tag:'ProbeCurlRoot',status});}catch{emit({_tag:'ProbeCurlRoot',failed:true});}}network=['ENOTFOUND','ECONNRESET','ECONNREFUSED','UND_ERR_CONNECT_TIMEOUT'].includes(error?.cause?.code)?error.cause.code:'other';}await new Promise(r=>setTimeout(r,500));}emit({_tag:'ProbeHealthResult',ready,status,network});if(!ready)throw Error('probe-health');emit({_tag:'ProbeHealth',ready});});
+          stage='stream';const result=yield* Effect.raceFirst(tunnel.waitForExit,Effect.tryPromise(async()=>{const r=await fetchProbe(publicOrigin+'/.sim/helper/'+device+'/stream.mjpeg',{headers,signal:AbortSignal.timeout(90000)});const reader=r.body.getReader();let bytes=0,previous=0,completed=false;try{while(bytes<16777216){const part=await reader.read();if(part.done)break;for(const x of part.value){bytes++;if(previous===255&&x===217)completed=true;previous=x;}if(completed)break;}}finally{await reader.cancel();}if(!completed)throw Error('probe-frame');await new Promise(r=>setTimeout(r,2000));return {status:r.status,frames,bytes,completeJpeg:completed};}));emit({_tag:'ProbeFrame',...result});})));}catch(error){emit({_tag:'ProbeFailed',tag:error?._tag??'unknown',stage});}finally{await gateway.close();}
+          const rawText=readFileSync(raw,'utf8');for(const line of rawText.split('\n'))for(const token of line.match(/[a-z][a-z0-9+.-]*:\/\/[^\s|\]]+/gi)??[]){let url;try{url=new URL(token)}catch{}emit({_tag:'ProbeUrlShape',knownUdpWarning:token==='https://github.com/quic-go/quic-go/wiki/UDP-Buffer-Sizes',scheme:url?.protocol,host:url&&['localhost','127.0.0.1','github.com','developers.cloudflare.com','www.cloudflare.com'].includes(url.hostname)?url.hostname:url?.hostname.endsWith('.trycloudflare.com')?'trycloudflare':'other',localPrefix:token.startsWith(localOrigin),publicPrefix:publicOrigin!==undefined&&token.startsWith(publicOrigin),path:url?.pathname==='/'?'root':url?.pathname.startsWith('/.sim/helper/')?'helper':'other',hasQuery:!!url?.search,hasUserInfo:!!url?.username,endsQuote:/["\\]$/.test(token),requestDiagnostic:line.includes('ERR Request failed'),originService:line.includes('originService='),destination:line.includes('dest=')});}
+          emit({_tag:'ProbeCleanup',closed:true,frames,diagnostics:diagnostics.length});
+          
+          if(frames<1||diagnostics.length!==0)process.exitCode=1;
+          JS
+      - name: Exercise real preview gateway and tunnel
+        env:
+          PROBE_DIRECT_DNS: "1"
+          PROBE_ROOT: ${{ runner.temp }}/preview-probe
+          PROBE_TUNNEL: ${{ runner.temp }}/tools/cloudflared
+          NODE_NO_WARNINGS: '1'
+        run: node .local/cache-import-e2e-2026-10-24/preview-probe.mjs
+      - name: Dispose only probe simulator
+        if: always() && env.PROBE_DEVICE != ''
+        run: |
+          xcrun simctl shutdown "$PROBE_DEVICE" || true
+          xcrun simctl delete "$PROBE_DEVICE"
