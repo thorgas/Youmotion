@@ -102,7 +102,12 @@ jobs:
           if node .local/cache-import-e2e-2026-10-24/native-app-hosted-repro.mjs > "$RUNNER_TEMP/native-app-qa-private.log" 2>&1; then
             printf '%s\n' '{"_tag":"NativeAppQaProbe","status":"ready","actualPiSourceAuthority":false,"actualPiQa":false}'
           else
-            printf '%s\n' '{"_tag":"NativeAppQaProbe","status":"failed","actualPiSourceAuthority":false,"actualPiQa":false}'
+            node --input-type=module <<'DIAG'
+          import {readFileSync} from 'node:fs';import {nativeAdapterVocabulary as v} from './packages/protocol/src/constants.ts';
+          let diagnostic;
+          for(const line of readFileSync(process.env.RUNNER_TEMP+'/native-app-qa-private.log','utf8').slice(-65536).split('\n')){try{const e=JSON.parse(line);if(e._tag!=='NativeQaFailure')continue;const d={stage:Object.values(v.fixtureStages).includes(e.stage)?e.stage:'unknown'};if(Object.values(v.startupStages).includes(e.startupDiagnostic?.stage)&&Object.values(v.startupReasons).includes(e.startupDiagnostic?.reason))d.startupDiagnostic=e.startupDiagnostic;if(e.selection){d.selection=Object.fromEntries(['buttonCount','staticTextCount','wrapperCount','unknownRoleCount'].flatMap(k=>Number.isSafeInteger(e.selection[k])&&e.selection[k]>=0&&e.selection[k]<=v.limits.refs?[[k,e.selection[k]]]:[]));d.selection.selected=e.selection.selected===true;}diagnostic=d;}catch{}}
+          console.log(JSON.stringify({_tag:'NativeAppQaProbe',status:'failed',diagnostic:diagnostic??null,actualPiSourceAuthority:false,actualPiQa:false}));
+          DIAG
             exit 1
           fi
       - name: Upload only synthetic app screenshots
