@@ -1,4 +1,4 @@
-name: pi-action native app QA probe
+name: pi-action verified cache viewer proof
 on: workflow_dispatch
 permissions: {}
 jobs:
@@ -16,7 +16,7 @@ jobs:
       - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8
         with:
           repository: thorgas/pi-action
-          ref: 6e6f2ce7753008aa86452e70797379222de8ab15
+          ref: d82f4295421df5e8cd739abb493816857fd9adf5
           token: ${{ secrets.PI_ACTION_HARNESS_READ_TOKEN }}
           persist-credentials: false
           path: pi-action-harness
@@ -39,83 +39,85 @@ jobs:
           path: ${{ runner.temp }}/pi-action-native-cache
           key: ${{ vars.PI_ACTION_NATIVE_CACHE_KEY }}
           fail-on-cache-miss: true
-      - name: Reproduce cached actual app QA without Pi or App credentials
+      - name: Verify restored cache and hold authenticated coding preview
         env:
           NODE_NO_WARNINGS: "1"
+          VIEWER_SECRET: ${{ secrets.PI_ACTION_VIEWER_SECRET }}
+          REVIEWED_PROFILE_JSON: ${{ vars.PI_ACTION_PROFILE_JSON }}
         run: |
           set -euo pipefail
           umask 077
+          trap 'rm -f "$RUNNER_TEMP/viewer-secret"' EXIT
+          test -n "$VIEWER_SECRET"
+          printf '%s' "$VIEWER_SECRET" > "$RUNNER_TEMP/viewer-secret"
+          unset VIEWER_SECRET
+          printf '%s' "$REVIEWED_PROFILE_JSON" > "$RUNNER_TEMP/viewer-profile.json"
+          unset REVIEWED_PROFILE_JSON
+          node tooling/github-actions/viewer-cache-probe.mjs "$RUNNER_TEMP/cache-precheck" "$RUNNER_TEMP/pi-action-native-cache" "$RUNNER_TEMP/viewer-profile.json" unused "$RUNNER_TEMP/viewer-secret" unused --verify-only
           app_source="$GITHUB_WORKSPACE/native-app-source"
           cp -R "$RUNNER_TEMP/pi-action-native-cache/seed/node_modules" "$app_source/node_modules"
           app_home="$RUNNER_TEMP/native-app-home"; app_tmp="$RUNNER_TEMP/native-app-tmp"
           mkdir -m 700 "$app_home" "$app_tmp"
           trusted_node="$(command -v node)"
           cd "$app_source"
-          env -i PATH="$PATH" HOME="$app_home" TMPDIR="$app_tmp" LANG=en_US.UTF-8 CI=1 EXPO_PUBLIC_E2E=true EXPO_NO_DOTENV=1 EXPO_NO_TELEMETRY=1 MOBILE_UPDATE_CHANNEL=none pnpm i18n:all > "$RUNNER_TEMP/native-app-i18n.log" 2>&1
-          env -i PATH="$PATH" HOME="$app_home" TMPDIR="$app_tmp" LANG=en_US.UTF-8 CI=1 EXPO_PUBLIC_E2E=true EXPO_NO_DOTENV=1 EXPO_NO_TELEMETRY=1 MOBILE_UPDATE_CHANNEL=none NODE_OPTIONS=--dns-result-order=ipv4first "$trusted_node" node_modules/expo/bin/cli start --dev-client --localhost --port 8084 > "$RUNNER_TEMP/native-app-metro.log" 2>&1 &
+          env -i PATH="$PATH" HOME="$app_home" TMPDIR="$app_tmp" LANG=en_US.UTF-8 CI=1 pnpm_config_verify_deps_before_run=warn EAS_BUILD_GIT_COMMIT_HASH=c0e1f445903238cd94b1420dddb12ce3450782a9 EXPO_UPDATES_FINGERPRINT_OVERRIDE=0000000000000000000000000000000000000000 EXPO_PUBLIC_E2E=true EXPO_NO_DOTENV=1 EXPO_NO_TELEMETRY=1 MOBILE_UPDATE_CHANNEL=none pnpm i18n:all > "$RUNNER_TEMP/native-app-i18n.log" 2>&1
+          env -i PATH="$PATH" HOME="$app_home" TMPDIR="$app_tmp" LANG=en_US.UTF-8 CI=1 pnpm_config_verify_deps_before_run=warn EAS_BUILD_GIT_COMMIT_HASH=c0e1f445903238cd94b1420dddb12ce3450782a9 EXPO_UPDATES_FINGERPRINT_OVERRIDE=0000000000000000000000000000000000000000 EXPO_PUBLIC_E2E=true EXPO_NO_DOTENV=1 EXPO_NO_TELEMETRY=1 MOBILE_UPDATE_CHANNEL=none NODE_OPTIONS=--dns-result-order=ipv4first "$trusted_node" node_modules/expo/bin/cli start --dev-client --localhost --port 8084 > "$RUNNER_TEMP/native-app-metro.log" 2>&1 &
           metro_pid=$!
+          device=""
+          cleanup() {
+            device_deleted=null
+            if test -n "$device"; then
+              xcrun simctl io "$device" screenshot "$RUNNER_TEMP/native-app-after.png" >/dev/null 2>&1 || true
+              if xcrun simctl delete "$device" >/dev/null 2>&1; then device_deleted=true; else device_deleted=false; fi
+            fi
+            kill "$metro_pid" >/dev/null 2>&1 || true
+            wait "$metro_pid" >/dev/null 2>&1 || true
+            if kill -0 "$metro_pid" >/dev/null 2>&1; then metro_stopped=false; else metro_stopped=true; fi
+            printf '{"simulatorDeleted":%s,"metroStopped":%s}\n' "$device_deleted" "$metro_stopped" > "$RUNNER_TEMP/shell-cleanup.json"
+            rm -f "$RUNNER_TEMP/viewer-secret"
+          }
+          trap cleanup EXIT
           cd "$GITHUB_WORKSPACE/pi-action-harness"
-          device="$(xcrun simctl create pi-action-native-app-probe com.apple.CoreSimulator.SimDeviceType.iPhone-17 com.apple.CoreSimulator.SimRuntime.iOS-26-2)"
-          trap 'xcrun simctl io "$device" screenshot "$RUNNER_TEMP/native-app-after.png" >/dev/null 2>&1 || true; kill "$metro_pid" >/dev/null 2>&1 || true; xcrun simctl delete "$device" >/dev/null 2>&1 || true' EXIT
+          xcrun simctl list runtimes --json > "$RUNNER_TEMP/viewer-runtimes.json"
+          runtime="$(node --input-type=module - "$RUNNER_TEMP/viewer-profile.json" "$RUNNER_TEMP/viewer-runtimes.json" <<'JS'
+          import { readFileSync } from 'node:fs';
+          const profile = JSON.parse(readFileSync(process.argv[2], 'utf8'));
+          const runtimes = JSON.parse(readFileSync(process.argv[3], 'utf8')).runtimes;
+          const runtime = runtimes.find(value => value.identifier === profile.native.runtimeIdentifier && value.isAvailable === true);
+          const parts = runtime?.version.split('.').map(Number);
+          if (!parts || parts[0] * 65536 + (parts[1] ?? 0) * 256 + (parts[2] ?? 0) !== profile.native.simulatorOsVersion) process.exit(1);
+          process.stdout.write(runtime.identifier);
+          JS
+          )"
+          device="$(xcrun simctl create pi-action-native-app-probe com.apple.CoreSimulator.SimDeviceType.iPhone-17 "$runtime")"
           xcrun simctl boot "$device"
           xcrun simctl bootstatus "$device" -b >/dev/null
           app="$RUNNER_TEMP/pi-action-native-cache/bundle/artifact.app"
           codesign --verify --deep --strict "$app"
           xcrun simctl install "$device" "$app"
-          mkdir -p .local/cache-import-e2e-2026-10-24
-          printf '%s' "$device" > .local/cache-import-e2e-2026-10-24/native-input-device2.txt
-          xcrun simctl launch "$device" com.youmotion.mobile > .local/cache-import-e2e-2026-10-24/native-input-app-pid2.txt
+          xcrun simctl launch "$device" com.youmotion.mobile -EXDevMenuDisableAutoLaunch YES -EXDevMenuShowsAtLaunch NO -EXDevMenuIsOnboardingFinished YES > "$RUNNER_TEMP/app-launch.txt"
           for attempt in {1..120}; do if curl -fsS http://127.0.0.1:8084/status > /dev/null; then break; fi; sleep 2; done
           curl -fsS http://127.0.0.1:8084/status > /dev/null
           xcrun simctl openurl "$device" 'exp+youmotion://expo-development-client/?url=http%3A%2F%2F127.0.0.1%3A8084&disableOnboarding=1'
           xcrun simctl io "$device" screenshot "$RUNNER_TEMP/native-app-before.png" >/dev/null 2>&1
-          cat > .local/cache-import-e2e-2026-10-24/native-app-hosted-repro.mjs <<'JS'
-          import assert from 'node:assert/strict';
-          import * as Effect from 'effect/Effect';import * as Exit from 'effect/Exit';
-          import {mkdtemp,realpath,readFile,writeFile} from 'node:fs/promises';import {tmpdir} from 'node:os';import {join} from 'node:path';
-          import {makeSessionTelemetry} from '../../apps/cli/src/session-runtime.ts';
-          const fixtureConfiguration=()=>({native:{qaLabel:'Settings',agentQa:false,deepLinkScheme:'exp+youmotion',metroPort:8084}});
-           const {runSessionQa}=await import('../../apps/cli/src/session-runtime.ts');
-           const {makeSqliteTaskStore}=await import('../../packages/task-store/src/sqlite.ts');
-           const {makeTaskStorage}=await import('../../packages/core/src/tasks.ts');
-           const {makePreparationExclusivity}=await import('../../packages/runner/src/preparation-lock.ts');
-           const {reduceTaskLifecycle,reducePreparationLifecycle}=await import('../../packages/core/src/task-machine.ts');
-           const {fork}=await import('node:child_process');
-           for(const expectedReady of [true]){
-           const directory=await realpath(await mkdtemp(join(tmpdir(),'pi-qa-navigation-')));
-           try{await Effect.runPromise(Effect.scoped(Effect.gen(function*(){
-            const now=()=>1;const store=yield* Effect.acquireRelease(makeSqliteTaskStore({path:':memory:',now}),(owned)=>owned.close.pipe(Effect.orDie));
-            const taskId='fixture-task';yield* store.admit({taskId,requestId:'request-1',payloadHash:'a'.repeat(64),initialBudget:3});
-            yield* store.acquireLease({taskId,operationId:'lease-1',attemptId:'attempt-1',workerId:'worker-1',expectedGeneration:0,expiresAt:now()+60000});
-            const staged=yield* store.stageLifecycle({taskId,eventId:'prepare-1',expectedCursor:0,type:'PREPARE_REQUESTED',attemptId:'attempt-1',generation:1},reduceTaskLifecycle);
-            const prepared=yield* store.issuePreparation({taskId,operationId:staged.outbox[0].operationId,attemptId:'attempt-1',generation:1,expectedCursor:staged.checkpoint.cursor,runnerId:'runner-1'});
-            yield* store.recordPreparationObservation(prepared.permit,{...prepared.permit,outcome:'allocated',manifestHash:'f'.repeat(64)},reducePreparationLifecycle);
-            const deviceId=(yield* Effect.promise(()=>readFile(new URL('./native-input-device2.txt',import.meta.url),'utf8'))).trim();const appPid=Number((yield* Effect.promise(()=>readFile(new URL('./native-input-app-pid2.txt',import.meta.url),'utf8'))).trim().split(': ')[1]);
-            const ownership=yield* store.bindSimulatorControl({taskId,operationId:'control-bind-1',preparationOperationId:prepared.permit.operationId,attemptId:'attempt-1',generation:1,deviceId,bindingManifestHash:'b'.repeat(64),owner:'agent'});
-            const route=join(directory,'route.json');yield* Effect.promise(()=>writeFile(route,JSON.stringify({labels:expectedReady?['Open','Close','Skip','Today','Settings']:['Unreviewed','Close','Skip','Today','Settings'],index:0}),{mode:0o600}));
-            const config=fixtureConfiguration(directory);config.deadline=Date.now()+900000;config.native.qaStartupLabels=['Open','Close','Skip','Today'];config.native.qaScreenLabels=['TODAY'];
-            const lock=yield* makePreparationExclusivity({directory});const telemetry=yield* makeSessionTelemetry(directory);
-            const result=yield* Effect.exit(runSessionQa({config,codingOptions:{},storage:makeTaskStorage(store),lock,telemetry,candidate:{taskId,candidateHash:'a'.repeat(64),writerRevision:1},ownership,launched:{bundleId:'com.youmotion.mobile',appPid},stateRoot:directory,qaOperationId:'qa-input'}));
-            assert.equal(Exit.isSuccess(result),expectedReady);if(Exit.isSuccess(result))assert.equal(result.value.input.status.phase,'ready');assert.ok(Exit.isSuccess(result));if(Exit.isSuccess(result))assert.ok(result.value.snapshot.nodes.some(node=>node.label.includes('Settings')));
-           })));}finally{console.log(JSON.stringify({localEvidenceRoot:directory}));}
-           }
-          JS
-          if node .local/cache-import-e2e-2026-10-24/native-app-hosted-repro.mjs > "$RUNNER_TEMP/native-app-qa-private.log" 2>&1; then
-            printf '%s\n' '{"_tag":"NativeAppQaProbe","status":"ready","actualPiSourceAuthority":false,"actualPiQa":false}'
-          else
-            node --input-type=module <<'DIAG'
-          import {readFileSync} from 'node:fs';import {nativeAdapterVocabulary as v} from './packages/protocol/src/constants.ts';
-          let diagnostic;
-          for(const line of readFileSync(process.env.RUNNER_TEMP+'/native-app-qa-private.log','utf8').slice(-65536).split('\n')){try{const e=JSON.parse(line);if(e._tag!=='NativeQaFailure')continue;const d={stage:Object.values(v.fixtureStages).includes(e.stage)?e.stage:'unknown'};if(Object.values(v.startupStages).includes(e.startupDiagnostic?.stage)&&Object.values(v.startupReasons).includes(e.startupDiagnostic?.reason))d.startupDiagnostic=e.startupDiagnostic;if(e.selection){d.selection=Object.fromEntries(['buttonCount','staticTextCount','wrapperCount','unknownRoleCount'].flatMap(k=>Number.isSafeInteger(e.selection[k])&&e.selection[k]>=0&&e.selection[k]<=v.limits.refs?[[k,e.selection[k]]]:[]));d.selection.selected=e.selection.selected===true;}diagnostic=d;}catch{}}
-          console.log(JSON.stringify({_tag:'NativeAppQaProbe',status:'failed',diagnostic:diagnostic??null,actualPiSourceAuthority:false,actualPiQa:false}));
-          DIAG
-            exit 1
-          fi
-      - name: Upload only synthetic app screenshots
+          mkdir -m 700 "$RUNNER_TEMP/viewer-tools"
+          curl --max-time 120 --fail --location --silent --show-error --output "$RUNNER_TEMP/viewer-tools/cloudflared.tgz" https://github.com/cloudflare/cloudflared/releases/download/2026.9.3/cloudflared-darwin-arm64.tgz
+          printf '%s  %s\n' 587c2cfb1c230fe36c7fa7727da78be459dae028cabe8c001291999350f07095 "$RUNNER_TEMP/viewer-tools/cloudflared.tgz" | shasum -a 256 --check --status
+          tar -xzf "$RUNNER_TEMP/viewer-tools/cloudflared.tgz" -C "$RUNNER_TEMP/viewer-tools"
+          node tooling/github-actions/viewer-cache-probe.mjs "$RUNNER_TEMP/viewer-proof" "$RUNNER_TEMP/pi-action-native-cache" "$RUNNER_TEMP/viewer-profile.json" "$device" "$RUNNER_TEMP/viewer-secret" "$RUNNER_TEMP/viewer-tools/cloudflared"
+      - name: Save verified frozen cache copy under task-owned immutable key
+        uses: actions/cache/save@0400d5f644dc74513175e3cd8d07132dd4860809
+        with:
+          path: ${{ runner.temp }}/pi-action-native-cache
+          key: pi-action-viewer-proof-${{ github.run_id }}
+      - name: Upload receipts and actual app screenshots
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
-          name: native-app-probe-screenshots
-          path: ${{ runner.temp }}/native-app-*.png
+          name: viewer-cache-proof-${{ github.run_id }}
+          path: |
+            ${{ runner.temp }}/viewer-proof/receipt.json
+            ${{ runner.temp }}/shell-cleanup.json
+            ${{ runner.temp }}/native-app-*.png
           retention-days: 1
-          if-no-files-found: ignore
+          if-no-files-found: error
