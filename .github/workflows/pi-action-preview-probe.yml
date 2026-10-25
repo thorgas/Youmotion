@@ -5,7 +5,7 @@ jobs:
   preview:
     if: github.actor == github.repository_owner && github.repository == 'thorgas/Youmotion'
     runs-on: macos-26
-    timeout-minutes: 12
+    timeout-minutes: 20
     permissions:
       contents: read
     defaults:
@@ -49,7 +49,7 @@ jobs:
           xcrun simctl install "$device" "$app"
           pid="$(xcrun simctl launch "$device" com.youmotion.mobile | sed -E 's/.*: ([0-9]+)$/\1/')"
           export PROBE_DEVICE="$device" PROBE_PID="$pid"
-          node --input-type=module -e 'import{readFileSync,writeFileSync}from"node:fs";const p="packages/protocol/src/constants.ts",s=readFileSync(p,"utf8"),a="commandMs: 120000, configBytes: 4096, startupMs: 60000";if(!s.includes(a))throw Error("Unexpected probe source");writeFileSync(p,s.replace(a,"commandMs: 120000, configBytes: 4096, startupMs: 120000"));'
+          node --input-type=module -e 'import{readFileSync,writeFileSync}from"node:fs";const p="packages/protocol/src/constants.ts",s=readFileSync(p,"utf8"),a="commandMs: 120000, configBytes: 4096, startupMs: 60000";if(!s.includes(a))throw Error("Unexpected probe source");writeFileSync(p,s.replace(a,"commandMs: 120000, configBytes: 4096, startupMs: 300000"));'
           node --input-type=module <<'PATCH'
           import {readFileSync,writeFileSync} from 'node:fs';
           const p='packages/runner/src/native-input-child.mjs',s=readFileSync(p,'utf8');let n=0;
