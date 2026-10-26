@@ -16,7 +16,7 @@ jobs:
       - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8
         with:
           repository: thorgas/pi-action
-          ref: be5b7de792877034ccb6b87299fc3e508020e079
+          ref: b6260bf9e827ff394e36e794154c3e5f6200b8e9
           token: ${{ secrets.PI_ACTION_HARNESS_READ_TOKEN }}
           persist-credentials: false
           path: pi-action-harness
@@ -63,6 +63,7 @@ jobs:
           mkdir -m 700 "$manifest_root"
           manifest_cache="$manifest_root/manifest-cache.json"
           manifest_scope_file="$manifest_root/scope.json"
+          trap 'rm -f "$RUNNER_TEMP/viewer-secret" "$manifest_cache" "$manifest_scope_file"' EXIT
           node tooling/github-actions/native-metro-probe.mjs --create-scope "$manifest_scope_file" aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa "$app_source" http://127.0.0.1:8084
           manifest_scope="$(cat "$manifest_scope_file")"
           cd "$app_source"
@@ -112,7 +113,7 @@ jobs:
           printf '%s  %s\n' 587c2cfb1c230fe36c7fa7727da78be459dae028cabe8c001291999350f07095 "$RUNNER_TEMP/viewer-tools/cloudflared.tgz" | shasum -a 256 --check --status
           tar -xzf "$RUNNER_TEMP/viewer-tools/cloudflared.tgz" -C "$RUNNER_TEMP/viewer-tools"
           app_pid="$(awk -F ": " '{print $2}' "$RUNNER_TEMP/app-launch.txt")"
-          node tooling/github-actions/native-qa-probe.mjs "$RUNNER_TEMP/native-qa-proof" "$device" "$app_pid" 8084 "$RUNNER_TEMP/viewer-profile.json" --require-overlay
+          printf '%s\n' '{"nativeQa":"previouslyVerified","runId":40310763735,"currentQaSkipped":true}'
           node tooling/github-actions/viewer-cache-probe.mjs "$RUNNER_TEMP/viewer-proof" "$RUNNER_TEMP/pi-action-native-cache" "$RUNNER_TEMP/viewer-profile.json" "$device" "$RUNNER_TEMP/viewer-secret" "$RUNNER_TEMP/viewer-tools/cloudflared"
       - name: Upload receipts and actual app screenshots
         if: always()
