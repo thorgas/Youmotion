@@ -16,7 +16,7 @@ jobs:
       - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8
         with:
           repository: thorgas/pi-action
-          ref: f572fd2a6cb5837a5f66697d58a8e43b5bb7358c
+          ref: 94ccba5ce3fc5518afc3f427f4a8e9c886caddaf
           token: ${{ secrets.PI_ACTION_HARNESS_READ_TOKEN }}
           persist-credentials: false
           path: pi-action-harness
@@ -61,7 +61,7 @@ jobs:
           trusted_node="$(command -v node)"
           cd "$app_source"
           env -i PATH="$PATH" HOME="$app_home" TMPDIR="$app_tmp" LANG=en_US.UTF-8 CI=1 pnpm_config_verify_deps_before_run=warn EAS_BUILD_GIT_COMMIT_HASH=c0e1f445903238cd94b1420dddb12ce3450782a9 EXPO_UPDATES_FINGERPRINT_OVERRIDE=0000000000000000000000000000000000000000 EXPO_PUBLIC_E2E=true EXPO_NO_DOTENV=1 EXPO_NO_TELEMETRY=1 MOBILE_UPDATE_CHANNEL=none pnpm i18n:all > "$RUNNER_TEMP/native-app-i18n.log" 2>&1
-          env -i PATH="$PATH" HOME="$app_home" TMPDIR="$app_tmp" LANG=en_US.UTF-8 CI=1 pnpm_config_verify_deps_before_run=warn EAS_BUILD_GIT_COMMIT_HASH=c0e1f445903238cd94b1420dddb12ce3450782a9 EXPO_UPDATES_FINGERPRINT_OVERRIDE=0000000000000000000000000000000000000000 EXPO_PUBLIC_E2E=true EXPO_NO_DOTENV=1 EXPO_NO_TELEMETRY=1 MOBILE_UPDATE_CHANNEL=none NODE_OPTIONS=--dns-result-order=ipv4first "$trusted_node" node_modules/expo/bin/cli start --dev-client --localhost --port 8084 > "$RUNNER_TEMP/native-app-metro.log" 2>&1 &
+          env -i PATH="$PATH" HOME="$app_home" TMPDIR="$app_tmp" LANG=en_US.UTF-8 CI=1 pnpm_config_verify_deps_before_run=warn EAS_BUILD_GIT_COMMIT_HASH=c0e1f445903238cd94b1420dddb12ce3450782a9 EXPO_UPDATES_FINGERPRINT_OVERRIDE=0000000000000000000000000000000000000000 EXPO_PUBLIC_E2E=true EXPO_NO_DOTENV=1 EXPO_NO_TELEMETRY=1 MOBILE_UPDATE_CHANNEL=none PI_ACTION_METRO_DIAGNOSTICS_FILE="$RUNNER_TEMP/metro-requests.jsonl" NODE_OPTIONS="--dns-result-order=ipv4first --require=$GITHUB_WORKSPACE/pi-action-harness/tooling/github-actions/metro-request-diagnostics.cjs" "$trusted_node" node_modules/expo/bin/cli start --dev-client --localhost --port 8084 > "$RUNNER_TEMP/native-app-metro.log" 2>&1 &
           metro_pid=$!
           device=""
           cleanup() {
@@ -99,6 +99,7 @@ jobs:
           curl -fsS http://127.0.0.1:8084/status > /dev/null
           node tooling/github-actions/native-metro-probe.mjs "$RUNNER_TEMP/native-metro-receipt.json" http://127.0.0.1:8084
           xcrun simctl launch "$device" com.youmotion.mobile -EXDevMenuDisableAutoLaunch NO -EXDevMenuShowsAtLaunch YES -EXDevMenuIsOnboardingFinished NO --initialUrl http://127.0.0.1:8084 > "$RUNNER_TEMP/app-launch.txt"
+          node tooling/github-actions/native-metro-client-probe.mjs "$RUNNER_TEMP/metro-requests.jsonl" "$RUNNER_TEMP/native-metro-client-receipt.json"
           xcrun simctl io "$device" screenshot "$RUNNER_TEMP/native-app-before.png" >/dev/null 2>&1
           mkdir -m 700 "$RUNNER_TEMP/viewer-tools"
           curl --max-time 120 --fail --location --silent --show-error --output "$RUNNER_TEMP/viewer-tools/cloudflared.tgz" https://github.com/cloudflare/cloudflared/releases/download/2026.9.3/cloudflared-darwin-arm64.tgz
@@ -116,6 +117,8 @@ jobs:
             ${{ runner.temp }}/viewer-proof/receipt.json
             ${{ runner.temp }}/native-qa-proof/receipt.json
             ${{ runner.temp }}/native-qa-proof/native-qa-failure.json
+            ${{ runner.temp }}/native-metro-client-receipt.json
+            ${{ runner.temp }}/metro-requests.jsonl
             ${{ runner.temp }}/native-metro-receipt.json
             ${{ runner.temp }}/shell-cleanup.json
             ${{ runner.temp }}/native-app-*.png
