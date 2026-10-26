@@ -16,7 +16,7 @@ jobs:
       - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8
         with:
           repository: thorgas/pi-action
-          ref: 539f0908fc928bfb164dfd6ae387bfc120d1d11d
+          ref: ff6e673a6dc569361a994482c2325520d930bea0
           token: ${{ secrets.PI_ACTION_HARNESS_READ_TOKEN }}
           persist-credentials: false
           path: pi-action-harness
@@ -98,6 +98,7 @@ jobs:
           xcrun simctl launch "$device" com.youmotion.mobile -EXDevMenuDisableAutoLaunch NO -EXDevMenuShowsAtLaunch YES -EXDevMenuIsOnboardingFinished NO > "$RUNNER_TEMP/app-launch.txt"
           for attempt in {1..120}; do if curl -fsS http://127.0.0.1:8084/status > /dev/null; then break; fi; sleep 2; done
           curl -fsS http://127.0.0.1:8084/status > /dev/null
+          node tooling/github-actions/native-metro-probe.mjs "$RUNNER_TEMP/native-metro-receipt.json" http://127.0.0.1:8084
           xcrun simctl openurl "$device" 'exp+youmotion://expo-development-client/?url=http%3A%2F%2F127.0.0.1%3A8084&disableOnboarding=1'
           xcrun simctl io "$device" screenshot "$RUNNER_TEMP/native-app-before.png" >/dev/null 2>&1
           mkdir -m 700 "$RUNNER_TEMP/viewer-tools"
@@ -116,6 +117,7 @@ jobs:
             ${{ runner.temp }}/viewer-proof/receipt.json
             ${{ runner.temp }}/native-qa-proof/receipt.json
             ${{ runner.temp }}/native-qa-proof/native-qa-failure.json
+            ${{ runner.temp }}/native-metro-receipt.json
             ${{ runner.temp }}/shell-cleanup.json
             ${{ runner.temp }}/native-app-*.png
           retention-days: 1
