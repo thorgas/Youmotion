@@ -16,7 +16,7 @@ jobs:
       - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8
         with:
           repository: thorgas/pi-action
-          ref: 4ec1dd099fb426b935f7f5d7e0f8888fd6866317
+          ref: f572fd2a6cb5837a5f66697d58a8e43b5bb7358c
           token: ${{ secrets.PI_ACTION_HARNESS_READ_TOKEN }}
           persist-credentials: false
           path: pi-action-harness
@@ -95,11 +95,10 @@ jobs:
           app="$RUNNER_TEMP/pi-action-native-cache/bundle/artifact.app"
           codesign --verify --deep --strict "$app"
           xcrun simctl install "$device" "$app"
-          xcrun simctl launch "$device" com.youmotion.mobile -EXDevMenuDisableAutoLaunch NO -EXDevMenuShowsAtLaunch YES -EXDevMenuIsOnboardingFinished NO > "$RUNNER_TEMP/app-launch.txt"
           for attempt in {1..120}; do if curl -fsS http://127.0.0.1:8084/status > /dev/null; then break; fi; sleep 2; done
           curl -fsS http://127.0.0.1:8084/status > /dev/null
           node tooling/github-actions/native-metro-probe.mjs "$RUNNER_TEMP/native-metro-receipt.json" http://127.0.0.1:8084
-          xcrun simctl openurl "$device" 'exp+youmotion://expo-development-client/?url=http%3A%2F%2F127.0.0.1%3A8084&disableOnboarding=1'
+          xcrun simctl launch "$device" com.youmotion.mobile -EXDevMenuDisableAutoLaunch NO -EXDevMenuShowsAtLaunch YES -EXDevMenuIsOnboardingFinished NO --initialUrl http://127.0.0.1:8084 > "$RUNNER_TEMP/app-launch.txt"
           xcrun simctl io "$device" screenshot "$RUNNER_TEMP/native-app-before.png" >/dev/null 2>&1
           mkdir -m 700 "$RUNNER_TEMP/viewer-tools"
           curl --max-time 120 --fail --location --silent --show-error --output "$RUNNER_TEMP/viewer-tools/cloudflared.tgz" https://github.com/cloudflare/cloudflared/releases/download/2026.9.3/cloudflared-darwin-arm64.tgz
