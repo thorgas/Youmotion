@@ -16,7 +16,7 @@ jobs:
       - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8
         with:
           repository: thorgas/pi-action
-          ref: 94ccba5ce3fc5518afc3f427f4a8e9c886caddaf
+          ref: be5b7de792877034ccb6b87299fc3e508020e079
           token: ${{ secrets.PI_ACTION_HARNESS_READ_TOKEN }}
           persist-credentials: false
           path: pi-action-harness
@@ -59,9 +59,15 @@ jobs:
           app_home="$RUNNER_TEMP/native-app-home"; app_tmp="$RUNNER_TEMP/native-app-tmp"
           mkdir -m 700 "$app_home" "$app_tmp"
           trusted_node="$(command -v node)"
+          manifest_root="$RUNNER_TEMP/native-metro-private"
+          mkdir -m 700 "$manifest_root"
+          manifest_cache="$manifest_root/manifest-cache.json"
+          manifest_scope_file="$manifest_root/scope.json"
+          node tooling/github-actions/native-metro-probe.mjs --create-scope "$manifest_scope_file" aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa "$app_source" http://127.0.0.1:8084
+          manifest_scope="$(cat "$manifest_scope_file")"
           cd "$app_source"
           env -i PATH="$PATH" HOME="$app_home" TMPDIR="$app_tmp" LANG=en_US.UTF-8 CI=1 pnpm_config_verify_deps_before_run=warn EAS_BUILD_GIT_COMMIT_HASH=c0e1f445903238cd94b1420dddb12ce3450782a9 EXPO_UPDATES_FINGERPRINT_OVERRIDE=0000000000000000000000000000000000000000 EXPO_PUBLIC_E2E=true EXPO_NO_DOTENV=1 EXPO_NO_TELEMETRY=1 MOBILE_UPDATE_CHANNEL=none pnpm i18n:all > "$RUNNER_TEMP/native-app-i18n.log" 2>&1
-          env -i PATH="$PATH" HOME="$app_home" TMPDIR="$app_tmp" LANG=en_US.UTF-8 CI=1 pnpm_config_verify_deps_before_run=warn EAS_BUILD_GIT_COMMIT_HASH=c0e1f445903238cd94b1420dddb12ce3450782a9 EXPO_UPDATES_FINGERPRINT_OVERRIDE=0000000000000000000000000000000000000000 EXPO_PUBLIC_E2E=true EXPO_NO_DOTENV=1 EXPO_NO_TELEMETRY=1 MOBILE_UPDATE_CHANNEL=none PI_ACTION_METRO_DIAGNOSTICS_FILE="$RUNNER_TEMP/metro-requests.jsonl" NODE_OPTIONS="--dns-result-order=ipv4first --require=$GITHUB_WORKSPACE/pi-action-harness/tooling/github-actions/metro-request-diagnostics.cjs" "$trusted_node" node_modules/expo/bin/cli start --dev-client --localhost --port 8084 > "$RUNNER_TEMP/native-app-metro.log" 2>&1 &
+          env -i PATH="$PATH" HOME="$app_home" TMPDIR="$app_tmp" LANG=en_US.UTF-8 CI=1 pnpm_config_verify_deps_before_run=warn EAS_BUILD_GIT_COMMIT_HASH=c0e1f445903238cd94b1420dddb12ce3450782a9 EXPO_UPDATES_FINGERPRINT_OVERRIDE=0000000000000000000000000000000000000000 EXPO_PUBLIC_E2E=true EXPO_NO_DOTENV=1 EXPO_NO_TELEMETRY=1 MOBILE_UPDATE_CHANNEL=none PI_ACTION_METRO_DIAGNOSTICS_FILE="$RUNNER_TEMP/metro-requests.jsonl" PI_ACTION_METRO_MANIFEST_CACHE_FILE="$manifest_cache" PI_ACTION_METRO_MANIFEST_SCOPE="$manifest_scope" "$trusted_node" --dns-result-order=ipv4first --require "$GITHUB_WORKSPACE/pi-action-harness/tooling/github-actions/metro-request-diagnostics.cjs" node_modules/expo/bin/cli start --dev-client --localhost --port 8084 > "$RUNNER_TEMP/native-app-metro.log" 2>&1 &
           metro_pid=$!
           device=""
           cleanup() {
@@ -74,7 +80,7 @@ jobs:
             wait "$metro_pid" >/dev/null 2>&1 || true
             if kill -0 "$metro_pid" >/dev/null 2>&1; then metro_stopped=false; else metro_stopped=true; fi
             printf '{"simulatorDeleted":%s,"metroStopped":%s}\n' "$device_deleted" "$metro_stopped" > "$RUNNER_TEMP/shell-cleanup.json"
-            rm -f "$RUNNER_TEMP/viewer-secret"
+            rm -f "$RUNNER_TEMP/viewer-secret" "$manifest_cache" "$manifest_scope_file"
           }
           trap cleanup EXIT
           cd "$GITHUB_WORKSPACE/pi-action-harness"
@@ -97,7 +103,7 @@ jobs:
           xcrun simctl install "$device" "$app"
           for attempt in {1..120}; do if curl -fsS http://127.0.0.1:8084/status > /dev/null; then break; fi; sleep 2; done
           curl -fsS http://127.0.0.1:8084/status > /dev/null
-          node tooling/github-actions/native-metro-probe.mjs "$RUNNER_TEMP/native-metro-receipt.json" http://127.0.0.1:8084
+          node tooling/github-actions/native-metro-probe.mjs "$RUNNER_TEMP/native-metro-receipt.json" http://127.0.0.1:8084 "$manifest_cache" "$manifest_scope_file"
           xcrun simctl launch "$device" com.youmotion.mobile -EXDevMenuDisableAutoLaunch NO -EXDevMenuShowsAtLaunch YES -EXDevMenuIsOnboardingFinished NO --initialUrl http://127.0.0.1:8084 > "$RUNNER_TEMP/app-launch.txt"
           node tooling/github-actions/native-metro-client-probe.mjs "$RUNNER_TEMP/metro-requests.jsonl" "$RUNNER_TEMP/native-metro-client-receipt.json"
           xcrun simctl io "$device" screenshot "$RUNNER_TEMP/native-app-before.png" >/dev/null 2>&1
