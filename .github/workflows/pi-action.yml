@@ -45,6 +45,12 @@ jobs:
       pull-requests: read
       issues: read
       actions: read
+    env:
+      PI_ACTION_MODEL_PROVIDER: ${{ vars.PI_ACTION_MODEL_PROVIDER || 'ollama' }}
+      PI_ACTION_MODEL_ID: ${{ vars.PI_ACTION_MODEL_ID }}
+      PI_ACTION_MODEL_BASE_URL: ${{ vars.PI_ACTION_MODEL_BASE_URL }}
+      PI_ACTION_MODEL_API: ${{ vars.PI_ACTION_MODEL_API }}
+      PI_ACTION_MODEL_CONTEXT_WINDOW: ${{ vars.PI_ACTION_MODEL_CONTEXT_WINDOW }}
     defaults:
       run:
         shell: bash
@@ -65,7 +71,7 @@ jobs:
         uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8
         with:
           repository: thorgas/pi-action
-          ref: 81cb801bda5bb89d1550779b049a67adb72701a7
+          ref: 8a73482fc290d04728db86241abf1709b43e71da
           token: ${{ secrets.PI_ACTION_HARNESS_READ_TOKEN }}
           path: pi-action-harness
           persist-credentials: false
@@ -113,20 +119,24 @@ jobs:
           set -euo pipefail
           printf 'PI_ACTION_STAGE=tools\n' >> "$GITHUB_ENV"
           tools="$PI_ACTION_RUN_ROOT/tools"
-          mkdir -m 700 "$tools" "$tools/ollama"
-          remaining_seconds=$(( PI_ACTION_DEADLINE / 1000 - $(date +%s) ))
-          test "$remaining_seconds" -gt 0
-          curl --max-time "$remaining_seconds" --fail --location --proto '=https' --tlsv1.2 --output "$tools/ollama.tgz" https://github.com/ollama/ollama/releases/download/v0.40.3/ollama-darwin.tgz
-          printf '%s  %s\n' a2d1d906a2c8febd9cb18f5c183854d0a6db5dc522940d68b0c0ed048e8dfdea "$tools/ollama.tgz" | shasum -a 256 --check --status
-          tar -xzf "$tools/ollama.tgz" -C "$tools/ollama"
+          mkdir -m 700 "$tools"
+          if [ "${PI_ACTION_MODEL_PROVIDER:-ollama}" = ollama ]; then
+            mkdir -m 700 "$tools/ollama"
+            remaining_seconds=$(( PI_ACTION_DEADLINE / 1000 - $(date +%s) ))
+            test "$remaining_seconds" -gt 0
+            curl --max-time "$remaining_seconds" --fail --location --proto '=https' --tlsv1.2 --output "$tools/ollama.tgz" https://github.com/ollama/ollama/releases/download/v0.40.3/ollama-darwin.tgz
+            printf '%s  %s\n' a2d1d906a2c8febd9cb18f5c183854d0a6db5dc522940d68b0c0ed048e8dfdea "$tools/ollama.tgz" | shasum -a 256 --check --status
+            tar -xzf "$tools/ollama.tgz" -C "$tools/ollama"
+            test -x "$tools/ollama/ollama"
+            printf 'PI_ACTION_OLLAMA_EXECUTABLE=%s\n' "$tools/ollama/ollama" >> "$GITHUB_ENV"
+          fi
           remaining_seconds=$(( PI_ACTION_DEADLINE / 1000 - $(date +%s) ))
           test "$remaining_seconds" -gt 0
           curl --max-time "$remaining_seconds" --fail --location --proto '=https' --tlsv1.2 --output "$tools/cloudflared.tgz" https://github.com/cloudflare/cloudflared/releases/download/2026.9.3/cloudflared-darwin-arm64.tgz
           printf '%s  %s\n' 587c2cfb1c230fe36c7fa7727da78be459dae028cabe8c001291999350f07095 "$tools/cloudflared.tgz" | shasum -a 256 --check --status
           tar -xzf "$tools/cloudflared.tgz" -C "$tools"
-          test -x "$tools/ollama/ollama"
           test -x "$tools/cloudflared"
-          printf 'PI_ACTION_OLLAMA_EXECUTABLE=%s\nPI_ACTION_TUNNEL_EXECUTABLE=%s\n' "$tools/ollama/ollama" "$tools/cloudflared" >> "$GITHUB_ENV"
+          printf 'PI_ACTION_TUNNEL_EXECUTABLE=%s\n' "$tools/cloudflared" >> "$GITHUB_ENV"
       - name: Write private credential files for trusted adapters
         if: ${{ !env.ACT }}
         working-directory: ${{ runner.temp }}
@@ -139,6 +149,10 @@ jobs:
           PUBLICATION_TOKEN: ${{ secrets.PI_ACTION_PUBLICATION_TOKEN }}
           VIEWER_SECRET: ${{ secrets.PI_ACTION_VIEWER_SECRET }}
           CHECKPOINT_KEY: ${{ secrets.PI_ACTION_CHECKPOINT_KEY }}
+          OPENCODE_API_KEY: ${{ secrets.OPENCODE_API_KEY }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
         run: |
           set -euo pipefail
           printf 'PI_ACTION_STAGE=credentials\n' >> "$GITHUB_ENV"
@@ -146,6 +160,20 @@ jobs:
           test -n "$VIEWER_SECRET"
           [[ "$CHECKPOINT_KEY" =~ ^[a-f0-9]{64}$ ]]
           umask 077
+          case "${PI_ACTION_MODEL_PROVIDER:-ollama}" in
+            ollama) model_api_key='' ;;
+            opencode) model_api_key="${OPENCODE_API_KEY:-}" ;;
+            openai) model_api_key="${OPENAI_API_KEY:-}" ;;
+            anthropic) model_api_key="${ANTHROPIC_API_KEY:-}" ;;
+            cloudflare) model_api_key="${CLOUDFLARE_API_TOKEN:-}" ;;
+            *) exit 1 ;;
+          esac
+          if [ "${PI_ACTION_MODEL_PROVIDER:-ollama}" != ollama ]; then
+            test -n "$model_api_key"
+            printf '%s' "$model_api_key" > "$PI_ACTION_RUN_ROOT/model-api-key.txt"
+            printf 'PI_ACTION_MODEL_API_KEY_FILE=%s/model-api-key.txt\n' "$PI_ACTION_RUN_ROOT" >> "$GITHUB_ENV"
+          fi
+          unset model_api_key OPENCODE_API_KEY OPENAI_API_KEY ANTHROPIC_API_KEY CLOUDFLARE_API_TOKEN
           printf '%s' "$READ_TOKEN" > "$PI_ACTION_RUN_ROOT/read-token.txt"
           case "$PUBLICATION_AUTH" in
             app)
@@ -174,6 +202,14 @@ jobs:
       - name: Run the shared session with scoped artifact runtime authority
         if: ${{ !env.ACT }}
         uses: ./pi-action-harness/tooling/github-actions/session-action
+      - name: Remove the temporary model credential
+        if: ${{ always() && !env.ACT }}
+        working-directory: ${{ runner.temp }}
+        run: |
+          set -euo pipefail
+          if [ -n "${PI_ACTION_RUN_ROOT:-}" ] && [ -d "$PI_ACTION_RUN_ROOT" ]; then
+            rm -f -- "$PI_ACTION_RUN_ROOT/model-api-key.txt"
+          fi
       - name: Export verified native baseline for cache
         id: native-cache-export
         if: ${{ always() && !env.ACT && vars.PI_ACTION_NATIVE_CACHE_KEY == '' }}
