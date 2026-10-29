@@ -71,7 +71,7 @@ jobs:
         uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8
         with:
           repository: thorgas/pi-action
-          ref: 3aafb331fc5a1e6b81b17b4d0a03ce77749940ea
+          ref: 0cfeada8727e656c5f1e87591aac412a71565fd5
           token: ${{ secrets.PI_ACTION_HARNESS_READ_TOKEN }}
           path: pi-action-harness
           persist-credentials: false
