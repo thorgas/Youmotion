@@ -21,7 +21,7 @@ jobs:
         uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
         with:
           repository: thorgas/pi-action
-          ref: 59f26811a7c007343acb14bce2963b529003b01e
+          ref: 265ae4ddb544f7069d8739d0dafc5c790e20f110
           token: ${{ secrets.PI_ACTION_HARNESS_READ_TOKEN }}
           path: pi-action-harness
           persist-credentials: false
@@ -38,8 +38,11 @@ jobs:
       - name: Install exact trusted dependencies
         run: pnpm install --frozen-lockfile --ignore-scripts --no-optimistic-repeat-install
       - name: Verify bare simulator viewing and fenced manual input without a model
-        run: node tooling/github-actions/native-control-probe.mjs
+        run: |
+          test -n "$PI_ACTION_PROFILE_JSON"
+          node tooling/github-actions/native-control-probe.mjs
         env:
+          PI_ACTION_PROFILE_JSON: ${{ vars.PI_ACTION_PROFILE_JSON }}
           PI_NATIVE_CONTROL_RECEIPT: ${{ runner.temp }}/pi-native-control-probe-receipt.json
       - name: Upload only the sanitized native control receipt
         if: always()
