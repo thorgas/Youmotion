@@ -1,0 +1,78 @@
+name: pi-action build reviewed iOS cache
+on:
+  workflow_dispatch:
+    inputs:
+      issueNumber:
+        description: Open owner issue used for read-only source admission
+        required: true
+        default: '36'
+        type: string
+permissions: {}
+concurrency:
+  group: pi-action-${{ github.repository }}
+  cancel-in-progress: false
+jobs:
+  cache:
+    if: github.repository == 'thorgas/Youmotion' && github.actor == github.repository_owner && github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
+    runs-on: macos-26
+    timeout-minutes: 90
+    permissions:
+      contents: read
+      issues: read
+      pull-requests: read
+    defaults:
+      run:
+        shell: bash
+        working-directory: ${{ github.workspace }}/pi-action-harness
+    steps:
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8
+        with:
+          repository: thorgas/pi-action
+          ref: 0f8f734ad731190a94dfda4a898f7cb638aeb0e5
+          token: ${{ secrets.PI_ACTION_HARNESS_READ_TOKEN }}
+          persist-credentials: false
+          path: pi-action-harness
+      - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444
+        with:
+          node-version: 24.21.0
+          architecture: arm64
+      - uses: pnpm/action-setup@a7487c7e89a18df4991f7f222e4898a00d66ddda
+        with:
+          version: 11.21.0
+          run_install: false
+      - run: pnpm install --frozen-lockfile --ignore-scripts --no-optimistic-repeat-install
+      - name: Build cold seed and independently import it without starting Pi
+        id: build
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          REVIEWED_PROFILE_JSON: ${{ vars.PI_ACTION_PROFILE_JSON }}
+          NODE_NO_WARNINGS: '1'
+        run: |
+          set -euo pipefail
+          umask 077
+          node --input-type=module -e 'import{writeFileSync}from"node:fs";const p=JSON.parse(process.env.REVIEWED_PROFILE_JSON);p.preparation.expoDevClientInfoPlist="ios/Youmotion/Info.plist";writeFileSync(process.argv[1],JSON.stringify(p),{mode:0o600,flag:"wx"})' "$RUNNER_TEMP/cache-profile.json"
+          unset REVIEWED_PROFILE_JSON
+          export PI_ACTION_DEADLINE=$(node --input-type=module -e 'import{nativeCacheBuildVocabulary as v}from"./packages/protocol/src/constants.ts";process.stdout.write(String(Date.now()+v.jobMs))')
+          node tooling/github-actions/build-native-cache.mjs "$RUNNER_TEMP/cache-build" "$RUNNER_TEMP/pi-action-native-cache" "$RUNNER_TEMP/cache-profile.json"
+      - name: Save only the verified native cache
+        uses: actions/cache/save@0400d5f644dc74513175e3cd8d07132dd4860809
+        with:
+          path: ${{ runner.temp }}/pi-action-native-cache
+          key: ${{ steps.build.outputs.key }}
+      - name: Upload finite cache receipt
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: native-cache-${{ github.run_id }}
+          path: ${{ runner.temp }}/cache-build/cache-receipt.json
+          if-no-files-found: error
+          retention-days: 3
+      - name: Stop only the prepared simulator and dispose private bootstrap files
+        if: always()
+        run: |
+          set -euo pipefail
+          root="$RUNNER_TEMP/cache-build"
+          if test -f "$root/session-config.json"; then
+            device=$(node --input-type=module -e 'import{readFileSync}from"node:fs";const c=JSON.parse(readFileSync(process.argv[1],"utf8"));if(!/^[A-F0-9-]{36}$/.test(c.native.deviceId))process.exit(1);process.stdout.write(c.native.deviceId)' "$root/session-config.json")
+            xcrun simctl shutdown "$device"
+          fi
+          rm -f "$root/read-token.txt" "$root/viewer-secret.txt" "$RUNNER_TEMP/cache-profile.json"
