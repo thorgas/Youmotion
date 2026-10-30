@@ -115,16 +115,25 @@ jobs:
         run: |
           set -euo pipefail
           node --input-type=module <<'NODE'
-          import { constants, openSync, closeSync, fstatSync, realpathSync, writeFileSync } from 'node:fs';
+          import { constants, openSync, closeSync, fstatSync, fchmodSync, ftruncateSync, realpathSync, writeFileSync } from 'node:fs';
           import { join } from 'node:path';
           import { preflightRunnerToolchain, RunnerToolchainError } from './tooling/runner-toolchain.mjs';
+          const writeReceipt = value => {
+            const path = join(realpathSync(process.env.PI_ACTION_RUN_ROOT), 'runner-toolchain-receipt.json');
+            const descriptor = openSync(path, constants.O_WRONLY | constants.O_CREAT | constants.O_NOFOLLOW | constants.O_NONBLOCK, 0o600);
+            try {
+              const info = fstatSync(descriptor);
+              if (!info.isFile() || info.nlink !== 1 || info.uid !== process.getuid()) throw new Error();
+              fchmodSync(descriptor, 0o600); ftruncateSync(descriptor, 0);
+              writeFileSync(descriptor, JSON.stringify(value));
+            } finally { closeSync(descriptor); }
+          };
           try {
             const reviewed = process.env.REVIEWED_RUNNER_ENVIRONMENT_JSON ?? '{}';
             if (Buffer.byteLength(reviewed) > 16384) throw new Error();
             const { environment, ...receipt } = await preflightRunnerToolchain(JSON.parse(reviewed));
             if (!receipt.match || receipt.hash !== process.env.PI_ACTION_RUNNER_ENVIRONMENT_HASH) throw new Error();
-            const root = realpathSync(process.env.PI_ACTION_RUN_ROOT);
-            writeFileSync(join(root, 'runner-toolchain-receipt.json'), JSON.stringify(receipt), { mode: 0o600, flag: 'wx' });
+            writeReceipt(receipt);
             const path = process.env.GITHUB_ENV;
             if (realpathSync(path) !== path) throw new Error();
             const descriptor = openSync(path, constants.O_WRONLY | constants.O_APPEND | constants.O_NOFOLLOW | constants.O_NONBLOCK);
@@ -135,10 +144,12 @@ jobs:
             } finally { closeSync(descriptor); }
             console.log(JSON.stringify(receipt));
           } catch (error) {
-            if (error instanceof RunnerToolchainError && error.receipt?.match === false) {
-              try { writeFileSync(join(realpathSync(process.env.PI_ACTION_RUN_ROOT), 'runner-toolchain-receipt.json'), JSON.stringify(error.receipt), { mode: 0o600, flag: 'wx' }); } catch {}
-            }
-            console.error('{"_tag":"RunnerToolchainFailed"}'); process.exitCode = 1;
+            const code = error instanceof RunnerToolchainError && ['invalid', 'unavailable', 'timeout', 'output-limit', 'malformed', 'mismatch'].includes(error.code) ? error.code : 'unknown';
+            const stage = error instanceof RunnerToolchainError && ['configuration', 'node', 'pnpm', 'architecture', 'host', 'selection', 'xcode', 'sdk'].includes(error.stage) ? error.stage : 'unknown';
+            const failure = { code, stage };
+            const receipt = error instanceof RunnerToolchainError && error.receipt?.match === false ? { ...error.receipt, failure } : { match: false, failure };
+            try { writeReceipt(receipt); } catch {}
+            console.error(JSON.stringify({ _tag: 'RunnerToolchainFailed', code, stage })); process.exitCode = 1;
           }
           NODE
       - name: Upload the finite toolchain receipt
