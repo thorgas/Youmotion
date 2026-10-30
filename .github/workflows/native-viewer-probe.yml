@@ -1,0 +1,138 @@
+name: pi-action cached iOS viewer proof
+on: workflow_dispatch
+permissions: {}
+concurrency:
+  group: pi-action-${{ github.repository }}
+  cancel-in-progress: false
+jobs:
+  preview:
+    if: github.actor == github.repository_owner && github.repository == 'thorgas/Youmotion'
+    runs-on: macos-26
+    timeout-minutes: 20
+    permissions:
+      contents: read
+    defaults:
+      run:
+        shell: bash
+        working-directory: ${{ github.workspace }}/pi-action-harness
+    steps:
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8
+        with:
+          repository: thorgas/pi-action
+          ref: dddfd9449f6f759808bb39365f86b2ce76cecb60
+          token: ${{ secrets.PI_ACTION_HARNESS_READ_TOKEN }}
+          persist-credentials: false
+          path: pi-action-harness
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8
+        with:
+          ref: ${{ github.event.repository.default_branch }}
+          persist-credentials: false
+          path: native-app-source
+      - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444
+        with:
+          node-version: 24.21.0
+          architecture: arm64
+      - uses: pnpm/action-setup@a7487c7e89a18df4991f7f222e4898a00d66ddda
+        with:
+          version: 11.21.0
+          run_install: false
+      - run: pnpm install --frozen-lockfile --ignore-scripts --reporter=silent
+      - uses: actions/cache/restore@0400d5f644dc74513175e3cd8d07132dd4860809
+        with:
+          path: ${{ runner.temp }}/pi-action-native-cache
+          key: ${{ vars.PI_ACTION_NATIVE_CACHE_KEY }}
+          fail-on-cache-miss: true
+      - name: Verify restored cache and hold authenticated coding preview
+        env:
+          NODE_NO_WARNINGS: "1"
+          VIEWER_SECRET: ${{ secrets.PI_ACTION_VIEWER_SECRET }}
+          REVIEWED_PROFILE_JSON: ${{ vars.PI_ACTION_PROFILE_JSON }}
+        run: |
+          set -euo pipefail
+          umask 077
+          trap 'rm -f "$RUNNER_TEMP/viewer-secret"' EXIT
+          test -n "$VIEWER_SECRET"
+          printf '%s' "$VIEWER_SECRET" > "$RUNNER_TEMP/viewer-secret"
+          unset VIEWER_SECRET
+          printf '%s' "$REVIEWED_PROFILE_JSON" > "$RUNNER_TEMP/viewer-profile.json"
+          unset REVIEWED_PROFILE_JSON
+          node tooling/github-actions/viewer-cache-probe.mjs "$RUNNER_TEMP/cache-precheck" "$RUNNER_TEMP/pi-action-native-cache" "$RUNNER_TEMP/viewer-profile.json" unused "$RUNNER_TEMP/viewer-secret" unused --verify-only
+          app_source="$GITHUB_WORKSPACE/native-app-source"
+          source_commit=$(node --input-type=module -e 'import{readFileSync}from"node:fs";const r=JSON.parse(readFileSync(process.argv[1],"utf8"));if(!/^[a-f0-9]{40}$/.test(r.request.candidateCommitOid))process.exit(1);process.stdout.write(r.request.candidateCommitOid)' "$RUNNER_TEMP/pi-action-native-cache/bundle/producer-receipt.json")
+          git -C "$app_source" -c core.hooksPath=/dev/null fetch --no-tags --depth=1 origin "$source_commit"
+          git -C "$app_source" -c core.hooksPath=/dev/null checkout --quiet --detach "$source_commit"
+          test "$(git -C "$app_source" rev-parse HEAD)" = "$source_commit"
+          export PI_ACTION_PROBE_SOURCE_COMMIT="$source_commit"
+          cp -R "$RUNNER_TEMP/pi-action-native-cache/seed/node_modules" "$app_source/node_modules"
+          app_home="$RUNNER_TEMP/native-app-home"; app_tmp="$RUNNER_TEMP/native-app-tmp"
+          mkdir -m 700 "$app_home" "$app_tmp"
+          trusted_node="$(command -v node)"
+          manifest_root="$RUNNER_TEMP/native-metro-private"
+          mkdir -m 700 "$manifest_root"
+          manifest_cache="$manifest_root/manifest-cache.json"
+          manifest_scope_file="$manifest_root/scope.json"
+          trap 'rm -f "$RUNNER_TEMP/viewer-secret" "$manifest_cache" "$manifest_scope_file"' EXIT
+          node tooling/github-actions/native-metro-probe.mjs --create-scope "$manifest_scope_file" aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa "$app_source" http://127.0.0.1:8081
+          manifest_scope="$(cat "$manifest_scope_file")"
+          cd "$app_source"
+          env -i PATH="$PATH" HOME="$app_home" TMPDIR="$app_tmp" LANG=en_US.UTF-8 CI=1 pnpm_config_verify_deps_before_run=warn EAS_BUILD_GIT_COMMIT_HASH="$source_commit" EXPO_UPDATES_FINGERPRINT_OVERRIDE=0000000000000000000000000000000000000000 EXPO_PUBLIC_E2E=true EXPO_NO_DOTENV=1 EXPO_NO_TELEMETRY=1 MOBILE_UPDATE_CHANNEL=none pnpm i18n:all > "$RUNNER_TEMP/native-app-i18n.log" 2>&1
+          env -i PATH="$PATH" HOME="$app_home" TMPDIR="$app_tmp" LANG=en_US.UTF-8 CI=1 pnpm_config_verify_deps_before_run=warn EAS_BUILD_GIT_COMMIT_HASH="$source_commit" EXPO_UPDATES_FINGERPRINT_OVERRIDE=0000000000000000000000000000000000000000 EXPO_PUBLIC_E2E=true EXPO_NO_DOTENV=1 EXPO_NO_TELEMETRY=1 MOBILE_UPDATE_CHANNEL=none PI_ACTION_METRO_DIAGNOSTICS_FILE="$RUNNER_TEMP/metro-requests.jsonl" PI_ACTION_METRO_MANIFEST_CACHE_FILE="$manifest_cache" PI_ACTION_METRO_MANIFEST_SCOPE="$manifest_scope" "$trusted_node" --dns-result-order=ipv4first --require "$GITHUB_WORKSPACE/pi-action-harness/tooling/github-actions/metro-request-diagnostics.cjs" node_modules/expo/bin/cli start --dev-client --localhost --port 8081 > "$RUNNER_TEMP/native-app-metro.log" 2>&1 &
+          metro_pid=$!
+          device=""
+          cleanup() {
+            device_deleted=null
+            if test -n "$device"; then
+              xcrun simctl io "$device" screenshot "$RUNNER_TEMP/native-app-after.png" >/dev/null 2>&1 || true
+              if xcrun simctl delete "$device" >/dev/null 2>&1; then device_deleted=true; else device_deleted=false; fi
+            fi
+            kill "$metro_pid" >/dev/null 2>&1 || true
+            wait "$metro_pid" >/dev/null 2>&1 || true
+            if kill -0 "$metro_pid" >/dev/null 2>&1; then metro_stopped=false; else metro_stopped=true; fi
+            printf '{"simulatorDeleted":%s,"metroStopped":%s}\n' "$device_deleted" "$metro_stopped" > "$RUNNER_TEMP/shell-cleanup.json"
+            rm -f "$RUNNER_TEMP/viewer-secret" "$manifest_cache" "$manifest_scope_file"
+          }
+          trap cleanup EXIT
+          cd "$GITHUB_WORKSPACE/pi-action-harness"
+          xcrun simctl list runtimes --json > "$RUNNER_TEMP/viewer-runtimes.json"
+          runtime="$(node --input-type=module - "$RUNNER_TEMP/viewer-profile.json" "$RUNNER_TEMP/viewer-runtimes.json" <<'JS'
+          import { readFileSync } from 'node:fs';
+          const profile = JSON.parse(readFileSync(process.argv[2], 'utf8'));
+          const runtimes = JSON.parse(readFileSync(process.argv[3], 'utf8')).runtimes;
+          const runtime = runtimes.find(value => value.identifier === profile.native.runtimeIdentifier && value.isAvailable === true);
+          const parts = runtime?.version.split('.').map(Number);
+          if (!parts || parts[0] * 65536 + (parts[1] ?? 0) * 256 + (parts[2] ?? 0) !== profile.native.simulatorOsVersion) process.exit(1);
+          process.stdout.write(runtime.identifier);
+          JS
+          )"
+          device="$(xcrun simctl create pi-action-native-app-probe com.apple.CoreSimulator.SimDeviceType.iPhone-17 "$runtime")"
+          xcrun simctl boot "$device"
+          xcrun simctl bootstatus "$device" -b >/dev/null
+          app="$RUNNER_TEMP/pi-action-native-cache/bundle/artifact.app"
+          codesign --verify --deep --strict "$app"
+          xcrun simctl install "$device" "$app"
+          for attempt in {1..120}; do if curl -fsS http://127.0.0.1:8081/status > /dev/null; then break; fi; sleep 2; done
+          curl -fsS http://127.0.0.1:8081/status > /dev/null
+          node tooling/github-actions/native-metro-probe.mjs "$RUNNER_TEMP/native-metro-receipt.json" http://127.0.0.1:8081 "$manifest_cache" "$manifest_scope_file"
+          xcrun simctl launch "$device" com.youmotion.mobile --initialUrl http://127.0.0.1:8081 > "$RUNNER_TEMP/app-launch.txt"
+          node tooling/github-actions/native-metro-client-probe.mjs "$RUNNER_TEMP/metro-requests.jsonl" "$RUNNER_TEMP/native-metro-client-receipt.json"
+          xcrun simctl io "$device" screenshot "$RUNNER_TEMP/native-app-before.png" >/dev/null 2>&1
+          mkdir -m 700 "$RUNNER_TEMP/viewer-tools"
+          curl --max-time 120 --fail --location --silent --show-error --output "$RUNNER_TEMP/viewer-tools/cloudflared.tgz" https://github.com/cloudflare/cloudflared/releases/download/2026.9.3/cloudflared-darwin-arm64.tgz
+          printf '%s  %s\n' 587c2cfb1c230fe36c7fa7727da78be459dae028cabe8c001291999350f07095 "$RUNNER_TEMP/viewer-tools/cloudflared.tgz" | shasum -a 256 --check --status
+          tar -xzf "$RUNNER_TEMP/viewer-tools/cloudflared.tgz" -C "$RUNNER_TEMP/viewer-tools"
+          app_pid="$(awk -F ": " '{print $2}' "$RUNNER_TEMP/app-launch.txt")"
+          node tooling/github-actions/viewer-cache-probe.mjs "$RUNNER_TEMP/viewer-proof" "$RUNNER_TEMP/pi-action-native-cache" "$RUNNER_TEMP/viewer-profile.json" "$device" "$RUNNER_TEMP/viewer-secret" "$RUNNER_TEMP/viewer-tools/cloudflared"
+      - name: Upload receipts and actual app screenshots
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: viewer-cache-proof-${{ github.run_id }}
+          path: |
+            ${{ runner.temp }}/viewer-proof/receipt.json
+            ${{ runner.temp }}/native-metro-client-receipt.json
+            ${{ runner.temp }}/metro-requests.jsonl
+            ${{ runner.temp }}/native-metro-receipt.json
+            ${{ runner.temp }}/shell-cleanup.json
+            ${{ runner.temp }}/native-app-*.png
+          retention-days: 1
+          if-no-files-found: error
