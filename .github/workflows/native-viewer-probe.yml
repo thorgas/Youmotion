@@ -19,7 +19,7 @@ jobs:
       - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8
         with:
           repository: thorgas/pi-action
-          ref: dddfd9449f6f759808bb39365f86b2ce76cecb60
+          ref: 22447ff54d691634f1b2f21a9413fd8855c7d896
           token: ${{ secrets.PI_ACTION_HARNESS_READ_TOKEN }}
           persist-credentials: false
           path: pi-action-harness
@@ -63,6 +63,7 @@ jobs:
           git -C "$app_source" -c core.hooksPath=/dev/null checkout --quiet --detach "$source_commit"
           test "$(git -C "$app_source" rev-parse HEAD)" = "$source_commit"
           export PI_ACTION_PROBE_SOURCE_COMMIT="$source_commit"
+          export PI_ACTION_PROBE_SOURCE_DIRECTORY="$app_source"
           cp -R "$RUNNER_TEMP/pi-action-native-cache/seed/node_modules" "$app_source/node_modules"
           app_home="$RUNNER_TEMP/native-app-home"; app_tmp="$RUNNER_TEMP/native-app-tmp"
           mkdir -m 700 "$app_home" "$app_tmp"
