@@ -19,7 +19,7 @@ jobs:
       - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8
         with:
           repository: thorgas/pi-action
-          ref: ba7af087cf39b8d9484b5ad9eeba51935970378f
+          ref: dddfd9449f6f759808bb39365f86b2ce76cecb60
           token: ${{ secrets.PI_ACTION_HARNESS_READ_TOKEN }}
           persist-credentials: false
           path: pi-action-harness
@@ -132,6 +132,7 @@ jobs:
             ${{ runner.temp }}/viewer-proof/receipt.json
             ${{ runner.temp }}/native-qa-proof/receipt.json
             ${{ runner.temp }}/native-qa-proof/native-qa-failure.json
+            ${{ runner.temp }}/native-qa-proof/native-qa-progress.json
             ${{ runner.temp }}/native-metro-client-receipt.json
             ${{ runner.temp }}/metro-requests.jsonl
             ${{ runner.temp }}/native-metro-receipt.json
