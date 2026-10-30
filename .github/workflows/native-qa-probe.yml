@@ -8,7 +8,7 @@ jobs:
   preview:
     if: github.actor == github.repository_owner && github.repository == 'thorgas/Youmotion'
     runs-on: macos-26
-    timeout-minutes: 20
+    timeout-minutes: ${{ fromJSON(vars.PI_ACTION_PROFILE_JSON || '{}').diagnostics.nativeJobMinutes || 20 }}
     permissions:
       contents: read
     defaults:
@@ -19,7 +19,7 @@ jobs:
       - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8
         with:
           repository: thorgas/pi-action
-          ref: 22447ff54d691634f1b2f21a9413fd8855c7d896
+          ref: d4d47a2944e8ac7ba57a05a0ff34fb11338b4f24
           token: ${{ secrets.PI_ACTION_HARNESS_READ_TOKEN }}
           persist-credentials: false
           path: pi-action-harness
