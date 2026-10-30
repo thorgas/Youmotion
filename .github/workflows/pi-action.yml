@@ -32,20 +32,81 @@ concurrency:
   group: pi-action-${{ github.repository }}
   cancel-in-progress: false
 jobs:
-  session:
+  runner-environment:
     if: >-
       github.repository == 'thorgas/Youmotion' &&
       github.actor == github.repository_owner &&
       (github.event_name == 'workflow_dispatch' && github.ref == format('refs/heads/{0}', github.event.repository.default_branch) ||
        github.event_name == 'issue_comment' && startsWith(github.event.comment.body, '/pi run'))
     runs-on: macos-26
-    timeout-minutes: 360
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    outputs:
+      runner-image: ${{ steps.environment.outputs.runner-image }}
+      host-architecture: ${{ steps.environment.outputs.host-architecture }}
+      node-version: ${{ steps.environment.outputs.node-version }}
+      pnpm-version: ${{ steps.environment.outputs.pnpm-version }}
+      job-timeout-minutes: ${{ steps.environment.outputs.job-timeout-minutes }}
+      artifact-retention-days: ${{ steps.environment.outputs.artifact-retention-days }}
+      cleanup-reserve-ms: ${{ steps.environment.outputs.cleanup-reserve-ms }}
+      configuration-hash: ${{ steps.environment.outputs.configuration-hash }}
+    steps:
+      - name: Checkout immutable private harness
+        if: ${{ !env.ACT }}
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8
+        with:
+          repository: thorgas/pi-action
+          ref: 522d176d8cdd357b2d0d0471b1617c491fc08c53
+          token: ${{ secrets.PI_ACTION_HARNESS_READ_TOKEN }}
+          path: pi-action-harness
+          persist-credentials: false
+      - name: Set up trusted bootstrap Node
+        if: ${{ !env.ACT }}
+        uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444
+        with:
+          node-version: 24.21.0
+          architecture: arm64
+      - name: Resolve reviewed runner environment
+        id: environment
+        working-directory: ${{ env.ACT && env.PI_ACTION_WORKSPACE || format('{0}/pi-action-harness', github.workspace) }}
+        env:
+          REVIEWED_RUNNER_ENVIRONMENT_JSON: ${{ vars.PI_ACTION_RUNNER_ENVIRONMENT_JSON || '{}' }}
+        run: |
+          set -euo pipefail
+          node --input-type=module <<'NODE'
+          import { mkdtempSync, realpathSync, writeFileSync, rmSync } from 'node:fs';
+          import { join } from 'node:path';
+          import { runRunnerEnvironment } from './tooling/runner-environment.mjs';
+          try {
+            const reviewed = process.env.REVIEWED_RUNNER_ENVIRONMENT_JSON ?? '{}';
+            if (Buffer.byteLength(reviewed) > 16384) throw new Error();
+            const directory = mkdtempSync(join(realpathSync(process.env.RUNNER_TEMP), 'pi-runner-environment-'));
+            try {
+              const path = join(directory, 'reviewed.json');
+              writeFileSync(path, reviewed, { mode: 0o600, flag: 'wx' });
+              console.log(JSON.stringify(runRunnerEnvironment([path, '--github-output', process.env.GITHUB_OUTPUT])));
+            } finally { rmSync(directory, { recursive: true, force: true }); }
+          } catch { console.error('{"_tag":"RunnerEnvironmentInvalid"}'); process.exitCode = 1; }
+          NODE
+  session:
+    needs: runner-environment
+    if: >-
+      github.repository == 'thorgas/Youmotion' &&
+      github.actor == github.repository_owner &&
+      (github.event_name == 'workflow_dispatch' && github.ref == format('refs/heads/{0}', github.event.repository.default_branch) ||
+       github.event_name == 'issue_comment' && startsWith(github.event.comment.body, '/pi run'))
+    runs-on: ${{ needs.runner-environment.outputs.runner-image }}
+    timeout-minutes: ${{ fromJSON(needs.runner-environment.outputs.job-timeout-minutes) }}
     permissions:
       contents: read
       pull-requests: read
       issues: read
       actions: read
     env:
+      PI_ACTION_JOB_TIMEOUT_MINUTES: ${{ needs.runner-environment.outputs.job-timeout-minutes }}
+      PI_ACTION_CLEANUP_RESERVE_MS: ${{ needs.runner-environment.outputs.cleanup-reserve-ms }}
+      PI_ACTION_RUNNER_ENVIRONMENT_HASH: ${{ needs.runner-environment.outputs.configuration-hash }}
       PI_ACTION_MODEL_PROVIDER: ${{ vars.PI_ACTION_MODEL_PROVIDER || 'ollama' }}
       PI_ACTION_MODEL_ID: ${{ vars.PI_ACTION_MODEL_ID }}
       PI_ACTION_MODEL_BASE_URL: ${{ vars.PI_ACTION_MODEL_BASE_URL }}
@@ -61,7 +122,7 @@ jobs:
         run: |
           set -euo pipefail
           started_ms=$(( $(date +%s) * 1000 ))
-          deadline_ms=$(( started_ms + 21600000 - 480000 ))
+          deadline_ms=$(( started_ms + PI_ACTION_JOB_TIMEOUT_MINUTES * 60000 - PI_ACTION_CLEANUP_RESERVE_MS ))
           run_root="${PI_ACTION_RUN_ROOT:-$(mktemp -d "$RUNNER_TEMP/pi-action.XXXXXX")}"
           test -d "$run_root"
           printf 'PI_ACTION_NATIVE_CACHE_ROOT=%s/pi-action-native-cache\n' "$RUNNER_TEMP" >> "$GITHUB_ENV"
@@ -71,7 +132,7 @@ jobs:
         uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8
         with:
           repository: thorgas/pi-action
-          ref: d4d47a2944e8ac7ba57a05a0ff34fb11338b4f24
+          ref: 522d176d8cdd357b2d0d0471b1617c491fc08c53
           token: ${{ secrets.PI_ACTION_HARNESS_READ_TOKEN }}
           path: pi-action-harness
           persist-credentials: false
@@ -79,14 +140,46 @@ jobs:
         if: ${{ !env.ACT }}
         uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444
         with:
-          node-version: 24.21.0
-          architecture: arm64
+          node-version: ${{ needs.runner-environment.outputs.node-version }}
+          architecture: ${{ needs.runner-environment.outputs.host-architecture }}
       - name: Set up pinned pnpm
         if: ${{ !env.ACT }}
         uses: pnpm/action-setup@a7487c7e89a18df4991f7f222e4898a00d66ddda
         with:
-          version: 11.21.0
+          version: ${{ needs.runner-environment.outputs.pnpm-version }}
           run_install: false
+      - name: Select and verify the reviewed native toolchain
+        env:
+          REVIEWED_RUNNER_ENVIRONMENT_JSON: ${{ vars.PI_ACTION_RUNNER_ENVIRONMENT_JSON || '{}' }}
+        run: |
+          set -euo pipefail
+          node --input-type=module <<'NODE'
+          import { constants, openSync, closeSync, fstatSync, realpathSync, writeFileSync } from 'node:fs';
+          import { join } from 'node:path';
+          import { preflightRunnerToolchain, RunnerToolchainError } from './tooling/runner-toolchain.mjs';
+          try {
+            const reviewed = process.env.REVIEWED_RUNNER_ENVIRONMENT_JSON ?? '{}';
+            if (Buffer.byteLength(reviewed) > 16384) throw new Error();
+            const { environment, ...receipt } = await preflightRunnerToolchain(JSON.parse(reviewed));
+            if (!receipt.match || receipt.hash !== process.env.PI_ACTION_RUNNER_ENVIRONMENT_HASH) throw new Error();
+            const root = realpathSync(process.env.PI_ACTION_RUN_ROOT);
+            writeFileSync(join(root, 'runner-toolchain-receipt.json'), JSON.stringify(receipt), { mode: 0o600, flag: 'wx' });
+            const path = process.env.GITHUB_ENV;
+            if (realpathSync(path) !== path) throw new Error();
+            const descriptor = openSync(path, constants.O_WRONLY | constants.O_APPEND | constants.O_NOFOLLOW | constants.O_NONBLOCK);
+            try {
+              const info = fstatSync(descriptor);
+              if (!info.isFile() || info.nlink !== 1 || info.uid !== process.getuid()) throw new Error();
+              writeFileSync(descriptor, `DEVELOPER_DIR=${environment.DEVELOPER_DIR}\n`);
+            } finally { closeSync(descriptor); }
+            console.log(JSON.stringify(receipt));
+          } catch (error) {
+            if (error instanceof RunnerToolchainError && error.receipt?.match === false) {
+              try { writeFileSync(join(realpathSync(process.env.PI_ACTION_RUN_ROOT), 'runner-toolchain-receipt.json'), JSON.stringify(error.receipt), { mode: 0o600, flag: 'wx' }); } catch {}
+            }
+            console.error('{"_tag":"RunnerToolchainFailed"}'); process.exitCode = 1;
+          }
+          NODE
       - name: Install the exact trusted harness dependency graph
         if: ${{ !env.ACT }}
         run: pnpm install --frozen-lockfile --ignore-scripts --no-optimistic-repeat-install
@@ -255,4 +348,4 @@ jobs:
           path: ${{ env.PI_ACTION_RUN_ROOT }}/hosted-receipt.json
           if-no-files-found: error
           include-hidden-files: false
-          retention-days: 1
+          retention-days: ${{ fromJSON(needs.runner-environment.outputs.artifact-retention-days) }}
