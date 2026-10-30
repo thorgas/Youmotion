@@ -19,7 +19,7 @@ jobs:
       - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8
         with:
           repository: thorgas/pi-action
-          ref: dddfd9449f6f759808bb39365f86b2ce76cecb60
+          ref: 22447ff54d691634f1b2f21a9413fd8855c7d896
           token: ${{ secrets.PI_ACTION_HARNESS_READ_TOKEN }}
           persist-credentials: false
           path: pi-action-harness
@@ -45,24 +45,20 @@ jobs:
       - name: Verify restored cache and hold authenticated coding preview
         env:
           NODE_NO_WARNINGS: "1"
-          VIEWER_SECRET: ${{ secrets.PI_ACTION_VIEWER_SECRET }}
           REVIEWED_PROFILE_JSON: ${{ vars.PI_ACTION_PROFILE_JSON }}
         run: |
           set -euo pipefail
           umask 077
-          trap 'rm -f "$RUNNER_TEMP/viewer-secret"' EXIT
-          test -n "$VIEWER_SECRET"
-          printf '%s' "$VIEWER_SECRET" > "$RUNNER_TEMP/viewer-secret"
-          unset VIEWER_SECRET
           printf '%s' "$REVIEWED_PROFILE_JSON" > "$RUNNER_TEMP/viewer-profile.json"
           unset REVIEWED_PROFILE_JSON
-          node tooling/github-actions/viewer-cache-probe.mjs "$RUNNER_TEMP/cache-precheck" "$RUNNER_TEMP/pi-action-native-cache" "$RUNNER_TEMP/viewer-profile.json" unused "$RUNNER_TEMP/viewer-secret" unused --verify-only
+          node tooling/github-actions/viewer-cache-probe.mjs "$RUNNER_TEMP/cache-precheck" "$RUNNER_TEMP/pi-action-native-cache" "$RUNNER_TEMP/viewer-profile.json" unused unused unused --verify-only
           app_source="$GITHUB_WORKSPACE/native-app-source"
           source_commit=$(node --input-type=module -e 'import{readFileSync}from"node:fs";const r=JSON.parse(readFileSync(process.argv[1],"utf8"));if(!/^[a-f0-9]{40}$/.test(r.request.candidateCommitOid))process.exit(1);process.stdout.write(r.request.candidateCommitOid)' "$RUNNER_TEMP/pi-action-native-cache/bundle/producer-receipt.json")
           git -C "$app_source" -c core.hooksPath=/dev/null fetch --no-tags --depth=1 origin "$source_commit"
           git -C "$app_source" -c core.hooksPath=/dev/null checkout --quiet --detach "$source_commit"
           test "$(git -C "$app_source" rev-parse HEAD)" = "$source_commit"
           export PI_ACTION_PROBE_SOURCE_COMMIT="$source_commit"
+          export PI_ACTION_PROBE_SOURCE_DIRECTORY="$app_source"
           cp -R "$RUNNER_TEMP/pi-action-native-cache/seed/node_modules" "$app_source/node_modules"
           app_home="$RUNNER_TEMP/native-app-home"; app_tmp="$RUNNER_TEMP/native-app-tmp"
           mkdir -m 700 "$app_home" "$app_tmp"
@@ -71,7 +67,7 @@ jobs:
           mkdir -m 700 "$manifest_root"
           manifest_cache="$manifest_root/manifest-cache.json"
           manifest_scope_file="$manifest_root/scope.json"
-          trap 'rm -f "$RUNNER_TEMP/viewer-secret" "$manifest_cache" "$manifest_scope_file"' EXIT
+          trap 'rm -f "$manifest_cache" "$manifest_scope_file"' EXIT
           node tooling/github-actions/native-metro-probe.mjs --create-scope "$manifest_scope_file" aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa "$app_source" http://127.0.0.1:8081
           manifest_scope="$(cat "$manifest_scope_file")"
           cd "$app_source"
@@ -89,7 +85,7 @@ jobs:
             wait "$metro_pid" >/dev/null 2>&1 || true
             if kill -0 "$metro_pid" >/dev/null 2>&1; then metro_stopped=false; else metro_stopped=true; fi
             printf '{"simulatorDeleted":%s,"metroStopped":%s}\n' "$device_deleted" "$metro_stopped" > "$RUNNER_TEMP/shell-cleanup.json"
-            rm -f "$RUNNER_TEMP/viewer-secret" "$manifest_cache" "$manifest_scope_file"
+            rm -f "$manifest_cache" "$manifest_scope_file"
           }
           trap cleanup EXIT
           cd "$GITHUB_WORKSPACE/pi-action-harness"
@@ -116,20 +112,14 @@ jobs:
           xcrun simctl launch "$device" com.youmotion.mobile --initialUrl http://127.0.0.1:8081 > "$RUNNER_TEMP/app-launch.txt"
           node tooling/github-actions/native-metro-client-probe.mjs "$RUNNER_TEMP/metro-requests.jsonl" "$RUNNER_TEMP/native-metro-client-receipt.json"
           xcrun simctl io "$device" screenshot "$RUNNER_TEMP/native-app-before.png" >/dev/null 2>&1
-          mkdir -m 700 "$RUNNER_TEMP/viewer-tools"
-          curl --max-time 120 --fail --location --silent --show-error --output "$RUNNER_TEMP/viewer-tools/cloudflared.tgz" https://github.com/cloudflare/cloudflared/releases/download/2026.9.3/cloudflared-darwin-arm64.tgz
-          printf '%s  %s\n' 587c2cfb1c230fe36c7fa7727da78be459dae028cabe8c001291999350f07095 "$RUNNER_TEMP/viewer-tools/cloudflared.tgz" | shasum -a 256 --check --status
-          tar -xzf "$RUNNER_TEMP/viewer-tools/cloudflared.tgz" -C "$RUNNER_TEMP/viewer-tools"
           app_pid="$(awk -F ": " '{print $2}' "$RUNNER_TEMP/app-launch.txt")"
           node tooling/github-actions/native-qa-probe.mjs "$RUNNER_TEMP/native-qa-proof" "$device" "$app_pid" 8081 "$RUNNER_TEMP/viewer-profile.json"
-          node tooling/github-actions/viewer-cache-probe.mjs "$RUNNER_TEMP/viewer-proof" "$RUNNER_TEMP/pi-action-native-cache" "$RUNNER_TEMP/viewer-profile.json" "$device" "$RUNNER_TEMP/viewer-secret" "$RUNNER_TEMP/viewer-tools/cloudflared"
       - name: Upload receipts and actual app screenshots
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
           name: viewer-cache-proof-${{ github.run_id }}
           path: |
-            ${{ runner.temp }}/viewer-proof/receipt.json
             ${{ runner.temp }}/native-qa-proof/receipt.json
             ${{ runner.temp }}/native-qa-proof/native-qa-failure.json
             ${{ runner.temp }}/native-qa-proof/native-qa-progress.json
