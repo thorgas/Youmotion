@@ -22,6 +22,11 @@ on:
         required: false
         default: false
         type: boolean
+      browserProof:
+        description: Run deterministic browser acceptance on the final Pi QA candidate
+        required: false
+        default: false
+        type: boolean
       prompt:
         description: Optional task text; otherwise use the independently fetched issue or PR title and body
         required: false
@@ -57,7 +62,7 @@ jobs:
         uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8
         with:
           repository: thorgas/pi-action
-          ref: 33c6929254eba9975466a503577426032e1e3f74
+          ref: 1d33732c3cbf593fbaa94a0e54cb68e244b46c1d
           token: ${{ secrets.PI_ACTION_HARNESS_READ_TOKEN }}
           path: pi-action-harness
           persist-credentials: false
@@ -107,6 +112,7 @@ jobs:
       PI_ACTION_JOB_TIMEOUT_MINUTES: ${{ needs.runner-environment.outputs.job-timeout-minutes }}
       PI_ACTION_CLEANUP_RESERVE_MS: ${{ needs.runner-environment.outputs.cleanup-reserve-ms }}
       PI_ACTION_RUNNER_ENVIRONMENT_HASH: ${{ needs.runner-environment.outputs.configuration-hash }}
+      PI_ACTION_BROWSER_PROOF: ${{ github.event_name == 'workflow_dispatch' && inputs.browserProof == true && github.actor == github.repository_owner }}
       PI_ACTION_MODEL_PROVIDER: ${{ vars.PI_ACTION_MODEL_PROVIDER || 'ollama' }}
       PI_ACTION_MODEL_ID: ${{ vars.PI_ACTION_MODEL_ID }}
       PI_ACTION_MODEL_BASE_URL: ${{ vars.PI_ACTION_MODEL_BASE_URL }}
@@ -132,7 +138,7 @@ jobs:
         uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8
         with:
           repository: thorgas/pi-action
-          ref: 33c6929254eba9975466a503577426032e1e3f74
+          ref: 1d33732c3cbf593fbaa94a0e54cb68e244b46c1d
           token: ${{ secrets.PI_ACTION_HARNESS_READ_TOKEN }}
           path: pi-action-harness
           persist-credentials: false
@@ -352,6 +358,19 @@ jobs:
           if [ -n "${GITHUB_STEP_SUMMARY:-}" ]; then
             printf '%s\n' 'pi-action bootstrap did not produce a trusted session receipt; outcome and cleanup remain unknown.' >> "$GITHUB_STEP_SUMMARY"
           fi
+      - name: Upload candidate-bound browser proof
+        if: ${{ always() && !env.ACT && github.event_name == 'workflow_dispatch' && inputs.browserProof == true && github.actor == github.repository_owner }}
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: pi-action-candidate-browser-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            ${{ github.workspace }}/pi-action-harness/.local/provider-online-test/browser-e2e-candidate/*/viewer-proof.json
+            ${{ github.workspace }}/pi-action-harness/.local/provider-online-test/browser-e2e-candidate/*/results/**/screenshots/*-authenticated-live-frame.png
+            ${{ github.workspace }}/pi-action-harness/.local/provider-online-test/browser-e2e-candidate/*/results/**/screenshots/*-acknowledged-tap.png
+            ${{ github.workspace }}/pi-action-harness/.local/provider-online-test/browser-e2e-candidate/*/results/**/screenshots/*-released-to-agent.png
+          if-no-files-found: error
+          include-hidden-files: true
+          retention-days: ${{ fromJSON(needs.runner-environment.outputs.artifact-retention-days) }}
       - name: Upload only the sanitized hosted receipt
         if: ${{ always() && !env.ACT }}
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
