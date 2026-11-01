@@ -1,5 +1,11 @@
 name: pi-action cached iOS viewer proof
-on: workflow_dispatch
+on:
+  workflow_dispatch:
+    inputs:
+      browser_proof:
+        description: Run the deterministic authenticated headless browser proof
+        type: boolean
+        default: true
 permissions: {}
 concurrency:
   group: pi-action-${{ github.repository }}
@@ -19,7 +25,7 @@ jobs:
       - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8
         with:
           repository: thorgas/pi-action
-          ref: cc1acbf41651e3bb1e746b42355f031c405d38ea
+          ref: 0d34ac2f7fefe5936814e30fd77d9e328a0538c7
           token: ${{ secrets.PI_ACTION_HARNESS_READ_TOKEN }}
           persist-credentials: false
           path: pi-action-harness
@@ -45,11 +51,33 @@ jobs:
       - name: Verify restored cache and hold authenticated coding preview
         env:
           NODE_NO_WARNINGS: "1"
+          BROWSER_PROOF: ${{ inputs.browser_proof }}
+          REVIEWED_RUNNER_ENVIRONMENT_JSON: ${{ vars.PI_ACTION_RUNNER_ENVIRONMENT_JSON || '{}' }}
           VIEWER_SECRET: ${{ secrets.PI_ACTION_VIEWER_SECRET }}
           REVIEWED_PROFILE_JSON: ${{ vars.PI_ACTION_PROFILE_JSON }}
         run: |
           set -euo pipefail
           umask 077
+          developer_directory="$(node --input-type=module <<'NODE'
+          import { writeFileSync } from 'node:fs';
+          import { join } from 'node:path';
+          import { preflightRunnerToolchain, RunnerToolchainError } from './tooling/runner-toolchain.mjs';
+          const path = join(process.env.RUNNER_TEMP, 'native-toolchain-receipt.json');
+          try {
+            const reviewed = process.env.REVIEWED_RUNNER_ENVIRONMENT_JSON ?? '{}';
+            if (Buffer.byteLength(reviewed) > 16384) throw new Error();
+            const { environment, ...receipt } = await preflightRunnerToolchain(JSON.parse(reviewed));
+            writeFileSync(path, JSON.stringify(receipt), { mode: 0o600, flag: 'wx' });
+            process.stdout.write(environment.DEVELOPER_DIR);
+          } catch (error) {
+            const failure = error instanceof RunnerToolchainError ? { code: error.code, stage: error.stage } : { code: 'invalid', stage: 'configuration' };
+            writeFileSync(path, JSON.stringify({ match: false, failure }), { mode: 0o600, flag: 'wx' });
+            process.exitCode = 1;
+          }
+          NODE
+          )"
+          export DEVELOPER_DIR="$developer_directory"
+          unset REVIEWED_RUNNER_ENVIRONMENT_JSON
           trap 'rm -f "$RUNNER_TEMP/viewer-secret"' EXIT
           test -n "$VIEWER_SECRET"
           printf '%s' "$VIEWER_SECRET" > "$RUNNER_TEMP/viewer-secret"
@@ -76,8 +104,8 @@ jobs:
           node tooling/github-actions/native-metro-probe.mjs --create-scope "$manifest_scope_file" aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa "$app_source" http://127.0.0.1:8081
           manifest_scope="$(cat "$manifest_scope_file")"
           cd "$app_source"
-          env -i PATH="$PATH" HOME="$app_home" TMPDIR="$app_tmp" LANG=en_US.UTF-8 CI=1 pnpm_config_verify_deps_before_run=warn EAS_BUILD_GIT_COMMIT_HASH="$source_commit" EXPO_UPDATES_FINGERPRINT_OVERRIDE=0000000000000000000000000000000000000000 EXPO_PUBLIC_E2E=true EXPO_NO_DOTENV=1 EXPO_NO_TELEMETRY=1 MOBILE_UPDATE_CHANNEL=none pnpm i18n:all > "$RUNNER_TEMP/native-app-i18n.log" 2>&1
-          env -i PATH="$PATH" HOME="$app_home" TMPDIR="$app_tmp" LANG=en_US.UTF-8 CI=1 pnpm_config_verify_deps_before_run=warn EAS_BUILD_GIT_COMMIT_HASH="$source_commit" EXPO_UPDATES_FINGERPRINT_OVERRIDE=0000000000000000000000000000000000000000 EXPO_PUBLIC_E2E=true EXPO_NO_DOTENV=1 EXPO_NO_TELEMETRY=1 MOBILE_UPDATE_CHANNEL=none PI_ACTION_METRO_DIAGNOSTICS_FILE="$RUNNER_TEMP/metro-requests.jsonl" PI_ACTION_METRO_MANIFEST_CACHE_FILE="$manifest_cache" PI_ACTION_METRO_MANIFEST_SCOPE="$manifest_scope" "$trusted_node" --dns-result-order=ipv4first --require "$GITHUB_WORKSPACE/pi-action-harness/tooling/github-actions/metro-request-diagnostics.cjs" node_modules/expo/bin/cli start --dev-client --localhost --port 8081 > "$RUNNER_TEMP/native-app-metro.log" 2>&1 &
+          env -i PATH="$PATH" DEVELOPER_DIR="$DEVELOPER_DIR" HOME="$app_home" TMPDIR="$app_tmp" LANG=en_US.UTF-8 CI=1 pnpm_config_verify_deps_before_run=warn EAS_BUILD_GIT_COMMIT_HASH="$source_commit" EXPO_UPDATES_FINGERPRINT_OVERRIDE=0000000000000000000000000000000000000000 EXPO_PUBLIC_E2E=true EXPO_NO_DOTENV=1 EXPO_NO_TELEMETRY=1 MOBILE_UPDATE_CHANNEL=none pnpm i18n:all > "$RUNNER_TEMP/native-app-i18n.log" 2>&1
+          env -i PATH="$PATH" DEVELOPER_DIR="$DEVELOPER_DIR" HOME="$app_home" TMPDIR="$app_tmp" LANG=en_US.UTF-8 CI=1 pnpm_config_verify_deps_before_run=warn EAS_BUILD_GIT_COMMIT_HASH="$source_commit" EXPO_UPDATES_FINGERPRINT_OVERRIDE=0000000000000000000000000000000000000000 EXPO_PUBLIC_E2E=true EXPO_NO_DOTENV=1 EXPO_NO_TELEMETRY=1 MOBILE_UPDATE_CHANNEL=none PI_ACTION_METRO_DIAGNOSTICS_FILE="$RUNNER_TEMP/metro-requests.jsonl" PI_ACTION_METRO_MANIFEST_CACHE_FILE="$manifest_cache" PI_ACTION_METRO_MANIFEST_SCOPE="$manifest_scope" "$trusted_node" --dns-result-order=ipv4first --require "$GITHUB_WORKSPACE/pi-action-harness/tooling/github-actions/metro-request-diagnostics.cjs" node_modules/expo/bin/cli start --dev-client --localhost --port 8081 > "$RUNNER_TEMP/native-app-metro.log" 2>&1 &
           metro_pid=$!
           device=""
           cleanup() {
@@ -122,14 +150,21 @@ jobs:
           printf '%s  %s\n' 587c2cfb1c230fe36c7fa7727da78be459dae028cabe8c001291999350f07095 "$RUNNER_TEMP/viewer-tools/cloudflared.tgz" | shasum -a 256 --check --status
           tar -xzf "$RUNNER_TEMP/viewer-tools/cloudflared.tgz" -C "$RUNNER_TEMP/viewer-tools"
           app_pid="$(awk -F ": " '{print $2}' "$RUNNER_TEMP/app-launch.txt")"
-          node tooling/github-actions/viewer-cache-probe.mjs "$RUNNER_TEMP/viewer-proof" "$RUNNER_TEMP/pi-action-native-cache" "$RUNNER_TEMP/viewer-profile.json" "$device" "$RUNNER_TEMP/viewer-secret" "$RUNNER_TEMP/viewer-tools/cloudflared"
+          browser_mode=()
+          if test "$BROWSER_PROOF" = true; then browser_mode=(--browser-proof); fi
+          node tooling/github-actions/viewer-cache-probe.mjs "$RUNNER_TEMP/viewer-proof" "$RUNNER_TEMP/pi-action-native-cache" "$RUNNER_TEMP/viewer-profile.json" "$device" "$RUNNER_TEMP/viewer-secret" "$RUNNER_TEMP/viewer-tools/cloudflared" "${browser_mode[@]}"
       - name: Upload receipts and actual app screenshots
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
           name: viewer-cache-proof-${{ github.run_id }}
           path: |
+            ${{ runner.temp }}/native-toolchain-receipt.json
             ${{ runner.temp }}/viewer-proof/receipt.json
+            ${{ github.workspace }}/pi-action-harness/.local/provider-online-test/browser-e2e-hosted/viewer-proof.json
+            ${{ github.workspace }}/pi-action-harness/.local/provider-online-test/browser-e2e-hosted/results/**/screenshots/*-authenticated-live-frame.png
+            ${{ github.workspace }}/pi-action-harness/.local/provider-online-test/browser-e2e-hosted/results/**/screenshots/*-acknowledged-tap.png
+            ${{ github.workspace }}/pi-action-harness/.local/provider-online-test/browser-e2e-hosted/results/**/screenshots/*-released-to-agent.png
             ${{ runner.temp }}/native-metro-client-receipt.json
             ${{ runner.temp }}/metro-requests.jsonl
             ${{ runner.temp }}/native-metro-receipt.json
