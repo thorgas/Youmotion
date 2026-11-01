@@ -57,7 +57,7 @@ jobs:
         uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8
         with:
           repository: thorgas/pi-action
-          ref: 1de07a08fbe60817cee6735bf5a70a59d5ee40d0
+          ref: 0d34ac2f7fefe5936814e30fd77d9e328a0538c7
           token: ${{ secrets.PI_ACTION_HARNESS_READ_TOKEN }}
           path: pi-action-harness
           persist-credentials: false
@@ -132,7 +132,7 @@ jobs:
         uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8
         with:
           repository: thorgas/pi-action
-          ref: 1de07a08fbe60817cee6735bf5a70a59d5ee40d0
+          ref: 0d34ac2f7fefe5936814e30fd77d9e328a0538c7
           token: ${{ secrets.PI_ACTION_HARNESS_READ_TOKEN }}
           path: pi-action-harness
           persist-credentials: false
@@ -306,13 +306,14 @@ jobs:
       - name: Run the shared session with scoped artifact runtime authority
         if: ${{ !env.ACT }}
         uses: ./pi-action-harness/tooling/github-actions/session-action
-      - name: Remove the temporary model credential
+      - name: Dispose temporary runtime credential files
         if: ${{ always() && !env.ACT }}
         working-directory: ${{ runner.temp }}
         run: |
           set -euo pipefail
-          if [ -n "${PI_ACTION_RUN_ROOT:-}" ] && [ -d "$PI_ACTION_RUN_ROOT" ]; then
-            rm -f -- "$PI_ACTION_RUN_ROOT/model-api-key.txt"
+          harness="$GITHUB_WORKSPACE/pi-action-harness"
+          if [ -n "${PI_ACTION_RUN_ROOT:-}" ] && [ -d "$PI_ACTION_RUN_ROOT" ] && [ -f "$harness/tooling/github-actions/runtime-credentials.mjs" ]; then
+            node "$harness/tooling/github-actions/runtime-credentials.mjs" "$PI_ACTION_RUN_ROOT"
           fi
       - name: Export verified native baseline for cache
         id: native-cache-export
@@ -356,7 +357,9 @@ jobs:
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
           name: pi-action-session-result-${{ github.run_id }}-${{ github.run_attempt }}
-          path: ${{ env.PI_ACTION_RUN_ROOT }}/hosted-receipt.json
+          path: |
+            ${{ env.PI_ACTION_RUN_ROOT }}/hosted-receipt.json
+            ${{ env.PI_ACTION_RUN_ROOT }}/credential-files-cleanup.json
           if-no-files-found: error
           include-hidden-files: false
           retention-days: ${{ fromJSON(needs.runner-environment.outputs.artifact-retention-days) }}
