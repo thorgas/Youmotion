@@ -1,0 +1,64 @@
+name: pi-action native candidate replay
+on: workflow_dispatch
+permissions: {}
+concurrency:
+  group: pi-action-${{ github.repository }}
+  cancel-in-progress: false
+jobs:
+  compare:
+    if: github.repository == 'thorgas/Youmotion' && github.event.repository.private == false && github.actor == github.repository_owner && github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
+    runs-on: macos-26
+    timeout-minutes: 30
+    permissions:
+      contents: read
+      issues: read
+      pull-requests: read
+    defaults:
+      run:
+        shell: bash
+        working-directory: ${{ github.workspace }}/pi-action-harness
+    steps:
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8
+        with:
+          repository: thorgas/pi-action
+          ref: 50c2542915b2eecb4f10cda3df49b821336411c5
+          token: ${{ secrets.PI_ACTION_HARNESS_READ_TOKEN }}
+          persist-credentials: false
+          path: pi-action-harness
+      - name: Checkout the original accepted source revision read-only
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8
+        with:
+          ref: 7809b5709d2585cab1098c3b5b208cb5c1f51ad7
+          persist-credentials: false
+          path: native-replay-source
+      - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444
+        with:
+          node-version: 24.21.0
+          architecture: arm64
+      - uses: pnpm/action-setup@a7487c7e89a18df4991f7f222e4898a00d66ddda
+        with:
+          version: 11.21.0
+          run_install: false
+      - run: pnpm install --frozen-lockfile --ignore-scripts --no-optimistic-repeat-install
+      - uses: actions/cache/restore@0400d5f644dc74513175e3cd8d07132dd4860809
+        with:
+          path: ${{ runner.temp }}/pi-action-native-cache
+          key: ${{ vars.PI_ACTION_NATIVE_CACHE_KEY }}
+          fail-on-cache-miss: true
+      - name: Replay issue candidate with zero model calls
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          REVIEWED_PROFILE_JSON: ${{ vars.PI_ACTION_PROFILE_JSON }}
+          REVIEWED_RUNNER_ENVIRONMENT_JSON: ${{ vars.PI_ACTION_RUNNER_ENVIRONMENT_JSON || '{}' }}
+          NODE_NO_WARNINGS: '1'
+        run: node tooling/github-actions/native-candidate-replay-probe.mjs
+      - name: Upload finite diagnostic
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: native-candidate-replay-${{ github.run_id }}
+          path: |
+            ${{ runner.temp }}/cache-comparison/receipt.json
+            ${{ runner.temp }}/cache-comparison/native-candidate-replay.json
+          retention-days: 1
+          if-no-files-found: error
