@@ -21,7 +21,7 @@ jobs:
       - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8
         with:
           repository: thorgas/pi-action
-          ref: 831d0a1b753c9855d32cf1c23332f13da53723f4
+          ref: e184d3743ee0a3ba316b8c512ff16f0402e59f33
           token: ${{ secrets.PI_ACTION_HARNESS_READ_TOKEN }}
           persist-credentials: false
           path: pi-action-harness
@@ -51,7 +51,9 @@ jobs:
           REVIEWED_PROFILE_JSON: ${{ vars.PI_ACTION_PROFILE_JSON }}
           REVIEWED_RUNNER_ENVIRONMENT_JSON: ${{ vars.PI_ACTION_RUNNER_ENVIRONMENT_JSON || '{}' }}
           NODE_NO_WARNINGS: '1'
-        run: node tooling/github-actions/native-candidate-replay-probe.mjs
+        run: |
+          umask 077
+          node tooling/github-actions/native-candidate-replay-probe.mjs
       - name: Upload finite diagnostic
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
