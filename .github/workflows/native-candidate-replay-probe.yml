@@ -21,7 +21,7 @@ jobs:
       - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8
         with:
           repository: thorgas/pi-action
-          ref: cba2c88169711f36334d0ca6c6d27b5d585c250e
+          ref: 831d0a1b753c9855d32cf1c23332f13da53723f4
           token: ${{ secrets.PI_ACTION_HARNESS_READ_TOKEN }}
           persist-credentials: false
           path: pi-action-harness
@@ -45,7 +45,7 @@ jobs:
           path: ${{ runner.temp }}/pi-action-native-cache
           key: ${{ vars.PI_ACTION_NATIVE_CACHE_KEY }}
           fail-on-cache-miss: true
-      - name: Replay issue candidate with zero model calls
+      - name: Replay candidate launch and SDK preparation with zero model calls
         env:
           GITHUB_TOKEN: ${{ github.token }}
           REVIEWED_PROFILE_JSON: ${{ vars.PI_ACTION_PROFILE_JSON }}
