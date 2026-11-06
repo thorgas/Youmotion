@@ -43,7 +43,7 @@ jobs:
           sample() { set +e +o pipefail; while true; do printf '%s\t%s\t%s\t%s\n' "$(date +%s)" "$(sysctl -n vm.loadavg | tr -d '{}' | xargs)" "$(memory_pressure -Q 2>/dev/null | awk -F': ' '/free percentage/{print $2}')" "$(ps -Aceo pcpu=,comm= -r | head -5 | awk '{printf "%s:%s;",$2,$1}')" >> "$PROBE_DIR/samples.tsv"; sleep 2; done; }
           sample & SAMPLER=$!
           trap 'kill $SAMPLER 2>/dev/null || true' EXIT
-          { sysctl -n machdep.cpu.brand_string hw.ncpu hw.memsize; sw_vers -productVersion; xcodebuild -version | head -1; } > "$PROBE_DIR/host.txt"
+          { sysctl -n machdep.cpu.brand_string hw.ncpu hw.memsize; sw_vers -productVersion; xcodebuild -version | sed -n 1p; } > "$PROBE_DIR/host.txt"
           cd target
           for i in 1 2 3; do timed git-hash-object-all bash -c 'git ls-files -z | xargs -0 git hash-object >/dev/null'; done
           cd ..
