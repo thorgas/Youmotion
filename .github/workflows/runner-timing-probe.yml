@@ -1,0 +1,80 @@
+name: pi-action runner timing probe
+on:
+  workflow_dispatch:
+    inputs:
+      observations:
+        description: Number of 1s-spaced simulator launchctl observations
+        required: false
+        default: '120'
+        type: string
+permissions: {}
+concurrency:
+  group: pi-action-runner-timing-probe-${{ github.repository }}
+  cancel-in-progress: false
+jobs:
+  timing:
+    if: >-
+      github.repository == 'thorgas/Youmotion' &&
+      github.actor == github.repository_owner &&
+      github.event.repository.visibility == 'public' &&
+      github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
+    runs-on: macos-26
+    timeout-minutes: 45
+    permissions:
+      contents: read
+    env:
+      PROBE_DIR: ${{ runner.temp }}/pi-runner-timing
+      OBSERVATIONS: ${{ inputs.observations }}
+    steps:
+      - name: Checkout target source without credentials
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8
+        with:
+          path: target
+          persist-credentials: false
+      - name: Measure host, git and simulator command latency under background sampling
+        shell: bash
+        run: |
+          set -euo pipefail
+          umask 077
+          mkdir -p "$PROBE_DIR"
+          [[ "$OBSERVATIONS" =~ ^[0-9]{1,3}$ ]] || exit 64
+          export DEVELOPER_DIR=/Applications/Xcode_26.6.app/Contents/Developer
+          timed() { local label=$1; shift; local start end code=0; start=$(perl -MTime::HiRes=time -e 'printf "%.3f", time'); perl -e 'alarm 60; exec @ARGV' "$@" >/dev/null 2>&1 || code=$?; end=$(perl -MTime::HiRes=time -e 'printf "%.3f", time'); printf '%s\t%s\t%s\t%s\n' "$label" "$start" "$end" "$code" >> "$PROBE_DIR/commands.tsv"; }
+          sample() { set +e +o pipefail; while true; do printf '%s\t%s\t%s\t%s\n' "$(date +%s)" "$(sysctl -n vm.loadavg | tr -d '{}' | xargs)" "$(memory_pressure -Q 2>/dev/null | awk -F': ' '/free percentage/{print $2}')" "$(ps -Aceo pcpu=,comm= -r | head -5 | awk '{printf "%s:%s;",$2,$1}')" >> "$PROBE_DIR/samples.tsv"; sleep 2; done; }
+          sample & SAMPLER=$!
+          trap 'kill $SAMPLER 2>/dev/null || true' EXIT
+          { sysctl -n machdep.cpu.brand_string hw.ncpu hw.memsize; sw_vers -productVersion; xcodebuild -version | head -1; } > "$PROBE_DIR/host.txt"
+          cd target
+          for i in 1 2 3; do timed git-hash-object-all bash -c 'git ls-files -z | xargs -0 git hash-object >/dev/null'; done
+          cd ..
+          for i in 1 2 3 4 5; do timed simctl-list xcrun simctl list devices -j; done
+          RUNTIME=$(xcrun simctl list runtimes -j | python3 -c 'import json,sys;r=[x for x in json.load(sys.stdin)["runtimes"] if x["platform"]=="iOS" and x["isAvailable"]];print(r[-1]["identifier"])')
+          UDID=$(xcrun simctl create pi-timing-probe com.apple.CoreSimulator.SimDeviceType.iPhone-16 "$RUNTIME")
+          echo "$RUNTIME" >> "$PROBE_DIR/host.txt"
+          timed simctl-boot xcrun simctl boot "$UDID"
+          timed simctl-bootstatus xcrun simctl bootstatus "$UDID" -b
+          for ((i=0; i<OBSERVATIONS; i++)); do timed simctl-spawn-launchctl-list xcrun simctl spawn "$UDID" launchctl list; sleep 1; done
+          for i in 1 2 3; do timed simctl-launch-safari xcrun simctl launch "$UDID" com.apple.mobilesafari; timed simctl-terminate-safari xcrun simctl terminate "$UDID" com.apple.mobilesafari; done
+          timed simctl-shutdown xcrun simctl shutdown "$UDID"
+          xcrun simctl delete "$UDID" || true
+          kill $SAMPLER || true
+          python3 - "$PROBE_DIR" <<'PY'
+          import json,sys,statistics,pathlib
+          d=pathlib.Path(sys.argv[1]);rows=[l.split('\t') for l in (d/'commands.tsv').read_text().splitlines()]
+          out={}
+          for label in dict.fromkeys(r[0] for r in rows):
+              ms=sorted((float(r[2])-float(r[1]))*1000 for r in rows if r[0]==label);codes=[int(r[3]) for r in rows if r[0]==label]
+              out[label]={"count":len(ms),"p50Ms":round(statistics.median(ms)),"p95Ms":round(ms[min(len(ms)-1,int(len(ms)*0.95))]),"maxMs":round(ms[-1]),"over10s":sum(m>10000 for m in ms),"over30s":sum(m>30000 for m in ms),"failed":sum(c!=0 for c in codes)}
+          samples=[l.split('\t') for l in (d/'samples.tsv').read_text().splitlines()]
+          load=[float(s[1].split()[0]) for s in samples if s[1]]
+          summary={"host":(d/'host.txt').read_text().split('\n'),"commands":out,"load1":{"max":max(load),"p50":statistics.median(load)},"topCpuAtMaxLoad":samples[load.index(max(load))][3]}
+          (d/'summary.json').write_text(json.dumps(summary,indent=1));print(json.dumps(summary,indent=1))
+          PY
+      - name: Upload timing samples
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: pi-runner-timing-${{ github.run_id }}
+          path: ${{ runner.temp }}/pi-runner-timing
+          retention-days: 3
+          if-no-files-found: error
