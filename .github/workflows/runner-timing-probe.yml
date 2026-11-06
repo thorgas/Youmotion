@@ -23,7 +23,6 @@ jobs:
     permissions:
       contents: read
     env:
-      PROBE_DIR: ${{ runner.temp }}/pi-runner-timing
       OBSERVATIONS: ${{ inputs.observations }}
     steps:
       - name: Checkout target source without credentials
@@ -36,6 +35,7 @@ jobs:
         run: |
           set -euo pipefail
           umask 077
+          PROBE_DIR="$RUNNER_TEMP/pi-runner-timing"
           mkdir -p "$PROBE_DIR"
           [[ "$OBSERVATIONS" =~ ^[0-9]{1,3}$ ]] || exit 64
           export DEVELOPER_DIR=/Applications/Xcode_26.6.app/Contents/Developer
