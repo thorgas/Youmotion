@@ -62,7 +62,7 @@ jobs:
         uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8
         with:
           repository: thorgas/pi-action
-          ref: e1c2410bd6cbf3f67202944b44e8143ef895d236
+          ref: 97505b94d6cf6b61ad5c251214e4a2947d52be82
           token: ${{ secrets.PI_ACTION_HARNESS_READ_TOKEN }}
           path: pi-action-harness
           persist-credentials: false
@@ -138,7 +138,7 @@ jobs:
         uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8
         with:
           repository: thorgas/pi-action
-          ref: e1c2410bd6cbf3f67202944b44e8143ef895d236
+          ref: 97505b94d6cf6b61ad5c251214e4a2947d52be82
           token: ${{ secrets.PI_ACTION_HARNESS_READ_TOKEN }}
           path: pi-action-harness
           persist-credentials: false
